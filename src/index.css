@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: "Poppins", ui-sans-serif, system-ui, sans-serif;
+
+  --color-background: #e4f8e7;
+  --color-foreground: #152c1e;
+  --color-card: #ffffff;
+  --color-card-foreground: #152c1e;
+  --color-primary: #e66d24;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #ceefd3;
+  --color-secondary-foreground: #173523;
+  --color-muted: #dbeede;
+  --color-muted-foreground: #4c6554;
+  --color-accent: #267b4c;
+  --color-accent-foreground: #ffffff;
+  --color-destructive: #e40014;
+  --color-border: #c3dcc7;
+  --color-input: #c3dcc7;
+  --color-ring: #e66d24;
+  --color-section-light: #dcf7e1;
+  --color-section-light-foreground: #152c1e;
+  --color-section-dark: #17482d;
+  --color-section-dark-foreground: #ecf9ee;
+  --color-section-dark-muted: #b3ccb7;
+  --color-whatsapp: #00c565;
+  --color-whatsapp-foreground: #ffffff;
+
+  --radius: 0.625rem;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
