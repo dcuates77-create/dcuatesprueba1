@@ -357,11 +357,11 @@ function Hero() {
           </div>
         </div>
         <div className="order-1 lg:order-2">
-          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl shadow-lg lg:aspect-[3/4]">
+          <div className="relative w-full overflow-hidden rounded-3xl shadow-lg">
             <img
               src="/images/hero-comunidad.png"
               alt="Comunidad latina reunida: negocio local, préstamo de libros en bici y rescate de una mascota"
-              className="h-full w-full object-cover"
+              className="block h-auto max-h-[70vh] w-full object-contain"
             />
           </div>
         </div>
@@ -901,7 +901,7 @@ function PrivacyModal({ open, onClose }) {
 
   return (
     <div
-      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
@@ -1012,7 +1012,7 @@ function WhatsAppButton() {
       href={waUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className="group fixed bottom-5 right-5 z-50 flex items-center gap-3"
+      className="group fixed bottom-24 right-5 z-50 flex items-center gap-3"
       aria-label="Atención personal y dudas por WhatsApp"
     >
       <span className="hidden rounded-full bg-whatsapp px-5 py-3 text-lg font-bold text-white shadow-lg sm:block">
