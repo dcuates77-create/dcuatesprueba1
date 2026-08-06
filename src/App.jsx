@@ -357,11 +357,11 @@ function Hero() {
           </div>
         </div>
         <div className="order-1 lg:order-2">
-          <div className="relative w-full overflow-hidden rounded-3xl shadow-lg">
+          <div className="relative w-full overflow-hidden rounded-3xl shadow-lg" style={{ minHeight: "200px" }}>
             <img
               src="/images/hero-comunidad.png"
               alt="Comunidad latina reunida: negocio local, préstamo de libros en bici y rescate de una mascota"
-              className="block h-auto max-h-[70vh] w-full object-contain"
+              style={{ width: "100%", height: "auto", display: "block", objectFit: "cover" }}
             />
           </div>
         </div>
@@ -987,14 +987,14 @@ function Footer({ onOpenPrivacy }) {
             </a>
           ))}
         </div>
-        <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-base font-medium text-section-dark-muted">
+        <nav className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 px-2 text-base font-medium text-section-dark-muted">
           <a href="#proyectos" className="transition-colors hover:text-section-dark-foreground">Proyectos</a>
           <a href="#publicidad" className="transition-colors hover:text-section-dark-foreground">Publicidad</a>
           <a href="#donaciones" className="transition-colors hover:text-section-dark-foreground">Donaciones</a>
           <button
             type="button"
             onClick={onOpenPrivacy}
-            className="transition-colors hover:text-section-dark-foreground"
+            className="cursor-pointer underline underline-offset-4 transition-colors hover:text-section-dark-foreground"
           >
             Aviso de Privacidad
           </button>
@@ -1012,7 +1012,7 @@ function WhatsAppButton() {
       href={waUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className="group fixed bottom-24 right-5 z-50 flex items-center gap-3"
+      className="group fixed bottom-6 left-5 z-[9999] flex items-center gap-3"
       aria-label="Atención personal y dudas por WhatsApp"
     >
       <span className="hidden rounded-full bg-whatsapp px-5 py-3 text-lg font-bold text-white shadow-lg sm:block">
