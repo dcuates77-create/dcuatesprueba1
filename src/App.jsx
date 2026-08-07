@@ -29,7 +29,7 @@ const PROJECTS = [
   {
     id: "bibliobici",
     tag: "Educación y desarrollo",
-    title: "La Bibliobici y Amigos",
+    title: "LA BIBLIOBICI Y AMIGOS",
     icon: "book",
     desc: "Préstamo gratuito de libros y materiales educativos para el desarrollo personal y social. La lectura que llega hasta tu colonia.",
     points: ["Préstamo sin costo", "Materiales para todas la edades", "Fomento a la lectura"],
