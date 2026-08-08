@@ -328,6 +328,8 @@ function Hero() {
   return (
     <section id="inicio" className="bg-background">
       <div className="mx-auto grid max-w-6xl items-center gap-8 px-4 py-10 md:px-6 md:py-16 lg:grid-cols-2 lg:gap-12 lg:py-20">
+        
+        {/* Columna Texto (Izquierda) */}
         <div className="order-2 flex flex-col items-start gap-5 lg:order-1">
           <span className="inline-flex items-center gap-2 rounded-full bg-accent/10 px-4 py-1.5 text-base font-medium text-accent">
             <Icon name="heartHandshake" className="h-5 w-5" />
@@ -355,18 +357,21 @@ function Hero() {
               Conocer los proyectos
             </a>
           </div>
-                  <div className="order-1 lg:order-2">
-            <div className="relative w-full overflow-hidden rounded-3xl shadow-lg">
-              <img
-                src="images/hero-comunidad.png"
-                className="w-full h-auto block object-contain mx-auto"
-                alt="Comunidad latina reunida: negocio local, préstamo de libros en bici y rescate de una mascota"
-              />
-            </div>
+        </div>
+
+        {/* Columna Imagen Corregida (Derecha) */}
+        <div className="order-1 lg:order-2 w-full">
+          <div className="relative w-full max-w-[550px] mx-auto overflow-hidden rounded-3xl shadow-lg">
+            <img
+              src="images/hero-comunidad.png"
+              className="w-full h-auto block object-contain mx-auto"
+              alt="Comunidad latina reunida: negocio local, préstamo de libros en bici y rescate de una mascota"
+            />
           </div>
         </div>
+
       </div>
-      </section>
+    </section>
   );
 }
 
