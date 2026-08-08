@@ -355,16 +355,17 @@ function Hero() {
               Conocer los proyectos
             </a>
           </div>
-        </div>                  <div className="order-1 lg:order-2">
+                  <div className="order-1 lg:order-2">
             <div className="relative w-full overflow-hidden rounded-3xl shadow-lg">
               <img
                 src="images/hero-comunidad.png"
-                className="w-full h-auto block object-contain"
+                className="w-full h-auto block object-contain mx-auto"
                 alt="Comunidad latina reunida: negocio local, préstamo de libros en bici y rescate de una mascota"
               />
             </div>
           </div>
         </div>
+      </div>
       </section>
   );
 }
