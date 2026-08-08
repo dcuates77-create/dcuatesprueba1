@@ -357,11 +357,11 @@ function Hero() {
           </div>
         </div>
         <div className="order-1 lg:order-2">
-          <div className="relative w-full overflow-hidden rounded-3xl shadow-lg" style={{ minHeight: "200px" }}>
+          <div className="relative w-full overflow-hidden rounded-3xl shadow-lg" style={{ minHeight: "400px" }}>
             <img
               src="images/hero-comunidad.png"
               alt="Comunidad latina reunida: negocio local, préstamo de libros en bici y rescate de una mascota"
-              style={{ width: "100%", height: "auto", display: "block", objectFit: "cover" }}
+              style={{ width: "100%", height: "auto", display: "block", objectFit: "contein" }}
             />
           </div>
         </div>
