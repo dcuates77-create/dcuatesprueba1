@@ -29,7 +29,7 @@ const PROJECTS = [
   {
     id: "bibliobici",
     tag: "Educación y desarrollo",
-    title: "La Bibliobici y Amigos",
+    title: "LA BIBLIOBICI Y AMIGOS",
     icon: "book",
     desc: "Préstamo gratuito de libros y materiales educativos para el desarrollo personal y social. La lectura que llega hasta tu colonia.",
     points: ["Préstamo sin costo", "Materiales para todas la edades", "Fomento a la lectura"],
@@ -355,18 +355,17 @@ function Hero() {
               Conocer los proyectos
             </a>
           </div>
-        </div>
-        <div className="order-1 lg:order-2">
-          <div className="relative w-full overflow-hidden rounded-3xl shadow-lg" style={{ minHeight: "200px" }}>
-            <img
-              src="/images/hero-comunidad.png"
-              alt="Comunidad latina reunida: negocio local, préstamo de libros en bici y rescate de una mascota"
-              style={{ width: "100%", height: "auto", display: "block", objectFit: "cover" }}
-            />
+        </div>                  <div className="order-1 lg:order-2">
+            <div className="relative w-full overflow-hidden rounded-3xl shadow-lg">
+              <img
+                src="images/hero-comunidad.png"
+                className="w-full h-auto block object-contain"
+                alt="Comunidad latina reunida: negocio local, préstamo de libros en bici y rescate de una mascota"
+              />
+            </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
   );
 }
 
