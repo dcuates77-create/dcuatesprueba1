@@ -42,3 +42,17 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+/* Solución definitiva para liberar la imagen de portada */
+img[src*="hero-comunidad.png"] {
+  width: 100% !important;
+  height: auto !important;
+  max-height: none !important;
+  object-fit: contain !important;
+}
+
+/* Elimina cualquier restricción de altura del contenedor de esa imagen */
+.order-1.lg\:order-2, 
+.order-1.lg\:order-2 > div {
+  height: auto !important;
+  min-height: initial !important;
+}
