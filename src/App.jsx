@@ -281,18 +281,7 @@ function SiteHeader() {
                 </a>
               ))}
             </div>
-            
-            {/* Botón de WhatsApp integrado en el Header: Solo visible en PC, justo abajo de las redes */}
-            <a
-              href="https://wa.me/525520696629?text=Mas%20informacion%20por%20favor,%20GRACIAS!!!%20"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hidden lg:flex items-center gap-1.5 rounded-full bg-whatsapp/10 px-3 py-1 text-xs font-bold text-whatsapp transition-transform hover:scale-105"
-            >
-              <span className="h-2 w-2 rounded-full bg-whatsapp animate-pulse" />
-              Atención personal y dudas
-            </a>
-          </div>
+           
 
           <button
             type="button"
@@ -1027,23 +1016,24 @@ function Footer({ onOpenPrivacy }) {
 }
 
 function WhatsAppButton() {
-  const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`;
+  const waUrl = `https://wa.me/525520696627?text=Quiero%20registrar%20mi%20negocio%20o%20conocer%20mas%20sobre%20los%20demas%20proyectos%20GRACIAS!!!%20`;
   return (
-        <a
+    <a
       href={waUrl}
       target="_blank"
       rel="noopener noreferrer"
-                  className="group fixed bottom-6 right-5 md:bottom-auto md:top-32 z-[9999] flex flex-row-reverse items-center gap-3"
       aria-label="Atención personal y dudas por WhatsApp"
+      className="fixed z-50 flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg bottom-4 right-4 h-14 w-14 rounded-full bg-[#25D366] text-white lg:top-[85px] lg:bottom-auto lg:right-6 lg:h-auto lg:w-auto lg:rounded-full lg:bg-whatsapp/10 lg:px-4 lg:py-2 lg:text-xs lg:font-bold lg:text-whatsapp lg:border lg:border-whatsapp/20"
     >
-      <span className="hidden rounded-full bg-whatsapp px-5 py-3 text-lg font-bold text-white shadow-lg sm:block">
-        Atención personal y dudas
-      </span>
-      <span className="flex h-16 w-16 items-center justify-center rounded-full bg-whatsapp text-white shadow-lg transition-transform group-hover:scale-105">
-        <svg viewBox="0 0 24 24" fill="currentColor" className="h-9 w-9" aria-hidden="true">
-          <path d="M17.5 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48s1.06 2.88 1.21 3.08c.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.69.63.71.22 1.36.19 1.87.12.57-.09 1.76-.72 2.01-1.41.25-.7.25-1.29.17-1.42-.07-.12-.27-.2-.57-.35ZM12.05 21.5h-.01a9.4 9.4 0 0 1-4.79-1.31l-.34-.2-3.56.93.95-3.47-.22-.36a9.38 9.38 0 0 1-1.44-5A9.42 9.42 0 0 1 18.7 5.35a9.35 9.35 0 0 1 2.76 6.66 9.42 9.42 0 0 1-9.41 9.49ZM20.52 3.53A11.36 11.36 0 0 0 12.05.03 11.42 11.42 0 0 0 .64 11.43a11.37 11.37 0 0 0 1.52 5.7L.03 24l7.03-1.84a11.4 11.4 0 0 0 5 1.21h.01a11.42 11.42 0 0 0 11.4-11.4 11.34 11.34 0 0 0-2.95-8.44Z" />
+      {/* Icono exclusivo para móviles */}
+      <span className="block lg:hidden text-2xl font-normal">
+        <svg className="h-7 w-7 fill-current" viewBox="0 0 24 24">
+          <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.4.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.713-1.457L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.965C16.528 1.977 14.07 1.53 11.997 1.53c-5.442 0-9.866 4.372-9.87 9.802 0 1.686.446 3.333 1.29 4.796L2.456 21.2l5.191-1.353z" />
         </svg>
       </span>
+      {/* Estructura exclusiva para PC (Justo abajo de tus redes en el layout) */}
+      <span className="hidden lg:block h-2 w-2 rounded-full bg-whatsapp animate-pulse mr-2" />
+      <span className="hidden lg:block">Atención personal y dudas</span>
     </a>
   );
 }
