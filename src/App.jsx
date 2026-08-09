@@ -1016,24 +1016,28 @@ function Footer({ onOpenPrivacy }) {
 }
 
 function WhatsAppButton() {
-  const waUrl = `https://wa.me/525520696627?text=Quiero%20registrar%20mi%20negocio%20o%20conocer%20mas%20sobre%20los%20demas%20proyectos%20GRACIAS!!!%20`;
+  const waUrl = `https://wa.me`;
   return (
     <a
       href={waUrl}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Atención personal y dudas por WhatsApp"
-      className="fixed z-50 flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-95 shadow-xl bottom-4 right-4 h-14 w-14 rounded-full bg-[#25D366] text-white lg:absolute lg:top-[125px] lg:bottom-auto lg:right-[max(1rem,calc((100vw-1152px)/2+1rem))] lg:h-auto lg:w-auto lg:rounded-xl lg:bg-[#25D366] lg:px-6 lg:py-3.5 lg:text-sm lg:font-black lg:text-white lg:border-none"
+      className="fixed z-50 flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 shadow-2xl
+        /* MÓVIL: Flotante clásico gigante abajo a la derecha */
+        bottom-6 right-6 h-16 w-16 rounded-full bg-[#25D366] text-white
+        /* PC: Flotante XL a la derecha del contenedor centrado de la web, sin tocar contenido */
+        lg:bottom-8 lg:right-auto lg:left-1/2 lg:translate-x-[400px] lg:h-auto lg:w-auto lg:rounded-2xl lg:bg-[#25D366] lg:px-8 lg:py-4 lg:text-base lg:font-black lg:text-white lg:border-none"
     >
-      {/* Icono de WhatsApp: Más visible en PC y adaptable en celular */}
-      <span className="flex items-center justify-center text-2xl font-normal lg:mr-3">
-        <svg className="h-7 w-7 fill-current lg:h-5 lg:w-5 lg:text-white" viewBox="0 0 24 24">
+      {/* Icono de WhatsApp XL */}
+      <span className="flex items-center justify-center text-3xl font-normal lg:mr-3">
+        <svg className="h-8 w-8 fill-current lg:h-6 lg:w-6 lg:text-white" viewBox="0 0 24 24">
           <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.4.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.713-1.457L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.965C16.528 1.977 14.07 1.53 11.997 1.53c-5.442 0-9.866 4.372-9.87 9.802 0 1.686.446 3.333 1.29 4.796L2.456 21.2l5.191-1.353z" />
         </svg>
       </span>
 
-      {/* Texto complementario en PC con máxima fuerza visual */}
-      <span className="hidden lg:block tracking-wide uppercase">Atención personal y dudas</span>
+      {/* Letrero con máxima fuerza visual y legible */}
+      <span className="hidden lg:block tracking-wider uppercase font-black">Atención personal y dudas</span>
     </a>
   );
 }
