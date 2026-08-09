@@ -263,22 +263,37 @@ function SiteHeader() {
               {l.label}
             </a>
           ))}
-        </nav>
+                </nav>
         <div className="flex items-center gap-2">
-          <div className="hidden items-center gap-2 sm:flex">
-            {SOCIALS.map(({ key, label, href }) => (
-              <a
-                key={key}
-                href={href}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={label}
-                className="flex h-11 w-11 items-center justify-center rounded-lg text-foreground transition-colors hover:bg-accent hover:text-accent-foreground md:h-12 md:w-12"
-              >
-                <SocialIcon platform={key} className="h-6 w-6 md:h-7 md:w-7" />
-              </a>
-            ))}
+          {/* Contenedor de Redes Sociales: Ahora SIEMPRE visible, adaptable en móviles */}
+          <div className="flex flex-col items-end gap-1">
+            <div className="flex items-center gap-1 sm:gap-2">
+              {SOCIALS.map(({ key, label, href }) => (
+                <a
+                  key={key}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={label}
+                  className="flex h-9 w-9 items-center justify-center rounded-lg text-foreground transition-colors hover:bg-accent hover:text-accent-foreground sm:h-11 sm:w-11 md:h-12 md:w-12"
+                >
+                  <SocialIcon platform={key} className="h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7" />
+                </a>
+              ))}
+            </div>
+            
+            {/* Botón de WhatsApp integrado en el Header: Solo visible en PC, justo abajo de las redes */}
+            <a
+              href="https://wa.me/525520696629?text=Mas%20informacion%20por%20favor,%20GRACIAS!!!%20"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden lg:flex items-center gap-1.5 rounded-full bg-whatsapp/10 px-3 py-1 text-xs font-bold text-whatsapp transition-transform hover:scale-105"
+            >
+              <span className="h-2 w-2 rounded-full bg-whatsapp animate-pulse" />
+              Atención personal y dudas
+            </a>
           </div>
+
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
@@ -303,6 +318,7 @@ function SiteHeader() {
                 {l.label}
               </a>
             ))}
+            {/* Como las redes ya son visibles arriba en el celular, este bloque inferior se puede mantener limpio u oculto */}
             <div className="mt-3 flex items-center gap-3 border-t border-border/60 px-3 pt-3 sm:hidden">
               {SOCIALS.map(({ key, label, href }) => (
                 <a
