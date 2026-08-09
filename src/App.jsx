@@ -280,10 +280,10 @@ function SiteHeader() {
                   <SocialIcon platform={key} className="h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7" />
                 </a>
               ))}
-            </div>
-           
+                   </div>
+      </div>
 
-          <button
+      <button
             type="button"
             onClick={() => setOpen((v) => !v)}
             aria-label={open ? "Cerrar menú" : "Abrir menú"}
