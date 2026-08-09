@@ -1013,11 +1013,11 @@ function Footer({ onOpenPrivacy }) {
 function WhatsAppButton() {
   const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`;
   return (
-    <a
+        <a
       href={waUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className="group fixed bottom-6 left-5 z-[9999] flex items-center gap-3"
+            className="group fixed bottom-6 right-5 z-[9999] flex flex-row-reverse items-center gap-3"
       aria-label="Atención personal y dudas por WhatsApp"
     >
       <span className="hidden rounded-full bg-whatsapp px-5 py-3 text-lg font-bold text-white shadow-lg sm:block">
