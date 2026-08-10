@@ -1016,7 +1016,7 @@ function Footer({ onOpenPrivacy }) {
 }
 
 function WhatsAppButton() {
-  const waUrl = `https://wa.me`;
+  const waUrl = `https://wa.me/525520696627?text=Quiero%20registrar%20mi%20negocio%20o%20conocer%20mas%20sobre%20los%20demas%20proyectos%20GRACIAS!!!%20`;;
   return (
     <a
       href={waUrl}
