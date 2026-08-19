@@ -274,7 +274,7 @@ function SiteHeader() {
 
         {/* Sección Derecha: Redes Sociales (Desktop) y Botón Hamburguesa (Móvil) */}
         <div className="flex items-center gap-4">
-          {/* Redes Sociales fijas en Desktop */}
+                    {/* Redes Sociales fijas en Desktop */}
           <div className="hidden sm:flex items-center gap-2">
             {SOCIALS.map((soc) => (
               <a
@@ -318,24 +318,44 @@ function SiteHeader() {
             ))}
           </nav>
           
-          {/* Bloque de Redes Sociales en el pie del menú móvil flotante */}
-          <div className="mt-auto p-6 bg-secondary/30 border-t border-border/40">
-            <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3 text-center">
-              Síguenos en redes sociales
-            </p>
+                      {/* Redes Sociales en Menú Móvil (Formato Original) */}
             <div className="flex justify-center gap-4">
-              {SOCIALS.map((soc) => (
-                <a
-                  key={soc.key}
-                  href={soc.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => setOpen(false)}
-                  className="flex h-12 w-12 items-center justify-center rounded-xl border border-border bg-card text-foreground shadow-sm transition-colors hover:bg-accent"
-                >
-                  <Icon name={soc.key} className="h-6 w-6" />
-                </a>
-              ))}
+              <a
+                href={SOCIAL_LINKS.facebook}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setOpen(false)}
+                className="flex h-12 w-12 items-center justify-center rounded-xl border border-border bg-card text-foreground shadow-sm transition-colors hover:bg-accent"
+              >
+                <Icon name="facebook" className="h-6 w-6" />
+              </a>
+              <a
+                href={SOCIAL_LINKS.youtube}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setOpen(false)}
+                className="flex h-12 w-12 items-center justify-center rounded-xl border border-border bg-card text-foreground shadow-sm transition-colors hover:bg-accent"
+              >
+                <Icon name="youtube" className="h-6 w-6" />
+              </a>
+              <a
+                href={SOCIAL_LINKS.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setOpen(false)}
+                className="flex h-12 w-12 items-center justify-center rounded-xl border border-border bg-card text-foreground shadow-sm transition-colors hover:bg-accent"
+              >
+                <Icon name="instagram" className="h-6 w-6" />
+              </a>
+              <a
+                href={SOCIAL_LINKS.tiktok}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setOpen(false)}
+                className="flex h-12 w-12 items-center justify-center rounded-xl border border-border bg-card text-foreground shadow-sm transition-colors hover:bg-accent"
+              >
+                <Icon name="tiktok" className="h-6 w-6" />
+              </a>
             </div>
           </div>
         </div>
