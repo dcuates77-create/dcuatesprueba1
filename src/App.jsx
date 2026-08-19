@@ -17,21 +17,11 @@ const NAV_LINKS = [
 
 const PROJECTS = [
   {
-    id: "publicidad",
-    tag: "Proyecto principal",
-    title: "Publicidad comunitaria",
-    icon: "megaphone",
-    desc: "Difunde tu negocio, promociones y servicios de forma gratuita. Con aportación voluntaria ayudas a que la plataforma llegue a más familias.",
-    points: ["Registro gratuito", "Comparte promociones e imágenes", "Más clientes de tu zona"],
-    cta: "Publicar mi negocio",
-    href: "#publicidad",
-  },
-  {
     id: "bibliobici",
     tag: "Educación y desarrollo",
     title: "LA BIBLIOBICI Y AMIGOS",
     icon: "book",
-    desc: "Préstamo gratuito de libros y materiales educativos para el desarrollo personal y social. La lectura que llega hasta tu colonia.",
+    desc: "Préstamo gratuito de libros y materiales educativos para el desarrollo personal y social. La lectura que llega hasta tu colonia para fortalecer a la **COMUNIDAD**.",
     points: ["Préstamo sin costo", "Materiales para todas la edades", "Fomento a la lectura"],
     cta: "Quiero participar",
     href: "#alianzas",
@@ -39,9 +29,9 @@ const PROJECTS = [
   {
     id: "ecatepets",
     tag: "Bienestar animal",
-    title: "ECATEPETs",
+    title: "ECATEPETS",
     icon: "paw",
-    desc: "Apoyo en la búsqueda de mascotas extraviadas, y fomento de la adopción y el cuidado animal responsable en la comunidad.",
+    desc: "Apoyo en la búsqueda de mascotas extraviadas, y fomento de la adopción y el cuidado animal responsable en conjunto con los vecinos de **DCUATES**.",
     points: ["Difusión de extravíos", "Adopción responsable", "Cuidado y concientización"],
     cta: "Sumarme a la causa",
     href: "#alianzas",
@@ -49,28 +39,24 @@ const PROJECTS = [
   {
     id: "alianzas-card",
     tag: "Crecimiento conjunto",
-    title: "Alianzas Ganar-Ganar",
+    title: "ALIANZAS GANAR-GANAR",
     icon: "handshake",
-    desc: "Emprendedores, organizaciones y particulares que desean hacer sinergia para crecer juntos y fortalecer a la comunidad.",
+    desc: "Emprendedores, organizaciones y particulares que desean hacer sinergia para crecer juntos y robustecer el tejido social de la **COMUNIDAD**.",
     points: ["Colaboración mutua", "Red de contactos", "Impacto comunitario"],
     cta: "Generar alianza",
     href: "#alianzas",
   },
-];
-
-const BANK_ACCOUNTS = [
   {
-    id: "principal",
-    label: "Transferencia / Depósito bancario",
-    bank: "Bancoppel",
-    accountName: "Abel Meraz Alvarado",
-    accountNumber: "10522966083",
-    clabe: "137180105229660838",
-    reference: "Donativo DCUATES",
+    id: "publicidad",
+    tag: "Proyecto principal",
+    title: "PUBLICIDAD COMUNITARIA",
+    icon: "megaphone",
+    desc: "Difunde tu negocio, promociones y servicios de forma gratuita. Con aportación voluntaria ayudas a que la plataforma de **DCUATES** llegue a más familias.",
+    points: ["Registro gratuito", "Comparte promociones e imágenes", "Más clientes de tu zona"],
+    cta: "Publicar mi negocio",
+    href: "#publicidad",
   },
 ];
-
-const DONATION_AMOUNTS = [50, 100, 200, 500];
 
 const WHATSAPP_NUMBER = "525520696627";
 const WHATSAPP_MESSAGE = "Hola DCUATES, quiero registrar mi negocio o conocer más sobre los proyectos";
@@ -246,83 +232,112 @@ const SOCIALS = [
 
 function SiteHeader() {
   const [open, setOpen] = useState(false);
+
+  // Efecto para bloquear el scroll de la página de fondo cuando el menú overlay está abierto
+  useEffect(() => {
+    if (open) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [open]);
+
   return (
-    <header className="sticky top-0 z-40 border-b border-border/60 bg-background/90 backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-border/60 bg-background/90 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 md:px-6">
+        
+        {/* Logotipo Izquierda */}
         <a href="#inicio" className="flex items-center gap-2.5" onClick={() => setOpen(false)}>
-          <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent font-heading text-base font-extrabold text-accent-foreground md:h-12 md:w-12 md:text-lg">
+          <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent font-heading text-lg font-bold text-accent-foreground">
             DC
           </span>
-          <span className="font-heading text-xl font-extrabold leading-none tracking-tight text-foreground md:text-2xl">
+          <span className="font-heading text-xl font-extrabold leading-none tracking-tight text-foreground uppercase">
             DCUATES
           </span>
         </a>
+
+        {/* Menú de Navegación de Escritorio (Desktop) */}
         <nav className="hidden items-center gap-6 text-base font-medium text-muted-foreground lg:flex">
-          {NAV_LINKS.map((l) => (
-            <a key={l.href} href={l.href} className="transition-colors hover:text-foreground">
-              {l.label}
+          {NAV_LINKS.map((link) => (
+            <a 
+              key={link.href} 
+              href={link.href} 
+              className="transition-colors hover:text-foreground font-semibold"
+            >
+              {link.label}
             </a>
           ))}
-                </nav>
-        <div className="flex items-center gap-2">
-          {/* Contenedor de Redes Sociales: Ahora SIEMPRE visible, adaptable en móviles */}
-          <div className="flex flex-col items-end gap-1">
-            <div className="flex items-center gap-1 sm:gap-2">
-              {SOCIALS.map(({ key, label, href }) => (
-                <a
-                  key={key}
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={label}
-                  className="flex h-9 w-9 items-center justify-center rounded-lg text-foreground transition-colors hover:bg-accent hover:text-accent-foreground sm:h-11 sm:w-11 md:h-12 md:w-12"
-                >
-                  <SocialIcon platform={key} className="h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7" />
-                </a>
-              ))}
-                   </div>
-      </div>
+        </nav>
 
-      <button
+        {/* Sección Derecha: Redes Sociales (Desktop) y Botón Hamburguesa (Móvil) */}
+        <div className="flex items-center gap-4">
+          {/* Redes Sociales fijas en Desktop */}
+          <div className="hidden sm:flex items-center gap-2">
+            {SOCIALS.map((soc) => (
+              <a
+                key={soc.key}
+                href={soc.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                title={soc.label}
+              >
+                <Icon name={soc.key} className="h-4 w-4" />
+              </a>
+            ))}
+          </div>
+
+          {/* Botón de Hamburguesa Móvil */}
+          <button
             type="button"
-            onClick={() => setOpen((v) => !v)}
+            onClick={() => setOpen(!open)}
+            className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-card text-foreground lg:hidden"
             aria-label={open ? "Cerrar menú" : "Abrir menú"}
-            aria-expanded={open}
-            className="flex h-11 w-11 items-center justify-center rounded-lg border border-border text-foreground transition-colors hover:bg-secondary lg:hidden"
           >
             <Icon name={open ? "close" : "menu"} className="h-6 w-6" />
           </button>
         </div>
       </div>
+
+      {/* MENÚ MÓVIL EN MODO FLOANTE (OVERLAY ABSOLUTO) */}
       {open && (
-        <div className="border-t border-border/60 bg-background lg:hidden">
-          <nav className="mx-auto flex max-w-6xl flex-col gap-1 px-4 py-3">
-            {NAV_LINKS.map((l) => (
+        <div className="fixed inset-x-0 top-[69px] bottom-0 z-50 flex flex-col bg-background/98 animate-in fade-in slide-in-from-top-5 duration-200 lg:hidden">
+          <nav className="flex flex-col p-6 gap-5 border-t border-border/40">
+            {NAV_LINKS.map((link) => (
               <a
-                key={l.href}
-                href={l.href}
+                key={link.href}
+                href={link.href}
                 onClick={() => setOpen(false)}
-                className="rounded-lg px-3 py-3 text-lg font-medium text-foreground transition-colors hover:bg-secondary"
+                className="text-xl font-bold text-foreground border-b border-border/40 pb-3 transition-colors hover:text-primary"
               >
-                {l.label}
+                {link.label}
               </a>
             ))}
-            {/* Como las redes ya son visibles arriba en el celular, este bloque inferior se puede mantener limpio u oculto */}
-            <div className="mt-3 flex items-center gap-3 border-t border-border/60 px-3 pt-3 sm:hidden">
-              {SOCIALS.map(({ key, label, href }) => (
+          </nav>
+          
+          {/* Bloque de Redes Sociales en el pie del menú móvil flotante */}
+          <div className="mt-auto p-6 bg-secondary/30 border-t border-border/40">
+            <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3 text-center">
+              Síguenos en redes sociales
+            </p>
+            <div className="flex justify-center gap-4">
+              {SOCIALS.map((soc) => (
                 <a
-                  key={key}
-                  href={href}
+                  key={soc.key}
+                  href={soc.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label={label}
-                  className="flex h-12 w-12 items-center justify-center rounded-lg bg-secondary text-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+                  onClick={() => setOpen(false)}
+                  className="flex h-12 w-12 items-center justify-center rounded-xl border border-border bg-card text-foreground shadow-sm transition-colors hover:bg-accent"
                 >
-                  <SocialIcon platform={key} className="h-7 w-7" />
+                  <Icon name={soc.key} className="h-6 w-6" />
                 </a>
               ))}
             </div>
-          </nav>
+          </div>
         </div>
       )}
     </header>
@@ -335,33 +350,19 @@ function Hero() {
       <div className="mx-auto grid max-w-6xl items-center gap-8 px-4 py-10 md:px-6 md:py-16 lg:grid-cols-2 lg:gap-12 lg:py-20">
         
         {/* Columna Texto (Izquierda) */}
-        <div className="order-2 flex flex-col items-start gap-5 lg:order-1">
-          <span className="inline-flex items-center gap-2 rounded-full bg-accent/10 px-4 py-1.5 text-base font-medium text-accent">
-            <Icon name="heartHandshake" className="h-5 w-5" />
-            Proyectos comunitarios DCUATES
+              <div className="order-2 flex flex-col items-start gap-5 lg:order-1">
+          <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-5 py-2 text-lg font-bold uppercase tracking-wider text-primary shadow-sm">
+            <Icon name="handshake" className="h-6 w-5 text-accent" />
+            PROYECTOS COMUNITARIOS DCUATES
           </span>
-          <h1 className="text-balance font-heading text-4xl font-extrabold leading-tight text-foreground md:text-5xl">
-            Juntos hacemos comunidad
+          <h1 className="font-heading text-4xl font-black tracking-tight text-foreground sm:text-5xl md:text-6xl">
+            Juntos hacemos <strong>COMUNIDAD</strong>
           </h1>
-          <p className="max-w-xl text-pretty text-lg leading-relaxed text-foreground/80 md:text-xl">
-            DCUATES impulsa proyectos que benefician a las familias: publicidad gratuita para tu
-            negocio, préstamo de libros y materiales, apoyo a mascotas y alianzas ganar-ganar.
+          <p className="max-w-xl text-pretty text-lg leading-relaxed text-foreground/80 md:text-xl mt-4">
+            <strong>DCUATES</strong> impulsa proyectos que benefician a las familias: publicidad gratuita para tu
+            negocio, préstamo de libros y materiales, apoyo a mascotas y <strong>ALIANZAS GANAR-GANAR</strong>.
             Súmate con tu participación o con tu apoyo voluntario.
           </p>
-          <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
-            <a
-              href="#publicidad"
-              className="inline-flex items-center justify-center rounded-lg bg-primary px-7 py-3.5 text-lg font-bold text-primary-foreground shadow-md transition-opacity hover:opacity-90"
-            >
-              Publicar mi negocio gratis
-            </a>
-            <a
-              href="#proyectos"
-              className="inline-flex items-center justify-center rounded-lg border-2 border-accent bg-card px-7 py-3.5 text-lg font-bold text-accent transition-colors hover:bg-accent hover:text-accent-foreground"
-            >
-              Conocer los proyectos
-            </a>
-          </div>
         </div>
 
         {/* Columna Imagen Corregida (Derecha) */}
@@ -379,7 +380,6 @@ function Hero() {
     </section>
   );
 }
-
 function Projects() {
   return (
     <section id="proyectos" className="bg-section-dark text-section-dark-foreground">
@@ -467,21 +467,51 @@ function BusinessRegistration() {
   async function handleSubmit(e) {
     e.preventDefault();
     const form = e.currentTarget;
+    const formData = new FormData(form);
+    
+    // Captura de los datos optimizados
+    const bName = formData.get("businessName");
+    const bCat = formData.get("category");
+    const bOwner = formData.get("ownerName");
+    const bPhone = formData.get("phone");
+    const bAddress = formData.get("address") || "No proporcionada";
+    const bMainLink = formData.get("mainLink");
+    const bFacebook = formData.get("facebookLink") || "No proporcionado";
+    const bOtherSocial = formData.get("otherSocialLink") || "No proporcionado";
+    const bDesc = formData.get("description") || "Sin descripción adicional";
+
     setStatus("submitting");
+    
+    // Armado del mensaje automatizado para tu WhatsApp
+    const mensajeWhatsApp = `Hola, DCUATES, quiero REGISTRAR MI NEGOCIO o conocer mas sobre los demas proyectos, o para atencion personal, GRACIAS!!!%0A%0A` +
+      `*DETALLES DEL REGISTRO:*%0A` +
+      `• *Negocio:* ${encodeURIComponent(bName)}%0A` +
+      `• *Giro:* ${encodeURIComponent(bCat)}%0A` +
+      `• *Propietario:* ${encodeURIComponent(bOwner)}%0A` +
+      `• *WhatsApp:* ${encodeURIComponent(bPhone)}%0A` +
+      `• *Dirección:* ${encodeURIComponent(bAddress)}%0A` +
+      `• *Enlace principal/Correo:* ${encodeURIComponent(bMainLink)}%0A` +
+      `• *Facebook:* ${encodeURIComponent(bFacebook)}%0A` +
+      `• *Otra Red:* ${encodeURIComponent(bOtherSocial)}%0A` +
+      `• *Descripción:* ${encodeURIComponent(bDesc)}%0A%0A` +
+      `Por favor, adjunta a este chat las imágenes de tu negocio y la promoción que deseas que publiquemos para completar tu registro.`;
+
     await new Promise((r) => setTimeout(r, 800));
     setStatus("success");
     form.reset();
     setImages([]);
+    
+    // Disparador dinámico nativo sin pérdida de caracteres especiales
+    window.open(`https://wa.me{mensajeWhatsApp}`, '_blank');
   }
 
   if (status === "success") {
     return (
       <div className="rounded-2xl border border-border bg-card p-8 text-center shadow-sm">
         <Icon name="check" className="mx-auto mb-4 h-14 w-14 text-accent" />
-        <h3 className="font-heading text-2xl font-bold text-foreground">¡Registro enviado!</h3>
+        <h3 className="font-heading text-2xl font-bold text-foreground">¡Registro procesado!</h3>
         <p className="mx-auto mt-2 max-w-md text-pretty text-lg leading-relaxed text-foreground/80">
-          Gracias por sumar tu negocio a la comunidad. Revisaremos tu información y nos pondremos
-          en contacto contigo pronto.
+          Tu información ha sido recopilada. Se abrirá **WhatsApp** para que puedas enviar las imágenes promocionales de tu negocio.
         </p>
         <button
           type="button"
@@ -496,6 +526,7 @@ function BusinessRegistration() {
 
   return (
     <form onSubmit={handleSubmit} className="rounded-2xl border border-border bg-card p-6 shadow-sm md:p-8">
+      {/* Sección 1: Datos de Identidad */}
       <div className="grid gap-5 md:grid-cols-2">
         <div>
           <label htmlFor="businessName" className={labelClass}>Nombre del negocio</label>
@@ -503,47 +534,59 @@ function BusinessRegistration() {
         </div>
         <div>
           <label htmlFor="category" className={labelClass}>Giro / categoría</label>
-          <input id="category" name="category" className={inputClass} placeholder="Ej. Restaurante, Salón, Tienda" />
+          <input id="category" name="category" required className={inputClass} placeholder="Ej. Restaurante, Salón, Tienda" />
         </div>
         <div>
           <label htmlFor="ownerName" className={labelClass}>Nombre del propietario</label>
-          <input id="ownerName" name="ownerName" className={inputClass} placeholder="Tu nombre" />
+          <input id="ownerName" name="ownerName" required className={inputClass} placeholder="Tu nombre" />
         </div>
         <div>
-          <label htmlFor="phone" className={labelClass}>Teléfono</label>
-          <input id="phone" name="phone" type="tel" className={inputClass} placeholder="(000) 000 0000" />
+          <label htmlFor="phone" className={labelClass}>Teléfono de contacto (WhatsApp)</label>
+          <input id="phone" name="phone" type="tel" required className={inputClass} placeholder="Ej. 5512345678" />
         </div>
-        <div>
-          <label htmlFor="email" className={labelClass}>Correo electrónico</label>
-          <input id="email" name="email" type="email" className={inputClass} placeholder="correo@ejemplo.com" />
-        </div>
-        <div>
-          <label htmlFor="address" className={labelClass}>Dirección</label>
-          <input id="address" name="address" className={inputClass} placeholder="Calle, número, ciudad" />
+        <div className="md:col-span-2">
+          <label htmlFor="address" className={labelClass}>Dirección (Física u Online)</label>
+          <input id="address" name="address" className={inputClass} placeholder="Calle, número, ciudad o colonia" />
         </div>
       </div>
-      <div className="mt-5">
-        <label htmlFor="website" className={labelClass}>Página web o redes sociales</label>
-        <div className="relative">
-          <Icon name="globe" className="pointer-events-none absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
-          <input id="website" name="website" className={`${inputClass} pl-11`} placeholder="https://... o @tu_usuario" />
+
+      {/* Sección 2: Canales Digitales de 3 Niveles (Sin Email General) */}
+      <div className="mt-6 grid gap-5 border-t border-border pt-6">
+        <h4 className="text-base font-bold text-primary uppercase tracking-wider">Enlaces y Redes Digitales</h4>
+        
+        <div>
+          <label htmlFor="mainLink" className={labelClass}>1. Página principal o Correo Electrónico</label>
+          <div className="relative">
+            <Icon name="globe" className="pointer-events-none absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+            <input id="mainLink" name="mainLink" required className={`${inputClass} pl-11`} placeholder="Página Web, Menú Digital o correo@ejemplo.com" />
+          </div>
         </div>
-        <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-          <span className="inline-flex items-center gap-1">
-            <Icon name="atsign" className="h-4 w-4" /> Redes sociales
-          </span>
-          <span className="inline-flex items-center gap-1">
-            <Icon name="share" className="h-4 w-4" /> Instagram, Facebook y más
-          </span>
-          <span>— separa varios enlaces con comas</span>
+
+        <div>
+          <label htmlFor="facebookLink" className={labelClass}>2. Perfil o Página de Facebook (Opcional)</label>
+          <div className="relative">
+            <Icon name="facebook" className="pointer-events-none absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+            <input id="facebookLink" name="facebookLink" className={`${inputClass} pl-11`} placeholder="Ej. ://facebook.com" />
+          </div>
+        </div>
+
+        <div>
+          <label htmlFor="otherSocialLink" className={labelClass}>3. Cualquier otra Red Social (Opcional)</label>
+          <div className="relative">
+            <Icon name="instagram" className="pointer-events-none absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+            <input id="otherSocialLink" name="otherSocialLink" className={`${inputClass} pl-11`} placeholder="Instagram, TikTok, YouTube o X" />
+          </div>
         </div>
       </div>
+
+      {/* Sección 3: Descripción e Imágenes */}
       <div className="mt-5">
         <label htmlFor="description" className={labelClass}>Descripción y promociones</label>
-        <textarea id="description" name="description" rows={4} className={inputClass} placeholder="Cuéntanos sobre tu negocio, promociones y publicidad que quieres compartir." />
+        <textarea id="description" name="description" rows={4} className={inputClass} placeholder="Cuéntanos brevemente sobre tu negocio o qué promociones te gustaría difundir." />
       </div>
+
       <div className="mt-5">
-        <span className={labelClass}>Imágenes del negocio (promociones, publicidad, etc.)</span>
+        <span className={labelClass}>Imágenes del negocio (Para adjuntar luego en WhatsApp)</span>
         <div
           role="button"
           tabIndex={0}
@@ -554,11 +597,11 @@ function BusinessRegistration() {
               fileRef.current?.click();
             }
           }}
-          className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border bg-secondary/50 px-4 py-10 text-center transition-colors hover:border-primary hover:bg-secondary"
+          className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border bg-secondary/50 px-4 py-8 text-center transition-colors hover:border-primary hover:bg-secondary"
         >
           <Icon name="upload" className="h-8 w-8 text-primary" />
-          <p className="text-base font-medium text-foreground">Haz clic para subir imágenes</p>
-          <p className="text-sm text-muted-foreground">PNG o JPG — hasta 6 imágenes</p>
+          <p className="text-base font-medium text-foreground">Selecciona tus imágenes</p>
+          <p className="text-sm text-muted-foreground">Sube hasta 6 fotos (promociones, logotipos, etc.)</p>
           <input
             ref={fileRef}
             type="file"
@@ -586,6 +629,7 @@ function BusinessRegistration() {
           </ul>
         )}
       </div>
+
       <button
         type="submit"
         disabled={status === "submitting"}
@@ -756,114 +800,124 @@ function CopyRow({ label, value }) {
 }
 
 function Donations() {
-  const [amount, setAmount] = useState("");
-  const [openBank, setOpenBank] = useState(BANK_ACCOUNTS[0]?.id ?? null);
+  // Función para abrir los chats de WhatsApp con mensajes personalizados y estructurados
+  function handleWhatsAppDonation(tipo) {
+    let mensaje = "";
+    if (tipo === "economica") {
+      mensaje = "¡Hola! Me gustaría realizar una aportación económica a *DCUATES*. ¿Me podrían compartir los datos de la cuenta bancaria? ¡Muchas gracias!";
+    } else if (tipo === "especie") {
+      mensaje = "¡Hola! Quiero apoyar a *DCUATES* con una donación en especie (materiales/insumos). ¿Me podrían indicar qué es lo que más necesitan actualmente y cómo coordinar la entrega?";
+    } else if (tipo === "trueque") {
+      mensaje = "¡Hola! Me interesa la economía solidaria y me gustaría proponer un trueque con productos o servicios para los proyectos de *DCUATES*. ¿Cómo podemos coordinarlo?";
+    } else if (tipo === "voluntario") {
+      mensaje = "¡Hola! Me entusiasman los proyectos de *DCUATES* y quiero donar mi tiempo y conocimientos como voluntario. ¿Cuáles son los perfiles o actividades donde puedo sumarme?";
+    }
+
+    // Recuerda reemplazar TUNUMERODEWHATSAPP por tu número real a 10 dígitos (ej. 5512345678)
+    window.open(`https://wa.me/5520696627?text=${encodeURIComponent(mensaje)}`, '_blank');
+  }
+
   return (
     <section id="donaciones" className="bg-background">
       <div className="mx-auto max-w-6xl px-4 py-16 md:px-6 md:py-24">
         <div className="grid gap-8 lg:grid-cols-5">
+          
+          {/* Columna Izquierda: Información */}
           <div className="lg:col-span-2">
-            <span className="inline-flex items-center gap-2 rounded-full bg-accent/10 px-4 py-1.5 text-base font-medium text-accent">
-              <Icon name="heart" className="h-5 w-5" />
-              Apoyo voluntario
+            <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-5 py-2 text-base font-bold uppercase tracking-wider text-primary shadow-sm">
+              <Icon name="handshake" className="h-5 w-5 text-accent" />
+              APOYO VOLUNTARIO
             </span>
-            <h2 className="mt-4 text-balance font-heading text-3xl font-extrabold text-foreground md:text-4xl">
-              Tu aportación impulsa a la comunidad
+            <h2 className="mt-4 text-balance font-heading text-3xl font-black text-foreground md:text-4xl uppercase">
+              Tu aportación impulsa a la **COMUNIDAD**
             </h2>
             <p className="mt-4 text-pretty text-lg leading-relaxed text-foreground/80">
-              Cada donativo, del monto que decidas, nos ayuda a sostener y hacer crecer los proyectos
-              que benefician a los negocios y familias latinas.
+              Cada donativo, del formato que decidas, nos ayuda a sostener y hacer crecer los proyectos 
+              que benefician a los negocios y familias latinas en conjunto con **DCUATES**.
             </p>
             <div className="mt-6 flex items-start gap-3 rounded-xl border-2 border-accent/30 bg-accent/5 p-4">
               <Icon name="shield" className="mt-0.5 h-7 w-7 shrink-0 text-accent" />
               <p className="text-base leading-relaxed text-foreground">
-                Parte de la utilidad de los proyectos se destina al{" "}
-                <strong className="font-bold">
-                  apoyo de causas sociales, con total transparencia
-                </strong>
-                . Rendimos cuentas de cómo se usa cada aportación.
+                Parte de la utilidad de los proyectos se destina al {" "}
+                <strong>apoyo de causas sociales, con total transparencia.</strong> Rendimos cuentas de cómo se usa cada aportación.
               </p>
             </div>
           </div>
-          <div className="lg:col-span-3">
-            <div className="rounded-2xl border border-border bg-card p-6 shadow-sm md:p-8">
-              <label htmlFor="amount" className="mb-2 block text-base font-medium text-foreground">
-                Elige tu aportación (libre)
-              </label>
-              <div className="flex flex-wrap gap-2.5">
-                {DONATION_AMOUNTS.map((amt) => (
-                  <button
-                    key={amt}
-                    type="button"
-                    onClick={() => setAmount(String(amt))}
-                    className={`rounded-lg border-2 px-5 py-2.5 text-base font-bold transition-colors ${
-                      amount === String(amt)
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-border bg-card text-foreground hover:border-primary"
-                    }`}
-                  >
-                    ${amt}
-                  </button>
-                ))}
-              </div>
-              <div className="relative mt-3">
-                <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-lg text-muted-foreground">
-                  $
+
+          {/* Columna Derecha: Opciones de Aportación Directas a WhatsApp */}
+          <div className="lg:col-span-3 flex flex-col gap-4 justify-center">
+            <h3 className="text-xl font-bold text-foreground mb-2">Selecciona tu tipo de aportación:</h3>
+            
+            <button
+              type="button"
+              onClick={() => handleWhatsAppDonation("economica")}
+              className="flex w-full items-center justify-between rounded-xl border-2 border-border bg-card p-4 text-left shadow-sm transition-all hover:border-primary hover:bg-primary/5 group"
+            >
+              <div className="flex items-center gap-4">
+                <span className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                  <Icon name="credit-card" className="h-6 w-6" />
                 </span>
-                <input
-                  id="amount"
-                  inputMode="numeric"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value.replace(/[^0-9.]/g, ""))}
-                  placeholder="Otro monto (aportación libre)"
-                  className="w-full rounded-lg border-2 border-input bg-card py-3 pl-8 pr-3 text-base text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/30"
-                />
+                <div>
+                  <h4 className="font-bold text-lg text-foreground">Aportación Económica</h4>
+                  <p className="text-sm text-muted-foreground">Solicita los datos bancarios de manera directa y segura.</p>
+                </div>
               </div>
-              <p className="mt-6 mb-2 text-base font-medium text-foreground">
-                Elige cómo realizar tu depósito
-              </p>
-              <div className="space-y-3">
-                {BANK_ACCOUNTS.map((acc) => {
-                  const isOpen = openBank === acc.id;
-                  return (
-                    <div key={acc.id} className="overflow-hidden rounded-xl border border-border">
-                      <button
-                        type="button"
-                        onClick={() => setOpenBank(isOpen ? null : acc.id)}
-                        aria-expanded={isOpen}
-                        className="flex w-full items-center justify-between gap-3 bg-secondary/40 px-4 py-3.5 text-left transition-colors hover:bg-secondary"
-                      >
-                        <span className="text-base font-bold text-foreground">{acc.label}</span>
-                        <Icon
-                          name="chevron"
-                          className={`h-6 w-6 shrink-0 text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`}
-                        />
-                      </button>
-                      {isOpen && (
-                        <div className="px-4 py-2">
-                          <CopyRow label="Banco" value={acc.bank} />
-                          <CopyRow label="Titular" value={acc.accountName} />
-                          <CopyRow label="Número de cuenta" value={acc.accountNumber} />
-                          <CopyRow label="CLABE" value={acc.clabe} />
-                          <CopyRow label="Referencia" value={acc.reference} />
-                          {amount && (
-                            <p className="mt-3 rounded-lg bg-primary/10 px-3 py-2.5 text-base text-foreground">
-                              Monto a depositar:{" "}
-                              <strong className="font-bold text-primary">${amount}</strong>
-                            </p>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
+              <Icon name="chevron-right" className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleWhatsAppDonation("especie")}
+              className="flex w-full items-center justify-between rounded-xl border-2 border-border bg-card p-4 text-left shadow-sm transition-all hover:border-primary hover:bg-primary/5 group"
+            >
+              <div className="flex items-center gap-4">
+                <span className="flex h-12 w-12 items-center justify-center rounded-lg bg-accent/10 text-accent group-hover:bg-accent group-hover:text-accent-foreground transition-colors">
+                  <Icon name="package" className="h-6 w-6" />
+                </span>
+                <div>
+                  <h4 className="font-bold text-lg text-foreground">Aportación en Especie</h4>
+                  <p className="text-sm text-muted-foreground">Apoya donando herramientas, materiales o insumos útiles.</p>
+                </div>
               </div>
-              <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-                Realiza tu depósito o transferencia con los datos mostrados. Guarda tu comprobante;
-                si deseas un recibo, envíanoslo por nuestros canales de contacto.
-              </p>
-            </div>
+              <Icon name="chevron-right" className="h-5 w-5 text-muted-foreground group-hover:text-accent transition-colors" />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleWhatsAppDonation("trueque")}
+              className="flex w-full items-center justify-between rounded-xl border-2 border-border bg-card p-4 text-left shadow-sm transition-all hover:border-primary hover:bg-primary/5 group"
+            >
+              <div className="flex items-center gap-4">
+                <span className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                  <Icon name="refresh-cw" className="h-6 w-6" />
+                </span>
+                <div>
+                  <h4 className="font-bold text-lg text-foreground">Trueque Solidario</h4>
+                  <p className="text-sm text-muted-foreground">Intercambia productos o servicios de valor equivalente.</p>
+                </div>
+              </div>
+              <Icon name="chevron-right" className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleWhatsAppDonation("voluntario")}
+              className="flex w-full items-center justify-between rounded-xl border-2 border-border bg-card p-4 text-left shadow-sm transition-all hover:border-primary hover:bg-primary/5 group"
+            >
+              <div className="flex items-center gap-4">
+                <span className="flex h-12 w-12 items-center justify-center rounded-lg bg-accent/10 text-accent group-hover:bg-accent group-hover:text-accent-foreground transition-colors">
+                  <Icon name="users" className="h-6 w-6" />
+                </span>
+                <div>
+                  <h4 className="font-bold text-lg text-foreground">Labor Voluntaria</h4>
+                  <p className="text-sm text-muted-foreground">Dona tu valioso tiempo y conocimientos para crecer juntos.</p>
+                </div>
+              </div>
+              <Icon name="chevron-right" className="h-5 w-5 text-muted-foreground group-hover:text-accent transition-colors" />
+            </button>
+
           </div>
+
         </div>
       </div>
     </section>
@@ -1016,28 +1070,24 @@ function Footer({ onOpenPrivacy }) {
 }
 
 function WhatsAppButton() {
-  const waUrl = `https://wa.me/525520696627?text=Hola%20,%20DCUATES%20,%20quiero%20registrar%20mi%20negocio%20o%20conocer%20mas%20sobre%20los%20demas%20proyectos%20,%20GRACIAS!!!%20`;
+  const mensajeBase = "Hola, DCUATES, quiero REGISTRAR MI NEGOCIO o conocer mas sobre los demas proyectos, o para atencion personal, GRACIAS!!!";
+
   return (
     <a
-      href={waUrl}
+      href={`https://wa.me{encodeURIComponent(mensajeBase)}`}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label="Atención personal y dudas por WhatsApp"
-      className="fixed z-50 flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 shadow-2xl
-        /* MÓVIL: Flotante clásico gigante abajo a la derecha */
-        bottom-6 right-6 h-16 w-16 rounded-full bg-[#25D366] text-white
-        /* PC: Flotante XL a la derecha del contenedor centrado de la web, sin tocar contenido */
-        lg:bottom-8 lg:right-auto lg:left-1/2 lg:translate-x-[400px] lg:h-auto lg:w-auto lg:rounded-2xl lg:bg-[#25D366] lg:px-8 lg:py-4 lg:text-base lg:font-black lg:text-white lg:border-none"
+      className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-xl transition-all hover:scale-110 active:scale-95 animate-bounce duration-1000"
+      title="Atención personal y dudas"
     >
-      {/* Icono de WhatsApp XL */}
-      <span className="flex items-center justify-center text-3xl font-normal lg:mr-3">
-        <svg className="h-8 w-8 fill-current lg:h-6 lg:w-6 lg:text-white" viewBox="0 0 24 24">
-          <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.4.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.713-1.457L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.965C16.528 1.977 14.07 1.53 11.997 1.53c-5.442 0-9.866 4.372-9.87 9.802 0 1.686.446 3.333 1.29 4.796L2.456 21.2l5.191-1.353z" />
-        </svg>
-      </span>
-
-      {/* Letrero con máxima fuerza visual y legible */}
-      <span className="hidden lg:block tracking-wider uppercase font-black">Atención personal y dudas</span>
+      {/* Icono de WhatsApp Optimizado */}
+      <svg
+        className="h-8 w-8 fill-current text-white"
+        viewBox="0 0 24 24"
+        xmlns="http://w3.org"
+      >
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.458 5.704 1.459h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+      </svg>
     </a>
   );
 }
