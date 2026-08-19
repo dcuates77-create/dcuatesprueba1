@@ -274,20 +274,44 @@ function SiteHeader() {
 
         {/* Sección Derecha: Redes Sociales (Desktop) y Botón Hamburguesa (Móvil) */}
         <div className="flex items-center gap-4">
-                    {/* Redes Sociales fijas en Desktop */}
+                              {/* Redes Sociales fijas en Desktop (Formato Ultra Seguro) */}
           <div className="hidden sm:flex items-center gap-2">
-            {SOCIALS.map((soc) => (
-              <a
-                key={soc.key}
-                href={soc.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
-                title={soc.label}
-              >
-                <Icon name={soc.key} className="h-4 w-4" />
-              </a>
-            ))}
+            <a
+              href="https://facebook.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+              title="Facebook"
+            >
+              <Icon name="facebook" className="h-4 w-4" />
+            </a>
+            <a
+              href="https://youtube.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+              title="YouTube"
+            >
+              <Icon name="youtube" className="h-4 w-4" />
+            </a>
+            <a
+              href="https://instagram.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+              title="Instagram"
+            >
+              <Icon name="instagram" className="h-4 w-4" />
+            </a>
+            <a
+              href="https://tiktok.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+              title="TikTok"
+            >
+              <Icon name="smartphone" className="h-4 w-4" />
+            </a>
           </div>
 
           {/* Botón de Hamburguesa Móvil */}
@@ -318,10 +342,10 @@ function SiteHeader() {
             ))}
           </nav>
           
-                      {/* Redes Sociales en Menú Móvil (Formato Original) */}
+                                  {/* Redes Sociales en Menú Móvil (Formato Ultra Seguro) */}
             <div className="flex justify-center gap-4">
               <a
-                href={SOCIAL_LINKS.facebook}
+                href="https://facebook.com"
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setOpen(false)}
@@ -330,7 +354,7 @@ function SiteHeader() {
                 <Icon name="facebook" className="h-6 w-6" />
               </a>
               <a
-                href={SOCIAL_LINKS.youtube}
+                href="https://youtube.com"
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setOpen(false)}
@@ -339,7 +363,7 @@ function SiteHeader() {
                 <Icon name="youtube" className="h-6 w-6" />
               </a>
               <a
-                href={SOCIAL_LINKS.instagram}
+                href="https://instagram.com"
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setOpen(false)}
@@ -348,13 +372,13 @@ function SiteHeader() {
                 <Icon name="instagram" className="h-6 w-6" />
               </a>
               <a
-                href={SOCIAL_LINKS.tiktok}
+                href="https://tiktok.com"
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setOpen(false)}
                 className="flex h-12 w-12 items-center justify-center rounded-xl border border-border bg-card text-foreground shadow-sm transition-colors hover:bg-accent"
               >
-                <Icon name="tiktok" className="h-6 w-6" />
+                <Icon name="smartphone" className="h-6 w-6" />
               </a>
             </div>
           </div>
