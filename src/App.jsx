@@ -245,7 +245,7 @@ function SiteHeader() {
     };
   }, [open]);
 
-    return (
+  return (
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/90 backdrop-blur" suppressHydrationWarning={true}>
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 md:px-6">
         
@@ -274,7 +274,8 @@ function SiteHeader() {
 
         {/* Sección Derecha: Redes Sociales (Desktop) y Botón Hamburguesa (Móvil) */}
         <div className="flex items-center gap-4">
-                              {/* Redes Sociales fijas en Desktop (Formato Ultra Seguro) */}
+          
+          {/* Redes Sociales fijas en Desktop (Formato Ultra Seguro) */}
           <div className="hidden sm:flex items-center gap-2">
             <a
               href="https://facebook.com"
@@ -342,7 +343,11 @@ function SiteHeader() {
             ))}
           </nav>
           
-                                  {/* Redes Sociales en Menú Móvil (Formato Ultra Seguro) */}
+          {/* Bloque de Redes Sociales en el pie del menú móvil flotante */}
+          <div className="mt-auto p-6 bg-secondary/30 border-t border-border/40">
+            <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3 text-center">
+              Síguenos en redes sociales
+            </p>
             <div className="flex justify-center gap-4">
               <a
                 href="https://facebook.com"
