@@ -227,7 +227,7 @@ const SOCIALS = [
   { key: "facebook", label: "Facebook", href: SOCIAL_LINKS.facebook },
   { key: "youtube", label: "YouTube", href: SOCIAL_LINKS.youtube },
   { key: "instagram", label: "Instagram", href: SOCIAL_LINKS.instagram },
-  { key: "video", label: "TikTok", href: SOCIAL_LINKS.tiktok }, // Usamos 'video' o el identificador nativo de tu app para TikTok
+  { key: "smartphone", label: "TikTok", href: SOCIAL_LINKS.tiktok }
 ];
 
 function SiteHeader() {
