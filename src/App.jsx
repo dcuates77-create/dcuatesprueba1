@@ -245,8 +245,8 @@ function SiteHeader() {
     };
   }, [open]);
 
-  return (
-    <header className="sticky top-0 z-50 border-b border-border/60 bg-background/90 backdrop-blur">
+    return (
+    <header className="sticky top-0 z-50 border-b border-border/60 bg-background/90 backdrop-blur" suppressHydrationWarning={true}>
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 md:px-6">
         
         {/* Logotipo Izquierda */}
@@ -1095,13 +1095,13 @@ function WhatsAppButton() {
 export default function App() {
   const [privacyOpen, setPrivacyOpen] = useState(false);
   return (
-    <main className="min-h-screen bg-background">
+    <main className="min-h-screen bg-background" suppressHydrationWarning={true}>
       <SiteHeader />
       <Hero />
       <Projects />
       <Alianzas />
       <Donations />
-      <Publicidad /> {/* <-- Movido al final con éxito para que conozcan los proyectos antes */}
+      <Publicidad />
       <Footer onOpenPrivacy={() => setPrivacyOpen(true)} />
       <WhatsAppButton />
       <PrivacyModal open={privacyOpen} onClose={() => setPrivacyOpen(false)} />
