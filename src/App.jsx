@@ -233,7 +233,6 @@ const SOCIALS = [
 function SiteHeader() {
   const [open, setOpen] = useState(false);
 
-  // Efecto para bloquear el scroll de la página de fondo cuando el menú overlay está abierto
   useEffect(() => {
     if (open) {
       document.body.style.overflow = "hidden";
@@ -275,7 +274,7 @@ function SiteHeader() {
         {/* Sección Derecha: Redes Sociales (Desktop) y Botón Hamburguesa (Móvil) */}
         <div className="flex items-center gap-4">
           
-                    {/* Redes Sociales fijas en Desktop (Logos SVG Directos) */}
+          {/* Redes Sociales fijas en Desktop (Logos SVG Directos) */}
           <div className="hidden sm:flex items-center gap-2">
             <a
               href="https://facebook.com"
@@ -353,7 +352,7 @@ function SiteHeader() {
             ))}
           </nav>
           
-                    {/* Redes Sociales en Menú Móvil (Logos SVG Directos) */}
+          {/* Bloque de Redes Sociales en el pie del menú móvil flotante */}
           <div className="mt-auto p-6 bg-secondary/30 border-t border-border/40">
             <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3 text-center">
               Síguenos en redes sociales
@@ -378,7 +377,7 @@ function SiteHeader() {
                 className="flex h-12 w-12 items-center justify-center rounded-xl border border-border bg-card text-foreground shadow-sm transition-colors hover:bg-accent"
               >
                 <svg className="h-6 w-6 fill-current" viewBox="0 0 24 24" xmlns="http://w3.org">
-                  <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93 *.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                  <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93c.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
                 </svg>
               </a>
               <a
@@ -401,12 +400,15 @@ function SiteHeader() {
                 onClick={() => setOpen(false)}
                 className="flex h-12 w-12 items-center justify-center rounded-xl border border-border bg-card text-foreground shadow-sm transition-colors hover:bg-accent"
               >
-                <svg className="h-6 w-6 fill-current" viewBox="0 0 24 24" xmlns="http://w3.org">
-                  <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.02 1.59 4.23.94 1.13 2.29 1.89 3.73 2.18l-.02 3.88c-1.63-.03-3.2-.55-4.51-1.52A7.83 7.83 0 0 1 16.43 7.5v8.32a7.83 7.83 0 0 1-3.32 6.42 7.91 7.91 0 0 1-8.73-.24 7.85 7.85 0 0 1-3.23-7.58 7.84 7.84 0 0 1 5.37-6.84V11.5a3.94 3.94 0 0 0-1.5 3.32 3.93 3.93 0 0 0 3.2 3.88 3.93 3.93 0 0 0 4.61-3.2c.04-.33.05-.66.05-.99V.02z" />
-                </svg>
-              </a>
-            </div>
+                             <svg className="h-6 w-6 fill-current" viewBox="0 0 24 24" xmlns="http://w3.org">
+                <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.02 1.59 4.23.94 1.13 2.29 1.89 3.73 2.18l-.02 3.88c-1.63-.03-3.2-.55-4.51-1.52A7.83 7.83 0 0 1 16.43 7.5v8.32a7.83 7.83 0 0 1-3.32 6.42 7.91 7.91 0 0 1-8.73-.24 7.85 7.85 0 0 1-3.23-7.58 7.84 7.84 0 0 1 5.37-6.84V11.5a3.94 3.94 0 0 0-1.5 3.32 3.93 3.93 0 0 0 3.2 3.88 3.93 3.93 0 0 0 4.61-3.2c.04-.33.05-.66.05-.99V.02z" />
+              </svg>
+            </a>
           </div>
+        </div>
+      )}
+    </header>
+  );
 }
 
 function Hero() {
