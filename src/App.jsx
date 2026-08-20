@@ -336,7 +336,7 @@ function SiteHeader() {
         </div>
       </div>
 
-      {/* MENÚ MÓVIL EN MODO FLOANTE (OVERLAY ABSOLUTO) */}
+      {/* MENÚ MÓVIL EN MODO FLOTANTE (OVERLAY ABSOLUTO) */}
       {open && (
         <div className="fixed inset-x-0 top-[69px] bottom-0 z-50 flex flex-col bg-background/98 animate-in fade-in slide-in-from-top-5 duration-200 lg:hidden">
           <nav className="flex flex-col p-6 gap-5 border-t border-border/40">
@@ -400,14 +400,15 @@ function SiteHeader() {
                 onClick={() => setOpen(false)}
                 className="flex h-12 w-12 items-center justify-center rounded-xl border border-border bg-card text-foreground shadow-sm transition-colors hover:bg-accent"
               >
-                                           <svg className="h-6 w-6 fill-current" viewBox="0 0 24 24">
-                <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.02 1.59 4.23.94 1.13 2.29 1.89 3.73 2.18l-.02 3.88c-1.63-.03-3.2-.55-4.51-1.52A7.83 7.83 0 0 1 16.43 7.5v8.32a7.83 7.83 0 0 1-3.32 6.42 7.91 7.91 0 0 1-8.73-.24 7.85 7.85 0 0 1-3.23-7.58 7.84 7.84 0 0 1 5.37-6.84V11.5a3.94 3.94 0 0 0-1.5 3.32 3.93 3.93 0 0 0 3.2 3.88 3.93 3.93 0 0 0 4.61-3.2c.04-.33.05-.66.05-.99V.02z" />
-                    </svg>
-            </a>
-  </div>
-</div>
-)}
-</header>
+                <svg className="h-6 w-6 fill-current" viewBox="0 0 24 24" xmlns="http://w3.org">
+                  <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.02 1.59 4.23.94 1.13 2.29 1.89 3.73 2.18l-.02 3.88c-1.63-.03-3.2-.55-4.51-1.52A7.83 7.83 0 0 1 16.43 7.5v8.32a7.83 7.83 0 0 1-3.32 6.42 7.91 7.91 0 0 1-8.73-.24 7.85 7.85 0 0 1-3.23-7.58 7.84 7.84 0 0 1 5.37-6.84V11.5a3.94 3.94 0 0 0-1.5 3.32 3.93 3.93 0 0 0 3.2 3.88 3.93 3.93 0 0 0 4.61-3.2c.04-.33.05-.66.05-.99V.02z" />
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+    </header>
   );
 }
 
