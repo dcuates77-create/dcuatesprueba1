@@ -407,6 +407,7 @@ function SiteHeader() {
               </a>
             </div>
           </div>
+}
 
 function Hero() {
   return (
