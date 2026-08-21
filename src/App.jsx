@@ -6,6 +6,9 @@ import React, { useState, useEffect } from "react";
 const WHATSAPP_NUMERO = "525520696627";
 const GOOGLE_SHEETS_URL = "https://google.com";
 
+// ID del video de YouTube que se muestra en la portada (puedes cambiar esta ID cuando gustes)
+const YOUTUBE_VIDEO_ID = "dQw4w9WgXcQ"; 
+
 const REDES_SOCIALES = {
   facebook: "https://facebook.com",
   instagram: "https://instagram.com",
@@ -15,9 +18,8 @@ const REDES_SOCIALES = {
 
 const NAV_LINKS = [
   { label: "Inicio", href: "#inicio" },
-  { label: "Proyectos", href: "#iniciativas" },
-  { label: "Nuevos", href: "#nuevos-proyectos" },
-  { label: "Alianzas", href: "#alianzas" },
+  { label: "Proyectos Base", href: "#iniciativas" },
+  { label: "Nuevos Proyectos", href: "#nuevos-proyectos" },
   { label: "Donaciones", href: "#donaciones" },
   { label: "Publicidad", href: "#publicidad" }
 ];
@@ -28,7 +30,7 @@ const INICIATIVAS_PRINCIPALES = [
     id: "libros",
     categoria: "EDUCACIÓN Y DESARROLLO",
     titulo: "LA BIBLIOBICI Y AMIGOS",
-    descripcion: "Préstamo gratuito de libros y materiales educativos para el desarrollo personal y social. La lectura que llega hasta tu colonia para fortalecer a la **COMUNIDAD**.",
+    descripcion: "Préstamo gratuito de libros y materiales educativos para el desarrollo personal y social. La lectura que llega hasta tu colonia para fortalecer a la COMUNIDAD.",
     puntos: ["Préstamo sin costo", "Materiales para todas las edades", "Fomento a la lectura"],
     textoBoton: "Quiero participar",
     mensajeWA: "Hola DCUATES! Me interesa participar en la iniciativa de La Bibliobici y Amigos. ¿Cómo puedo colaborar o solicitar libros?"
@@ -37,7 +39,7 @@ const INICIATIVAS_PRINCIPALES = [
     id: "ecatepets",
     categoria: "BIENESTAR ANIMAL",
     titulo: "ECATEPETS",
-    descripcion: "Apoyo en la búsqueda de mascotas extraviadas, y fomento de la adopción y el cuidado animal responsable en conjunto con los vecinos de **DCUATES**.",
+    descripcion: "Apoyo en la búsqueda de mascotas extraviadas, y fomento de la adopción y el cuidado animal responsable en conjunto con los vecinos de DCUATES.",
     puntos: ["Difusión de extravíos", "Adopción responsable", "Cuidado y concientización"],
     textoBoton: "Sumarme a la causa",
     mensajeWA: "Hola DCUATES! Me interesa sumarme a la causa de Ecatepets o reportar/apoyar un caso de bienestar animal."
@@ -46,7 +48,7 @@ const INICIATIVAS_PRINCIPALES = [
     id: "alianzas-tarjeta",
     categoria: "CRECIMIENTO CONJUNTO",
     titulo: "ALIANZAS GANAR-GANAR",
-    descripcion: "Emprendedores, organizaciones y particulares que desean hacer sinergia para crecer juntos y robustecer el tejido social de la **COMUNIDAD**.",
+    descripcion: "Emprendedores, organizations y particulares que desean hacer sinergia para crecer juntos y robustecer el tejido social de la COMUNIDAD.",
     puntos: ["Colaboración mutua", "Red de contactos", "Impacto comunitario"],
     textoBoton: "Generar alianza",
     mensajeWA: "Hola DCUATES! Quiero proponer una Alianza Ganar-Ganar para crecer juntos y beneficiar a la comunidad."
@@ -55,42 +57,50 @@ const INICIATIVAS_PRINCIPALES = [
     id: "publicidad-tarjeta",
     categoria: "PROYECTO PRINCIPAL",
     titulo: "PUBLICIDAD COMUNITARIA",
-    descripcion: "Difunde tu negocio, promociones y servicios de forma gratuita. Con aportación voluntaria ayudas a que la plataforma de **DCUATES** llegue a más familias.",
+    descripcion: "Difunde tu negocio, promociones y servicios de forma gratuita. Con aportación voluntaria ya ayudas a que la plataforma de DCUATES llegue a más familias.",
     puntos: ["Registro gratuito", "Comparte promociones e imágenes", "Más clientes de tu zona"],
     textoBoton: "Publicar mi negocio",
     mensajeWA: "Hola DCUATES! Me interesa publicar mi negocio de forma gratuita mediante su espacio de Publicidad Comunitaria."
   }
 ];
 
-// Arreglo de los 4 Proyectos Nuevos Adicionales del Clon 4
-const NUEVOS_PROYECTOS = [
+// Arreglo de los 4 Proyectos Nuevos Transformados al formato premium con 3 puntos clave
+const NUEVOS_PROYECTOS_DATA = [
   {
     id: "asesorias",
+    categoria: "DESARROLLO PROFESIONAL",
     titulo: "Asesorías Personales y de Negocios",
-    intro: "Orientación profesional sin barreras.",
-    descripcion: "Asesoramiento gratuito y de aportación voluntaria para impulsar tus metas personales o regularizar tu modelo de negocio.",
-    icono: "💡"
+    descripcion: "Orientación profesional sin barreras para impulsar tus metas o regularizar tu modelo de negocio de manera efectiva.",
+    puntos: ["Asesoría gratuita", "Aportación voluntaria", "Impulso de metas"],
+    textoBoton: "Solicitar asesoría",
+    mensajeWA: "Hola DCUATES! Me interesa recibir información sobre las Asesorías Personales y de Negocios."
   },
   {
     id: "bazares",
+    categoria: "RENOVACIÓN ECONÓMICA",
     titulo: "Bazares, Mercados y Tianguis",
-    intro: "Comercio local seguro y de barrio de confianza.",
     descripcion: "Ventas caseras y de calle basadas en la confianza mutua para reactivar la economía de nuestras familias de forma directa.",
-    icono: "🏪"
+    puntos: ["Comercio local seguro", "Barrio de confianza", "Reactivación económica"],
+    textoBoton: "Participar en bazar",
+    mensajeWA: "Hola DCUATES! Solicito información sobre los Bazares, Mercados y Tianguis de confianza."
   },
   {
     id: "noticias",
-    titulo: "Noticias y Agenda Cultural",
-    intro: "El pulso social de nuestra comunidad.",
-    descripcion: "Mantente al día con los eventos culturales, convocatorias comunitarias y acontecimientos sociales más relevantes de la zona.",
-    icono: "📰"
+    categoria: "COMUNICACIÓN COLECTIVA",
+    titulo: "News y Agenda Cultural",
+    descripcion: "Mantente al día con los eventos culturales, convocatorias comunitarias y acontecimientos sociales de la zona.",
+    puntos: ["Eventos culturales", "Convocatorias vecinales", "Acontecimientos sociales"],
+    textoBoton: "Ver agenda cultural",
+    mensajeWA: "Hola DCUATES! Me interesa conocer las noticias y la Agenda Cultural de nuestra comunidad."
   },
   {
     id: "bienestar",
+    categoria: "SALUD Y ESPARCIMIENTO",
     titulo: "Bienestar, Cultura y Recreación",
-    intro: "Espacios sanos para convivir.",
     descripcion: "Actividades recreativas y talleres enfocados en el desarrollo integral, la salud mental y el esparcimiento familiar.",
-    icono: "✨"
+    puntos: ["Desarrollo integral", "Salud mental", "Esparcimiento familiar"],
+    textoBoton: "Preguntar por talleres",
+    mensajeWA: "Hola DCUATES! Quiero información sobre las actividades de Bienestar, Cultura y Recreación."
   }
 ];
 
@@ -101,34 +111,47 @@ export default function App() {
   const [showPrivacy, setShowPrivacy] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#1b4332] font-sans antialiased text-slate-900 selection:bg-emerald-500/30">
+    <div className="min-h-screen bg-[#1b4332] font-sans antialiased text-slate-900 selection:bg-emerald-500/30 relative">
       
-      {/* Encabezado con Iconos Vectoriales Nativos */}
+      {/* Botón Flotante Permanente de WhatsApp del Clon 3 */}
+      <a
+        href={`https://wa.me{WHATSAPP_NUMERO}`}
+        target="_blank"
+        rel="noreferrer"
+        className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#25d366] text-white shadow-2xl transition-all hover:scale-110 active:scale-95 group hover:bg-[#128c7e]"
+        title="Chat de Atención Directa"
+      >
+        <svg className="h-7 w-7 fill-current" viewBox="0 0 24 24" xmlns="http://w3.org">
+          <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.503-5.729-1.458L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.965C16.428 1.978 13.96 1.951 12.01 1.951c-5.438 0-9.863 4.374-9.867 9.802 0 1.685.459 3.324 1.333 4.766L2.483 20.3l3.966-.995zM17.15 14.34c-.283-.141-1.674-.824-1.933-.917-.26-.093-.448-.14-.637.142-.188.282-.729.917-.894 1.105-.165.188-.33.212-.613.07a9.23 9.23 0 0 1-2.28-1.401 10.15 10.15 0 0 1-1.579-1.954c-.165-.282-.018-.434.124-.574.127-.127.283-.329.424-.494.141-.165.188-.282.283-.47.094-.188.047-.353-.024-.494-.071-.141-.637-1.53-.873-2.102-.229-.554-.46-.478-.637-.487-.164-.008-.353-.01-.542-.01-.189 0-.495.07-.755.353-.26.282-.99 1.011-.99 2.467 0 1.457 1.06 2.867 1.201 3.056.142.188 2.086 3.178 5.053 4.462.705.305 1.256.488 1.684.624.708.226 1.353.194 1.863.118.568-.085 1.674-.682 1.909-1.34.236-.658.236-1.223.165-1.34-.07-.117-.26-.188-.542-.329z"/>
+        </svg>
+      </a>
+
+      {/* Encabezado */}
       <SiteHeader />
-      {/* SECCIÓN PORTADA / HERO (Diseño de 3 Columnas según la Imagen 2) */}
+
+      {/* SECCIÓN PORTADA / HERO (Diseño de 3 Columnas) */}
       <section id="inicio" className="bg-[#e8f5e9] text-[#0f2d1e] py-12 px-4 md:py-16 border-b-4 border-[#0f2d1e]">
-        <div className="mx-auto max-w-7xl grid gap-8 items-start lg:grid-cols-12">
+        <div className="mx-auto max-w-7xl grid gap-8 items-stretch lg:grid-cols-12">
           
-          {/* COLUMNA IZQUIERDA: Textos y Foto de la Bibliobici (5 columnas de ancho en PC) */}
-          <div className="lg:col-span-5 space-y-6 flex flex-col justify-between h-full">
-            <div>
-              <h1 className="text-4xl sm:text-5xl font-black uppercase tracking-tight text-[#0f2d1e] leading-none mb-4">
+          {/* COLUMNA IZQUIERDA: Textos Nuevos de Clon 4 y Foto de la Bibliobici */}
+          <div className="lg:col-span-5 flex flex-col justify-between space-y-6">
+            <div className="space-y-4">
+              <h1 className="text-4xl sm:text-5xl font-black uppercase tracking-tight text-[#0f2d1e] leading-none">
                 Jūntos hacemos<br />COMUNIDAD
               </h1>
-              <p className="text-xs font-bold text-amber-700 uppercase tracking-wider mb-3">
-                ⚡ Proyectos Comunitarios DCUATES
+              <p className="text-xs font-black text-amber-700 uppercase tracking-wider">
+                ⚡ PROYECTOS COMUNITARIOS DCUATES
               </p>
               <p className="text-sm sm:text-base text-slate-800 leading-relaxed text-justify font-medium">
-                <strong>DCUATES</strong> impulsa proyectos que benefician a las familias: publicidad gratuita para tu negocio, préstamo de libros y materiales, apoyo a mascotas y <strong>ALIANZAS GANAR-GANAR</strong>. Súmate con tu participación o con tu apoyo voluntario.
+                <strong>DCUATES</strong> impulsa proyectos, <strong>PERSONAS, ORGANIZACIONES Y EMPRENDIMIENTOS</strong> que <strong>BENEFICIAN a las FAMILIAS</strong>: <strong>PUBLICIDAD GRATUITA</strong> para tu negocio, préstamo de <strong>LIBROS</strong> y materiales <strong>EDUCATIVOS</strong>, apoyo a <strong>MASCOTAS Y GRUPOS VULNERABLES</strong>, y <strong>ALIANZAS GANAR-GANAR</strong> que generan apoyos y beneficios mutuos y comunitarios. Suma con tu valiosa colaboración o con tu invaluable <strong>APOYO VOLUNTARIO</strong> para lograr nuestros objetivos de forma más efectiva, y forjar <strong>LA CADENA DE VALOR Y DE VALORES</strong> que nos liberará de nuestras limitaciones para ser mejores, Y ASÍ MEJORAR NUESTRO ENTORNO Y NUESTRO MUNDO !!!
               </p>
             </div>
             
-            {/* Foto de la Bibliobici Móvil */}
-            <div className="overflow-hidden rounded-2xl border-4 border-[#0f2d1e]/30 bg-white shadow-lg mt-4">
+            <div className="overflow-hidden rounded-2xl border-4 border-[#0f2d1e]/30 bg-white shadow-lg">
               <img 
                 src="/bibliobici-movil.jpg" 
                 alt="Bibliobici Móvil DCUATES en la comunidad" 
-                className="w-full h-auto object-cover max-h-[320px]"
+                className="w-full h-auto object-cover max-h-[280px]"
                 onError={(e) => {
                   e.target.style.display = 'none';
                   e.target.parentElement.innerHTML = '<div class="p-12 text-center text-[#0f2d1e]/70 font-bold uppercase text-xs tracking-wider bg-emerald-50">📷 [Espacio para Foto de la Bibliobici Móvil]</div>';
@@ -136,9 +159,8 @@ export default function App() {
               />
             </div>
           </div>
-
-          {/* COLUMNA CENTRAL: Botonera Interactiva de 8 Botones Naranjas (3 columnas de ancho en PC) */}
-          <div className="lg:col-span-3 flex flex-col gap-2 pt-2">
+          {/* COLUMNA CENTRAL: Botonera con más espaciado vertical para alineación simétrica (3 columnas) */}
+          <div className="lg:col-span-3 flex flex-col justify-between py-1 gap-3">
             {[
               { t: "Préstamo de Libros", h: "#libros" },
               { t: "Ecatepets Mascotas", h: "#ecatepets" },
@@ -152,18 +174,18 @@ export default function App() {
               <a 
                 key={idx}
                 href={btn.h}
-                className="w-full text-center rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3 px-4 shadow-md transition-all hover:scale-[1.02] uppercase tracking-wide text-xs sm:text-sm font-heading"
+                className="w-full flex-1 flex items-center justify-center text-center rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black px-4 shadow-md transition-all hover:scale-[1.02] uppercase tracking-wide text-xs sm:text-sm font-heading"
               >
                 {btn.t}
               </a>
             ))}
           </div>
 
-          {/* COLUMNA DERECHA: Logo, WhatsApp y Caja de Video/GIF Semanal (4 columnas de ancho en PC) */}
-          <div className="lg:col-span-4 flex flex-col items-center text-center space-y-6">
+          {/* COLUMNA DERECHA: Logo Circular (Liga WA removida) y Video YouTube Nativo (4 columnas) */}
+          <div className="lg:col-span-4 flex flex-col items-center justify-between text-center space-y-6">
             
-            {/* Logotipo Circular Oficial */}
-            <div className="w-48 h-48 sm:w-56 sm:h-56 flex items-center justify-center rounded-full overflow-hidden bg-white p-2 border-4 border-[#0f2d1e]/20 shadow-xl">
+            {/* Logotipo Oficial */}
+            <div className="w-44 h-44 sm:w-52 sm:h-52 flex items-center justify-center rounded-full overflow-hidden bg-white p-2 border-4 border-[#0f2d1e]/20 shadow-xl">
               <img 
                 src="/logo-circular.png" 
                 alt="Logo Oficial DCUATES.COM" 
@@ -175,42 +197,28 @@ export default function App() {
               />
             </div>
 
-            {/* Bloque WhatsApp Gigante */}
-            <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-2xl border-2 border-[#1b4332] shadow-md">
-              <span className="text-xl">🟢</span>
-              <a 
-                href={`https://wa.me{WHATSAPP_NUMERO}`}
-                target="_blank"
-                rel="noreferrer"
-                className="text-2xl sm:text-3xl font-black text-[#0f2d1e] tracking-tight hover:underline font-mono"
-              >
-                5520696627
-              </a>
-              <span className="text-xl">🟢</span>
-            </div>
-            <p className="text-xs font-black uppercase text-[#0f2d1e] tracking-widest bg-amber-400 px-4 py-1 rounded-full shadow-sm">
+            {/* Título engrandecido y limpio sin fondo extra */}
+            <h3 className="text-xl sm:text-2xl font-black uppercase text-[#0f2d1e] tracking-wider leading-none">
               BRINDANDO LO MEJOR !!!
-            </p>
+            </h3>
 
-            {/* Ventana Multimedia Adaptativa (Video de YouTube o GIF Animado Semanal) */}
-            <div className="w-full rounded-2xl border-4 border-[#00c853] bg-white p-3 shadow-xl relative min-h-[200px] flex flex-col justify-center items-center">
-              {/* NOTA: Para cambiar a un Video real de YouTube, sustituye el bloque de abajo por un <iframe> */}
-              <div className="text-center p-4 flex flex-col items-center justify-center space-y-2">
-                <span className="text-3xl">📺</span>
-                <h4 className="font-black text-sm uppercase tracking-wide text-blue-800">
-                  VENTANA CON VIDEO DE YOUTUBE
-                </h4>
-                <p className="text-[11px] font-bold text-slate-600 leading-tight text-justify">
-                  Que se abra en automático... o un GIF animado... (este se cambiaría semanalmente, para mostrar novedades...).
-                </p>
-              </div>
+            {/* Ventana Multimedia con Reproductor Real de YouTube responsivo */}
+            <div className="w-full rounded-2xl border-4 border-[#00c853] bg-black overflow-hidden shadow-xl aspect-video relative">
+              <iframe
+                className="absolute top-0 left-0 w-full h-full"
+                src={`https://youtube.com{YOUTUBE_VIDEO_ID}?autoplay=0&mute=0`}
+                title="Reproductor de Novedades DCUATES"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
             </div>
 
           </div>
 
         </div>
       </section>
-      {/* SECCIÓN 1: LOS 4 PROYECTOS BASE (Restauración Exacta de la Imagen 1) */}
+      {/* SECCIÓN 1: LOS 4 PROYECTOS BASE (Restauración de la Imagen 1 con Botones WA Validados) */}
       <section id="iniciativas" className="bg-[#1b4332] text-white py-16 px-4 border-b-4 border-[#0f2d1e]">
         <div className="mx-auto max-w-6xl">
           <h2 className="text-3xl sm:text-4xl font-black text-center uppercase tracking-tight mb-12 text-emerald-300">
@@ -225,7 +233,6 @@ export default function App() {
                 className="rounded-3xl border-4 border-[#0f2d1e] bg-white p-6 text-slate-800 shadow-xl flex flex-col justify-between transition-all hover:scale-[1.01] duration-200"
               >
                 <div>
-                  {/* Encabezado de la Tarjeta */}
                   <div className="flex items-center gap-3 mb-2">
                     <span className="text-3xl bg-emerald-50 p-2 rounded-xl border border-emerald-800/10">{item.icono}</span>
                     <div>
@@ -238,12 +245,10 @@ export default function App() {
                     </div>
                   </div>
                   
-                  {/* Descripción de la iniciativa */}
-                  <p className="text-sm text-slate-600 leading-relaxed text-justify mb-4 pt-2">
+                  <p className="text-sm text-slate-600 leading-relaxed text-justify mb-4 pt-2 font-medium">
                     {item.descripcion}
                   </p>
                   
-                  {/* Viñetas con Puntitos Verdes según la Imagen 1 */}
                   <ul className="space-y-2 mb-6 pl-1">
                     {item.puntos.map((punto, pIdx) => (
                       <li key={pIdx} className="flex items-center gap-2 text-xs font-bold text-slate-700 uppercase">
@@ -254,7 +259,6 @@ export default function App() {
                   </ul>
                 </div>
 
-                {/* Botón de Acción Naranja Individual */}
                 <button
                   onClick={() => window.open(`https://wa.me{WHATSAPP_NUMERO}?text=${encodeURIComponent(item.mensajeWA)}`, '_blank')}
                   className="w-full text-center rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3 px-4 shadow-md transition-colors uppercase tracking-wide text-xs sm:text-sm font-heading"
@@ -267,61 +271,59 @@ export default function App() {
         </div>
       </section>
 
-      {/* SECCIÓN 2: LOS 4 NUEVOS PROYECTOS ADICIONALES (Fondo Verde Claro Alternado) */}
-      <section id="nuevos-proyectos" className="bg-[#e8f5e9] text-[#0f2d1e] py-16 px-4 border-b-4 border-[#0f2d1e]">
+      {/* SECCIÓN 2: LOS 4 NUEVOS PROYECTOS SOCIALES (Transformados al Formato Unificado de Tarjetas de la Imagen 1) */}
+      <section id="nuevos-proyectos" className="bg-[#e8f5e9] text-slate-800 py-16 px-4 border-b-4 border-[#0f2d1e]">
         <div className="mx-auto max-w-6xl">
           <h2 className="text-3xl sm:text-4xl font-black text-center uppercase tracking-tight mb-3 text-[#0f2d1e]">
             Nuevos Proyectos Sociales
           </h2>
-          <p className="text-center text-slate-700 mb-10 max-w-xl mx-auto text-xs sm:text-sm font-bold uppercase tracking-wide">
-            Ampliamos nuestro impacto con cuatro nuevos canales diseñados para responder a tus necesidades directas.
+          <p className="text-center text-slate-700 mb-12 max-w-xl mx-auto text-xs sm:text-sm font-bold uppercase tracking-wide">
+            Ampliamos nuestro impacto con cuatro nuevos canales comunitarios unificados.
           </p>
           
-          <div className="grid gap-6 sm:grid-cols-2">
-            {NUEVOS_PROYECTOS.map((item) => (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2">
+            {NUEVOS_PROYECTOS_DATA.map((item) => (
               <div 
                 id={item.id} 
                 key={item.id} 
-                className="rounded-2xl border-2 border-emerald-800/30 bg-white p-5 shadow-md flex items-start gap-4 transition-all hover:bg-emerald-50/50"
+                className="rounded-3xl border-4 border-[#0f2d1e] bg-white p-6 text-slate-800 shadow-xl flex flex-col justify-between transition-all hover:scale-[1.01] duration-200"
               >
-                <div className="text-3xl bg-emerald-100/50 p-2.5 rounded-xl border border-emerald-800/10 flex-shrink-0">
-                  {item.icono}
-                </div>
-                <div className="space-y-1">
-                  <h3 className="text-lg font-black uppercase tracking-tight text-[#0f2d1e] leading-tight">
-                    {item.titulo}
-                  </h3>
-                  <p className="text-[11px] font-bold text-amber-700 uppercase tracking-wider">
-                    {item.intro}
-                  </p>
-                  <p className="text-xs text-slate-600 leading-relaxed text-justify pt-1">
+                <div>
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="text-3xl bg-emerald-50 p-2 rounded-xl border border-emerald-800/10">{item.icono}</span>
+                    <div>
+                      <p className="text-xs font-black uppercase text-amber-700 tracking-wider">
+                        {item.categoria}
+                      </p>
+                      <h3 className="text-xl font-black text-[#0f2d1e] uppercase tracking-tight leading-tight">
+                        {item.titulo}
+                      </h3>
+                    </div>
+                  </div>
+                  
+                  <p className="text-sm text-slate-600 leading-relaxed text-justify mb-4 pt-2 font-medium">
                     {item.descripcion}
                   </p>
+                  
+                  <ul className="space-y-2 mb-6 pl-1">
+                    {item.puntos.map((punto, pIdx) => (
+                      <li key={pIdx} className="flex items-center gap-2 text-xs font-bold text-slate-700 uppercase">
+                        <span className="h-2 w-2 rounded-full bg-[#00c853] flex-shrink-0" />
+                        {punto}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
+
+                <button
+                  onClick={() => window.open(`https://wa.me{WHATSAPP_NUMERO}?text=${encodeURIComponent(item.mensajeWA)}`, '_blank')}
+                  className="w-full text-center rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3 px-4 shadow-md transition-colors uppercase tracking-wide text-xs sm:text-sm font-heading"
+                >
+                  {item.textoBoton}
+                </button>
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* SECCIÓN 3: ALIANZAS GANAR-GANAR (Fondo Verde Oscuro Original) */}
-      <section id="alianzas" className="bg-[#0f2d1e] text-white py-16 px-4 border-b-4 border-[#1b4332]">
-        <div className="mx-auto max-w-3xl text-center space-y-6">
-          <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-tight text-emerald-400">
-            Alianzas Ganar-Ganar
-          </h2>
-          <p className="text-emerald-100/90 leading-relaxed max-w-xl mx-auto text-sm sm:text-base text-justify sm:text-center font-medium">
-            Hagamos sinergia. Si eres emprendedor, organización o vecino con visión de cambio, colaboremos bajo nuestro formato original para robustecer de forma mutua el tejido comunitario con beneficios directos a las familias.
-          </p>
-          <button 
-            onClick={() => {
-              const msg = "Hola DCUATES! Me interesa proponer una Alianza Ganar-Ganar para trabajar en conjunto y multiplicar el impacto social.";
-              window.open(`https://wa.me{WHATSAPP_NUMERO}?text=${encodeURIComponent(msg)}`, '_blank');
-            }}
-            className="inline-block rounded-xl bg-[#e65100] text-white font-black px-8 py-3.5 shadow-md hover:bg-[#bf360c] transition-all hover:scale-[1.02] uppercase tracking-wide text-xs sm:text-sm font-heading"
-          >
-            Generar alianza vía WhatsApp
-          </button>
         </div>
       </section>
       {/* SECCIÓN: APORTE VOLUNTARIO (Restauración de la Imagen 3) */}
@@ -372,7 +374,7 @@ export default function App() {
         </div>
       </section>
 
-      {/* SECCIÓN 4: FORMULARIO DE PUBLICIDAD (Diseño Original de la Imagen 3) */}
+      {/* SECCIÓN 4: FORMULARIO DE PUBLICIDAD */}
       <section id="publicidad" className="bg-[#1b4332] text-white py-16 px-4">
         <div className="mx-auto max-w-2xl">
           <div className="text-center space-y-2 mb-8">
@@ -389,7 +391,6 @@ export default function App() {
           <FormularioPublicidad />
         </div>
       </section>
-
       {/* FOOTER */}
       <footer className="bg-slate-950 text-slate-400 py-10 text-center text-xs space-y-3 border-t border-emerald-950">
         <p>© {new Date().getFullYear()} DCUATES Comunidad. Todos los derechos reservados.</p>
@@ -415,7 +416,7 @@ export default function App() {
                 En cumplimiento con la normativa de protección de datos, <strong>DCUATES</strong> le informa que los datos recabados en este formulario (Nombre de Negocio, Categoría y Enlaces Digitales) tienen la única y exclusiva finalidad de promover de forma comunitaria y gratuita sus actividades comerciales.
               </p>
               <p>
-                Sus datos no serán vendidos, transferidos ni compartidos con terceros con fines of lucro. Al enviar la información y continuar la interacción en WhatsApp, usted acepta el tratamiento de los mismos para los fines de difusión colectiva estipulados en nuestras iniciativas de Apoyo al Emprendimiento.
+                Sus datos no serán vendidos, transferidos ni compartidos con terceros con fines de lucro. Al enviar la información y continuar la interacción en WhatsApp, usted acepta el tratamiento de los mismos para los fines de difusión colectiva estipulados en nuestras iniciativas de Apoyo al Emprendimiento.
               </p>
               <p>
                 Usted puede solicitar la baja, rectificación o eliminación de los datos publicitados en cualquier momento poniéndose en contacto directo mediante nuestros canales oficiales de atención.
@@ -433,8 +434,8 @@ export default function App() {
     </div>
   );
 }
-// =========================================================================
-// 3. SUBCOMPONENTE: SITE HEADER (ICONOS VECTORIALES ORIGINALES RECUPERADOS)
+    // =========================================================================
+// 3. SUBCOMPONENTE: SITE HEADER (ICONOS REPARADOS SIN RECORTES)
 // =========================================================================
 function SiteHeader() {
   const [open, setOpen] = useState(false);
@@ -454,7 +455,6 @@ function SiteHeader() {
           ))}
         </nav>
 
-        {/* Vectores SVG Limpios Nativos del Clon 3 */}
         <div className="hidden sm:flex items-center gap-2">
           <a href={REDES_SOCIALES.facebook} target="_blank" rel="noreferrer" className="flex h-9 w-9 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="Facebook">
             <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24" xmlns="http://w3.org">
@@ -553,4 +553,6 @@ function FormularioPublicidad() {
     </form>
   );
 }
+
+
 
