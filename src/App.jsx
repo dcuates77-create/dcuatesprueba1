@@ -124,24 +124,24 @@ export default function App() {
         </div>
       </section>
 
-      {/* SECCIÓN 2: 4 PROYECTOS NUEVOS (Fondo Verde Oscuro - Alternado) */}
-      <section id="nuevos-proyectos" className="bg-[#0f2d1e] text-white py-20 px-4">
+      {/* SECCIÓN 2: 4 PROYECTOS NUEVOS (Fondo Verde Claro Alternado) */}
+      <section id="nuevos-proyectos" className="bg-[#1b4332] text-white py-20 px-4 border-b border-emerald-900/40">
         <div className="mx-auto max-w-6xl">
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-center uppercase tracking-tight mb-4 md:text-5xl">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-center uppercase tracking-tight mb-4 md:text-5xl text-emerald-400">
             Nuevos Proyectos Sociales
           </h2>
           <p className="text-center text-emerald-200/80 mb-12 max-w-2xl mx-auto text-sm sm:text-base">
             Ampliamos nuestro impacto comunitario con cuatro nuevos canales diseñados para responder a tus necesidades directas.
           </p>
-          <div className="grid gap-8 sm:grid-cols-2">
+          <div className="grid gap-6 sm:grid-cols-2">
             {NUEVOS_PROYECTOS.map((item) => (
-              <div id={item.id} key={item.id} className="rounded-2xl border border-emerald-800/60 bg-emerald-950/40 p-6 transition-all hover:bg-emerald-950/60">
+              <div id={item.id} key={item.id} className="rounded-2xl border border-emerald-800/40 bg-[#0f2d1e]/60 p-6 transition-all hover:bg-[#0f2d1e]/90">
                 <div className="flex items-start gap-4">
-                  <div className="text-4xl bg-emerald-900/50 p-3 rounded-xl">{item.icono}</div>
+                  <div className="text-4xl bg-emerald-900/40 p-3 rounded-xl">{item.icono}</div>
                   <div className="space-y-1">
-                    <h3 className="text-xl font-bold uppercase tracking-wide text-emerald-400">{item.titulo}</h3>
-                    <p className="text-xs font-bold text-white/60 uppercase">{item.intro}</p>
-                    <p className="text-sm text-emerald-100/80 pt-2 leading-relaxed">{item.descripcion}</p>
+                    <h3 className="text-xl font-bold uppercase tracking-wide text-emerald-300">{item.titulo}</h3>
+                    <p className="text-xs font-bold text-white/50 uppercase">{item.intro}</p>
+                    <p className="text-sm text-emerald-100/80 pt-2 leading-relaxed text-justify">{item.descripcion}</p>
                   </div>
                 </div>
               </div>
@@ -150,52 +150,55 @@ export default function App() {
         </div>
       </section>
 
-      {/* SECCIÓN 3: ALIANZAS GANAR-GANAR (Fondo Claro - Alternado) */}
-      <section id="alianzas" className="bg-slate-50 text-slate-900 py-20 px-4 border-b border-slate-200">
+      {/* SECCIÓN 3: ALIANZAS GANAR-GANAR (Fondo Verde Oscuro Original del Clon 3) */}
+      <section id="alianzas" className="bg-[#0f2d1e] text-white py-20 px-4 border-b border-emerald-900/30">
         <div className="mx-auto max-w-3xl text-center space-y-6">
-          <h2 className="text-3xl sm:text-4xl font-extrabold uppercase tracking-tight md:text-5xl">
+          <h2 className="text-3xl sm:text-4xl font-extrabold uppercase tracking-tight md:text-5xl text-emerald-400">
             Alianzas Ganar-Ganar
           </h2>
-          <p className="text-slate-600 leading-relaxed max-w-xl mx-auto text-sm sm:text-base">
-            Hagamos sinergia. Si eres emprendedor, organización o vecino con visión de cambio, colaboremos para robustecer de forma mutua el tejido comunitario.
+          <p className="text-emerald-100/80 leading-relaxed max-w-xl mx-auto text-sm sm:text-base text-justify sm:text-center">
+            Hagamos sinergia. Si eres emprendedor, organización o vecino con visión de cambio, colaboremos bajo nuestro formato original para robustecer de forma mutua el tejido comunitario con beneficios directos a las familias.
           </p>
           <button 
             onClick={() => {
               const msg = "Hola DCUATES! Me interesa proponer una Alianza Ganar-Ganar para trabajar en conjunto y multiplicar el impacto social.";
               window.open(`https://wa.me{WHATSAPP_NUMERO}?text=${encodeURIComponent(msg)}`, '_blank');
             }}
-            className="inline-block rounded-xl bg-emerald-700 text-white font-bold px-8 py-3.5 shadow-md hover:bg-emerald-800 transition-colors uppercase tracking-wide text-xs sm:text-sm"
+            className="inline-block rounded-xl bg-emerald-600 text-white font-bold px-8 py-3.5 shadow-md hover:bg-emerald-500 transition-all hover:scale-[1.02] uppercase tracking-wide text-xs sm:text-sm font-heading"
           >
             Generar alianza vía WhatsApp
           </button>
         </div>
       </section>
 
-      {/* SECCIÓN 4: FORMULARIO DE PUBLICIDAD (Fondo Verde Oscuro - Alternado) */}
-      <section id="publicidad" className="bg-[#0f2d1e] text-white py-20 px-4">
+           {/* SECCIÓN 4: FORMULARIO DE PUBLICIDAD (Diseño Original del Clon 3) */}
+      <section id="publicidad" className="bg-[#1b4332] text-white py-20 px-4">
         <div className="mx-auto max-w-2xl">
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-center uppercase tracking-tight mb-8 md:text-5xl">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-center uppercase tracking-tight mb-8 md:text-5xl text-emerald-400">
             Registro de Negocios
           </h2>
           <FormularioPublicidad />
         </div>
       </section>
 
-      {/* FOOTER */}
-      <footer className="bg-slate-950 text-slate-400 py-8 text-center text-xs space-y-2 border-t border-slate-900">
+      {/* FOOTER CON ENLACE DE PRIVACIDAD ENGRANDECIDO */}
+      <footer className="bg-slate-950 text-slate-400 py-10 text-center text-xs space-y-3 border-t border-emerald-950">
         <p>© {new Date().getFullYear()} DCUATES Comunidad. Todos los derechos reservados.</p>
-        <button 
-          onClick={() => setShowPrivacy(true)}
-          className="text-emerald-500 hover:underline font-semibold bg-transparent border-none cursor-pointer"
-        >
-          Ver Aviso de Privacidad Oficial
-        </button>
+        <div className="pt-1">
+          <button 
+            onClick={() => setShowPrivacy(true)}
+            className="text-emerald-400 hover:text-emerald-300 font-bold bg-transparent border-none cursor-pointer text-sm sm:text-base tracking-wide transition-colors"
+          >
+            👉 Ver Aviso de Privacidad Oficial 👈
+          </button>
+        </div>
       </footer>
+
       {/* MODAL DEL AVISO DE PRIVACIDAD */}
       {showPrivacy && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
           <div className="bg-white text-slate-900 rounded-2xl max-w-xl w-full p-6 shadow-2xl flex flex-col max-h-[85vh]">
-            <h3 className="text-xl font-bold uppercase tracking-tight border-b pb-3 mb-4 text-emerald-800">
+            <h3 className="text-xl font-bold uppercase tracking-tight border-b pb-3 mb-4 text-emerald-800 font-heading">
               Aviso de Privacidad Simplificado
             </h3>
             <div className="overflow-y-auto space-y-3 pr-2 text-sm text-slate-600 leading-relaxed text-justify">
@@ -211,7 +214,7 @@ export default function App() {
             </div>
             <button
               onClick={() => setShowPrivacy(false)}
-              className="mt-6 w-full rounded-xl bg-emerald-700 text-white font-bold py-3 text-center transition-colors hover:bg-emerald-800 uppercase text-xs tracking-wider"
+              className="mt-6 w-full rounded-xl bg-emerald-700 text-white font-bold py-3.5 text-center transition-colors hover:bg-emerald-800 uppercase text-xs tracking-wider font-heading"
             >
               Aceptar y Cerrar
             </button>
@@ -223,61 +226,7 @@ export default function App() {
 }
 
 // =========================================================================
-// 3. SUBCOMPONENTE: SITE HEADER (MENÚ CON ENLACES REALES COMPLETADOS)
-// =========================================================================
-function SiteHeader() {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur py-3 px-4 shadow-sm text-slate-900">
-      <div className="mx-auto flex max-w-6xl items-center justify-between">
-        
-        <a href="#inicio" className="flex items-center gap-2">
-          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#0f2d1e] font-bold text-white text-base">DC</span>
-          <span className="text-lg font-black uppercase tracking-tight text-[#0f2d1e]">DCUATES</span>
-        </a>
-
-        <nav className="hidden md:flex items-center gap-5 text-xs font-bold text-slate-600 lg:text-sm">
-          {NAV_LINKS.map(link => (
-            <a key={link.href} href={link.href} className="hover:text-emerald-700 transition-colors uppercase tracking-wide">{link.label}</a>
-          ))}
-        </nav>
-        <div className="hidden sm:flex items-center gap-1.5 font-bold text-[11px]">
-          <a href={REDES_SOCIALES.facebook} target="_blank" rel="noreferrer" className="px-2 py-1.5 border rounded-lg hover:bg-slate-100 text-slate-600 hover:text-blue-600 transition-colors">FB</a>
-          <a href={REDES_SOCIALES.instagram} target="_blank" rel="noreferrer" className="px-2 py-1.5 border rounded-lg hover:bg-slate-100 text-slate-600 hover:text-pink-600 transition-colors">IG</a>
-          <a href={REDES_SOCIALES.youtube} target="_blank" rel="noreferrer" className="px-2 py-1.5 border rounded-lg hover:bg-slate-100 text-slate-600 hover:text-red-600 transition-colors">YT</a>
-          <a href={REDES_SOCIALES.tiktok} target="_blank" rel="noreferrer" className="px-2 py-1.5 border rounded-lg hover:bg-slate-100 text-slate-600 hover:text-black transition-colors">TK</a>
-        </div>
-
-        <button onClick={() => setOpen(!open)} className="md:hidden font-bold text-xs bg-slate-100 px-3 py-2 rounded-lg border">
-          {open ? "CERRAR" : "MENÚ"}
-        </button>
-      </div>
-
-      {open && (
-        <div className="fixed inset-x-0 top-[57px] bottom-0 bg-white z-50 flex flex-col p-6 md:hidden">
-          <nav className="flex flex-col gap-4 text-base font-bold">
-            {NAV_LINKS.map(link => (
-              <a key={link.href} href={link.href} onClick={() => setOpen(false)} className="border-b pb-2 uppercase text-slate-800 hover:text-emerald-700">{link.label}</a>
-            ))}
-          </nav>
-          <div className="mt-auto pt-6 border-t text-center space-y-3">
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Nuestros Espacios y Canales</p>
-            <div className="flex flex-wrap justify-center gap-2 font-bold text-xs">
-              <a href={REDES_SOCIALES.facebook} target="_blank" rel="noreferrer" onClick={() => setOpen(false)} className="px-3 py-2 border rounded-lg bg-slate-50 text-slate-700">FACEBOOK</a>
-              <a href={REDES_SOCIALES.instagram} target="_blank" rel="noreferrer" onClick={() => setOpen(false)} className="px-3 py-2 border rounded-lg bg-slate-50 text-slate-700">INSTAGRAM</a>
-              <a href={REDES_SOCIALES.youtube} target="_blank" rel="noreferrer" onClick={() => setOpen(false)} className="px-3 py-2 border rounded-lg bg-slate-50 text-slate-700">YOUTUBE</a>
-              <a href={REDES_SOCIALES.tiktok} target="_blank" rel="noreferrer" onClick={() => setOpen(false)} className="px-3 py-2 border rounded-lg bg-slate-50 text-slate-700">TIKTOK</a>
-            </div>
-          </div>
-        </div>
-      )}
-    </header>
-  );
-}
-
-// =========================================================================
-// 4. SUBCOMPONENTE: FORMULARIO DE PUBLICIDAD
+// 4. SUBCOMPONENTE: FORMULARIO DE PUBLICIDAD (Estilos Originales Clon 3)
 // =========================================================================
 function FormularioPublicidad() {
   const [nombre, setNombre] = useState("");
@@ -308,22 +257,22 @@ function FormularioPublicidad() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-emerald-950/40 border border-emerald-800/50 p-6 rounded-2xl space-y-4">
+    <form onSubmit={handleSubmit} className="bg-[#0f2d1e]/80 border border-emerald-700/30 p-6 rounded-2xl space-y-4 shadow-xl">
       <div>
         <label className="block text-xs font-bold uppercase tracking-wider text-emerald-400 mb-1">Nombre del Negocio / Emprendimiento *</label>
-        <input type="text" required value={nombre} onChange={e => setNombre(e.target.value)} className="w-full bg-emerald-900/30 border border-emerald-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500" placeholder="Ej. Tacos El Vecino" />
+        <input type="text" required value={nombre} onChange={e => setNombre(e.target.value)} className="w-full bg-[#1b4332]/40 border border-emerald-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors" placeholder="Ej. Tacos El Vecino" />
       </div>
       <div>
         <label className="block text-xs font-bold uppercase tracking-wider text-emerald-400 mb-1">Giro o Categoría Comercial *</label>
-        <input type="text" required value={categoria} onChange={e => setCategoria(e.target.value)} className="w-full bg-emerald-900/30 border border-emerald-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500" placeholder="Ej. Alimentos / Alfarería / Servicios" />
+        <input type="text" required value={categoria} onChange={e => setCategoria(e.target.value)} className="w-full bg-[#1b4332]/40 border border-emerald-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors" placeholder="Ej. Alimentos / Alfarería / Servicios" />
       </div>
       <div className="space-y-2 pt-2">
         <label className="block text-xs font-bold uppercase tracking-wider text-emerald-400">Canales y Enlaces Digitales de Contacto (3 Campos)</label>
-        <input type="url" value={canal1} onChange={e => setCanal1(e.target.value)} className="w-full bg-emerald-900/30 border border-emerald-800 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-emerald-500" placeholder="Enlace 1: Ej. https://facebook.com" />
-        <input type="url" value={canal2} onChange={e => setCanal2(e.target.value)} className="w-full bg-emerald-900/30 border border-emerald-800 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-emerald-500" placeholder="Enlace 2: Ej. https://instagram.com" />
-        <input type="text" value={canal3} onChange={e => setCanal3(e.target.value)} className="w-full bg-emerald-900/30 border border-emerald-800 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-emerald-500" placeholder="Canal 3: Ej. Teléfono o Dirección" />
+        <input type="url" value={canal1} onChange={e => setCanal1(e.target.value)} className="w-full bg-[#1b4332]/40 border border-emerald-800 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 transition-colors" placeholder="Enlace 1: Ej. https://facebook.com" />
+        <input type="url" value={canal2} onChange={e => setCanal2(e.target.value)} className="w-full bg-[#1b4332]/40 border border-emerald-800 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 transition-colors" placeholder="Enlace 2: Ej. https://instagram.com" />
+        <input type="text" value={canal3} onChange={e => setCanal3(e.target.value)} className="w-full bg-[#1b4332]/40 border border-emerald-800 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 transition-colors" placeholder="Canal 3: Ej. Teléfono o Dirección" />
       </div>
-      <button type="submit" className="w-full rounded-xl bg-emerald-600 text-white font-bold py-3 uppercase tracking-wider text-xs hover:bg-emerald-500 transition-colors mt-2 shadow-md">
+      <button type="submit" className="w-full rounded-xl bg-emerald-600 text-white font-bold py-3.5 uppercase tracking-wider text-xs hover:bg-emerald-500 transition-all hover:scale-[1.01] mt-2 shadow-md font-heading">
         Enviar Registro y Abrir WhatsApp
       </button>
     </form>
