@@ -41,7 +41,7 @@
               BRINDANDO LO MEJOR !!!
             </h3>
 
-            {/* Ventana Multimedia con Reproductor Real de YouTube responsivo */}
+                      {/* Ventana Multimedia con Reproductor Real de YouTube responsivo */}
             <div className="w-full rounded-2xl border-4 border-[#00c853] bg-black overflow-hidden shadow-xl aspect-video relative">
               <iframe
                 className="absolute top-0 left-0 w-full h-full"
@@ -57,6 +57,7 @@
 
         </div>
       </section>
+
       {/* SECCIÓN 1: LOS 4 PROYECTOS BASE (Restauración de la Imagen 1 con Botones WA Validados) */}
       <section id="iniciativas" className="bg-[#1b4332] text-white py-16 px-4 border-b-4 border-[#0f2d1e]">
         <div className="mx-auto max-w-6xl">
@@ -245,14 +246,14 @@
 
       {/* MODAL DEL AVISO DE PRIVACIDAD */}
       {showPrivacy && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
+               <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
           <div className="bg-white text-slate-900 rounded-2xl max-w-xl w-full p-6 shadow-2xl flex flex-col max-h-[85vh]">
             <h3 className="text-xl font-bold uppercase tracking-tight border-b pb-3 mb-4 text-emerald-800 font-heading">
               Aviso de Privacidad Simplificado
             </h3>
             <div className="overflow-y-auto space-y-3 pr-2 text-sm text-slate-600 leading-relaxed text-justify font-medium">
               <p>
-                En cumplimiento con la normativa de protección de datos, <strong>DCUATES</strong> le informa que los datos recabados en este formulario (Nombre de Negocio, Categoría y Enlaces Digitales) tienen la única y exclusiva finalidad de promover de forma comunitaria y gratuita sus actividades comerciales.
+                En cumplimiento con la normativa de protección de datos, <strong>DCUATES</strong> le informa que los datos recabados in este formulario (Nombre de Negocio, Categoría y Enlaces Digitales) tienen la única y exclusiva finalidad de promover de forma comunitaria y gratuita sus actividades comerciales.
               </p>
               <p>
                 Sus datos no serán vendidos, transferidos ni compartidos con terceros con fines de lucro. Al enviar la información y continuar la interacción en WhatsApp, usted acepta el tratamiento de los mismos para los fines de difusión colectiva estipulados en nuestras iniciativas de Apoyo al Emprendimiento.
