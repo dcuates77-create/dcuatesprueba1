@@ -41,8 +41,7 @@
               BRINDANDO LO MEJOR !!!
             </h3>
 
-                      {/* Ventana Multimedia con Reproductor Real de YouTube responsivo */}
-            <div className="w-full rounded-2xl border-4 border-[#00c853] bg-black overflow-hidden shadow-xl aspect-video relative">
+                               <div className="w-full rounded-2xl border-4 border-[#00c853] bg-black overflow-hidden shadow-xl aspect-video relative">
               <iframe
                 className="absolute top-0 left-0 w-full h-full"
                 src={`https://youtube.com{YOUTUBE_VIDEO_ID}?autoplay=0&mute=0`}
@@ -57,6 +56,7 @@
 
         </div>
       </section>
+
 
       {/* SECCIÓN 1: LOS 4 PROYECTOS BASE (Restauración de la Imagen 1 con Botones WA Validados) */}
       <section id="iniciativas" className="bg-[#1b4332] text-white py-16 px-4 border-b-4 border-[#0f2d1e]">
