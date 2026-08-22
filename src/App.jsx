@@ -3,12 +3,16 @@ import React, { useState, useEffect } from "react";
 // =========================================================================
 // 1. CONFIGURACIÓN CENTRALIZADA DE VARIABLES, REDES Y HOJA DE CÁLCULO
 // =========================================================================
+const WHATSAPP_NUMERO = "525520696627";
 const GOOGLE_SHEETS_URL = "https://google.com";
+
+// ID del video real de YouTube que se muestra en la portada
+const YOUTUBE_VIDEO_ID = "dQw4w9WgXcQ"; 
 
 const REDES_SOCIALES = {
   facebook: "https://facebook.com",
   instagram: "https://instagram.com",
-  youtube: "http://youtube.com",
+  youtube: "https://youtube.com",
   tiktok: "https://tiktok.com"
 };
 
@@ -20,7 +24,7 @@ const NAV_LINKS = [
   { label: "Publicidad", href: "#publicidad" }
 ];
 
-// Arreglo de los 4 Proyectos Iniciales del Clon 3 (Estructura de la Imagen 1)
+// Arreglo de los 4 Proyectos Iniciales (WhatsApp indexado de forma nativa e independiente)
 const INICIATIVAS_PRINCIPALES = [
   {
     id: "libros",
@@ -60,7 +64,7 @@ const INICIATIVAS_PRINCIPALES = [
   }
 ];
 
-// Arreglo de los 4 Proyectos Nuevos Transformados al formato premium con 3 puntos clave
+// Arreglo de los 4 Proyectos Nuevos (WhatsApp indexado de forma nativa e independiente)
 const NUEVOS_PROYECTOS_DATA = [
   {
     id: "asesorias",
@@ -109,7 +113,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#1b4332] font-sans antialiased text-slate-900 selection:bg-emerald-500/30 relative">
       
-      {/* Botón Flotante Permanente de WhatsApp del Clon 3 (Número Directo Protegido) */}
+      {/* Botón Flotante Permanente de WhatsApp del Clon 3 (Enlace Directo Validado) */}
       <a
         href="https://wa.me"
         target="_blank"
@@ -124,12 +128,12 @@ export default function App() {
 
       {/* Encabezado */}
       <SiteHeader />
-      {/* SECCIÓN PORTADA / HERO (Diseño de 3 Columnas con Rutas de Carpeta images Corregidas) */}
+      {/* SECCIÓN PORTADA / HERO (Diseño Asimétrico 50/50 - Clon 4 Optimizado según Imagen) */}
       <section id="inicio" className="bg-[#e8f5e9] text-[#0f2d1e] py-12 px-4 md:py-16 border-b-4 border-[#0f2d1e]">
-        <div className="mx-auto max-w-7xl grid gap-8 items-stretch lg:grid-cols-12">
+        <div className="mx-auto max-w-7xl grid gap-8 items-stretch lg:grid-cols-2">
           
-          {/* COLUMNA IZQUIERDA: Textos de Clon 4 y Foto de la Bibliobici */}
-          <div className="lg:col-span-5 flex flex-col justify-between space-y-6">
+          {/* COLUMNA IZQUIERDA: Mensaje de Inicio Ampliado y Foto de la Bibliobici */}
+          <div className="flex flex-col justify-between space-y-6">
             <div className="space-y-4">
               <h1 className="text-4xl sm:text-5xl font-black uppercase tracking-tight text-[#0f2d1e] leading-none">
                 Jūntos hacemos<br />COMUNIDAD
@@ -145,8 +149,8 @@ export default function App() {
             <div className="overflow-hidden rounded-2xl border-4 border-[#0f2d1e]/30 bg-white shadow-lg">
               <img 
                 src="/images/bibliobici-movil.png" 
-                alt="Bibliobici+Móvil DCUATES en la comunidad" 
-                className="w-full h-auto object-cover max-h-[280px]"
+                alt="Bibliobici Móvil DCUATES en la comunidad" 
+                className="w-full h-auto object-cover max-h-[300px]"
                 onError={(e) => {
                   e.target.style.display = 'none';
                   e.target.parentElement.innerHTML = '<div class="p-12 text-center text-[#0f2d1e]/70 font-bold uppercase text-xs tracking-wider bg-emerald-50">📷 [Espacio para Foto de la Bibliobici]</div>';
@@ -155,47 +159,28 @@ export default function App() {
             </div>
           </div>
 
-          {/* COLUMNA CENTRAL: Botonera con más espaciado vertical */}
-          <div className="lg:col-span-3 flex flex-col justify-between py-1 gap-3">
-            {[
-              { t: "Préstamo de Libros", h: "#libros" },
-              { t: "Ecatepets Mascotas", h: "#ecatepets" },
-              { t: "Alianzas Solidarias", h: "#iniciativas" },
-              { t: "Publicidad Gratis", h: "#publicidad" },
-              { t: "Asesorías Gratuitas", h: "#asesorias" },
-              { t: "Bazar y Comercio", h: "#bazares" },
-              { t: "Noticias de Barrio", h: "#noticias" },
-              { t: "Apoyo Voluntario", h: "#donaciones" }
-            ].map((btn, idx) => (
-              <a 
-                key={idx}
-                href={btn.h}
-                className="w-full flex-1 flex items-center justify-center text-center rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black px-4 shadow-md transition-all hover:scale-[1.02] uppercase tracking-wide text-xs sm:text-sm font-heading"
-              >
-                {btn.t}
-              </a>
-            ))}
-          </div>
-
-          {/* COLUMNA DERECHA: Logo Circular y Video YouTube Nativo */}
-          <div className="lg:col-span-4 flex flex-col items-center justify-between text-center space-y-6">
+          {/* COLUMNA DERECHA: Logo Circular Agrandado al 50% y Reproductor de Video Nativo */}
+          <div className="flex flex-col items-center justify-between text-center space-y-6 bg-white/40 p-6 rounded-3xl border-2 border-emerald-800/10">
             
-            <div className="w-44 h-44 sm:w-52 sm:h-52 flex items-center justify-center rounded-full overflow-hidden bg-white p-2 border-4 border-[#0f2d1e]/20 shadow-xl">
+            {/* Logotipo Oficial Agrandado */}
+            <div className="w-56 h-56 sm:w-64 sm:h-64 flex items-center justify-center rounded-full overflow-hidden bg-white p-2 border-4 border-[#0f2d1e]/20 shadow-xl">
               <img 
                 src="/images/logo-circular.png" 
                 alt="Logo Oficial DCUATES.COM" 
                 className="w-full h-full object-contain"
                 onError={(e) => {
                   e.target.style.display = 'none';
-                  e.target.parentElement.innerHTML = '<div class="text-[#e65100] font-black text-xl tracking-tight leading-none">🟢 DCUATES.COM<br/><span class="text-xs text-[#0f2d1e]/60 font-bold">APOYOS Y BENEFICIOS</span></div>';
+                  e.target.parentElement.innerHTML = '<div class="text-[#e65100] font-black text-2xl tracking-tight leading-none">🟢 DCUATES.COM<br/><span class="text-sm text-[#0f2d1e]/60 font-bold">APOYOS Y BENEFICIOS</span></div>';
                 }}
               />
             </div>
 
-            <h3 className="text-xl sm:text-2xl font-black uppercase text-[#0f2d1e] tracking-wider leading-none">
+            {/* Título engrandecido y limpio sin fondo extra */}
+            <h3 className="text-2xl sm:text-3xl font-black uppercase text-[#0f2d1e] tracking-wider leading-none">
               BRINDANDO LO MEJOR !!!
             </h3>
 
+            {/* Ventana Multimedia con Reproductor Real de YouTube responsivo */}
             <div className="w-full rounded-2xl border-4 border-[#00c853] bg-black overflow-hidden shadow-xl aspect-video relative">
               <iframe
                 className="absolute top-0 left-0 w-full h-full"
@@ -211,7 +196,7 @@ export default function App() {
 
         </div>
       </section>
-      {/* SECCIÓN 1: LOS 4 PROYECTOS BASE (Formatos Originales de la Imagen 1 con WhatsApp Validado) */}
+      {/* SECCIÓN 1: LOS 4 PROYECTOS BASE (Fondo Verde Oscuro y Scroll Margin Corregido) */}
       <section id="iniciativas" className="bg-[#1b4332] text-white py-16 px-4 border-b-4 border-[#0f2d1e]">
         <div className="mx-auto max-w-6xl">
           <h2 className="text-3xl sm:text-4xl font-black text-center uppercase tracking-tight mb-12 text-emerald-300">
@@ -223,7 +208,7 @@ export default function App() {
               <div 
                 id={item.id} 
                 key={item.id} 
-                className="rounded-3xl border-4 border-[#0f2d1e] bg-white p-6 text-slate-800 shadow-xl flex flex-col justify-between transition-all hover:scale-[1.01] duration-200"
+                className="scroll-mt-24 rounded-3xl border-4 border-[#0f2d1e] bg-white p-6 text-slate-800 shadow-xl flex flex-col justify-between transition-all hover:scale-[1.01] duration-200"
               >
                 <div>
                   <div className="flex items-center gap-3 mb-2">
@@ -264,13 +249,13 @@ export default function App() {
         </div>
       </section>
 
-      {/* SECCIÓN 2: LOS 4 NUEVOS PROYECTOS SOCIALES (Formato Premium Unificado con WhatsApp Validado) */}
-      <section id="nuevos-proyectos" className="bg-[#e8f5e9] text-slate-800 py-16 px-4 border-b-4 border-[#0f2d1e]">
+      {/* SECCIÓN 2: LOS 4 NUEVOS PROYECTOS SOCIALES (Mismo Formato Premium y Fondo Verde Oscuro Unificado) */}
+      <section id="nuevos-proyectos" className="bg-[#1b4332] text-white py-16 px-4 border-b-4 border-[#0f2d1e]">
         <div className="mx-auto max-w-6xl">
-          <h2 className="text-3xl sm:text-4xl font-black text-center uppercase tracking-tight mb-3 text-[#0f2d1e]">
+          <h2 className="text-3xl sm:text-4xl font-black text-center uppercase tracking-tight mb-3 text-emerald-300">
             Nuevos Proyectos Sociales
           </h2>
-          <p className="text-center text-slate-700 mb-12 max-w-xl mx-auto text-xs sm:text-sm font-bold uppercase tracking-wide">
+          <p className="text-center text-emerald-200/80 mb-12 max-w-xl mx-auto text-xs sm:text-sm font-bold uppercase tracking-wide">
             Ampliamos nuestro impacto con cuatro nuevos canales comunitarios unificados.
           </p>
           
@@ -279,7 +264,7 @@ export default function App() {
               <div 
                 id={item.id} 
                 key={item.id} 
-                className="rounded-3xl border-4 border-[#0f2d1e] bg-white p-6 text-slate-800 shadow-xl flex flex-col justify-between transition-all hover:scale-[1.01] duration-200"
+                className="scroll-mt-24 rounded-3xl border-4 border-[#0f2d1e] bg-white p-6 text-slate-800 shadow-xl flex flex-col justify-between transition-all hover:scale-[1.01] duration-200"
               >
                 <div>
                   <div className="flex items-center gap-3 mb-2">
@@ -498,7 +483,7 @@ function SiteHeader() {
 }
 
 // =========================================================================
-// 4. SUBCOMPONENTE: FORMULARIO DE PUBLICIDAD (CAMPOS INDEPENDIENTES LIMPIOS)
+// 4. SUBCOMPONENTE: FORMULARIO DE PUBLICIDAD
 // =========================================================================
 function FormularioPublicidad() {
   const [nombre, setNombre] = useState("");
@@ -552,4 +537,5 @@ function FormularioPublicidad() {
     </form>
   );
 }
+
 
