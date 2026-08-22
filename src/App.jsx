@@ -143,6 +143,17 @@ export default function App() {
  <h1 className="text-4xl sm:text-5xl font-black uppercase tracking-tight text-[#0f2d1e] leading-none">
  Jūntos hacemos<br />COMUNIDAD
  </h1>
+  {/* BOTÓN TEMPORAL DE PRUEBA DE WHATSAPP */}
+<div className="pt-4">
+  <a
+    href="https://whatsapp.com."
+    target="_blank"
+    rel="noopener noreferrer"
+    className="inline-block bg-red-600 text-white font-black text-sm uppercase px-6 py-3 rounded-xl shadow-xl hover:bg-red-700 animate-bounce"
+  >
+    🚨 PROBAR WHATSAPP AQUÍ
+  </a>
+</div>
  <p className="text-xs font-black text-amber-700 uppercase tracking-wider">
  ⚡ PROYECTOS COMUNITARIOS DCUATES
  </p>
@@ -204,14 +215,15 @@ export default function App() {
  </h3>
  {/* Iframe estructurado con la URL embed definitiva */}
  <div className="w-full rounded-2xl border-4 border-[#00c853] bg-black overflow-hidden shadow-xl aspect-video relative">
- <iframe
- className="absolute top-0 left-0 w-full h-full"
- src="https://youtube.com"
- title="CHUY EL SAPO SOÑADOR - DCUATES"
- frameBorder="0"
- allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
- allowFullScreen
- ></iframe>
+{/* Reemplaza tu etiqueta iframe actual por esta exacta */}
+<iframe
+  className="absolute top-0 left-0 w-full h-full"
+  src="https://youtube.com"
+  title="CHUY EL SAPO SOÑADOR - DCUATES"
+  frameBorder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowFullScreen
+></iframe>
  </div>
  </div>
 
