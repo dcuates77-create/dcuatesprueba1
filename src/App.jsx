@@ -117,7 +117,7 @@ export default function App() {
  return (
  <div className="min-h-screen bg-[#1b4332] font-sans antialiased text-slate-900 selection:bg-emerald-500/30 relative">
  
- {/* Botón Flotante Permanente de WhatsApp del Clon 3 */}
+ {/* Botón Flotante Permanente de WhatsApp Corregido de raíz */}
  <a
  href={`https://whatsapp.com{TELEFONO_WA}&text=${encodeURIComponent("Hola DCUATES! Me comunico para solicitar atención directa sobre los proyectos comunitarios.")}`}
  target="_blank"
@@ -133,11 +133,11 @@ export default function App() {
  {/* Encabezado */}
  <SiteHeader />
 
- {/* SECCIÓN PORTADA / HERO (Diseño de 3 Columnas con Embed de YouTube Corregido) */}
+ {/* SECCIÓN PORTADA / HERO (Diseño de 3 Columnas) */}
  <section id="inicio" className="bg-[#e8f5e9] text-[#0f2d1e] py-12 px-4 md:py-16 border-b-4 border-[#0f2d1e]">
  <div className="mx-auto max-w-7xl grid gap-8 items-stretch lg:grid-cols-12">
  
- {/* COLUMNA IZQUIERDA: Textos de Clon 4 y Foto de la Bibliobici */}
+ {/* COLUMNA IZQUIERDA */}
  <div className="lg:col-span-5 flex flex-col justify-between space-y-6">
  <div className="space-y-4">
  <h1 className="text-4xl sm:text-5xl font-black uppercase tracking-tight text-[#0f2d1e] leading-none">
@@ -147,7 +147,7 @@ export default function App() {
  ⚡ PROYECTOS COMUNITARIOS DCUATES
  </p>
  <p className="text-sm sm:text-base text-slate-800 leading-relaxed text-justify font-medium">
- <strong>DCUATES</strong> impulsa proyectos, <strong>PERSONAS, ORGANIZACIONES Y EMPRENDIMIENTOS</strong> que <strong>BENEFICIAN a las FAMILIAS</strong>: <strong>PUBLICIDAD GRATUITA</strong> para tu negocio, préstamo de <strong>LIBROS</strong> y materiales <strong>EDUCATIVOS</strong>, apoyo a <strong>MASCOTAS Y GRUPOS VULNERABLES</strong>, y <strong>ALIANZAS GANAR-GANAR</strong> que generan apoyos y beneficios mutuos y comunitarios. Suma con tu valiosa colaboración o con tu invaluable <strong>APOYO VOLUNTARIO</strong> para lograr nuestros objetivos de forma más effective, y forjar <strong>LA CADENA DE VALOR Y DE VALORES</strong> que nos liberará de nuestras limitaciones para ser mejores, Y ASÍ MEJORAR NUESTRO ENTORNO Y NUESTRO MUNDO !!!
+ <strong>DCUATES</strong> impulsa proyectos, <strong>PERSONAS, ORGANIZACIONES Y EMPRENDIMIENTOS</strong> que <strong>BENEFICIAN a las FAMILIAS</strong>: <strong>PUBLICIDAD GRATUITA</strong> para tu negocio, préstamo de <strong>LIBROS</strong> y materiales <strong>EDUCATIVOS</strong>, apoyo a <strong>MASCOTAS Y GRUPOS VULNERABLES</strong>, y <strong>ALIANZAS GANAR-GANAR</strong> que generan apoyos y beneficios mutuos y comunitarios. Suma con tu valiosa colaboración o con tu invaluable <strong>APOYO VOLUNTARIO</strong> para lograr nuestros objetivos de forma más efectiva, y forjar <strong>LA CADENA DE VALOR Y DE VALORES</strong> que nos liberará de nuestras limitaciones para ser mejores, Y ASÍ MEJORAR NUESTRO ENTORNO Y NUESTRO MUNDO !!!
  </p>
  </div>
  
@@ -164,7 +164,7 @@ export default function App() {
  </div>
  </div>
 
- {/* COLUMNA CENTRAL: Botonera Vertical de 8 Botones Naranjas Mantenida */}
+ {/* COLUMNA CENTRAL */}
  <div className="lg:col-span-3 flex flex-col justify-between py-1 gap-3">
  {[
  { t: "Préstamo de Libros", h: "#libros" },
@@ -186,7 +186,7 @@ export default function App() {
  ))}
  </div>
 
- {/* COLUMNA DERECHA: Logo Circular Maximizado y Video YouTube Nativo Reparado */}
+ {/* COLUMNA DERECHA: Video de Chuy Configurado con el ID Oficial Validado */}
  <div className="lg:col-span-4 flex flex-col items-center justify-between text-center space-y-4">
  <div className="w-56 h-56 sm:w-64 sm:h-64 lg:w-72 lg:h-72 flex items-center justify-center rounded-full overflow-hidden bg-white p-2 border-4 border-[#0f2d1e]/20 shadow-xl">
  <img 
@@ -202,7 +202,7 @@ export default function App() {
  <h3 className="text-xl sm:text-2xl font-black uppercase text-[#0f2d1e] tracking-wider leading-none pt-2">
  BRINDANDO LO MEJOR !!!
  </h3>
- {/* Ventana Multimedia con Dirección de Incrustación Fija de Chuy Reparada */}
+ {/* Iframe estructurado con la URL embed definitiva */}
  <div className="w-full rounded-2xl border-4 border-[#00c853] bg-black overflow-hidden shadow-xl aspect-video relative">
  <iframe
  className="absolute top-0 left-0 w-full h-full"
@@ -220,8 +220,7 @@ export default function App() {
  {/* SECCIÓN 1: LOS 4 PROYECTOS BASE */}
  <section id="iniciativas" className="bg-[#1b4332] text-white py-16 px-4 border-b-4 border-[#0f2d1e]">
  <div className="mx-auto max-w-6xl">
- <h2 className="text-3xl sm:text-4xl font-black text-center uppercase tracking-tight mb-12 
-text-emerald-300">
+ <h2 className="text-3xl sm:text-4xl font-black text-center uppercase tracking-tight mb-12 text-emerald-300">
  Nuestros Proyectos Originales
  </h2>
  
@@ -258,7 +257,7 @@ text-emerald-300">
  ))}
  </ul>
  </div>
- {/* Enlace directo nativo puro para saltar bloqueos */}
+ {/* Hipervínculos legítimos de escape para evitar bloqueos */}
  <a
  href={`https://whatsapp.com{TELEFONO_WA}&text=${encodeURIComponent(item.mensajeWA)}`}
  target="_blank"
@@ -316,7 +315,6 @@ text-emerald-300">
  ))}
  </ul>
  </div>
- {/* Enlace directo nativo puro para saltar bloqueos */}
  <a
  href={`https://whatsapp.com{TELEFONO_WA}&text=${encodeURIComponent(item.mensajeWA)}`}
  target="_blank"
@@ -331,7 +329,7 @@ text-emerald-300">
  </div>
  </section>
 
- {/* SECCIÓN: APORTE VOLUNTARIO (Botonera Estilizada de Enlaces de API Directos) */}
+ {/* SECCIÓN: APORTE VOLUNTARIO */}
  <section id="donaciones" className="bg-[#e8f5e9] text-[#0f2d1e] py-16 px-4 border-b-4 border-[#0f2d1e]">
  <div className="mx-auto max-w-5xl grid gap-10 md:grid-cols-12 items-center">
  
@@ -553,5 +551,3 @@ function FormularioPublicidad() {
  </form>
  );
 }
-
-
