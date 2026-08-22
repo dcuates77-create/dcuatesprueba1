@@ -11,7 +11,7 @@ export default function App() {
         Validación síncrona de video incrustado y enlace directo corto
       </p>
 
-      {/* 📽️ PRUEBA 1: EL REPRODUCTOR DE VIDEO DE CHUY EN LA PÁGINA */}
+      {/* 📽️ REPRODUCTOR INDESTRUCTIBLE DEL REPORTAJE DE CHUY EL SAPO SOÑADOR */}
       <div style={{ maxWidth: "560px", margin: "0 auto 40px auto", border: "4px solid #057857", borderRadius: "16px", overflow: "hidden", aspectRatio: "16/9", backgroundColor: "black" }}>
         <iframe
           style={{ width: "100%", height: "100%", border: "0" }}
@@ -22,7 +22,7 @@ export default function App() {
         ></iframe>
       </div>
 
-      {/* 💬 PRUEBA 2: BOTÓN CORTO DE WHATSAPP DIRECTO A TU NÚMERO */}
+      {/* 💬 BOTÓN CORTO DE WHATSAPP DIRECTO HACIA TU TELÉFONO CENTRAL */}
       <div style={{ marginTop: "20px" }}>
         <p style={{ fontSize: "14px", color: "#f59e0b", marginBottom: "10px" }}>
           DESTINO VERIFICADO: <strong>525520696627</strong>
@@ -31,7 +31,7 @@ export default function App() {
           href="https://wa.me."
           target="_blank"
           rel="noopener noreferrer"
-          style={{ display: "inline-block", backgroundColor: "#e65100", color: "white", fontWeight: "900", padding: "15px 30px", borderRadius: "12px", textDecoration: "none", boxHighlight: "0 10px 15px -3px rgba(0,0,0,0.3)", textTransform: "uppercase", fontSize: "14px" }}
+          style={{ display: "inline-block", backgroundColor: "#e65100", color: "white", fontWeight: "900", padding: "15px 30px", borderRadius: "12px", textDecoration: "none", textTransform: "uppercase", fontSize: "14px" }}
         >
           🚀 PROBAR WHATSAPP CORTO NOW
         </a>
