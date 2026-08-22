@@ -1,13 +1,9 @@
-          import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 
 // =========================================================================
 // 1. CONFIGURACIÓN CENTRALIZADA DE VARIABLES, REDES Y HOJA DE CÁLCULO
 // =========================================================================
-const WHATSAPP_NUMERO = "525520696627";
 const GOOGLE_SHEETS_URL = "https://google.com";
-
-// ID del video de YouTube que se muestra en la portada
-const YOUTUBE_VIDEO_ID = "dQw4w9WgXcQ"; 
 
 const REDES_SOCIALES = {
   facebook: "https://facebook.com",
@@ -96,7 +92,7 @@ const NUEVOS_PROYECTOS_DATA = [
   {
     id: "bienestar",
     categoria: "SALUD Y ESPARCIMIENTO",
-    titulo: "Bienestar, Culture y Recreación",
+    titulo: "Bienestar, Cultura y Recreación",
     descripcion: "Actividades recreativas y talleres enfocados en el desarrollo integral, la salud mental y el esparcimiento familiar.",
     puntos: ["Desarrollo integral", "Salud mental", "Esparcimiento familiar"],
     textoBoton: "Preguntar por talleres",
@@ -113,9 +109,9 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#1b4332] font-sans antialiased text-slate-900 selection:bg-emerald-500/30 relative">
       
-      {/* Botón Flotante Permanente de WhatsApp del Clon 3 */}
+      {/* Botón Flotante Permanente de WhatsApp del Clon 3 (Número Directo Protegido) */}
       <a
-        href={`https://wa.me{WHATSAPP_NUMERO}`}
+        href="https://wa.me"
         target="_blank"
         rel="noreferrer"
         className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#25d366] text-white shadow-2xl transition-all hover:scale-110 active:scale-95 group hover:bg-[#128c7e]"
@@ -128,7 +124,7 @@ export default function App() {
 
       {/* Encabezado */}
       <SiteHeader />
-      {/* SECCIÓN PORTADA / HERO (Diseño de 3 Columnas) */}
+      {/* SECCIÓN PORTADA / HERO (Diseño de 3 Columnas con Rutas de Carpeta images Corregidas) */}
       <section id="inicio" className="bg-[#e8f5e9] text-[#0f2d1e] py-12 px-4 md:py-16 border-b-4 border-[#0f2d1e]">
         <div className="mx-auto max-w-7xl grid gap-8 items-stretch lg:grid-cols-12">
           
@@ -142,14 +138,14 @@ export default function App() {
                 ⚡ PROYECTOS COMUNITARIOS DCUATES
               </p>
               <p className="text-sm sm:text-base text-slate-800 leading-relaxed text-justify font-medium">
-                <strong>DCUATES</strong> impulsa proyectos, <strong>PERSONAS, ORGANIZACIONES Y EMPRENDIMIENTOS</strong> que <strong>BENEFICIAN a las FAMILIAS</strong>: <strong>PUBLICIDAD GRATUITA</strong> para tu negocio, préstamo de <strong>LIBROS</strong> y materiales <strong>EDUCATIVOS</strong>, apoyo a <strong>MASCOTAS Y GRUPOS VULNERABLES</strong>, y <strong>ALIANZAS GANAR-GANAR</strong> que generan apoyos y beneficios mutuos y comunitarios. Suma con tu valiosa colaboración o con tu invaluable <strong>APOYO VOLUNTARIO</strong> para lograr nuestros objetivos de forma más effective, y forjar <strong>LA CADENA DE VALOR Y DE VALORES</strong> que nos liberará de nuestras limitaciones para ser mejores, Y ASÍ MEJORAR NUESTRO ENTORNO Y NUESTRO MUNDO !!!
+                <strong>DCUATES</strong> impulsa proyectos, <strong>PERSONAS, ORGANIZACIONES Y EMPRENDIMIENTOS</strong> que <strong>BENEFICIAN a las FAMILIAS</strong>: <strong>PUBLICIDAD GRATUITA</strong> para tu negocio, préstamo de <strong>LIBROS</strong> y materiales <strong>EDUCATIVOS</strong>, apoyo a <strong>MASCOTAS Y GRUPOS VULNERABLES</strong>, y <strong>ALIANZAS GANAR-GANAR</strong> que generan apoyos y beneficios mutuos y comunitarios. Suma con tu valiosa colaboración o con tu invaluable <strong>APOYO VOLUNTARIO</strong> para lograr nuestros objetivos de forma más efectiva, y forjar <strong>LA CADENA DE VALOR Y DE VALORES</strong> que nos liberará de nuestras limitaciones para ser mejores, Y ASÍ MEJORAR NUESTRO ENTORNO Y NUESTRO MUNDO !!!
               </p>
             </div>
             
             <div className="overflow-hidden rounded-2xl border-4 border-[#0f2d1e]/30 bg-white shadow-lg">
               <img 
-                src="/bibliobici-movil.jpg" 
-                alt="Bibliobici Móvil DCUATES en la comunidad" 
+                src="/images/bibliobici-movil.png" 
+                alt="Bibliobici+Móvil DCUATES en la comunidad" 
                 className="w-full h-auto object-cover max-h-[280px]"
                 onError={(e) => {
                   e.target.style.display = 'none';
@@ -186,7 +182,7 @@ export default function App() {
             
             <div className="w-44 h-44 sm:w-52 sm:h-52 flex items-center justify-center rounded-full overflow-hidden bg-white p-2 border-4 border-[#0f2d1e]/20 shadow-xl">
               <img 
-                src="/logo-circular.png" 
+                src="/images/logo-circular.png" 
                 alt="Logo Oficial DCUATES.COM" 
                 className="w-full h-full object-contain"
                 onError={(e) => {
@@ -215,7 +211,7 @@ export default function App() {
 
         </div>
       </section>
-      {/* SECCIÓN 1: LOS 4 PROYECTOS BASE (Formatos Originales de la Imagen 1) */}
+      {/* SECCIÓN 1: LOS 4 PROYECTOS BASE (Formatos Originales de la Imagen 1 con WhatsApp Validado) */}
       <section id="iniciativas" className="bg-[#1b4332] text-white py-16 px-4 border-b-4 border-[#0f2d1e]">
         <div className="mx-auto max-w-6xl">
           <h2 className="text-3xl sm:text-4xl font-black text-center uppercase tracking-tight mb-12 text-emerald-300">
@@ -257,7 +253,7 @@ export default function App() {
                 </div>
 
                 <button
-                  onClick={() => window.open(`https://wa.me{WHATSAPP_NUMERO}?text=${encodeURIComponent(item.mensajeWA)}`, '_blank')}
+                  onClick={() => window.open(`https://wa.me{encodeURIComponent(item.mensajeWA)}`, '_blank')}
                   className="w-full text-center rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3 px-4 shadow-md transition-colors uppercase tracking-wide text-xs sm:text-sm font-heading"
                 >
                   {item.textoBoton}
@@ -268,14 +264,14 @@ export default function App() {
         </div>
       </section>
 
-      {/* SECCIÓN 2: LOS 4 NUEVOS PROYECTOS SOCIALES (Formato Premium Unificado) */}
+      {/* SECCIÓN 2: LOS 4 NUEVOS PROYECTOS SOCIALES (Formato Premium Unificado con WhatsApp Validado) */}
       <section id="nuevos-proyectos" className="bg-[#e8f5e9] text-slate-800 py-16 px-4 border-b-4 border-[#0f2d1e]">
         <div className="mx-auto max-w-6xl">
           <h2 className="text-3xl sm:text-4xl font-black text-center uppercase tracking-tight mb-3 text-[#0f2d1e]">
             Nuevos Proyectos Sociales
           </h2>
           <p className="text-center text-slate-700 mb-12 max-w-xl mx-auto text-xs sm:text-sm font-bold uppercase tracking-wide">
-            Ampliamos nuestro impactó con cuatro nuevos canales comunitarios unificados.
+            Ampliamos nuestro impacto con cuatro nuevos canales comunitarios unificados.
           </p>
           
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2">
@@ -313,7 +309,7 @@ export default function App() {
                 </div>
 
                 <button
-                  onClick={() => window.open(`https://wa.me{WHATSAPP_NUMERO}?text=${encodeURIComponent(item.mensajeWA)}`, '_blank')}
+                  onClick={() => window.open(`https://wa.me{encodeURIComponent(item.mensajeWA)}`, '_blank')}
                   className="w-full text-center rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3 px-4 shadow-md transition-colors uppercase tracking-wide text-xs sm:text-sm font-heading"
                 >
                   {item.textoBoton}
@@ -323,32 +319,32 @@ export default function App() {
           </div>
         </div>
       </section>
-      {/* SECCIÓN: APORTE VOLUNTARIO */}
+      {/* SECCIÓN: APORTE VOLUNTARIO (Restauración de la Estructura Premium del Clon 3) */}
       <section id="donaciones" className="bg-[#e8f5e9] text-[#0f2d1e] py-16 px-4 border-b-4 border-[#0f2d1e]">
-        <div className="mx-auto max-w-4xl grid gap-8 md:grid-cols-12 items-start">
+        <div className="mx-auto max-w-5xl grid gap-10 md:grid-cols-12 items-center">
           
-          {/* Bloque Texto Izquierda */}
-          <div className="md:col-span-5 space-y-4">
-            <span className="inline-block rounded-full bg-emerald-200 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-emerald-800">
-              🤝 Apoyo Voluntario
+          {/* Bloque Informativo Izquierda */}
+          <div className="md:col-span-5 space-y-5">
+            <span className="inline-block rounded-full bg-emerald-200 px-4 py-1.5 text-xs font-black uppercase tracking-wider text-emerald-800 shadow-sm">
+              🟢 Apoyo Voluntario
             </span>
-            <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tight leading-none text-[#0f2d1e]">
+            <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-tight leading-none text-[#0f2d1e] font-heading">
               TU APORTACIÓN IMPULSA A LA **COMUNIDAD**
             </h2>
-            <p className="text-xs text-slate-700 leading-relaxed text-justify font-bold">
+            <p className="text-sm text-slate-700 leading-relaxed text-justify font-bold">
               Cada donativo, del formato que decidas, nos ayuda a sostener y hacer crecer los proyectos que benefician a los negocios y familias latinas en conjunto con **DCUATES**.
             </p>
-            <div className="rounded-xl bg-amber-100 border-2 border-amber-500/30 p-3 text-[11px] font-bold text-amber-900 leading-tight flex items-start gap-2">
-              <span>💡</span>
-              <p className="text-justify uppercase">
+            <div className="rounded-2xl bg-amber-50 border-2 border-amber-500/40 p-4 text-xs font-black text-amber-900 leading-relaxed flex items-start gap-3 shadow-sm">
+              <span className="text-xl">💡</span>
+              <p className="text-justify uppercase tracking-wide">
                 Parte de la utilidad de los proyectos se destina al apoyo de causas sociales, con total transparencia. Rendimos cuentas de cómo se usa cada aportación.
               </p>
             </div>
           </div>
 
-          {/* Bloque Opciones Derecha */}
-          <div className="md:col-span-7 space-y-2">
-            <p className="text-xs font-black uppercase tracking-wider text-[#0f2d1e] mb-2">
+          {/* Bloque Opciones Derecha: Botonera Estilizada de Alta Conversión */}
+          <div className="md:col-span-7 space-y-3">
+            <p className="text-xs font-black uppercase tracking-widest text-[#0f2d1e]/80 mb-3 block">
               Selecciona tu tipo de aportación:
             </p>
             {[
@@ -359,11 +355,16 @@ export default function App() {
             ].map((opc, oIdx) => (
               <button
                 key={oIdx}
-                onClick={() => window.open(`https://wa.me{WHATSAPP_NUMERO}?text=${encodeURIComponent(opc.m)}`, '_blank')}
-                className="w-full text-left rounded-xl border-2 border-slate-200 bg-white p-3 shadow-sm hover:border-emerald-600 transition-all hover:scale-[1.005] duration-200"
+                onClick={() => window.open(`https://wa.me{encodeURIComponent(opc.m)}`, '_blank')}
+                className="w-full text-left rounded-2xl border-4 border-[#0f2d1e] bg-white p-4 shadow-md transition-all hover:scale-[1.01] hover:border-[#e65100] group duration-200"
               >
-                <p className="text-sm font-black text-[#0f2d1e] uppercase tracking-tight">{opc.t}</p>
-                <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wide leading-none pt-0.5">{opc.d}</p>
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="text-base font-black text-[#0f2d1e] uppercase tracking-tight group-hover:text-[#e65100] transition-colors">{opc.t}</p>
+                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wide leading-none pt-1">{opc.d}</p>
+                  </div>
+                  <span className="text-xl opacity-40 group-hover:opacity-100 group-hover:text-[#e65100] transition-all pl-2">➔</span>
+                </div>
               </button>
             ))}
           </div>
@@ -433,7 +434,7 @@ export default function App() {
   );
 }
 // =========================================================================
-// 3. SUBCOMPONENTE: SITE HEADER (ICONOS REPARADOS SIN RECORTES)
+// 3. SUBCOMPONENTE: SITE HEADER (ICONOS REPARADOS SIN RECORTES VISUALES)
 // =========================================================================
 function SiteHeader() {
   const [open, setOpen] = useState(false);
@@ -497,7 +498,7 @@ function SiteHeader() {
 }
 
 // =========================================================================
-// 4. SUBCOMPONENTE: FORMULARIO DE PUBLICIDAD (DISEÑO ORIGINAL DE LA IMAGEN 3)
+// 4. SUBCOMPONENTE: FORMULARIO DE PUBLICIDAD (CAMPOS INDEPENDIENTES LIMPIOS)
 // =========================================================================
 function FormularioPublicidad() {
   const [nombre, setNombre] = useState("");
@@ -522,7 +523,7 @@ function FormularioPublicidad() {
     }
 
     const mensaje = `¡Hola DCUATES!\n\nSolicito el registro de publicidad para mi negocio:\n• Nombre: ${nombre}\n• Categoría: ${categoria}\n• Enlace 1: ${canal1 || "No especificado"}\n• Enlace 2: ${canal2 || "No especificado"}\n• Canal 3: ${canal3 || "No especificado"}\n\nA continuación adjunto mis imágenes promocionales.`;
-    window.open(`https://wa.me{WHATSAPP_NUMERO}?text=${encodeURIComponent(mensaje)}`, '_blank');
+    window.open(`https://wa.me{encodeURIComponent(mensaje)}`, '_blank');
   };
 
   return (
@@ -551,3 +552,4 @@ function FormularioPublicidad() {
     </form>
   );
 }
+
