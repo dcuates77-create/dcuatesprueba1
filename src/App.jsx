@@ -133,102 +133,98 @@ export default function App() {
  {/* Encabezado */}
  <SiteHeader />
 
- {/* SECCIÓN PORTADA / HERO (Diseño de 3 Columnas) */}
- <section id="inicio" className="bg-[#e8f5e9] text-[#0f2d1e] py-12 px-4 md:py-16 border-b-4 border-[#0f2d1e]">
- <div className="mx-auto max-w-7xl grid gap-8 items-stretch lg:grid-cols-12">
- 
- {/* COLUMNA IZQUIERDA */}
- <div className="lg:col-span-5 flex flex-col justify-between space-y-6">
- <div className="space-y-4">
- <h1 className="text-4xl sm:text-5xl font-black uppercase tracking-tight text-[#0f2d1e] leading-none">
- Jūntos hacemos<br />COMUNIDAD
- </h1>
-  {/* BOTÓN TEMPORAL DE PRUEBA DE WHATSAPP */}
-<div className="pt-4">
-  <a
-    href="https://whatsapp.com."
-    target="_blank"
-    rel="noopener noreferrer"
-    className="inline-block bg-red-600 text-white font-black text-sm uppercase px-6 py-3 rounded-xl shadow-xl hover:bg-red-700 animate-bounce"
-  >
-    🚨 PROBAR WHATSAPP AQUÍ
-  </a>
-</div>
- <p className="text-xs font-black text-amber-700 uppercase tracking-wider">
- ⚡ PROYECTOS COMUNITARIOS DCUATES
- </p>
- <p className="text-sm sm:text-base text-slate-800 leading-relaxed text-justify font-medium">
- <strong>DCUATES</strong> impulsa proyectos, <strong>PERSONAS, ORGANIZACIONES Y EMPRENDIMIENTOS</strong> que <strong>BENEFICIAN a las FAMILIAS</strong>: <strong>PUBLICIDAD GRATUITA</strong> para tu negocio, préstamo de <strong>LIBROS</strong> y materiales <strong>EDUCATIVOS</strong>, apoyo a <strong>MASCOTAS Y GRUPOS VULNERABLES</strong>, y <strong>ALIANZAS GANAR-GANAR</strong> que generan apoyos y beneficios mutuos y comunitarios. Suma con tu valiosa colaboración o con tu invaluable <strong>APOYO VOLUNTARIO</strong> para lograr nuestros objetivos de forma más efectiva, y forjar <strong>LA CADENA DE VALOR Y DE VALORES</strong> que nos liberará de nuestras limitaciones para ser mejores, Y ASÍ MEJORAR NUESTRO ENTORNO Y NUESTRO MUNDO !!!
- </p>
- </div>
- 
- <div className="overflow-hidden rounded-2xl border-4 border-[#0f2d1e]/30 bg-white shadow-lg">
- <img 
- src="/images/bibliobici-movil.png" 
- alt="Bibliobici Móvil DCUATES en la comunidad" 
- className="w-full h-auto object-cover max-h-[280px]"
- onError={(e) => {
- e.target.style.display = 'none';
- e.target.parentElement.innerHTML = '<div class="p-12 text-center text-[#0f2d1e]/70 font-bold uppercase text-xs tracking-wider bg-emerald-50">📷 [Espacio para Foto de la Bibliobici]</div>';
- }}
- />
- </div>
- </div>
+{/* ========================================================================= */}
+{/* SECCIÓN PORTADA / HERO (DISEÑO TOTALMENTE PLANO Y CORREGIDO DE RAÍZ) */}
+{/* ========================================================================= */}
+<section id="inicio" className="bg-[#e8f5e9] text-[#0f2d1e] py-12 px-4 md:py-16 border-b-4 border-[#0f2d1e]">
+  <div className="mx-auto max-w-7xl grid gap-8 items-stretch lg:grid-cols-12">
+  
+    {/* COLUMNA IZQUIERDA: TEXTOS Y FOTO */}
+    <div className="lg:col-span-5 flex flex-col justify-between space-y-6">
+      <div className="space-y-4">
+        <h1 className="text-4xl sm:text-5xl font-black uppercase tracking-tight text-[#0f2d1e] leading-none">
+          Jūntos hacemos<br />COMUNIDAD
+        </h1>
+        
+        {/* BOTÓN DE PRUEBA EXCLUSIVO PARA LA BIBLIOBICI (CON URL FIJA) */}
+        <div className="pt-2 pb-2">
+          <a
+            href="https://whatsapp.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block bg-[#e65100] hover:bg-[#bf360c] text-white font-black text-xs uppercase px-4 py-3 rounded-xl shadow-md tracking-wide"
+          >
+            🚀 PROBAR WHATSAPP: QUIERO PARTICIPAR
+          </a>
+        </div>
 
- {/* COLUMNA CENTRAL */}
- <div className="lg:col-span-3 flex flex-col justify-between py-1 gap-3">
- {[
- { t: "Préstamo de Libros", h: "#libros" },
- { t: "Ecatepets Mascotas", h: "#ecatepets" },
- { t: "Alianzas Solidarias", h: "#iniciativas" },
- { t: "Publicidad Gratis", h: "#publicidad" },
- { t: "Asesorías Gratuitas", h: "#asesorias" },
- { t: "Bazar y Comercio", h: "#bazares" },
- { t: "Noticias de Barrio", h: "#noticias" },
- { t: "Apoyo Voluntario", h: "#donaciones" }
- ].map((btn, idx) => (
- <a 
- key={idx}
- href={btn.h}
- className="w-full flex-1 flex items-center justify-center text-center rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black px-4 shadow-md transition-all hover:scale-[1.02] uppercase tracking-wide text-xs sm:text-sm font-heading"
- >
- {btn.t}
- </a>
- ))}
- </div>
+        <p className="text-xs font-black text-amber-700 uppercase tracking-wider">
+          ⚡ PROYECTOS COMUNITARIOS DCUATES
+        </p>
+        <p className="text-sm sm:text-base text-slate-800 leading-relaxed text-justify font-medium">
+          <strong>DCUATES</strong> impulsa proyectos que benefician a las familias. Suma con tu valiosa colaboración para lograr nuestros objetivos de forma más efectiva.
+        </p>
+      </div>
+      
+      <div className="overflow-hidden rounded-2xl border-4 border-[#0f2d1e]/30 bg-white shadow-lg">
+        <img 
+          src="/images/bibliobici-movil.png" 
+          alt="Bibliobici Móvil DCUATES en la comunidad" 
+          className="w-full h-auto object-cover max-h-[280px]"
+        />
+      </div>
+    </div>
 
- {/* COLUMNA DERECHA: Video de Chuy Configurado con el ID Oficial Validado */}
- <div className="lg:col-span-4 flex flex-col items-center justify-between text-center space-y-4">
- <div className="w-56 h-56 sm:w-64 sm:h-64 lg:w-72 lg:h-72 flex items-center justify-center rounded-full overflow-hidden bg-white p-2 border-4 border-[#0f2d1e]/20 shadow-xl">
- <img 
- src="/images/logo-circular.png" 
- alt="Logo Oficial DCUATES.COM" 
- className="w-full h-full object-contain"
- onError={(e) => {
- e.target.style.display = 'none';
- e.target.parentElement.innerHTML = '<div class="text-[#e65100] font-black text-xl tracking-tight leading-none">🟢 DCUATES.COM<br/><span class="text-xs text-[#0f2d1e]/60 font-bold">APOYOS Y BENEFICIOS</span></div>';
- }}
- />
- </div>
- <h3 className="text-xl sm:text-2xl font-black uppercase text-[#0f2d1e] tracking-wider leading-none pt-2">
- BRINDANDO LO MEJOR !!!
- </h3>
- {/* Iframe estructurado con la URL embed definitiva */}
- <div className="w-full rounded-2xl border-4 border-[#00c853] bg-black overflow-hidden shadow-xl aspect-video relative">
-{/* Reemplaza tu etiqueta iframe actual por esta exacta */}
-<iframe
-  className="absolute top-0 left-0 w-full h-full"
-  src="https://youtube.com"
-  title="CHUY EL SAPO SOÑADOR - DCUATES"
-  frameBorder="0"
-  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-  allowFullScreen
-></iframe>
- </div>
- </div>
+    {/* COLUMNA CENTRAL: BOTONERA DE MENÚ */}
+    <div className="lg:col-span-3 flex flex-col justify-between py-1 gap-3">
+      {[
+        { t: "Préstamo de Libros", h: "#libros" },
+        { t: "Ecatepets Mascotas", h: "#ecatepets" },
+        { t: "Alianzas Solidarias", h: "#iniciativas" },
+        { t: "Publicidad Gratis", h: "#publicidad" },
+        { t: "Asesorías Gratuitas", h: "#asesorias" },
+        { t: "Bazar y Comercio", h: "#bazares" },
+        { t: "Noticias de Barrio", h: "#noticias" },
+        { t: "Apoyo Voluntario", h: "#donaciones" }
+      ].map((btn, idx) => (
+        <a 
+          key={idx}
+          href={btn.h}
+          className="w-full flex-1 flex items-center justify-center text-center rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black px-4 shadow-md transition-all uppercase tracking-wide text-xs sm:text-sm font-heading"
+        >
+          {btn.t}
+        </a>
+      ))}
+    </div>
 
- </div>
- </section>
+    {/* COLUMNA DERECHA: LOGO Y VIDEO DE CHUY CON URL CONVERTIDA */}
+    <div className="lg:col-span-4 flex flex-col items-center justify-between text-center space-y-4">
+      <div className="w-56 h-56 sm:w-64 sm:h-64 lg:w-72 lg:h-72 flex items-center justify-center rounded-full overflow-hidden bg-white p-2 border-4 border-[#0f2d1e]/20 shadow-xl">
+        <img 
+          src="/images/logo-circular.png" 
+          alt="Logo Oficial DCUATES.COM" 
+          className="w-full h-full object-contain"
+        />
+      </div>
+      <h3 className="text-xl sm:text-2xl font-black uppercase text-[#0f2d1e] tracking-wider leading-none pt-2">
+        BRINDANDO LO MEJOR !!!
+      </h3>
+      
+      {/* VENTANA MULTIMEDIA DEFINITIVA PARA EL VIDEO DE CHUY */}
+      <div className="w-full rounded-2xl border-4 border-[#00c853] bg-black overflow-hidden shadow-xl aspect-video relative">
+        <iframe
+          className="absolute top-0 left-0 w-full h-full"
+          src="https://youtube.com"
+          title="CHUY EL SAPO SOÑADOR - DCUATES"
+          frameBorder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        ></iframe>
+      </div>
+    </div>
+
+  </div>
+</section>
  {/* SECCIÓN 1: LOS 4 PROYECTOS BASE */}
  <section id="iniciativas" className="bg-[#1b4332] text-white py-16 px-4 border-b-4 border-[#0f2d1e]">
  <div className="mx-auto max-w-6xl">
