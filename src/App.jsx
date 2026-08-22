@@ -7,12 +7,12 @@ const WHATSAPP_NUMERO = "525520696627";
 const GOOGLE_SHEETS_URL = "https://google.com";
 
 // ID de un video real de YouTube (puedes sustituir esta ID por la tuya en el futuro)
-const YOUTUBE_VIDEO_ID = "dQw4w9WgXcQ"; 
+const YOUTUBE_VIDEO_ID = "https://www.youtube.com/watch?v=EVZKrmsx-Po"; 
 
 const REDES_SOCIALES = {
   facebook: "https://facebook.com",
   instagram: "https://instagram.com",
-  youtube: "https://youtube.com",
+  youtube: "https://www.youtube.com/@abelmeraz",
   tiktok: "https://tiktok.com"
 };
 
