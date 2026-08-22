@@ -6,7 +6,7 @@ import React, { useState, useEffect } from "react";
 const WHATSAPP_NUMERO = "525520696627";
 const GOOGLE_SHEETS_URL = "https://google.com";
 
-// ID del video real de YouTube que se muestra en la portada
+// ID de un video real de YouTube (puedes sustituir esta ID por la tuya en el futuro)
 const YOUTUBE_VIDEO_ID = "dQw4w9WgXcQ"; 
 
 const REDES_SOCIALES = {
@@ -24,7 +24,7 @@ const NAV_LINKS = [
   { label: "Publicidad", href: "#publicidad" }
 ];
 
-// Arreglo de los 4 Proyectos Iniciales (WhatsApp indexado de forma nativa e independiente)
+// Arreglo de los 4 Proyectos Iniciales (Mensajes de WhatsApp validados de forma nativa)
 const INICIATIVAS_PRINCIPALES = [
   {
     id: "libros",
@@ -33,7 +33,7 @@ const INICIATIVAS_PRINCIPALES = [
     descripcion: "Préstamo gratuito de libros y materiales educativos para el desarrollo personal y social. La lectura que llega hasta tu colonia para fortalecer a la COMUNIDAD.",
     puntos: ["Préstamo sin costo", "Materiales para todas las edades", "Fomento a la lectura"],
     textoBoton: "Quiero participar",
-    mensajeWA: "Hola DCUATES! Me interesa participar en la iniciativa de La Bibliobici y Amigos. ¿Cómo puedo colaborar o solicitar libros?"
+    mensajeWA: "Hola DCUATES! Me interesa participar in la iniciativa de La Bibliobici y Amigos. ¿Cómo puedo colaborar o solicitar libros?"
   },
   {
     id: "ecatepets",
@@ -64,7 +64,7 @@ const INICIATIVAS_PRINCIPALES = [
   }
 ];
 
-// Arreglo de los 4 Proyectos Nuevos (WhatsApp indexado de forma nativa e independiente)
+// Arreglo de los 4 Proyectos Nuevos (Mensajes de WhatsApp validados de forma nativa)
 const NUEVOS_PROYECTOS_DATA = [
   {
     id: "asesorias",
@@ -113,7 +113,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#1b4332] font-sans antialiased text-slate-900 selection:bg-emerald-500/30 relative">
       
-      {/* Botón Flotante Permanente de WhatsApp del Clon 3 (Enlace Directo Validado) */}
+      {/* Botón Flotante Permanente de WhatsApp del Clon 3 (Dirección Nativa Corregida) */}
       <a
         href="https://wa.me"
         target="_blank"
@@ -128,12 +128,12 @@ export default function App() {
 
       {/* Encabezado */}
       <SiteHeader />
-      {/* SECCIÓN PORTADA / HERO (Diseño Asimétrico 50/50 - Clon 4 Optimizado según Imagen) */}
+      {/* SECCIÓN PORTADA / HERO (Diseño de 3 Columnas Restaurado y Optimizado sin Espacios Libres) */}
       <section id="inicio" className="bg-[#e8f5e9] text-[#0f2d1e] py-12 px-4 md:py-16 border-b-4 border-[#0f2d1e]">
-        <div className="mx-auto max-w-7xl grid gap-8 items-stretch lg:grid-cols-2">
+        <div className="mx-auto max-w-7xl grid gap-8 items-stretch lg:grid-cols-12">
           
-          {/* COLUMNA IZQUIERDA: Mensaje de Inicio Ampliado y Foto de la Bibliobici */}
-          <div className="flex flex-col justify-between space-y-6">
+          {/* COLUMNA IZQUIERDA: Textos de Clon 4 y Foto de la Bibliobici (5 columnas de ancho) */}
+          <div className="lg:col-span-5 flex flex-col justify-between space-y-6">
             <div className="space-y-4">
               <h1 className="text-4xl sm:text-5xl font-black uppercase tracking-tight text-[#0f2d1e] leading-none">
                 Jūntos hacemos<br />COMUNIDAD
@@ -150,7 +150,7 @@ export default function App() {
               <img 
                 src="/images/bibliobici-movil.png" 
                 alt="Bibliobici Móvil DCUATES en la comunidad" 
-                className="w-full h-auto object-cover max-h-[300px]"
+                className="w-full h-auto object-cover max-h-[280px]"
                 onError={(e) => {
                   e.target.style.display = 'none';
                   e.target.parentElement.innerHTML = '<div class="p-12 text-center text-[#0f2d1e]/70 font-bold uppercase text-xs tracking-wider bg-emerald-50">📷 [Espacio para Foto de la Bibliobici]</div>';
@@ -159,28 +159,50 @@ export default function App() {
             </div>
           </div>
 
-          {/* COLUMNA DERECHA: Logo Circular Agrandado al 50% y Reproductor de Video Nativo */}
-          <div className="flex flex-col items-center justify-between text-center space-y-6 bg-white/40 p-6 rounded-3xl border-2 border-emerald-800/10">
+          {/* COLUMNA CENTRAL: Botonera Vertical de 8 Botones Naranjas Mantenida (3 columnas de ancho) */}
+          <div className="lg:col-span-3 flex flex-col justify-between py-1 gap-3">
+            {[
+              { t: "Préstamo de Libros", h: "#libros" },
+              { t: "Ecatepets Mascotas", h: "#ecatepets" },
+              { t: "Alianzas Solidarias", h: "#iniciativas" },
+              { t: "Publicidad Gratis", h: "#publicidad" },
+              { t: "Asesorías Gratuitas", h: "#asesorias" },
+              { t: "Bazar y Comercio", h: "#bazares" },
+              { t: "Noticias de Barrio", h: "#noticias" },
+              { t: "Apoyo Voluntario", h: "#donaciones" }
+            ].map((btn, idx) => (
+              <a 
+                key={idx}
+                href={btn.h}
+                className="w-full flex-1 flex items-center justify-center text-center rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black px-4 shadow-md transition-all hover:scale-[1.02] uppercase tracking-wide text-xs sm:text-sm font-heading"
+              >
+                {btn.t}
+              </a>
+            ))}
+          </div>
+
+          {/* COLUMNA DERECHA: Logo Circular Maximizado y Video YouTube Nativo Reparado (4 columnas de ancho) */}
+          <div className="lg:col-span-4 flex flex-col items-center justify-between text-center space-y-4">
             
-            {/* Logotipo Oficial Agrandado */}
-            <div className="w-56 h-56 sm:w-64 sm:h-64 flex items-center justify-center rounded-full overflow-hidden bg-white p-2 border-4 border-[#0f2d1e]/20 shadow-xl">
+            {/* Logotipo Oficial Agrandado al Doble para eliminar huecos vacíos */}
+            <div className="w-56 h-56 sm:w-64 sm:h-64 lg:w-72 lg:h-72 flex items-center justify-center rounded-full overflow-hidden bg-white p-2 border-4 border-[#0f2d1e]/20 shadow-xl">
               <img 
                 src="/images/logo-circular.png" 
                 alt="Logo Oficial DCUATES.COM" 
                 className="w-full h-full object-contain"
                 onError={(e) => {
                   e.target.style.display = 'none';
-                  e.target.parentElement.innerHTML = '<div class="text-[#e65100] font-black text-2xl tracking-tight leading-none">🟢 DCUATES.COM<br/><span class="text-sm text-[#0f2d1e]/60 font-bold">APOYOS Y BENEFICIOS</span></div>';
+                  e.target.parentElement.innerHTML = '<div class="text-[#e65100] font-black text-xl tracking-tight leading-none">🟢 DCUATES.COM<br/><span class="text-xs text-[#0f2d1e]/60 font-bold">APOYOS Y BENEFICIOS</span></div>';
                 }}
               />
             </div>
 
-            {/* Título engrandecido y limpio sin fondo extra */}
-            <h3 className="text-2xl sm:text-3xl font-black uppercase text-[#0f2d1e] tracking-wider leading-none">
+            {/* Título engrandecido limpio sin fondos */}
+            <h3 className="text-xl sm:text-2xl font-black uppercase text-[#0f2d1e] tracking-wider leading-none pt-2">
               BRINDANDO LO MEJOR !!!
             </h3>
 
-            {/* Ventana Multimedia con Reproductor Real de YouTube responsivo */}
+            {/* Ventana Multimedia con Sintaxis de Embed Corregida */}
             <div className="w-full rounded-2xl border-4 border-[#00c853] bg-black overflow-hidden shadow-xl aspect-video relative">
               <iframe
                 className="absolute top-0 left-0 w-full h-full"
@@ -537,5 +559,6 @@ function FormularioPublicidad() {
     </form>
   );
 }
+
 
 
