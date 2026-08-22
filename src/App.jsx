@@ -20,7 +20,7 @@ const NAV_LINKS = [
   { label: "Publicidad", href: "#publicidad" }
 ];
 
-// Arreglo de los 4 Proyectos Iniciales con Enlaces de WhatsApp Blindados Directos
+// Arreglo de los 4 Proyectos Iniciales con Enlaces Directos de WhatsApp Planos y Estables
 const INICIATIVAS_PRINCIPALES = [
   {
     id: "libros",
@@ -29,7 +29,7 @@ const INICIATIVAS_PRINCIPALES = [
     descripcion: "Préstamo gratuito de libros y materiales educativos para el desarrollo personal y social. La lectura que llega hasta tu colonia para fortalecer a la COMUNIDAD.",
     puntos: ["Préstamo sin costo", "Materiales para todas las edades", "Fomento a la lectura"],
     textoBoton: "Quiero participar",
-    enlaceDirectoWA: "https://wa.me"
+    enlaceDirectoWA: "https://whatsapp.com"
   },
   {
     id: "ecatepets",
@@ -38,7 +38,7 @@ const INICIATIVAS_PRINCIPALES = [
     descripcion: "Apoyo en la búsqueda de mascotas extraviadas, y fomento de la adopción y el cuidado animal responsable en conjunto con los vecinos de DCUATES.",
     puntos: ["Difusión de extravíos", "Adopción responsable", "Cuidado y concientización"],
     textoBoton: "Sumarme a la causa",
-    enlaceDirectoWA: "https://wa.me."
+    enlaceDirectoWA: "https://whatsapp.com."
   },
   {
     id: "alianzas-tarjeta",
@@ -47,7 +47,7 @@ const INICIATIVAS_PRINCIPALES = [
     descripcion: "Emprendedores, organizaciones y particulares que desean hacer sinergia para crecer juntos y robustecer el tejido social de la COMUNIDAD.",
     puntos: ["Colaboración mutua", "Red de contactos", "Impacto comunitario"],
     textoBoton: "Generar alianza",
-    enlaceDirectoWA: "https://wa.me."
+    enlaceDirectoWA: "https://whatsapp.com."
   },
   {
     id: "publicidad-tarjeta",
@@ -56,11 +56,11 @@ const INICIATIVAS_PRINCIPALES = [
     descripcion: "Difunde tu negocio, promociones y servicios de forma gratuita. Con aportación voluntaria ya ayudas a que la plataforma de DCUATES llegue a más familias.",
     puntos: ["Registro gratuito", "Comparte promociones e imágenes", "Más clientes de tu zona"],
     textoBoton: "Publicar mi negocio",
-    enlaceDirectoWA: "https://wa.me."
+    enlaceDirectoWA: "https://whatsapp.com."
   }
 ];
 
-// Arreglo de los 4 Proyectos Nuevos con Enlaces de WhatsApp Blindados Directos
+// Arreglo de los 4 Proyectos Nuevos con Enlaces Directos de WhatsApp Planos y Estables
 const NUEVOS_PROYECTOS_DATA = [
   {
     id: "asesorias",
@@ -69,7 +69,7 @@ const NUEVOS_PROYECTOS_DATA = [
     descripcion: "Orientación profesional sin barreras para impulsar tus metas o regularizar tu modelo de negocio de manera efectiva.",
     puntos: ["Asesoría gratuita", "Aportación voluntaria", "Impulso de metas"],
     textoBoton: "Solicitar asesoría",
-    enlaceDirectoWA: "https://wa.me."
+    enlaceDirectoWA: "https://whatsapp.com."
   },
   {
     id: "bazares",
@@ -78,7 +78,7 @@ const NUEVOS_PROYECTOS_DATA = [
     descripcion: "Ventas caseras y de calle basadas en la confianza mutua para reactivar la economía de nuestras familias de forma directa.",
     puntos: ["Comercio local seguro", "Barrio de confianza", "Reactivación económica"],
     textoBoton: "Participar en bazar",
-    enlaceDirectoWA: "https://wa.me."
+    enlaceDirectoWA: "https://whatsapp.com."
   },
   {
     id: "noticias",
@@ -87,7 +87,7 @@ const NUEVOS_PROYECTOS_DATA = [
     descripcion: "Mantente al día con los eventos culturales, convocatorias comunitarias y acontecimientos sociales de la zona.",
     puntos: ["Eventos culturales", "Convocatorias vecinales", "Acontecimientos sociales"],
     textoBoton: "Ver agenda cultural",
-    enlaceDirectoWA: "https://wa.me."
+    enlaceDirectoWA: "https://whatsapp.com."
   },
   {
     id: "bienestar",
@@ -96,7 +96,7 @@ const NUEVOS_PROYECTOS_DATA = [
     descripcion: "Actividades recreativas y talleres enfocados en el desarrollo integral, la salud mental y el esparcimiento familiar.",
     puntos: ["Desarrollo integral", "Salud mental", "Esparcimiento familiar"],
     textoBoton: "Preguntar por talleres",
-    enlaceDirectoWA: "https://wa.me."
+    enlaceDirectoWA: "https://whatsapp.com."
   }
 ];
 
@@ -111,7 +111,7 @@ export default function App() {
       
       {/* Botón Flotante Permanente de WhatsApp del Clon 3 */}
       <a
-        href="https://wa.me"
+        href="https://whatsapp.com"
         target="_blank"
         rel="noopener noreferrer"
         className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#25d366] text-white shadow-2xl transition-all hover:scale-110 active:scale-95 group hover:bg-[#128c7e]"
@@ -124,8 +124,7 @@ export default function App() {
 
       {/* Encabezado */}
       <SiteHeader />
-
-            {/* SECCIÓN PORTADA / HERO (Diseño de 3 Columnas con Embed de YouTube Blindado) */}
+      {/* SECCIÓN PORTADA / HERO (Diseño de 3 Columnas con Embed de YouTube Forzado en Código Duro) */}
       <section id="inicio" className="bg-[#e8f5e9] text-[#0f2d1e] py-12 px-4 md:py-16 border-b-4 border-[#0f2d1e]">
         <div className="mx-auto max-w-7xl grid gap-8 items-stretch lg:grid-cols-12">
           
@@ -139,7 +138,7 @@ export default function App() {
                 ⚡ PROYECTOS COMUNITARIOS DCUATES
               </p>
               <p className="text-sm sm:text-base text-slate-800 leading-relaxed text-justify font-medium">
-                <strong>DCUATES</strong> impulsa proyectos, <strong>PERSONAS, ORGANIZACIONES Y EMPRENDIMIENTOS</strong> que <strong>BENEFICIAN a las FAMICIAS</strong>: <strong>PUBLICIDAD GRATUITA</strong> para tu negocio, préstamo de <strong>LIBROS</strong> y materiales <strong>EDUCATIVOS</strong>, apoyo a <strong>MASCOTAS Y GRUPOS VULNERABLES</strong>, y <strong>ALIANZAS GANAR-GANAR</strong> que generan apoyos y beneficios mutuos y comunitarios. Suma con tu valiosa colaboración o con tu invaluable <strong>APOYO VOLUNTARIO</strong> para lograr nuestros objetivos de forma más efectiva, y forjar <strong>LA CADENA DE VALOR Y DE VALORES</strong> que nos liberará de nuestras limitaciones para ser mejores, Y ASÍ MEJORAR NUESTRO ENTORNO Y NUESTRO MUNDO !!!
+                <strong>DCUATES</strong> impulsa proyectos, <strong>PERSONAS, ORGANIZACIONES Y EMPRENDIMIENTOS</strong> que <strong>BENEFICIAN a las FAMILIAS</strong>: <strong>PUBLICIDAD GRATUITA</strong> para tu negocio, préstamo de <strong>LIBROS</strong> y materiales <strong>EDUCATIVOS</strong>, apoyo a <strong>MASCOTAS Y GRUPOS VULNERABLES</strong>, y <strong>ALIANZAS GANAR-GANAR</strong> que generan apoyos y beneficios mutuos y comunitarios. Suma con tu valiosa colaboración o con tu invaluable <strong>APOYO VOLUNTARIO</strong> para lograr nuestros objetivos de forma más efectiva, y forjar <strong>LA CADENA DE VALOR Y DE VALORES</strong> que nos liberará de nuestras limitaciones para ser mejores, Y ASÍ MEJORAR NUESTRO ENTORNO Y NUESTRO MUNDO !!!
               </p>
             </div>
             
@@ -199,7 +198,7 @@ export default function App() {
               BRINDANDO LO MEJOR !!!
             </h3>
 
-            {/* Ventana Multimedia con Enlace Embed Oficial de Chuy Fijo */}
+            {/* Ventana Multimedia con Dirección de Incrustación Fija de Chuy */}
             <div className="w-full rounded-2xl border-4 border-[#00c853] bg-black overflow-hidden shadow-xl aspect-video relative">
               <iframe
                 className="absolute top-0 left-0 w-full h-full"
@@ -215,7 +214,7 @@ export default function App() {
 
         </div>
       </section>
-      {/* SECCIÓN 1: LOS 4 PROYECTOS BASE (Fondo Verde Oscuro, WhatsApp Directo y Scroll Margin Corregido) */}
+      {/* SECCIÓN 1: LOS 4 PROYECTOS BASE (Fondo Verde Oscuro, WhatsApp de API Validado y Scroll Margin Corregido) */}
       <section id="iniciativas" className="bg-[#1b4332] text-white py-16 px-4 border-b-4 border-[#0f2d1e]">
         <div className="mx-auto max-w-6xl">
           <h2 className="text-3xl sm:text-4xl font-black text-center uppercase tracking-tight mb-12 text-emerald-300">
@@ -271,7 +270,7 @@ export default function App() {
         </div>
       </section>
 
-      {/* SECCIÓN 2: LOS 4 NUEVOS PROYECTOS SOCIALES (Mismo Formato Premium, Fondo Verde Oscuro y WhatsApp Directo) */}
+      {/* SECCIÓN 2: LOS 4 NUEVOS PROYECTOS SOCIALES (Mismo Formato Premium, Fondo Verde Oscuro y WhatsApp de API Validado) */}
       <section id="nuevos-proyectos" className="bg-[#1b4332] text-white py-16 px-4 border-b-4 border-[#0f2d1e]">
         <div className="mx-auto max-w-6xl">
           <h2 className="text-3xl sm:text-4xl font-black text-center uppercase tracking-tight mb-3 text-emerald-300">
@@ -329,7 +328,7 @@ export default function App() {
           </div>
         </div>
       </section>
-      {/* SECCIÓN: APORTE VOLUNTARIO (Restauración de la Estructura Premium del Clon 3 con Enlaces WA Directos Blindados) */}
+      {/* SECCIÓN: APORTE VOLUNTARIO (Restauración de la Estructura Premium del Clon 3 con Enlaces de API Directos Blindados) */}
       <section id="donaciones" className="bg-[#e8f5e9] text-[#0f2d1e] py-16 px-4 border-b-4 border-[#0f2d1e]">
         <div className="mx-auto max-w-5xl grid gap-10 md:grid-cols-12 items-center">
           
@@ -352,7 +351,7 @@ export default function App() {
             </div>
           </div>
 
-          {/* Bloque Opciones Derecha: Botonera Estilizada con Enlaces Nativo Directos para Evitar Bloqueos */}
+          {/* Bloque Opciones Derecha: Botonera Estilizada con Enlaces de API Oficial Directos para Evitar Bloqueos */}
           <div className="md:col-span-7 space-y-3">
             <p className="text-xs font-black uppercase tracking-widest text-[#0f2d1e]/80 mb-3 block">
               Selecciona tu tipo de aportación:
@@ -364,8 +363,8 @@ export default function App() {
               { t: "Labor Voluntaria", d: "Dona tu valioso tiempo y conocimientos para crecer juntos.", m: "Hola DCUATES! Quiero sumarme con Labor Voluntaria aportando mi tiempo y conocimientos comunitarios." }
             ].map((opc, oIdx) => (
               <a
-                key={oIdx}
-                href={`https://wa.me{encodeURIComponent(opc.m)}`}
+                key={opc.t}
+                href={`https://whatsapp.com{encodeURIComponent(opc.m)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full text-left rounded-2xl border-4 border-[#0f2d1e] bg-white p-4 shadow-md transition-all hover:scale-[1.01] hover:border-[#e65100] group duration-200 block"
@@ -427,7 +426,7 @@ export default function App() {
                 En cumplimiento con la normativa de protección de datos, <strong>DCUATES</strong> le informa que los datos recabados en este formulario (Nombre de Negocio, Categoría y Enlaces Digitales) tienen la única y exclusiva finalidad de promover de forma comunitaria y gratuita sus actividades comerciales.
               </p>
               <p>
-                Sus datos no serán vendidos, transferidos ni compartidos con terceros con fines de lucro. Al enviar la información y continuar la interacción en WhatsApp, usted acepta el tratamiento de los mismos para los fines de difusión colectiva estipulados en nuestras initiatives de Apoyo al Emprendimiento.
+                Sus datos no serán vendidos, transferidos ni compartidos con terceros con fines de lucro. Al enviar la información y continuar la interacción en WhatsApp, usted acepta el tratamiento de los mismos para los fines de difusión colectiva estipulados en nuestras iniciativas de Apoyo al Emprendimiento.
               </p>
               <p>
                 Usted puede solicitar la baja, rectificación o eliminación de los datos publicitados en cualquier momento poniéndose en contacto directo mediante nuestros canales oficiales de atención.
@@ -535,7 +534,7 @@ function FormularioPublicidad() {
     }
 
     const mensaje = `¡Hola DCUATES!\n\nSolicito el registro de publicidad para mi negocio:\n• Nombre: ${nombre}\n• Categoría: ${categoria}\n• Enlace 1: ${canal1 || "No especificado"}\n• Enlace 2: ${canal2 || "No especificado"}\n• Canal 3: ${canal3 || "No especificado"}\n\nA continuación adjunto mis imágenes promocionales.`;
-    window.open(`https://wa.me{encodeURIComponent(mensaje)}`, '_blank');
+    window.open(`https://whatsapp.com{encodeURIComponent(mensaje)}`, '_blank');
   };
 
   return (
@@ -564,3 +563,4 @@ function FormularioPublicidad() {
     </form>
   );
 }
+
