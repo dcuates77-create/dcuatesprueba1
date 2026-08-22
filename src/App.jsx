@@ -3,16 +3,15 @@ import React, { useState, useEffect } from "react";
 // =========================================================================
 // 1. CONFIGURACIÓN CENTRALIZADA DE VARIABLES, REDES Y HOJA DE CÁLCULO
 // =========================================================================
-const WHATSAPP_NUMERO = "525520696627";
 const GOOGLE_SHEETS_URL = "https://google.com";
 
-// ID de un video real de YouTube (puedes sustituir esta ID por la tuya en el futuro)
-const YOUTUBE_VIDEO_ID = "https://www.youtube.com/watch?v=EVZKrmsx-Po"; 
+// Ruta de incrustación oficial del video de Chuy El Sapo Soñador de Azteca Noticias
+const YOUTUBE_EMBED_URL = "https://youtube.com"; 
 
 const REDES_SOCIALES = {
   facebook: "https://facebook.com",
   instagram: "https://instagram.com",
-  youtube: "https://www.youtube.com/@abelmeraz",
+  youtube: "https://youtube.com",
   tiktok: "https://tiktok.com"
 };
 
@@ -24,7 +23,7 @@ const NAV_LINKS = [
   { label: "Publicidad", href: "#publicidad" }
 ];
 
-// Arreglo de los 4 Proyectos Iniciales (Mensajes de WhatsApp validados de forma nativa)
+// Arreglo de los 4 Proyectos Iniciales con mensajes personalizados pre-codificados
 const INICIATIVAS_PRINCIPALES = [
   {
     id: "libros",
@@ -33,7 +32,7 @@ const INICIATIVAS_PRINCIPALES = [
     descripcion: "Préstamo gratuito de libros y materiales educativos para el desarrollo personal y social. La lectura que llega hasta tu colonia para fortalecer a la COMUNIDAD.",
     puntos: ["Préstamo sin costo", "Materiales para todas las edades", "Fomento a la lectura"],
     textoBoton: "Quiero participar",
-    mensajeWA: "Hola DCUATES! Me interesa participar in la iniciativa de La Bibliobici y Amigos. ¿Cómo puedo colaborar o solicitar libros?"
+    mensajeWA: "Hola DCUATES! Me interesa participar en la iniciativa de La Bibliobici y Amigos. ¿Cómo puedo colaborar o solicitar libros?"
   },
   {
     id: "ecatepets",
@@ -64,7 +63,7 @@ const INICIATIVAS_PRINCIPALES = [
   }
 ];
 
-// Arreglo de los 4 Proyectos Nuevos (Mensajes de WhatsApp validados de forma nativa)
+// Arreglo de los 4 Proyectos Nuevos adaptados al formato premium con 3 puntos clave
 const NUEVOS_PROYECTOS_DATA = [
   {
     id: "asesorias",
@@ -113,11 +112,11 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#1b4332] font-sans antialiased text-slate-900 selection:bg-emerald-500/30 relative">
       
-      {/* Botón Flotante Permanente de WhatsApp del Clon 3 (Dirección Nativa Corregida) */}
+      {/* Botón Flotante Permanente de WhatsApp del Clon 3 (Modificado a Enlace Directo Irrompible) */}
       <a
         href="https://wa.me"
         target="_blank"
-        rel="noreferrer"
+        rel="noopener noreferrer"
         className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#25d366] text-white shadow-2xl transition-all hover:scale-110 active:scale-95 group hover:bg-[#128c7e]"
         title="Chat de Atención Directa"
       >
@@ -206,7 +205,7 @@ export default function App() {
             <div className="w-full rounded-2xl border-4 border-[#00c853] bg-black overflow-hidden shadow-xl aspect-video relative">
               <iframe
                 className="absolute top-0 left-0 w-full h-full"
-                src={`https://youtube.com{YOUTUBE_VIDEO_ID}?autoplay=0&mute=0`}
+                src={YOUTUBE_EMBED_URL}
                 title="Reproductor de Novedades DCUATES"
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -218,7 +217,7 @@ export default function App() {
 
         </div>
       </section>
-      {/* SECCIÓN 1: LOS 4 PROYECTOS BASE (Fondo Verde Oscuro y Scroll Margin Corregido) */}
+      {/* SECCIÓN 1: LOS 4 PROYECTOS BASE (Fondo Verde Oscuro, WhatsApp NATIVO Validado y Scroll Margin Corregido) */}
       <section id="iniciativas" className="bg-[#1b4332] text-white py-16 px-4 border-b-4 border-[#0f2d1e]">
         <div className="mx-auto max-w-6xl">
           <h2 className="text-3xl sm:text-4xl font-black text-center uppercase tracking-tight mb-12 text-emerald-300">
@@ -259,19 +258,22 @@ export default function App() {
                   </ul>
                 </div>
 
-                <button
-                  onClick={() => window.open(`https://wa.me{encodeURIComponent(item.mensajeWA)}`, '_blank')}
-                  className="w-full text-center rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3 px-4 shadow-md transition-colors uppercase tracking-wide text-xs sm:text-sm font-heading"
+                {/* Enlace directo nativo para saltar el bloqueo de ventanas emergentes */}
+                <a
+                  href={`https://wa.me{encodeURIComponent(item.mensajeWA)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full text-center rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3 px-4 shadow-md transition-colors uppercase tracking-wide text-xs sm:text-sm font-heading block"
                 >
                   {item.textoBoton}
-                </button>
+                </a>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* SECCIÓN 2: LOS 4 NUEVOS PROYECTOS SOCIALES (Mismo Formato Premium y Fondo Verde Oscuro Unificado) */}
+      {/* SECCIÓN 2: LOS 4 NUEVOS PROYECTOS SOCIALES (Mismo Formato Premium, Fondo Verde Oscuro y WhatsApp Nativo Validado) */}
       <section id="nuevos-proyectos" className="bg-[#1b4332] text-white py-16 px-4 border-b-4 border-[#0f2d1e]">
         <div className="mx-auto max-w-6xl">
           <h2 className="text-3xl sm:text-4xl font-black text-center uppercase tracking-tight mb-3 text-emerald-300">
@@ -315,18 +317,21 @@ export default function App() {
                   </ul>
                 </div>
 
-                <button
-                  onClick={() => window.open(`https://wa.me{encodeURIComponent(item.mensajeWA)}`, '_blank')}
-                  className="w-full text-center rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3 px-4 shadow-md transition-colors uppercase tracking-wide text-xs sm:text-sm font-heading"
+                {/* Enlace directo nativo para saltar el bloqueo de ventanas emergentes */}
+                <a
+                  href={`https://wa.me{encodeURIComponent(item.mensajeWA)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full text-center rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3 px-4 shadow-md transition-colors uppercase tracking-wide text-xs sm:text-sm font-heading block"
                 >
                   {item.textoBoton}
-                </button>
+                </a>
               </div>
             ))}
           </div>
         </div>
       </section>
-      {/* SECCIÓN: APORTE VOLUNTARIO (Restauración de la Estructura Premium del Clon 3) */}
+      {/* SECCIÓN: APORTE VOLUNTARIO (Restauración de la Estructura Premium del Clon 3 con Enlaces WA Directos) */}
       <section id="donaciones" className="bg-[#e8f5e9] text-[#0f2d1e] py-16 px-4 border-b-4 border-[#0f2d1e]">
         <div className="mx-auto max-w-5xl grid gap-10 md:grid-cols-12 items-center">
           
@@ -341,7 +346,7 @@ export default function App() {
             <p className="text-sm text-slate-700 leading-relaxed text-justify font-bold">
               Cada donativo, del formato que decidas, nos ayuda a sostener y hacer crecer los proyectos que benefician a los negocios y familias latinas en conjunto con **DCUATES**.
             </p>
-            <div className="rounded-2xl bg-amber-50 border-2 border-amber-500/40 p-4 text-xs font-black text-amber-900 leading-relaxed flex items-start gap-3 shadow-sm">
+            <div className="rounded-2xl bg-amber-50 border-2 border-amber-500/40 p-4 text-xs font-black text-amber-900 wading-relaxed flex items-start gap-3 shadow-sm">
               <span className="text-xl">💡</span>
               <p className="text-justify uppercase tracking-wide">
                 Parte de la utilidad de los proyectos se destina al apoyo de causas sociales, con total transparencia. Rendimos cuentas de cómo se usa cada aportación.
@@ -349,7 +354,7 @@ export default function App() {
             </div>
           </div>
 
-          {/* Bloque Opciones Derecha: Botonera Estilizada de Alta Conversión */}
+          {/* Bloque Opciones Derecha: Botonera Estilizada con Enlaces Nativo Directos para Evitar Bloqueos */}
           <div className="md:col-span-7 space-y-3">
             <p className="text-xs font-black uppercase tracking-widest text-[#0f2d1e]/80 mb-3 block">
               Selecciona tu tipo de aportación:
@@ -360,10 +365,12 @@ export default function App() {
               { t: "Trueque Solidario", d: "Intercambia productos o servicios de valor equivalente.", m: "Hola DCUATES! Me interesa el Trueque Solidario. Tengo productos/servicios para intercambiar a favor de la causa." },
               { t: "Labor Voluntaria", d: "Dona tu valioso tiempo y conocimientos para crecer juntos.", m: "Hola DCUATES! Quiero sumarme con Labor Voluntaria aportando mi tiempo y conocimientos comunitarios." }
             ].map((opc, oIdx) => (
-              <button
+              <a
                 key={oIdx}
-                onClick={() => window.open(`https://wa.me{encodeURIComponent(opc.m)}`, '_blank')}
-                className="w-full text-left rounded-2xl border-4 border-[#0f2d1e] bg-white p-4 shadow-md transition-all hover:scale-[1.01] hover:border-[#e65100] group duration-200"
+                href={`https://wa.me{encodeURIComponent(opc.m)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full text-left rounded-2xl border-4 border-[#0f2d1e] bg-white p-4 shadow-md transition-all hover:scale-[1.01] hover:border-[#e65100] group duration-200 block"
               >
                 <div className="flex justify-between items-center">
                   <div>
@@ -372,7 +379,7 @@ export default function App() {
                   </div>
                   <span className="text-xl opacity-40 group-hover:opacity-100 group-hover:text-[#e65100] transition-all pl-2">➔</span>
                 </div>
-              </button>
+              </a>
             ))}
           </div>
 
@@ -559,6 +566,7 @@ function FormularioPublicidad() {
     </form>
   );
 }
+
 
 
 
