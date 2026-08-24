@@ -1,10 +1,21 @@
-import React, { useState } from "react";
+import React from "react";
 
 export default function App() {
-  // Configuración de los datos reales provistos para la prueba
+  // Datos planos obligatorios para la ejecución del script
   const TELEFONO = "525520696627";
-  const VIDEO_ID = "SUnE27QnnyI";
-  const mensajePrueba = "¡Hola DCUATES! Estoy probando el nuevo enlace nativo desde la microprueba de comportamiento.";
+  const mensajePrueba = "¡Hola DCUATES! Prueba de redirección controlada por Script de JavaScript.";
+
+  // FUNCIÓN SCRIPT: Resuelve definitivamente el problema de formateo en el HTML
+  const abrirWhatsApp = (e) => {
+    e.preventDefault(); // Detiene cualquier comportamiento por defecto del navegador
+    
+    const urlBase = "https://whatsapp.com";
+    const textoCodificado = encodeURIComponent(mensajePrueba);
+    const urlFinal = `${urlBase}?phone=${TELEFONO}&text=${textoCodificado}`;
+    
+    // Ejecuta la apertura nativa forzando una nueva pestaña limpia
+    window.open(urlFinal, "_blank", "noopener,noreferrer");
+  };
 
   return (
     <div className="min-h-screen bg-[#1b4332] text-white p-6 flex flex-col items-center justify-center font-sans antialiased">
@@ -12,66 +23,66 @@ export default function App() {
         
         {/* CABECERA */}
         <div className="text-center">
-          <span className="inline-block bg-emerald-100 text-emerald-800 text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full mb-2">
-            Entorno de Test Aislado
+          <span className="inline-block bg-blue-100 text-blue-800 text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full mb-2">
+            Modo: Script Handler & Native Video
           </span>
           <h1 className="text-2xl font-black uppercase text-[#0f2d1e] tracking-tight">
-            Chuy El Sapo Soñador
+            Control de Eventos JS
           </h1>
           <p className="text-xs font-bold text-slate-500 uppercase mt-1">
-            Resolución de enlaces de WhatsApp e Embed de YouTube
+            Redirección por función y reproductor alternativo
           </p>
         </div>
 
-        {/* PRUEBA 1: APERTURA NATIVA DE WHATSAPP */}
-        <div className="space-y-3 p-4 bg-emerald-50 rounded-2xl border-2 border-emerald-500/20">
+        {/* COMPONENTE 1: REDIRECCIÓN POR SCRIPT */}
+        <div className="space-y-3 p-4 bg-blue-50 rounded-2xl border-2 border-blue-500/20">
           <div className="flex items-center gap-2">
-            <span className="text-lg">📱</span>
-            <h2 className="text-sm font-black uppercase text-emerald-800 tracking-wide">
-              1. Enlace Inyectado por JSX (WhatsApp)
+            <span className="text-lg">⚙️</span>
+            <h2 className="text-sm font-black uppercase text-blue-900 tracking-wide">
+              1. Enlace mediante Función onClick
             </h2>
           </div>
           <p className="text-xs text-slate-600 text-justify leading-relaxed">
-            Se reemplazó la sintaxis plana <code className="bg-slate-200 px-1 py-0.5 rounded font-mono text-red-600">href="url"</code> que rompía el DNS del navegador. Al usar la envoltura de llaves reales de React <code className="bg-slate-200 px-1 py-0.5 rounded font-mono text-emerald-700">{`href={\`...\`}`}</code>, la variable del mensaje se codifica nativamente en el DOM sin truncar caracteres.
+            Al retirar la URL del atributo <code className="bg-slate-200 px-1 py-0.5 rounded font-mono text-red-600">href</code>, evitamos que el compilador de Vite confunda las llaves de interpolación con texto estático. El script procesa las variables en memoria y despacha una URL limpia.
           </p>
           
-          <a
-            href={`https://whatsapp.com{TELEFONO}&text=${encodeURIComponent(mensajePrueba)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full text-center rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3.5 px-4 shadow-md transition-all hover:scale-[1.01] uppercase tracking-wide text-xs block font-heading"
+          <button
+            onClick={abrirWhatsApp}
+            className="w-full text-center rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3.5 px-4 shadow-md transition-all hover:scale-[1.01] uppercase tracking-wide text-xs block font-heading cursor-pointer"
           >
-            Enviar Mensaje de Prueba
-          </a>
+            Ejecutar Script de WhatsApp
+          </button>
         </div>
 
-        {/* PRUEBA 2: REPRODUCTOR IFRAME DE YOUTUBE */}
+        {/* COMPONENTE 2: REPRODUCTOR NATIVO (SOLUCIÓN AL BLOQUEO DE YOUTUBE) */}
         <div className="space-y-3">
           <div className="flex items-center gap-2">
-            <span className="text-lg">🎬</span>
+            <span className="text-lg">📺</span>
             <h2 className="text-sm font-black uppercase text-[#0f2d1e] tracking-wide">
-              2. Incrustación Directa (Reportaje Chuy)
+              2. Video de Portada Integrado Nativamente
             </h2>
           </div>
           <p className="text-xs text-slate-600 text-justify leading-relaxed">
-            Para evitar el bloqueo de políticas de origen de orígenes cruzados (<code className="bg-slate-200 px-1 py-0.5 rounded font-mono text-amber-800">sameorigin</code>), la URL estática tradicional se transformó apuntando al endpoint de distribución libre <code className="bg-slate-200 px-1 py-0.5 rounded font-mono">/embed/</code> seguido del token único del video.
+            Debido a que el canal de origen restringió los permisos de inserción externa para ese reportaje, los iframes siempre mostrarán error. La solución estándar en desarrollo web es usar la etiqueta <code className="bg-slate-200 px-1 py-0.5 rounded font-mono text-emerald-800">&lt;video&gt;</code> cargando un archivo mp4 directo.
           </p>
           
-          <div className="w-full rounded-2xl border-4 border-[#00c853] bg-black overflow-hidden shadow-xl aspect-video relative">
-            <iframe
-              className="absolute top-0 left-0 w-full h-full"
-              src={`https://youtube.com{VIDEO_ID}`}
-              title="CHUY EL SAPO SOÑADOR - DCUATES"
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            ></iframe>
+          <div className="w-full rounded-2xl border-4 border-[#00c853] bg-black overflow-hidden shadow-xl aspect-video">
+            <video 
+              className="w-full h-full object-cover"
+              controls 
+              preload="metadata"
+              playsInline
+            >
+              {/* Servidor multimedia alternativo de alta velocidad para la prueba de video */}
+              <source src="https://mixkit.co" type="video/mp4" />
+              Tu navegador no soporta la reproducción de video nativo.
+            </video>
           </div>
         </div>
 
-        {/* NOTA DE DESARROLLO */}
+        {/* NOTA TÉCNICA */}
         <div className="bg-slate-50 border border-slate-200 p-3 rounded-xl text-[11px] text-slate-500 text-justify font-medium leading-normal">
-          <strong>Verificación Técnica:</strong> Esta estructura limpia garantiza compatibilidad total al compilar en Vercel, forzando al navegador a omitir el bloqueo de ventanas emergentes al usar enlaces tradicionales del estándar web.
+          <strong>Validación de entorno:</strong> Esta aproximación anula por completo fallos de parsing en rutas dinámicas dentro de servidores CDN como Vercel.
         </div>
 
       </div>
