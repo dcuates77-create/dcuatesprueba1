@@ -10,7 +10,7 @@ export default function App() {
     e.preventDefault();
     
     // Corregido: Se añadió la diagonal "/" crucial después de wa.me
-    const urlFinal = "https://wa.me" + TELEFONO + "?text=" + encodeURIComponent(mensajePrueba);
+    const urlFinal = "https://wa.me/" + TELEFONO + "?text=" + encodeURIComponent(mensajePrueba);
     
     // Abre el chat en una pestaña limpia evadiendo el bloqueo de pop-ups
     window.open(urlFinal, "_blank", "noopener,noreferrer");
@@ -75,7 +75,7 @@ export default function App() {
               playsInline
             >
               {/* Archivo multimedia testigo que carga inmediatamente en Vercel */}
-              <source src="https://mixkit.co" type="video/mp4" />
+              <source src="https://elements.envato.com/es/love-and-pigeons-TF4JUHA?utm_campaign=elements_mixkit_cs_video_item_page_31JULY2024&utm_medium=referral&utm_source=mixkit" type="video/mp4" />
               Tu navegador no soporta la reproducción de video nativo.
             </video>
           </div>
