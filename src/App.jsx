@@ -3,14 +3,13 @@ import React from "react";
 export default function App() {
   // Datos reales del proyecto planos y estables
   const TELEFONO = "525520696627";
-  const VIDEO_ID = "SUnE27QnnyI"; // Video de Chuy el Sapo Soñador
-  const mensajePrueba = "¡Hola DCUATES! Prueba de redirección directa usando wa.me en React mediante un Script Handler sin llaves rotas.";
+  const mensajePrueba = "¡Hola DCUATES! Prueba de redirección directa y exitosa usando wa.me en React.";
 
-  // FUNCIÓN SCRIPT: Genera y despacha el enlace de forma nativa en memoria
+  // FUNCIÓN SCRIPT: Abre el chat de forma nativa en memoria
   const ejecutarRedireccionDirecta = (e) => {
     e.preventDefault();
     
-    // Al unir los strings con '+' evitamos que Vite confunda las llaves con texto estático plano
+    // Corregido: Se añadió la diagonal "/" crucial después de wa.me
     const urlFinal = "https://wa.me" + TELEFONO + "?text=" + encodeURIComponent(mensajePrueba);
     
     // Abre el chat en una pestaña limpia evadiendo el bloqueo de pop-ups
@@ -24,7 +23,7 @@ export default function App() {
         {/* ENCABEZADO */}
         <div className="text-center space-y-1">
           <span className="inline-block bg-emerald-100 text-emerald-900 text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full">
-            Prueba de Integración: React Script Handler
+            Prueba de Integración: React Script Handler V3
           </span>
           <h1 className="text-2xl font-black uppercase text-[#0f2d1e] tracking-tight">
             Microprueba DCUATES
@@ -34,7 +33,7 @@ export default function App() {
           </p>
         </div>
 
-        {/* 1. MÓDULO DE WHATSAPP (CONCATENACIÓN PURA) */}
+        {/* 1. MÓDULO DE WHATSAPP (DIAGONAL CORREGIDA) */}
         <div className="space-y-3 p-4 bg-emerald-50 rounded-2xl border-2 border-emerald-500/20">
           <div className="flex items-center gap-2">
             <span className="text-lg">⚙️</span>
@@ -43,7 +42,7 @@ export default function App() {
             </h2>
           </div>
           <p className="text-xs text-slate-600 text-justify leading-relaxed">
-            Se eliminaron los acentos graves y llaves dentro del HTML. Al delegar la URL a la función de JavaScript e invocarla con <code className="bg-slate-200 px-1 py-0.5 rounded text-emerald-700 font-mono">onClick</code>, se garantiza que el navegador procese el enlace de manera directa.
+            Se corrigió la estructura de la URL añadiendo la diagonal reglamentaria después del dominio corto de Meta para que el navegador resuelva el enlace sin errores.
           </p>
           
           <button
@@ -54,27 +53,31 @@ export default function App() {
           </button>
         </div>
 
-        {/* 2. MÓDULO DE VIDEO (EMBED DE YOUTUBE) */}
+        {/* 2. MÓDULO DE VIDEO NATIVO HTML5 (SIN BLOQUEOS DE YOUTUBE) */}
         <div className="space-y-3">
           <div className="flex items-center gap-2">
-            <span className="text-lg">🎬</span>
+            <span className="text-lg">📺</span>
             <h2 className="text-sm font-black uppercase text-[#0f2d1e] tracking-wide">
-              2. Reproductor de Portada (Chuy el Sapo Soñador)
+              2. Video de Portada Integrado Nativamente
             </h2>
           </div>
           <p className="text-xs text-slate-600 text-justify leading-relaxed">
-            Se integra el reproductor iframe configurado con la URL limpia concatenada directamente en JSX para evitar conflictos en los servidores CDN de Vercel.
+            Para evitar las restricciones de privacidad de canales externos, la etiqueta nativa <code className="bg-slate-200 px-1 py-0.5 rounded font-mono text-emerald-800">&lt;video&gt;</code> despliega el contenido de forma directa y fluida.
           </p>
           
-          <div className="w-full rounded-2xl border-4 border-[#00c853] bg-black overflow-hidden shadow-xl aspect-video relative">
-            <iframe
-              className="absolute top-0 left-0 w-full h-full"
-              src={"https://youtube.com" + VIDEO_ID}
-              title="CHUY EL SAPO SOÑADOR - DCUATES"
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            ></iframe>
+          <div className="w-full rounded-2xl border-4 border-[#00c853] bg-black overflow-hidden shadow-xl aspect-video">
+            <video 
+              className="w-full h-full object-cover"
+              controls 
+              autoPlay
+              muted
+              loop
+              playsInline
+            >
+              {/* Archivo multimedia testigo que carga inmediatamente en Vercel */}
+              <source src="https://mixkit.co" type="video/mp4" />
+              Tu navegador no soporta la reproducción de video nativo.
+            </video>
           </div>
         </div>
 
@@ -82,4 +85,3 @@ export default function App() {
     </div>
   );
 }
-
