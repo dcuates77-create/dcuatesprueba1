@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+    import React, { useState } from "react";
 
 // =========================================================================
 // 1. CONFIGURACIÓN CENTRALIZADA DE VARIABLES, REDES Y HOJA DE CÁLCULO
@@ -13,10 +13,10 @@ const WHATSAPP_NUMERO = "525520696627";
 const YOUTUBE_VIDEO_ID = "SUnE27QnnyI";
 
 const REDES_SOCIALES = {
-  facebook: "https://facebook.com",
-  instagram: "https://instagram.com",
-  youtube: "https://youtube.com",
-  tiktok: "https://tiktok.com"
+  facebook: "https://www.facebook.com/abelzarem/",
+  instagram: "https://www.instagram.com/conexionesconcausa/",
+  youtube: "http://www.youtube.com/@abelmeraz",
+  tiktok: "https://www.tiktok.com/@dcuates"
 };
 
 const NAV_LINKS = [
@@ -432,18 +432,18 @@ function SiteHeader() {
       <div className="mx-auto flex flex-wrap items-center justify-between gap-y-3 max-w-6xl">
 
         <a href="#inicio" className="flex items-center gap-3" onClick={() => setOpen(false)}>
-          <span className="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-full overflow-hidden bg-[#0f2d1e] border-2 border-[#0f2d1e]/20 shadow-sm shrink-0">
+          <span className="flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-full overflow-hidden bg-[#0f2d1e] border-2 border-[#0f2d1e]/20 shadow-sm shrink-0">
             <img
               src="/images/logo-circular.png"
               alt="Logo DCUATES"
               className="w-full h-full object-contain"
               onError={(e) => {
                 e.target.style.display = 'none';
-                e.target.parentElement.innerHTML = '<span class="font-black text-white text-lg">DC</span>';
+                e.target.parentElement.innerHTML = '<span class="font-black text-white text-2xl">DC</span>';
               }}
             />
           </span>
-          <span className="text-lg sm:text-xl font-black uppercase tracking-tight text-[#0f2d1e]">DCUATES</span>
+          <span className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#0f2d1e]">DCUATES</span>
         </a>
         <nav className="hidden md:flex items-center gap-6 text-xs font-black text-slate-600 lg:text-sm">
           {NAV_LINKS.map(link => (
@@ -543,3 +543,4 @@ function FormularioPublicidad() {
     </form>
   );
 }
+
