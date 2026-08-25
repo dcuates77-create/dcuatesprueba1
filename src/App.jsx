@@ -137,12 +137,12 @@ export default function App() {
       {/* Encabezado */}
       <SiteHeader />
 
-      {/* SECCIÓN PORTADA / HERO */}
+      {/* SECCIÓN PORTADA / HERO — 2 columnas (texto+imagen | botonera en pares) */}
       <section id="inicio" className="bg-[#e8f5e9] text-[#0f2d1e] py-12 px-4 md:py-16 border-b-4 border-[#0f2d1e]">
         <div className="mx-auto max-w-7xl grid gap-8 items-stretch lg:grid-cols-12">
 
-          {/* COLUMNA IZQUIERDA */}
-          <div className="lg:col-span-5 flex flex-col justify-between space-y-6">
+          {/* COLUMNA IZQUIERDA: Texto + Imagen Bibliobici */}
+          <div className="lg:col-span-7 flex flex-col justify-between space-y-6">
             <div className="space-y-4">
               <h1 className="text-4xl sm:text-5xl font-black uppercase tracking-tight text-[#0f2d1e] leading-none">
                 Juntos hacemos<br />COMUNIDAD
@@ -168,8 +168,8 @@ export default function App() {
             </div>
           </div>
 
-          {/* COLUMNA CENTRAL: Botonera Vertical */}
-          <div className="lg:col-span-3 flex flex-col justify-between py-1 gap-3">
+          {/* COLUMNA DERECHA: Botonera en pares (4 filas x 2 columnas), alineada en altura con la columna izquierda */}
+          <div className="lg:col-span-5 grid grid-cols-2 gap-3 sm:gap-4 auto-rows-fr">
             {[
               { t: "Préstamo de Libros", h: "#libros" },
               { t: "Ecatepets Mascotas", h: "#ecatepets" },
@@ -183,44 +183,17 @@ export default function App() {
               <a
                 key={idx}
                 href={btn.h}
-                className="w-full flex-1 flex items-center justify-center text-center rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black px-4 shadow-md transition-all hover:scale-[1.02] uppercase tracking-wide text-xs sm:text-sm font-heading"
+                className="flex items-center justify-center text-center rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black px-3 py-6 shadow-md transition-all hover:scale-[1.02] uppercase tracking-wide text-sm sm:text-base lg:text-lg leading-tight font-heading"
               >
                 {btn.t}
               </a>
             ))}
           </div>
 
-          {/* COLUMNA DERECHA: Logo y Video de Portada */}
-          <div className="lg:col-span-4 flex flex-col items-center justify-between text-center space-y-4">
-            <div className="w-56 h-56 sm:w-64 sm:h-64 lg:w-72 lg:h-72 flex items-center justify-center rounded-full overflow-hidden bg-white p-2 border-4 border-[#0f2d1e]/20 shadow-xl">
-              <img
-                src="/images/logo-circular.png"
-                alt="Logo Oficial DCUATES.COM"
-                className="w-full h-full object-contain"
-                onError={(e) => {
-                  e.target.style.display = 'none';
-                  e.target.parentElement.innerHTML = '<div class="text-[#e65100] font-black text-xl tracking-tight leading-none">🟢 DCUATES.COM<br/><span class="text-xs text-[#0f2d1e]/60 font-bold">APOYOS Y BENEFICIOS</span></div>';
-                }}
-              />
-            </div>
-            <h3 className="text-xl sm:text-2xl font-black uppercase text-[#0f2d1e] tracking-wider leading-none pt-2">
-              BRINDANDO LO MEJOR !!!
-            </h3>
-            {/* Ventana Multimedia: video de portada incrustado desde YouTube (formato /embed/) */}
-            <div className="w-full rounded-2xl border-4 border-[#00c853] bg-black overflow-hidden shadow-xl aspect-video relative">
-              <iframe
-                className="absolute top-0 left-0 w-full h-full"
-                src={`https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID}`}
-                title="CHUY EL SAPO SOÑADOR - DCUATES"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              ></iframe>
-            </div>
-          </div>
-
         </div>
       </section>
+
+      {/* Nota: el video de portada (YOUTUBE_VIDEO_ID) queda reservado para su propia sección — aún no incluido aquí */}
 
       {/* SECCIÓN 1: LOS 4 PROYECTOS BASE */}
       <section id="iniciativas" className="bg-[#1b4332] text-white py-16 px-4 border-b-4 border-[#0f2d1e]">
@@ -455,48 +428,59 @@ export default function App() {
 function SiteHeader() {
   const [open, setOpen] = useState(false);
   return (
-    <header className="sticky top-0 z-40 border-b border-emerald-800/20 bg-white/95 backdrop-blur py-3 px-4 shadow-sm text-slate-900">
-      <div className="mx-auto flex max-w-6xl items-center justify-between">
+    <header className="sticky top-0 z-40 border-b border-emerald-800/20 bg-white/95 backdrop-blur py-4 sm:py-5 px-4 shadow-sm text-slate-900 relative">
+      <div className="mx-auto flex flex-wrap items-center justify-between gap-y-3 max-w-6xl">
 
-        <a href="#inicio" className="flex items-center gap-2" onClick={() => setOpen(false)}>
-          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#0f2d1e] font-bold text-white text-base">DC</span>
-          <span className="text-lg font-black uppercase tracking-tight text-[#0f2d1e]">DCUATES</span>
+        <a href="#inicio" className="flex items-center gap-3" onClick={() => setOpen(false)}>
+          <span className="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-full overflow-hidden bg-[#0f2d1e] border-2 border-[#0f2d1e]/20 shadow-sm shrink-0">
+            <img
+              src="/images/logo-circular.png"
+              alt="Logo DCUATES"
+              className="w-full h-full object-contain"
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.parentElement.innerHTML = '<span class="font-black text-white text-lg">DC</span>';
+              }}
+            />
+          </span>
+          <span className="text-lg sm:text-xl font-black uppercase tracking-tight text-[#0f2d1e]">DCUATES</span>
         </a>
         <nav className="hidden md:flex items-center gap-6 text-xs font-black text-slate-600 lg:text-sm">
           {NAV_LINKS.map(link => (
             <a key={link.href} href={link.href} className="hover:text-emerald-700 transition-colors uppercase tracking-wide">{link.label}</a>
           ))}
         </nav>
-        <div className="hidden sm:flex items-center gap-2">
-          <a href={REDES_SOCIALES.facebook} target="_blank" rel="noreferrer" className="flex h-9 w-9 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="Facebook">
-            <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <a href={REDES_SOCIALES.facebook} target="_blank" rel="noreferrer" className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="Facebook">
+            <svg className="h-5 w-5 sm:h-6 sm:w-6 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" />
             </svg>
           </a>
-          <a href={REDES_SOCIALES.instagram} target="_blank" rel="noreferrer" className="flex h-9 w-9 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="Instagram">
-            <svg className="h-4 w-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <a href={REDES_SOCIALES.instagram} target="_blank" rel="noreferrer" className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="Instagram">
+            <svg className="h-5 w-5 sm:h-6 sm:w-6 fill-none stroke-current stroke-2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
               <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
               <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
             </svg>
           </a>
-          <a href={REDES_SOCIALES.youtube} target="_blank" rel="noreferrer" className="flex h-9 w-9 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="YouTube">
-            <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <a href={REDES_SOCIALES.youtube} target="_blank" rel="noreferrer" className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="YouTube">
+            <svg className="h-5 w-5 sm:h-6 sm:w-6 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
             </svg>
           </a>
-          <a href={REDES_SOCIALES.tiktok} target="_blank" rel="noreferrer" className="flex h-9 w-9 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="TikTok">
-            <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <a href={REDES_SOCIALES.tiktok} target="_blank" rel="noreferrer" className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="TikTok">
+            <svg className="h-5 w-5 sm:h-6 sm:w-6 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.02 1.59 4.23.94 1.13 2.29 1.89 3.73 2.18l-.02 3.88c-1.63-.03-3.2-.55-4.51-1.52A7.83 7.83 0 0 1 16.43 7.5v8.32a7.83 7.83 0 0 1-3.32 6.42 7.91 7.91 0 0 1-8.73-.24 7.85 7.85 0 0 1-3.23-7.58 7.84 7.84 0 0 1 5.37-6.84V11.5a3.94 3.94 0 0 0-1.5 3.32 3.93 3.93 0 0 0 3.2 3.88 3.93 3.93 0 0 0 4.61-3.2c.04-.33.05-.66.05-.99V.02z" />
             </svg>
           </a>
+          <button onClick={() => setOpen(!open)} className="md:hidden font-bold text-xs bg-emerald-50 border border-emerald-800/20 px-3 py-2.5 rounded-lg text-emerald-950 shrink-0">
+            {open ? "CERRAR" : "MENÚ"}
+          </button>
         </div>
-        <button onClick={() => setOpen(!open)} className="md:hidden font-bold text-xs bg-emerald-50 border border-emerald-800/20 px-3 py-2 rounded-lg text-emerald-950">
-          {open ? "CERRAR" : "MENÚ"}
-        </button>
       </div>
+      {/* Menú móvil: anclado justo debajo del header (top-full), nunca se encima con el contenido */}
       {open && (
-        <div className="fixed inset-x-0 top-[57px] bottom-0 bg-white z-50 flex flex-col p-6 md:hidden">
+        <div className="absolute top-full inset-x-0 bg-white z-50 flex flex-col p-6 md:hidden border-t border-emerald-800/20 shadow-lg">
           <nav className="flex flex-col gap-4 text-base font-bold">
             {NAV_LINKS.map(link => (
               <a key={link.href} href={link.href} onClick={() => setOpen(false)} className="border-b pb-2 uppercase text-slate-800 hover:text-emerald-700">{link.label}</a>
