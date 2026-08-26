@@ -1,4 +1,4 @@
-    import React, { useState } from "react";
+import React, { useState } from "react";
 
 // =========================================================================
 // 1. CONFIGURACIÓN CENTRALIZADA DE VARIABLES, REDES Y HOJA DE CÁLCULO
@@ -106,7 +106,7 @@ const NUEVOS_PROYECTOS_DATA = [
     categoria: "SALUD Y ESPARCIMIENTO",
     titulo: "Bienestar, Cultura y Recreación",
     descripcion: "Actividades recreativas y talleres enfocados en el desarrollo integral, la salud mental y el esparcimiento familiar.",
-    puntos: ["Desarrollo integral", "Salud mental", "Esparcimiento familiar"],
+    puntos: ["Desarrollo Personal y Social", "Salud Integral", "Disfrute Personal y Social"],
     textoBoton: "Preguntar por talleres",
     enlaceDirectoWA: enlaceWhatsApp("¡Hola DCUATES! Solicito información sobre los talleres de bienestar, cultura y recreación.")
   }
@@ -121,28 +121,34 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#1b4332] font-sans antialiased text-slate-900 selection:bg-emerald-500/30 relative">
 
-      {/* Botón Flotante Permanente de WhatsApp */}
-      <a
-        href={enlaceWhatsApp("¡Hola DCUATES! Me gustaría más información.")}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#25d366] text-white shadow-2xl transition-all hover:scale-110 active:scale-95 group hover:bg-[#128c7e]"
-        title="Chat de Atención Directa"
-      >
-        <svg className="h-7 w-7 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.503-5.729-1.458L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.965C16.428 1.978 13.96 1.951 12.01 1.951c-5.438 0-9.863 4.374-9.867 9.802 0 1.685.459 3.324 1.333 4.766L2.483 20.3l3.966-.995zM17.15 14.34c-.283-.141-1.674-.824-1.933-.917-.26-.093-.448-.14-.637.142-.188.282-.729.917-.894 1.105-.165.188-.33.212-.613.07a9.23 9.23 0 0 1-2.28-1.401 10.15 10.15 0 0 1-1.579-1.954c-.165-.282-.018-.434.124-.574.127-.127.283-.329.424-.494.141-.165.188-.282.283-.47.094-.188.047-.353-.024-.494-.071-.141-.637-1.53-.873-2.102-.229-.554-.46-.478-.637-.487-.164-.008-.353-.01-.542-.01-.189 0-.495.07-.755.353-.26.282-.99 1.011-.99 2.467 0 1.457 1.06 2.867 1.201 3.056.142.188 2.086 3.178 5.053 4.462.705.305 1.256.488 1.684.624.708.226 1.353.194 1.863.118.568-.085 1.674-.682 1.909-1.34.236-.658.236-1.223.165-1.34-.07-.117-.26-.188-.542-.329z"/>
-        </svg>
-      </a>
+      {/* Botón Flotante Permanente de WhatsApp — efecto 3D + anillo parpadeante + etiqueta */}
+      <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3">
+        <span className="bg-white text-[#0f2d1e] text-[11px] sm:text-sm font-black uppercase tracking-wide px-3 py-2 rounded-full shadow-lg border border-[#0f2d1e]/10 whitespace-nowrap animate-pulse">
+          Dudas y Atención
+        </span>
+        <a
+          href={enlaceWhatsApp("¡Hola DCUATES! Me gustaría más información.")}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="relative flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[#34e372] to-[#128c7e] text-white shadow-[0_10px_20px_rgba(0,0,0,0.35),inset_0_-3px_6px_rgba(0,0,0,0.25),inset_0_3px_4px_rgba(255,255,255,0.4)] transition-all hover:scale-110 active:scale-95 border-2 border-white/40"
+          title="Chat de Atención Directa"
+        >
+          <span className="absolute inset-0 rounded-full bg-[#25d366] animate-ping opacity-60"></span>
+          <svg className="relative z-10 h-7 w-7 fill-current drop-shadow" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.503-5.729-1.458L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.965C16.428 1.978 13.96 1.951 12.01 1.951c-5.438 0-9.863 4.374-9.867 9.802 0 1.685.459 3.324 1.333 4.766L2.483 20.3l3.966-.995zM17.15 14.34c-.283-.141-1.674-.824-1.933-.917-.26-.093-.448-.14-.637.142-.188.282-.729.917-.894 1.105-.165.188-.33.212-.613.07a9.23 9.23 0 0 1-2.28-1.401 10.15 10.15 0 0 1-1.579-1.954c-.165-.282-.018-.434.124-.574.127-.127.283-.329.424-.494.141-.165.188-.282.283-.47.094-.188.047-.353-.024-.494-.071-.141-.637-1.53-.873-2.102-.229-.554-.46-.478-.637-.487-.164-.008-.353-.01-.542-.01-.189 0-.495.07-.755.353-.26.282-.99 1.011-.99 2.467 0 1.457 1.06 2.867 1.201 3.056.142.188 2.086 3.178 5.053 4.462.705.305 1.256.488 1.684.624.708.226 1.353.194 1.863.118.568-.085 1.674-.682 1.909-1.34.236-.658.236-1.223.165-1.34-.07-.117-.26-.188-.542-.329z"/>
+          </svg>
+        </a>
+      </div>
 
       {/* Encabezado */}
       <SiteHeader />
 
-      {/* SECCIÓN PORTADA / HERO — 2 columnas (texto+imagen | botonera en pares) */}
+      {/* SECCIÓN PORTADA / HERO — 3 columnas (texto+imagen | 4 botones | 4 botones) */}
       <section id="inicio" className="bg-[#e8f5e9] text-[#0f2d1e] py-12 px-4 md:py-16 border-b-4 border-[#0f2d1e]">
-        <div className="mx-auto max-w-7xl grid gap-8 items-stretch lg:grid-cols-12">
+        <div className="mx-auto max-w-7xl grid gap-6 items-stretch lg:grid-cols-10">
 
-          {/* COLUMNA IZQUIERDA: Texto + Imagen Bibliobici (ampliada) */}
-          <div className="lg:col-span-7 flex flex-col justify-between space-y-6">
+          {/* COLUMNA 1: Texto + Imagen Bibliobici */}
+          <div className="lg:col-span-4 flex flex-col justify-between space-y-6">
             <div className="space-y-4">
               <h1 className="text-4xl sm:text-5xl font-black uppercase tracking-tight text-[#0f2d1e] leading-none">
                 Juntos hacemos<br />COMUNIDAD
@@ -156,7 +162,7 @@ export default function App() {
               <img
                 src="/images/bibliobici-movil.png"
                 alt="Bibliobici Móvil DCUATES en la comunidad"
-                className="w-full h-full min-h-[280px] sm:min-h-[380px] object-cover"
+                className="w-full h-full min-h-[280px] sm:min-h-[420px] object-cover"
                 onError={(e) => {
                   e.target.style.display = 'none';
                   e.target.parentElement.innerHTML = '<div class="p-12 text-center text-[#0f2d1e]/70 font-bold uppercase text-xs tracking-wider bg-emerald-50 h-full flex items-center justify-center min-h-[280px]">📷 [Espacio para Foto de la Bibliobici]</div>';
@@ -165,14 +171,36 @@ export default function App() {
             </div>
           </div>
 
-          {/* COLUMNA DERECHA: Botonera en pares (4 filas x 2 columnas) + etiqueta debajo, alineada en altura con la columna izquierda */}
-          <div className="lg:col-span-5 flex flex-col gap-4">
-            <div className="grid grid-cols-2 gap-3 sm:gap-4 auto-rows-fr flex-1">
+          {/* COLUMNA 2: 4 botones — Proyectos Base */}
+          <div className="lg:col-span-3 grid grid-rows-4 gap-4">
+            {[
+              { t: "Préstamo de Libros", h: "#libros", img: "/images/bb.png" },
+              { t: "Ecatepets Mascotas", h: "#ecatepets", img: "/images/Ecatepets.png" },
+              { t: "Alianzas Solidarias", h: "#iniciativas" },
+              { t: "Publicidad Gratis", h: "#publicidad" }
+            ].map((btn, idx) => (
+              <a
+                key={idx}
+                href={btn.h}
+                className="flex flex-col items-center justify-center gap-2 text-center rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black px-3 py-4 shadow-md transition-all hover:scale-[1.02] uppercase tracking-wide text-sm sm:text-base lg:text-lg leading-tight font-heading"
+              >
+                {btn.img && (
+                  <img
+                    src={btn.img}
+                    alt=""
+                    className="h-16 sm:h-20 w-auto object-contain drop-shadow"
+                    onError={(e) => { e.target.style.display = 'none'; }}
+                  />
+                )}
+                {btn.t}
+              </a>
+            ))}
+          </div>
+
+          {/* COLUMNA 3: 4 botones — Nuevos Proyectos */}
+          <div className="lg:col-span-3 flex flex-col gap-4">
+            <div className="grid grid-rows-4 gap-4 flex-1">
               {[
-                { t: "Préstamo de Libros", h: "#libros", img: "/images/bb.png" },
-                { t: "Ecatepets Mascotas", h: "#ecatepets", img: "/images/Ecatepets.png" },
-                { t: "Alianzas Solidarias", h: "#iniciativas" },
-                { t: "Publicidad Gratis", h: "#publicidad" },
                 { t: "Asesorías Gratuitas", h: "#asesorias" },
                 { t: "Bazar y Comercio", h: "#bazares" },
                 { t: "Noticias de Barrio", h: "#noticias" },
@@ -181,24 +209,17 @@ export default function App() {
                 <a
                   key={idx}
                   href={btn.h}
-                  className="flex flex-col items-center justify-center gap-2 text-center rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black px-3 py-6 shadow-md transition-all hover:scale-[1.02] uppercase tracking-wide text-sm sm:text-base lg:text-lg leading-tight font-heading"
+                  className="flex flex-col items-center justify-center gap-2 text-center rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black px-3 py-4 shadow-md transition-all hover:scale-[1.02] uppercase tracking-wide text-sm sm:text-base lg:text-lg leading-tight font-heading"
                 >
-                  {btn.img && (
-                    <img
-                      src={btn.img}
-                      alt=""
-                      className="h-24 sm:h-28 w-auto object-contain drop-shadow"
-                      onError={(e) => { e.target.style.display = 'none'; }}
-                    />
-                  )}
                   {btn.t}
                 </a>
               ))}
             </div>
-            <p className="text-center text-lg sm:text-xl font-black text-[#0f2d1e] uppercase tracking-wider">
-              ⚡ Proyectos Comunitarios DCUATES
-            </p>
           </div>
+
+          <p className="lg:col-span-6 lg:col-start-5 text-center text-lg sm:text-xl font-black text-[#0f2d1e] uppercase tracking-wider pt-2">
+            ⚡ Proyectos Comunitarios DCUATES
+          </p>
 
         </div>
       </section>
@@ -222,7 +243,7 @@ export default function App() {
                 <div>
                   <div className="flex items-center gap-3 mb-2">
                     <div className="text-[#0f2d1e]">
-                      <p className="text-xs sm:text-sm font-black uppercase text-amber-700 tracking-wider">
+                      <p className="text-sm sm:text-lg font-black uppercase text-amber-700 tracking-wider">
                         {item.categoria}
                       </p>
                       <h3 className="text-xl sm:text-2xl font-black text-[#0f2d1e] uppercase tracking-tight leading-tight">
@@ -279,7 +300,7 @@ export default function App() {
                 <div>
                   <div className="flex items-center gap-3 mb-2">
                     <div>
-                      <p className="text-xs sm:text-sm font-black uppercase text-amber-700 tracking-wider">
+                      <p className="text-sm sm:text-lg font-black uppercase text-amber-700 tracking-wider">
                         {item.categoria}
                       </p>
                       <h3 className="text-xl sm:text-2xl font-black text-[#0f2d1e] uppercase tracking-tight leading-tight">
@@ -321,7 +342,7 @@ export default function App() {
         <div className="mx-auto max-w-5xl grid gap-10 md:grid-cols-12 items-center">
 
           <div className="md:col-span-5 space-y-5">
-            <span className="inline-block rounded-full bg-emerald-200 px-4 py-1.5 text-xs font-black uppercase tracking-wider text-emerald-800 shadow-sm">
+            <span className="inline-block rounded-full bg-emerald-200 px-5 py-2 text-lg sm:text-2xl font-black uppercase tracking-wider text-emerald-800 shadow-sm">
               🟢 Apoyo Voluntario
             </span>
             <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-tight leading-none text-[#0f2d1e] font-heading">
@@ -339,7 +360,7 @@ export default function App() {
           </div>
 
           <div className="md:col-span-7 space-y-3">
-            <p className="text-xs font-black uppercase tracking-widest text-[#0f2d1e]/80 mb-3 block">
+            <p className="text-lg sm:text-2xl font-black uppercase tracking-widest text-[#0f2d1e]/80 mb-3 block">
               Selecciona tu tipo de aportación:
             </p>
             {[
@@ -373,7 +394,7 @@ export default function App() {
       <section id="publicidad" className="bg-[#1b4332] text-white py-16 px-4">
         <div className="mx-auto max-w-2xl">
           <div className="text-center space-y-2 mb-8">
-            <span className="inline-block rounded-full bg-emerald-900/60 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-emerald-400">
+            <span className="inline-block rounded-full bg-emerald-900/60 px-5 py-2 text-lg sm:text-2xl font-black uppercase tracking-wider text-emerald-400">
               📢 Publicidad Comunitaria
             </span>
             <h2 className="text-3xl sm:text-4xl font-black text-center uppercase tracking-tight text-emerald-300">
@@ -389,7 +410,8 @@ export default function App() {
 
       {/* FOOTER */}
       <footer className="bg-slate-950 text-slate-400 py-10 text-center text-xs space-y-3 border-t border-emerald-950">
-        <p>© {new Date().getFullYear()} DCUATES Comunidad. Todos los derechos reservados.</p>
+        <p>© {new Date().getFullYear()} DCUATES Comunidad, un programa de CONEXIONES CON CAUSA ♥</p>
+        <p className="font-bold tracking-wide">TODOS LOS DERECHOS RESERVADOS</p>
         <div className="pt-1">
           <button
             onClick={() => setShowPrivacy(true)}
@@ -555,26 +577,26 @@ function FormularioPublicidad() {
     <form onSubmit={handleSubmit} className="bg-white text-slate-800 border-4 border-[#0f2d1e] p-6 rounded-3xl space-y-4 shadow-xl">
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-slate-700 mb-1">Nombre de contacto *</label>
-          <input type="text" required value={contacto} onChange={e => setContacto(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="Ej. Juan Pérez" />
+          <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-slate-700 mb-1">Nombre de contacto</label>
+          <input type="text" value={contacto} onChange={e => setContacto(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="Ej. Juan Pérez" />
         </div>
         <div>
-          <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-slate-700 mb-1">Teléfono *</label>
-          <input type="tel" required value={telefono} onChange={e => setTelefono(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="Ej. 5512345678" />
+          <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-slate-700 mb-1">Teléfono</label>
+          <input type="text" value={telefono} onChange={e => setTelefono(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="Ej. 5512345678" />
         </div>
         <div>
-          <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-slate-700 mb-1">Nombre del negocio *</label>
-          <input type="text" required value={nombre} onChange={e => setNombre(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="Ej. Taquería El Sol" />
+          <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-slate-700 mb-1">Nombre del negocio</label>
+          <input type="text" value={nombre} onChange={e => setNombre(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="Ej. Taquería El Sol" />
         </div>
         <div>
-          <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-slate-700 mb-1">Giro / Categoría *</label>
-          <input type="text" required value={categoria} onChange={e => setCategoria(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="Ej. Restaurante, Salón, Tienda" />
+          <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-slate-700 mb-1">Giro / Categoría</label>
+          <input type="text" value={categoria} onChange={e => setCategoria(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="Ej. Restaurante, Salón, Tienda" />
         </div>
       </div>
       <div className="space-y-2 pt-2">
         <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-emerald-800">ENLACES Y REDES DIGITALES</label>
-        <input type="url" value={canal1} onChange={e => setCanal1(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="1. Página principal o Correo Electrónico" />
-        <input type="url" value={canal2} onChange={e => setCanal2(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="2. Perfil o Página de Facebook (Opcional)" />
+        <input type="text" value={canal1} onChange={e => setCanal1(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="1. Página principal o Correo Electrónico" />
+        <input type="text" value={canal2} onChange={e => setCanal2(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="2. Perfil o Página de Facebook (Opcional)" />
         <input type="text" value={canal3} onChange={e => setCanal3(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="3. Cualquier otra Red Social (Opcional)" />
       </div>
       <button type="submit" className="w-full rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3.5 uppercase tracking-wider text-xs transition-all mt-2 shadow-md font-heading">
