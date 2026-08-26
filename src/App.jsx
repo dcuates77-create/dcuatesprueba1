@@ -1,4 +1,4 @@
-     import React, { useState } from "react";
+    import React, { useState } from "react";
 
 // =========================================================================
 // 1. CONFIGURACIÓN CENTRALIZADA DE VARIABLES, REDES Y HOJA DE CÁLCULO
@@ -187,7 +187,7 @@ export default function App() {
                     <img
                       src={btn.img}
                       alt=""
-                      className="h-12 sm:h-14 w-auto object-contain drop-shadow"
+                      className="h-24 sm:h-28 w-auto object-contain drop-shadow"
                       onError={(e) => { e.target.style.display = 'none'; }}
                     />
                   )}
@@ -583,4 +583,5 @@ function FormularioPublicidad() {
     </form>
   );
 }
+
 
