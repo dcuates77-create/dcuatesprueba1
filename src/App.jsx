@@ -1,4 +1,4 @@
-       import React, { useState } from "react";
+     import React, { useState } from "react";
 
 // =========================================================================
 // 1. CONFIGURACIÓN CENTRALIZADA DE VARIABLES, REDES Y HOJA DE CÁLCULO
@@ -169,8 +169,8 @@ export default function App() {
           <div className="lg:col-span-5 flex flex-col gap-4">
             <div className="grid grid-cols-2 gap-3 sm:gap-4 auto-rows-fr flex-1">
               {[
-                { t: "Préstamo de Libros", h: "#libros" },
-                { t: "Ecatepets Mascotas", h: "#ecatepets" },
+                { t: "Préstamo de Libros", h: "#libros", img: "/images/bb.png" },
+                { t: "Ecatepets Mascotas", h: "#ecatepets", img: "/images/Ecatepets.png" },
                 { t: "Alianzas Solidarias", h: "#iniciativas" },
                 { t: "Publicidad Gratis", h: "#publicidad" },
                 { t: "Asesorías Gratuitas", h: "#asesorias" },
@@ -181,8 +181,16 @@ export default function App() {
                 <a
                   key={idx}
                   href={btn.h}
-                  className="flex items-center justify-center text-center rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black px-3 py-6 shadow-md transition-all hover:scale-[1.02] uppercase tracking-wide text-sm sm:text-base lg:text-lg leading-tight font-heading"
+                  className="flex flex-col items-center justify-center gap-2 text-center rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black px-3 py-6 shadow-md transition-all hover:scale-[1.02] uppercase tracking-wide text-sm sm:text-base lg:text-lg leading-tight font-heading"
                 >
+                  {btn.img && (
+                    <img
+                      src={btn.img}
+                      alt=""
+                      className="h-12 sm:h-14 w-auto object-contain drop-shadow"
+                      onError={(e) => { e.target.style.display = 'none'; }}
+                    />
+                  )}
                   {btn.t}
                 </a>
               ))}
@@ -214,22 +222,22 @@ export default function App() {
                 <div>
                   <div className="flex items-center gap-3 mb-2">
                     <div className="text-[#0f2d1e]">
-                      <p className="text-xs font-black uppercase text-amber-700 tracking-wider">
+                      <p className="text-xs sm:text-sm font-black uppercase text-amber-700 tracking-wider">
                         {item.categoria}
                       </p>
-                      <h3 className="text-xl font-black text-[#0f2d1e] uppercase tracking-tight leading-tight">
+                      <h3 className="text-xl sm:text-2xl font-black text-[#0f2d1e] uppercase tracking-tight leading-tight">
                         {item.titulo}
                       </h3>
                     </div>
                   </div>
 
-                  <p className="text-sm text-slate-600 leading-relaxed text-justify mb-4 pt-2 font-medium">
+                  <p className="text-sm sm:text-base text-slate-600 leading-relaxed text-justify mb-4 pt-2 font-medium">
                     {item.descripcion}
                   </p>
 
                   <ul className="space-y-2 mb-6 pl-1">
                     {item.puntos.map((punto, pIdx) => (
-                      <li key={pIdx} className="flex items-center gap-2 text-xs font-bold text-slate-700 uppercase">
+                      <li key={pIdx} className="flex items-center gap-2 text-sm sm:text-base font-bold text-slate-700 uppercase">
                         <span className="h-2 w-2 rounded-full bg-[#00c853] flex-shrink-0" />
                         {punto}
                       </li>
@@ -271,22 +279,22 @@ export default function App() {
                 <div>
                   <div className="flex items-center gap-3 mb-2">
                     <div>
-                      <p className="text-xs font-black uppercase text-amber-700 tracking-wider">
+                      <p className="text-xs sm:text-sm font-black uppercase text-amber-700 tracking-wider">
                         {item.categoria}
                       </p>
-                      <h3 className="text-xl font-black text-[#0f2d1e] uppercase tracking-tight leading-tight">
+                      <h3 className="text-xl sm:text-2xl font-black text-[#0f2d1e] uppercase tracking-tight leading-tight">
                         {item.titulo}
                       </h3>
                     </div>
                   </div>
 
-                  <p className="text-sm text-slate-600 leading-relaxed text-justify mb-4 pt-2 font-medium">
+                  <p className="text-sm sm:text-base text-slate-600 leading-relaxed text-justify mb-4 pt-2 font-medium">
                     {item.descripcion}
                   </p>
 
                   <ul className="space-y-2 mb-6 pl-1">
                     {item.puntos.map((punto, pIdx) => (
-                      <li key={pIdx} className="flex items-center gap-2 text-xs font-bold text-slate-700 uppercase">
+                      <li key={pIdx} className="flex items-center gap-2 text-sm sm:text-base font-bold text-slate-700 uppercase">
                         <span className="h-2 w-2 rounded-full bg-[#00c853] flex-shrink-0" />
                         {punto}
                       </li>
@@ -349,8 +357,8 @@ export default function App() {
               >
                 <div className="flex justify-between items-center">
                   <div>
-                    <p className="text-base font-black text-[#0f2d1e] uppercase tracking-tight group-hover:text-[#e65100] transition-colors">{opc.t}</p>
-                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wide leading-none pt-1">{opc.d}</p>
+                    <p className="text-lg sm:text-xl font-black text-[#0f2d1e] uppercase tracking-tight group-hover:text-[#e65100] transition-colors">{opc.t}</p>
+                    <p className="text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-wide leading-none pt-1">{opc.d}</p>
                   </div>
                   <span className="text-xl opacity-40 group-hover:opacity-100 group-hover:text-[#e65100] transition-all pl-2">➔</span>
                 </div>
@@ -431,10 +439,10 @@ function SiteHeader() {
   const [open, setOpen] = useState(false);
   return (
     <header className="sticky top-0 z-40 border-b border-emerald-800/20 bg-white/95 backdrop-blur py-2 sm:py-3 px-4 shadow-sm text-slate-900 relative">
-      <div className="mx-auto flex flex-wrap items-center justify-between gap-y-2 max-w-6xl">
+      <div className="mx-auto flex flex-wrap items-center gap-y-2 max-w-6xl">
 
-        <a href="#inicio" className="flex items-center gap-3" onClick={() => setOpen(false)}>
-          <span className="flex h-20 w-20 sm:h-24 sm:w-24 items-center justify-center rounded-full overflow-hidden bg-[#0f2d1e] border-2 border-[#0f2d1e]/20 shadow-sm shrink-0">
+        <a href="#inicio" className="flex items-center gap-3 shrink-0" onClick={() => setOpen(false)}>
+          <span className="flex h-24 w-24 sm:h-28 sm:w-28 items-center justify-center rounded-full overflow-hidden bg-[#0f2d1e] border-2 border-[#0f2d1e]/20 shadow-sm shrink-0">
             <img
               src="/images/logo-circular.png"
               alt="Logo DCUATES"
@@ -445,9 +453,9 @@ function SiteHeader() {
               }}
             />
           </span>
-          <span className="text-xl sm:text-2xl font-black uppercase tracking-tight text-[#0f2d1e]">DCUATES</span>
+          <span className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#0f2d1e]">DCUATES</span>
         </a>
-        <nav className="hidden md:flex items-center gap-6 text-xs font-black text-slate-600 lg:text-sm">
+        <nav className="hidden md:flex items-center gap-6 text-xs font-black text-slate-600 lg:text-sm ml-8 lg:ml-12">
           {NAV_LINKS.map(link => (
             <a key={link.href} href={link.href} className="hover:text-emerald-700 transition-colors uppercase tracking-wide">{link.label}</a>
           ))}
@@ -532,33 +540,42 @@ function FormularioPublicidad() {
 
     const mensaje = `¡Hola DCUATES!\n\nSolicito el registro de publicidad para mi negocio:\n• Contacto: ${contacto}\n• Negocio: ${nombre}\n• Categoría: ${categoria}\n• Teléfono: ${telefono}\n• Enlace 1: ${canal1 || "No especificado"}\n• Enlace 2: ${canal2 || "No especificado"}\n• Canal 3: ${canal3 || "No especificado"}\n\nA continuación adjunto mis imágenes promocionales.`;
     window.open(enlaceWhatsApp(mensaje), '_blank', 'noopener,noreferrer');
+
+    // Limpiar el formulario para dejarlo listo para un nuevo registro
+    setContacto("");
+    setTelefono("");
+    setNombre("");
+    setCategoria("");
+    setCanal1("");
+    setCanal2("");
+    setCanal3("");
   };
 
   return (
     <form onSubmit={handleSubmit} className="bg-white text-slate-800 border-4 border-[#0f2d1e] p-6 rounded-3xl space-y-4 shadow-xl">
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label className="block text-xs font-black uppercase tracking-wider text-slate-700 mb-1">Nombre de contacto *</label>
+          <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-slate-700 mb-1">Nombre de contacto *</label>
           <input type="text" required value={contacto} onChange={e => setContacto(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="Ej. Juan Pérez" />
         </div>
         <div>
-          <label className="block text-xs font-black uppercase tracking-wider text-slate-700 mb-1">Teléfono *</label>
+          <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-slate-700 mb-1">Teléfono *</label>
           <input type="tel" required value={telefono} onChange={e => setTelefono(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="Ej. 5512345678" />
         </div>
         <div>
-          <label className="block text-xs font-black uppercase tracking-wider text-slate-700 mb-1">Nombre del negocio *</label>
+          <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-slate-700 mb-1">Nombre del negocio *</label>
           <input type="text" required value={nombre} onChange={e => setNombre(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="Ej. Taquería El Sol" />
         </div>
         <div>
-          <label className="block text-xs font-black uppercase tracking-wider text-slate-700 mb-1">Giro / Categoría *</label>
+          <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-slate-700 mb-1">Giro / Categoría *</label>
           <input type="text" required value={categoria} onChange={e => setCategoria(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="Ej. Restaurante, Salón, Tienda" />
         </div>
       </div>
       <div className="space-y-2 pt-2">
-        <label className="block text-xs font-black uppercase tracking-wider text-emerald-800">ENLACES Y REDES DIGITALES</label>
-        <input type="url" value={canal1} onChange={e => setCanal1(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2 text-xs text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="1. Página principal o Correo Electrónico" />
-        <input type="url" value={canal2} onChange={e => setCanal2(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2 text-xs text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="2. Perfil o Página de Facebook (Opcional)" />
-        <input type="text" value={canal3} onChange={e => setCanal3(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2 text-xs text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="3. Cualquier otra Red Social (Opcional)" />
+        <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-emerald-800">ENLACES Y REDES DIGITALES</label>
+        <input type="url" value={canal1} onChange={e => setCanal1(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="1. Página principal o Correo Electrónico" />
+        <input type="url" value={canal2} onChange={e => setCanal2(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="2. Perfil o Página de Facebook (Opcional)" />
+        <input type="text" value={canal3} onChange={e => setCanal3(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="3. Cualquier otra Red Social (Opcional)" />
       </div>
       <button type="submit" className="w-full rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3.5 uppercase tracking-wider text-xs transition-all mt-2 shadow-md font-heading">
         Enviar registro
@@ -566,3 +583,4 @@ function FormularioPublicidad() {
     </form>
   );
 }
+
