@@ -1,9 +1,9 @@
-    import React, { useState } from "react";
+       import React, { useState } from "react";
 
 // =========================================================================
 // 1. CONFIGURACIÓN CENTRALIZADA DE VARIABLES, REDES Y HOJA DE CÁLCULO
 // =========================================================================
-const GOOGLE_SHEETS_URL = "https://google.com";
+const GOOGLE_SHEETS_URL = "https://script.google.com/macros/s/AKfycbxngMxuH03w0rI7AyJHRap9QCVf_Xs5roypGXnnkSGr_22SyfxWAVAiH614r1eGC2DW2g/exec";
 
 // Número de WhatsApp centralizado — cámbialo aquí una sola vez si cambia el teléfono
 const WHATSAPP_NUMERO = "525520696627";
@@ -141,53 +141,55 @@ export default function App() {
       <section id="inicio" className="bg-[#e8f5e9] text-[#0f2d1e] py-12 px-4 md:py-16 border-b-4 border-[#0f2d1e]">
         <div className="mx-auto max-w-7xl grid gap-8 items-stretch lg:grid-cols-12">
 
-          {/* COLUMNA IZQUIERDA: Texto + Imagen Bibliobici */}
+          {/* COLUMNA IZQUIERDA: Texto + Imagen Bibliobici (ampliada) */}
           <div className="lg:col-span-7 flex flex-col justify-between space-y-6">
             <div className="space-y-4">
               <h1 className="text-4xl sm:text-5xl font-black uppercase tracking-tight text-[#0f2d1e] leading-none">
                 Juntos hacemos<br />COMUNIDAD
               </h1>
-              <p className="text-xs font-black text-amber-700 uppercase tracking-wider">
-                ⚡ PROYECTOS COMUNITARIOS DCUATES
-              </p>
               <p className="text-sm sm:text-base text-slate-800 leading-relaxed text-justify font-medium">
                 <strong>DCUATES</strong> impulsa proyectos, <strong>PERSONAS, ORGANIZACIONES Y EMPRENDIMIENTOS</strong> que <strong>BENEFICIAN a las FAMILIAS</strong>: <strong>PUBLICIDAD GRATUITA</strong> para tu negocio, préstamo de <strong>LIBROS</strong> y materiales <strong>EDUCATIVOS</strong>, apoyo a <strong>MASCOTAS Y GRUPOS VULNERABLES</strong>, y <strong>ALIANZAS GANAR-GANAR</strong> que generan apoyos y beneficios mutuos y comunitarios. Suma con tu valiosa colaboración o con tu invaluable <strong>APOYO VOLUNTARIO</strong> para lograr nuestros objetivos de forma más efectiva, y forjar <strong>LA CADENA DE VALOR Y DE VALORES</strong> que nos liberará de nuestras limitaciones para ser mejores, Y ASÍ MEJORAR NUESTRO ENTORNO Y NUESTRO MUNDO !!!
               </p>
             </div>
 
-            <div className="overflow-hidden rounded-2xl border-4 border-[#0f2d1e]/30 bg-white shadow-lg">
+            <div className="overflow-hidden rounded-2xl border-4 border-[#0f2d1e]/30 bg-white shadow-lg flex-1">
               <img
                 src="/images/bibliobici-movil.png"
                 alt="Bibliobici Móvil DCUATES en la comunidad"
-                className="w-full h-auto object-cover max-h-[280px]"
+                className="w-full h-full min-h-[280px] sm:min-h-[380px] object-cover"
                 onError={(e) => {
                   e.target.style.display = 'none';
-                  e.target.parentElement.innerHTML = '<div class="p-12 text-center text-[#0f2d1e]/70 font-bold uppercase text-xs tracking-wider bg-emerald-50">📷 [Espacio para Foto de la Bibliobici]</div>';
+                  e.target.parentElement.innerHTML = '<div class="p-12 text-center text-[#0f2d1e]/70 font-bold uppercase text-xs tracking-wider bg-emerald-50 h-full flex items-center justify-center min-h-[280px]">📷 [Espacio para Foto de la Bibliobici]</div>';
                 }}
               />
             </div>
           </div>
 
-          {/* COLUMNA DERECHA: Botonera en pares (4 filas x 2 columnas), alineada en altura con la columna izquierda */}
-          <div className="lg:col-span-5 grid grid-cols-2 gap-3 sm:gap-4 auto-rows-fr">
-            {[
-              { t: "Préstamo de Libros", h: "#libros" },
-              { t: "Ecatepets Mascotas", h: "#ecatepets" },
-              { t: "Alianzas Solidarias", h: "#iniciativas" },
-              { t: "Publicidad Gratis", h: "#publicidad" },
-              { t: "Asesorías Gratuitas", h: "#asesorias" },
-              { t: "Bazar y Comercio", h: "#bazares" },
-              { t: "Noticias de Barrio", h: "#noticias" },
-              { t: "Apoyo Voluntario", h: "#donaciones" }
-            ].map((btn, idx) => (
-              <a
-                key={idx}
-                href={btn.h}
-                className="flex items-center justify-center text-center rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black px-3 py-6 shadow-md transition-all hover:scale-[1.02] uppercase tracking-wide text-sm sm:text-base lg:text-lg leading-tight font-heading"
-              >
-                {btn.t}
-              </a>
-            ))}
+          {/* COLUMNA DERECHA: Botonera en pares (4 filas x 2 columnas) + etiqueta debajo, alineada en altura con la columna izquierda */}
+          <div className="lg:col-span-5 flex flex-col gap-4">
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 auto-rows-fr flex-1">
+              {[
+                { t: "Préstamo de Libros", h: "#libros" },
+                { t: "Ecatepets Mascotas", h: "#ecatepets" },
+                { t: "Alianzas Solidarias", h: "#iniciativas" },
+                { t: "Publicidad Gratis", h: "#publicidad" },
+                { t: "Asesorías Gratuitas", h: "#asesorias" },
+                { t: "Bazar y Comercio", h: "#bazares" },
+                { t: "Noticias de Barrio", h: "#noticias" },
+                { t: "Apoyo Voluntario", h: "#donaciones" }
+              ].map((btn, idx) => (
+                <a
+                  key={idx}
+                  href={btn.h}
+                  className="flex items-center justify-center text-center rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black px-3 py-6 shadow-md transition-all hover:scale-[1.02] uppercase tracking-wide text-sm sm:text-base lg:text-lg leading-tight font-heading"
+                >
+                  {btn.t}
+                </a>
+              ))}
+            </div>
+            <p className="text-center text-lg sm:text-xl font-black text-[#0f2d1e] uppercase tracking-wider">
+              ⚡ Proyectos Comunitarios DCUATES
+            </p>
           </div>
 
         </div>
@@ -428,11 +430,11 @@ export default function App() {
 function SiteHeader() {
   const [open, setOpen] = useState(false);
   return (
-    <header className="sticky top-0 z-40 border-b border-emerald-800/20 bg-white/95 backdrop-blur py-4 sm:py-5 px-4 shadow-sm text-slate-900 relative">
-      <div className="mx-auto flex flex-wrap items-center justify-between gap-y-3 max-w-6xl">
+    <header className="sticky top-0 z-40 border-b border-emerald-800/20 bg-white/95 backdrop-blur py-2 sm:py-3 px-4 shadow-sm text-slate-900 relative">
+      <div className="mx-auto flex flex-wrap items-center justify-between gap-y-2 max-w-6xl">
 
         <a href="#inicio" className="flex items-center gap-3" onClick={() => setOpen(false)}>
-          <span className="flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-full overflow-hidden bg-[#0f2d1e] border-2 border-[#0f2d1e]/20 shadow-sm shrink-0">
+          <span className="flex h-20 w-20 sm:h-24 sm:w-24 items-center justify-center rounded-full overflow-hidden bg-[#0f2d1e] border-2 border-[#0f2d1e]/20 shadow-sm shrink-0">
             <img
               src="/images/logo-circular.png"
               alt="Logo DCUATES"
@@ -443,33 +445,33 @@ function SiteHeader() {
               }}
             />
           </span>
-          <span className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#0f2d1e]">DCUATES</span>
+          <span className="text-xl sm:text-2xl font-black uppercase tracking-tight text-[#0f2d1e]">DCUATES</span>
         </a>
         <nav className="hidden md:flex items-center gap-6 text-xs font-black text-slate-600 lg:text-sm">
           {NAV_LINKS.map(link => (
             <a key={link.href} href={link.href} className="hover:text-emerald-700 transition-colors uppercase tracking-wide">{link.label}</a>
           ))}
         </nav>
-        <div className="flex items-center gap-2 sm:gap-3">
-          <a href={REDES_SOCIALES.facebook} target="_blank" rel="noreferrer" className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="Facebook">
-            <svg className="h-5 w-5 sm:h-6 sm:w-6 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <div className="flex items-center gap-2 sm:gap-3 ml-auto">
+          <a href={REDES_SOCIALES.facebook} target="_blank" rel="noreferrer" className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="Facebook">
+            <svg className="h-4 w-4 sm:h-5 sm:w-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" />
             </svg>
           </a>
-          <a href={REDES_SOCIALES.instagram} target="_blank" rel="noreferrer" className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="Instagram">
-            <svg className="h-5 w-5 sm:h-6 sm:w-6 fill-none stroke-current stroke-2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <a href={REDES_SOCIALES.instagram} target="_blank" rel="noreferrer" className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="Instagram">
+            <svg className="h-4 w-4 sm:h-5 sm:w-5 fill-none stroke-current stroke-2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
               <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
               <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
             </svg>
           </a>
-          <a href={REDES_SOCIALES.youtube} target="_blank" rel="noreferrer" className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="YouTube">
-            <svg className="h-5 w-5 sm:h-6 sm:w-6 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <a href={REDES_SOCIALES.youtube} target="_blank" rel="noreferrer" className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="YouTube">
+            <svg className="h-4 w-4 sm:h-5 sm:w-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
             </svg>
           </a>
-          <a href={REDES_SOCIALES.tiktok} target="_blank" rel="noreferrer" className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="TikTok">
-            <svg className="h-5 w-5 sm:h-6 sm:w-6 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <a href={REDES_SOCIALES.tiktok} target="_blank" rel="noreferrer" className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="TikTok">
+            <svg className="h-4 w-4 sm:h-5 sm:w-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.02 1.59 4.23.94 1.13 2.29 1.89 3.73 2.18l-.02 3.88c-1.63-.03-3.2-.55-4.51-1.52A7.83 7.83 0 0 1 16.43 7.5v8.32a7.83 7.83 0 0 1-3.32 6.42 7.91 7.91 0 0 1-8.73-.24 7.85 7.85 0 0 1-3.23-7.58 7.84 7.84 0 0 1 5.37-6.84V11.5a3.94 3.94 0 0 0-1.5 3.32 3.93 3.93 0 0 0 3.2 3.88 3.93 3.93 0 0 0 4.61-3.2c.04-.33.05-.66.05-.99V.02z" />
             </svg>
           </a>
@@ -498,30 +500,51 @@ function SiteHeader() {
 function FormularioPublicidad() {
   const [nombre, setNombre] = useState("");
   const [categoria, setCategoria] = useState("");
+  const [contacto, setContacto] = useState("");
+  const [telefono, setTelefono] = useState("");
   const [canal1, setCanal1] = useState("");
   const [canal2, setCanal2] = useState("");
   const [canal3, setCanal3] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const payload = { nombre, category: categoria, canal1, canal2, canal3, fecha: new Date().toLocaleString() };
+    const fecha = new Date().toLocaleString();
+
+    // Apps Script (doPost) lee e.parameter.X, así que se envía como
+    // application/x-www-form-urlencoded — NO como JSON.
+    const datosFormulario = new URLSearchParams({
+      Nombre: contacto,
+      Negocio: nombre,
+      Giro: categoria,
+      Telefono: telefono,
+      Fecha: fecha
+    });
+
     try {
       await fetch(GOOGLE_SHEETS_URL, {
         method: "POST",
         mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
+        body: datosFormulario
       });
     } catch (err) {
       console.error("Error guardando respaldo en Sheets:", err);
     }
-    const mensaje = `¡Hola DCUATES!\n\nSolicito el registro de publicidad para mi negocio:\n• Nombre: ${nombre}\n• Categoría: ${categoria}\n• Enlace 1: ${canal1 || "No especificado"}\n• Enlace 2: ${canal2 || "No especificado"}\n• Canal 3: ${canal3 || "No especificado"}\n\nA continuación adjunto mis imágenes promocionales.`;
+
+    const mensaje = `¡Hola DCUATES!\n\nSolicito el registro de publicidad para mi negocio:\n• Contacto: ${contacto}\n• Negocio: ${nombre}\n• Categoría: ${categoria}\n• Teléfono: ${telefono}\n• Enlace 1: ${canal1 || "No especificado"}\n• Enlace 2: ${canal2 || "No especificado"}\n• Canal 3: ${canal3 || "No especificado"}\n\nA continuación adjunto mis imágenes promocionales.`;
     window.open(enlaceWhatsApp(mensaje), '_blank', 'noopener,noreferrer');
   };
 
   return (
     <form onSubmit={handleSubmit} className="bg-white text-slate-800 border-4 border-[#0f2d1e] p-6 rounded-3xl space-y-4 shadow-xl">
       <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <label className="block text-xs font-black uppercase tracking-wider text-slate-700 mb-1">Nombre de contacto *</label>
+          <input type="text" required value={contacto} onChange={e => setContacto(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="Ej. Juan Pérez" />
+        </div>
+        <div>
+          <label className="block text-xs font-black uppercase tracking-wider text-slate-700 mb-1">Teléfono *</label>
+          <input type="tel" required value={telefono} onChange={e => setTelefono(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="Ej. 5512345678" />
+        </div>
         <div>
           <label className="block text-xs font-black uppercase tracking-wider text-slate-700 mb-1">Nombre del negocio *</label>
           <input type="text" required value={nombre} onChange={e => setNombre(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="Ej. Taquería El Sol" />
@@ -543,4 +566,3 @@ function FormularioPublicidad() {
     </form>
   );
 }
-
