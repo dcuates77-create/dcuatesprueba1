@@ -123,7 +123,7 @@ export default function App() {
 
       {/* Botón Flotante Permanente de WhatsApp — efecto 3D + anillo parpadeante + etiqueta */}
       <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3">
-        <span className="bg-white text-[#0f2d1e] text-[11px] sm:text-sm font-black uppercase tracking-wide px-3 py-2 rounded-full shadow-lg border border-[#0f2d1e]/10 whitespace-nowrap animate-pulse">
+        <span className="bg-emerald-100/60 text-emerald-900 text-[11px] sm:text-sm font-black uppercase tracking-wide px-3 py-2 rounded-full shadow-lg border border-emerald-700/20 whitespace-nowrap animate-pulse backdrop-blur-sm">
           Dudas y Atención
         </span>
         <a
@@ -171,51 +171,65 @@ export default function App() {
             </div>
           </div>
 
-          {/* COLUMNA 2: 4 botones — Proyectos Base */}
-          <div className="lg:col-span-3 grid grid-rows-4 gap-4">
-            {[
-              { t: "Préstamo de Libros", h: "#libros", img: "/images/bb.png" },
-              { t: "Ecatepets Mascotas", h: "#ecatepets", img: "/images/Ecatepets.png" },
-              { t: "Alianzas Solidarias", h: "#iniciativas" },
-              { t: "Publicidad Gratis", h: "#publicidad" }
-            ].map((btn, idx) => (
-              <a
-                key={idx}
-                href={btn.h}
-                className="flex flex-col items-center justify-center gap-2 text-center rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black px-3 py-4 shadow-md transition-all hover:scale-[1.02] uppercase tracking-wide text-sm sm:text-base lg:text-lg leading-tight font-heading"
-              >
-                {btn.img && (
-                  <img
-                    src={btn.img}
-                    alt=""
-                    className="h-16 sm:h-20 w-auto object-contain drop-shadow"
-                    onError={(e) => { e.target.style.display = 'none'; }}
-                  />
-                )}
-                {btn.t}
-              </a>
-            ))}
-          </div>
+          {/* Datos de los 8 botones — mismo orden en que aparecen los proyectos en sus bloques */}
+          {(() => {
+            const BOTONES_PORTADA = [
+              { t: "PRÉSTAMO GRATUITO DE LIBROS", h: "#libros", img: "/images/bb.png", puntos: ["GRATUITO", "PÍDELO CON UN SOLO CLIC ;)", "SE ACEPTAN DONACIONES DE LIBROS Y MÁS..."] },
+              { t: "ECATEPETS MASCOTAS", h: "#ecatepets", img: "/images/Ecatepets.png", puntos: [] },
+              { t: "ALIANZAS SOLIDARIAS", h: "#iniciativas", img: "/images/Alianzas.png", puntos: [] },
+              { t: "PUBLICIDAD GRATIS", h: "#publicidad", img: "/images/Publicidad.png", puntos: [] },
+              { t: "ASESORÍAS GRATUITAS", h: "#asesorias", img: "/images/Asesorías.png", puntos: [] },
+              { t: "BAZAR Y COMERCIO", h: "#bazares", img: "/images/Bazar.png", puntos: [] },
+              { t: "NOTICIAS DE BARRIO", h: "#noticias", img: "/images/Noticias.png", puntos: [] },
+              { t: "BIENESTAR Y RECREACIÓN", h: "#bienestar", img: "/images/Bienestar.png", puntos: [] }
+            ];
 
-          {/* COLUMNA 3: 4 botones — Nuevos Proyectos */}
-          <div className="lg:col-span-3 flex flex-col gap-4">
-            <div className="grid grid-rows-4 gap-4 flex-1">
-              {[
-                { t: "Asesorías Gratuitas", h: "#asesorias" },
-                { t: "Bazar y Comercio", h: "#bazares" },
-                { t: "Noticias de Barrio", h: "#noticias" },
-                { t: "Apoyo Voluntario", h: "#donaciones" }
-              ].map((btn, idx) => (
-                <a
-                  key={idx}
-                  href={btn.h}
-                  className="flex flex-col items-center justify-center gap-2 text-center rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black px-3 py-4 shadow-md transition-all hover:scale-[1.02] uppercase tracking-wide text-sm sm:text-base lg:text-lg leading-tight font-heading"
-                >
-                  {btn.t}
-                </a>
-              ))}
-            </div>
-          </div>
+            const BotonProyecto = ({ btn }) => (
+              <a
+                href={btn.h}
+                className="flex flex-col rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white shadow-md transition-all hover:scale-[1.02] overflow-hidden font-heading"
+              >
+                <div className="px-2 pt-3 pb-1 text-center border-b border-white/20">
+                  <h4 className="uppercase font-black leading-tight text-xs sm:text-sm lg:text-base">
+                    {btn.t}
+                  </h4>
+                </div>
+                <div className="flex flex-1 items-center gap-2 px-2 py-2">
+                  <div className="w-2/5 h-full flex items-center justify-center">
+                    {btn.img && (
+                      <img
+                        src={btn.img}
+                        alt=""
+                        className="max-h-16 sm:max-h-20 w-auto object-contain drop-shadow"
+                        onError={(e) => { e.target.style.display = 'none'; }}
+                      />
+                    )}
+                  </div>
+                  {btn.puntos.length > 0 && (
+                    <ul className="w-3/5 space-y-1 text-left text-[10px] sm:text-xs font-bold leading-snug">
+                      {btn.puntos.map((p, i) => <li key={i}>* {p}</li>)}
+                    </ul>
+                  )}
+                </div>
+              </a>
+            );
+
+            return (
+              <>
+                {/* COLUMNA 2: 4 botones — Proyectos Base */}
+                <div className="lg:col-span-3 grid grid-rows-4 gap-4">
+                  {BOTONES_PORTADA.slice(0, 4).map((btn, idx) => <BotonProyecto key={idx} btn={btn} />)}
+                </div>
+
+                {/* COLUMNA 3: 4 botones — Nuevos Proyectos */}
+                <div className="lg:col-span-3 flex flex-col gap-4">
+                  <div className="grid grid-rows-4 gap-4 flex-1">
+                    {BOTONES_PORTADA.slice(4, 8).map((btn, idx) => <BotonProyecto key={idx} btn={btn} />)}
+                  </div>
+                </div>
+              </>
+            );
+          })()}
 
           <p className="lg:col-span-6 lg:col-start-5 text-center text-lg sm:text-xl font-black text-[#0f2d1e] uppercase tracking-wider pt-2">
             ⚡ Proyectos Comunitarios DCUATES
@@ -348,10 +362,10 @@ export default function App() {
             <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-tight leading-none text-[#0f2d1e] font-heading">
               TU APORTACIÓN IMPULSA A LA COMUNIDAD
             </h2>
-            <p className="text-sm text-slate-700 leading-relaxed text-justify font-bold">
+            <p className="text-base sm:text-lg text-slate-700 leading-relaxed text-justify font-bold">
               Cada donativo, del formato que decidas, nos ayuda a sostener y hacer crecer los proyectos que benefician a los negocios y familias latinas en conjunto con DCUATES.
             </p>
-            <div className="rounded-2xl bg-amber-50 border-2 border-amber-500/40 p-4 text-xs font-black text-amber-900 leading-relaxed flex items-start gap-3 shadow-sm">
+            <div className="rounded-2xl bg-emerald-50 border-2 border-emerald-500/40 p-4 text-sm sm:text-base font-black text-emerald-900 leading-relaxed flex items-start gap-3 shadow-sm">
               <span className="text-xl">💡</span>
               <p className="text-justify uppercase tracking-wide">
                 Parte de la utilidad de los proyectos se destina al apoyo de causas sociales, con total transparencia. Rendimos cuentas de cómo se usa cada aportación.
@@ -374,14 +388,14 @@ export default function App() {
                 href={enlaceWhatsApp(opc.m)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full text-left rounded-2xl border-4 border-[#0f2d1e] bg-white p-4 shadow-md transition-all hover:scale-[1.01] hover:border-[#e65100] group duration-200 block"
+                className="w-full text-left rounded-2xl border-4 border-[#0f2d1e] bg-[#e65100] hover:bg-[#bf360c] p-4 shadow-md transition-all hover:scale-[1.01] group duration-200 block"
               >
                 <div className="flex justify-between items-center">
                   <div>
-                    <p className="text-lg sm:text-xl font-black text-[#0f2d1e] uppercase tracking-tight group-hover:text-[#e65100] transition-colors">{opc.t}</p>
-                    <p className="text-xs sm:text-sm font-bold text-slate-500 uppercase tracking-wide leading-none pt-1">{opc.d}</p>
+                    <p className="text-lg sm:text-xl font-black text-white uppercase tracking-tight">{opc.t}</p>
+                    <p className="text-xs sm:text-sm font-bold text-[#0f2d1e] uppercase tracking-wide leading-none pt-1">{opc.d}</p>
                   </div>
-                  <span className="text-xl opacity-40 group-hover:opacity-100 group-hover:text-[#e65100] transition-all pl-2">➔</span>
+                  <span className="text-xl text-white opacity-70 group-hover:opacity-100 transition-all pl-2">➔</span>
                 </div>
               </a>
             ))}
@@ -605,5 +619,6 @@ function FormularioPublicidad() {
     </form>
   );
 }
+
 
 
