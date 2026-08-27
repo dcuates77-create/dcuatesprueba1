@@ -397,10 +397,10 @@ export default function App() {
       </section>
 
       {/* SECCIÓN: APORTE VOLUNTARIO */}
-      <section id="donaciones" className="bg-[#e8f5e9] text-[#0f2d1e] py-16 px-4 border-b-4 border-[#0f2d1e]">
-        <div className="mx-auto max-w-5xl grid gap-10 md:grid-cols-12 items-center">
+      <section id="donaciones" className="bg-[#e8f5e9] text-[#0f2d1e] py-20 px-4 border-b-4 border-[#0f2d1e]">
+        <div className="mx-auto max-w-6xl grid gap-x-10 gap-y-12 md:grid-cols-12 items-start">
 
-          <div className="md:col-span-5 space-y-5">
+          <div className="md:col-span-5 space-y-6">
             <span className="inline-block rounded-full bg-emerald-200 px-5 py-2 text-lg sm:text-2xl font-black uppercase tracking-wider text-emerald-800 shadow-sm">
               🟢 Apoyo Voluntario
             </span>
@@ -408,12 +408,15 @@ export default function App() {
               TU APORTACIÓN IMPULSA A LA COMUNIDAD
             </h2>
             <p className="text-base sm:text-lg text-slate-700 leading-relaxed text-justify font-bold">
-              Cada donativo, del formato que decidas, nos ayuda a sostener y hacer crecer los proyectos que benefician a los negocios y familias latinas en conjunto con DCUATES.
+              Cada donativo, del formato que decidas, nos ayuda a sostener y hacer crecer los proyectos que benefician a los negocios y familias latinas en conjunto con DCUATES Y CONEXIONES CON CAUSA ♥
+            </p>
+            <p className="text-lg sm:text-xl font-black uppercase text-center text-white bg-[#e65100] border-4 border-[#0f2d1e] rounded-2xl py-4 px-5 shadow-md leading-snug">
+              ¡Tu apoyo hoy es el cambio que nuestra comunidad necesita — súmate ahora! ♥
             </p>
             <div className="rounded-2xl bg-emerald-200 border-2 border-emerald-500/40 p-4 text-sm sm:text-base font-black text-emerald-900 leading-relaxed flex items-start gap-3 shadow-sm">
               <span className="text-xl">💡</span>
               <p className="text-justify uppercase tracking-wide">
-                Parte de la utilidad de los proyectos se destina al apoyo de causas sociales, con total transparencia. Rendimos cuentas de cómo se usa cada aportación.
+                Rendimos cuentas de cómo se usa cada aportación con total transparencia. Parte de la utilidad de nuestros proyectos y de lo que los amigos y la comunidad suman se destina al apoyo de causas sociales como esta gran causa y ejemplo de vida y de lo que se puede lograr con la suma de voluntades, talentos y corazones solidarios ♥
               </p>
             </div>
           </div>
@@ -444,6 +447,45 @@ export default function App() {
                 </div>
               </a>
             ))}
+          </div>
+
+          {/* Fila inferior: flecha de conexión + video incrustado de Chuy */}
+          <div className="md:col-span-12 flex flex-col md:flex-row items-center md:items-stretch gap-6 md:gap-8 mt-2">
+
+            {/* Espaciador para alinear el video bajo la columna de botones (solo escritorio) */}
+            <div className="hidden md:block md:w-5/12" aria-hidden="true"></div>
+
+            {/* Flecha con relleno naranja: apunta hacia abajo en móvil y hacia la derecha en escritorio */}
+            <div className="flex justify-center items-center shrink-0" aria-hidden="true">
+              <svg
+                viewBox="0 0 100 60"
+                className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rotate-90 md:rotate-0 drop-shadow-md"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M4 22 H58 V4 L96 30 L58 56 V38 H4 Z"
+                  fill="#e65100"
+                  stroke="#0f2d1e"
+                  strokeWidth="5"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+
+            {/* Video de Chuy incrustado */}
+            <div className="w-full md:w-6/12">
+              <div className="rounded-2xl overflow-hidden border-4 border-[#0f2d1e] shadow-lg bg-black aspect-video">
+                <iframe
+                  className="w-full h-full"
+                  src={`https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID}`}
+                  title="Video de Chuy — DCUATES"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                ></iframe>
+              </div>
+            </div>
+
           </div>
 
         </div>
