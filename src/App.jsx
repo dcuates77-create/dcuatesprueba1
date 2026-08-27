@@ -62,6 +62,24 @@ const INICIATIVAS_PRINCIPALES = [
     enlaceDirectoWA: enlaceWhatsApp("¡Hola DCUATES! Me interesa generar una alianza ganar-ganar con ustedes.")
   },
   {
+    id: "circulo-confianza",
+    categoria: "APOYOS Y BENEFICIOS MUTUOS",
+    titulo: "CÍRCULO DE CONFIANZA",
+    descripcion: "Si eres una persona o negocio TOTALMENTE CONFIABLE que desea SUMAR con perfiles que están en la misma sintonía, o conoces personas o negocios que les gustaría formar parte de nuestro círculo, ¡serán muy BIENVENIDOS!",
+    puntos: ["Perfiles verificados por confianza", "Beneficios y apoyos mutuos", "Red exclusiva de contactos"],
+    textoBoton: "Me interesa sumar",
+    enlaceDirectoWA: enlaceWhatsApp("¡Hola DCUATES! Me interesa sumarme al Círculo de Confianza y sus Apoyos y Beneficios Mutuos.")
+  },
+  {
+    id: "recomienda-evalua-gana",
+    categoria: "CONOCIMIENTOS Y EXPERIENCIAS QUE VALEN",
+    titulo: "RECOMIENDA, EVALÚA Y GANA",
+    descripcion: "Tus recomendaciones y comentarios sobre las buenas o malas prácticas, acciones y calidad que tienen los negocios con sus productos y servicios, y las personas que están a cargo de estos, APORTAN VALOR Y MERECEN ser RECOMPENSADOS de alguna forma.",
+    puntos: ["Recomendaciones con valor real", "Reconocimiento por tu experiencia", "Mejora continua de negocios"],
+    textoBoton: "Me interesa colaborar",
+    enlaceDirectoWA: enlaceWhatsApp("¡Hola DCUATES! Me interesa colaborar con Recomienda, Evalúa y Gana compartiendo mi experiencia.")
+  },
+  {
     id: "publicidad-tarjeta",
     categoria: "APOYOS COMUNITARIOS",
     titulo: "PUBLICIDAD GRATUITA",
@@ -177,6 +195,8 @@ export default function App() {
               { t: "PRÉSTAMO GRATUITO DE LIBROS", h: "#libros", img: "/images/bb.png", puntos: ["GRATUITO", "PÍDELO CON UN SOLO CLIC ;)", "SE ACEPTAN DONACIONES DE LIBROS Y MÁS..."] },
               { t: "ECATEPETS MASCOTAS", h: "#ecatepets", img: "/images/Ecatepets.png", puntos: [] },
               { t: "ALIANZAS SOLIDARIAS", h: "#iniciativas", img: "/images/Alianzas.png", puntos: [] },
+              { t: "CÍRCULO DE CONFIANZA", h: "#circulo-confianza", img: "/images/Círculo.png", puntos: [] },
+              { t: "RECOMIENDA, EVALÚA Y GANA", h: "#recomienda-evalua-gana", img: "/images/Recomienda.png", puntos: [] },
               { t: "PUBLICIDAD GRATIS", h: "#publicidad", img: "/images/Publicidad.png", puntos: [] },
               { t: "ASESORÍAS GRATUITAS", h: "#asesorias", img: "/images/Asesorías.png", puntos: [] },
               { t: "BAZAR Y COMERCIO", h: "#bazares", img: "/images/Bazar.png", puntos: [] },
@@ -216,15 +236,15 @@ export default function App() {
 
             return (
               <>
-                {/* COLUMNA 2: 4 botones — Proyectos Base */}
-                <div className="lg:col-span-3 grid grid-rows-4 gap-4">
-                  {BOTONES_PORTADA.slice(0, 4).map((btn, idx) => <BotonProyecto key={idx} btn={btn} />)}
+                {/* COLUMNA 2: 6 botones — Proyectos Base */}
+                <div className="lg:col-span-3 grid grid-rows-6 gap-3">
+                  {BOTONES_PORTADA.slice(0, 6).map((btn, idx) => <BotonProyecto key={idx} btn={btn} />)}
                 </div>
 
                 {/* COLUMNA 3: 4 botones — Nuevos Proyectos */}
-                <div className="lg:col-span-3 flex flex-col gap-4">
-                  <div className="grid grid-rows-4 gap-4 flex-1">
-                    {BOTONES_PORTADA.slice(4, 8).map((btn, idx) => <BotonProyecto key={idx} btn={btn} />)}
+                <div className="lg:col-span-3 flex flex-col gap-3">
+                  <div className="grid grid-rows-4 gap-3 flex-1">
+                    {BOTONES_PORTADA.slice(6, 10).map((btn, idx) => <BotonProyecto key={idx} btn={btn} />)}
                   </div>
                 </div>
               </>
@@ -619,6 +639,7 @@ function FormularioPublicidad() {
     </form>
   );
 }
+
 
 
 
