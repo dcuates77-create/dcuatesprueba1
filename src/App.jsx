@@ -24,7 +24,7 @@ const NAV_LINKS = [
   { label: "Proyectos Base", href: "#iniciativas" },
   { label: "Nuevos Proyectos", href: "#nuevos-proyectos" },
   { label: "Donaciones", href: "#donaciones" },
-  { label: "Publicidad", href: "#publicidad" }
+  { label: "Publicidad Gratuita", href: "#publicidad" }
 ];
 
 // Función helper para armar enlaces directos de WhatsApp de forma consistente
@@ -150,6 +150,17 @@ const NUEVOS_PROYECTOS_DATA = [
   }
 ];
 
+// Datos de EJEMPLO para la pasarela de "Ventas con Causa" — reemplázalos por
+// fotos y artículos reales cuando los tengas. Cada tarjeta puede llevar
+// imagen o video (mismo patrón que YOUTUBE_VIDEO_ID: si "video" tiene valor,
+// se incrusta un iframe de YouTube en lugar de la imagen).
+const VENTAS_CON_CAUSA_ITEMS = [
+  { id: "vc1", nombre: "Artesanías bordadas a mano", precio: "Desde $150", img: "/images/ventas-causa-1.png" },
+  { id: "vc2", nombre: "Pan casero y repostería", precio: "Desde $60", img: "/images/ventas-causa-2.png" },
+  { id: "vc3", nombre: "Servicio de jardinería", precio: "Cotización directa", img: "/images/ventas-causa-3.png" },
+  { id: "vc4", nombre: "Ropa y accesorios de segunda mano", precio: "Desde $80", img: "/images/ventas-causa-4.png" }
+];
+
 // =========================================================================
 // 2. COMPONENTE PRINCIPAL (INICIO DEL RENDERIZADO)
 // =========================================================================
@@ -157,7 +168,7 @@ export default function App() {
   const [showPrivacy, setShowPrivacy] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#17472d] font-sans antialiased text-slate-900 selection:bg-emerald-500/30 relative pb-16">
+    <div className="min-h-screen bg-[#17472d] font-sans antialiased text-slate-900 selection:bg-emerald-500/30 relative pb-28 sm:pb-24">
 
       {/* Barra Ticker Inferior Fija — combina negocios, mascotas, avisos y momentos */}
       <BarraTicker />
@@ -396,11 +407,56 @@ export default function App() {
         </div>
       </section>
 
+      {/* SECCIÓN: VENTAS CON CAUSA */}
+      <section id="ventas-con-causa" className="bg-[#e8f5e9] text-[#0f2d1e] py-16 px-4 border-b-4 border-[#0f2d1e]">
+        <div className="mx-auto max-w-6xl">
+          <div className="text-center max-w-2xl mx-auto mb-10 space-y-3">
+            <span className="inline-block rounded-full bg-emerald-200 px-5 py-2 text-lg sm:text-2xl font-black uppercase tracking-wider text-emerald-800 shadow-sm">
+              🛍️ Ventas con Causa
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-tight leading-none text-[#0f2d1e] font-heading">
+              Productos y servicios que también apoyan la comunidad
+            </h2>
+            <p className="text-sm sm:text-base text-slate-700 font-bold">
+              Artículos y servicios de vecinos y negocios locales. Explora, cuéntanos qué te interesa o qué estás buscando, y te contactamos directo por WhatsApp.
+            </p>
+          </div>
+
+          {/* Pasarela horizontal de imágenes/video — desliza en móvil, se ve completa en escritorio */}
+          <div className="flex gap-4 overflow-x-auto pb-4 mb-10 snap-x snap-mandatory">
+            {VENTAS_CON_CAUSA_ITEMS.map((item) => (
+              <div
+                key={item.id}
+                className="snap-start shrink-0 w-64 sm:w-72 rounded-2xl border-4 border-[#0f2d1e] bg-white overflow-hidden shadow-md"
+              >
+                <div className="aspect-square bg-emerald-100">
+                  <img
+                    src={item.img}
+                    alt={item.nombre}
+                    className="w-full h-full object-cover"
+                    onError={(e) => { e.target.style.display = 'none'; }}
+                  />
+                </div>
+                <div className="p-3">
+                  <p className="text-sm font-black text-[#0f2d1e] uppercase leading-tight">{item.nombre}</p>
+                  <p className="text-xs font-bold text-emerald-700 uppercase mt-1">{item.precio}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="max-w-xl mx-auto">
+            <FormularioVentasConCausa />
+          </div>
+        </div>
+      </section>
+
       {/* SECCIÓN: APORTE VOLUNTARIO */}
       <section id="donaciones" className="bg-[#e8f5e9] text-[#0f2d1e] py-20 px-4 border-b-4 border-[#0f2d1e]">
-        <div className="mx-auto max-w-6xl grid gap-x-10 gap-y-12 md:grid-cols-12 items-start">
+        <div className="mx-auto max-w-6xl flex flex-col md:grid md:grid-cols-12 gap-y-8 md:gap-x-10 md:gap-y-10">
 
-          <div className="md:col-span-5 space-y-6">
+          {/* Bloque 1: intro + CTA — fila 1 en escritorio (col. izquierda) */}
+          <div className="order-1 md:order-none md:col-start-1 md:col-span-5 md:row-start-1 space-y-6">
             <span className="inline-block rounded-full bg-emerald-200 px-5 py-2 text-lg sm:text-2xl font-black uppercase tracking-wider text-emerald-800 shadow-sm">
               🟢 Apoyo Voluntario
             </span>
@@ -413,15 +469,10 @@ export default function App() {
             <p className="text-lg sm:text-xl font-black uppercase text-center text-white bg-[#e65100] border-4 border-[#0f2d1e] rounded-2xl py-4 px-5 shadow-md leading-snug">
               ¡Tu apoyo hoy es el cambio que nuestra comunidad necesita — súmate ahora! ♥
             </p>
-            <div className="rounded-2xl bg-emerald-200 border-2 border-emerald-500/40 p-4 text-sm sm:text-base font-black text-emerald-900 leading-relaxed flex items-start gap-3 shadow-sm">
-              <span className="text-xl">💡</span>
-              <p className="text-justify uppercase tracking-wide">
-                Rendimos cuentas de cómo se usa cada aportación con total transparencia. Parte de la utilidad de nuestros proyectos y de lo que los amigos y la comunidad suman se destina al apoyo de causas sociales como esta gran causa y ejemplo de vida y de lo que se puede lograr con la suma de voluntades, talentos y corazones solidarios ♥
-              </p>
-            </div>
           </div>
 
-          <div className="md:col-span-7 space-y-3">
+          {/* Bloque 2: selecciona tu tipo de aportación + botones — fila 1 en escritorio (col. derecha) */}
+          <div className="order-4 md:order-none md:col-start-7 md:col-span-6 md:row-start-1 space-y-3">
             <p className="text-lg sm:text-2xl font-black uppercase tracking-widest text-[#0f2d1e]/80 mb-3 block">
               Selecciona tu tipo de aportación:
             </p>
@@ -449,12 +500,18 @@ export default function App() {
             ))}
           </div>
 
-          {/* Fila inferior: flecha de conexión + video incrustado de Chuy */}
-          <div className="md:col-span-12 flex flex-col md:flex-row items-center md:items-stretch gap-6 md:gap-8 mt-2">
+          {/* Bloque 3: transparencia — fila 2 en escritorio (col. izquierda), justo antes del video en móvil */}
+          <div className="order-2 md:order-none md:col-start-1 md:col-span-5 md:row-start-2">
+            <div className="h-full rounded-2xl bg-emerald-200 border-2 border-emerald-500/40 p-4 text-sm sm:text-base font-black text-emerald-900 leading-relaxed flex items-start gap-3 shadow-sm">
+              <span className="text-xl">💡</span>
+              <p className="text-justify uppercase tracking-wide">
+                Rendimos cuentas de cómo se usa cada aportación con total transparencia. Parte de la utilidad de nuestros proyectos y de lo que los amigos y la comunidad suman se destina al apoyo de causas sociales como esta gran causa y ejemplo de vida y de lo que se puede lograr con la suma de voluntades, talentos y corazones solidarios ♥
+              </p>
+            </div>
+          </div>
 
-            {/* Espaciador para alinear el video bajo la columna de botones (solo escritorio) */}
-            <div className="hidden md:block md:w-5/12" aria-hidden="true"></div>
-
+          {/* Bloque 4: flecha + video de Chuy — fila 2 en escritorio (col. derecha), justo después de la transparencia en móvil */}
+          <div className="order-3 md:order-none md:col-start-7 md:col-span-6 md:row-start-2 flex flex-col md:flex-row items-center gap-4 md:gap-6">
             {/* Flecha con relleno naranja: apunta hacia abajo en móvil y hacia la derecha en escritorio */}
             <div className="flex justify-center items-center shrink-0" aria-hidden="true">
               <svg
@@ -472,8 +529,7 @@ export default function App() {
               </svg>
             </div>
 
-            {/* Video de Chuy incrustado */}
-            <div className="w-full md:w-6/12">
+            <div className="w-full">
               <div className="rounded-2xl overflow-hidden border-4 border-[#0f2d1e] shadow-lg bg-black aspect-video">
                 <iframe
                   className="w-full h-full"
@@ -485,7 +541,6 @@ export default function App() {
                 ></iframe>
               </div>
             </div>
-
           </div>
 
         </div>
@@ -510,56 +565,56 @@ export default function App() {
       </section>
 
       {/* FOOTER */}
-      <footer className="bg-[#17472d] text-emerald-100 py-12 px-4 text-center space-y-8">
+      <footer className="bg-[#e8f5e9] text-[#0f2d1e] py-12 px-4 text-center space-y-8 border-t-4 border-[#0f2d1e]">
 
         <div className="flex items-center justify-center gap-3">
-          <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-800/50 font-black text-white text-lg shrink-0">DC</span>
-          <span className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-white">DCUATES</span>
+          <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#0f2d1e] font-black text-white text-lg shrink-0">DC</span>
+          <span className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#0f2d1e]">DCUATES</span>
         </div>
 
-        <p className="max-w-xl mx-auto text-sm sm:text-base text-emerald-100/80 leading-relaxed">
+        <p className="max-w-xl mx-auto text-sm sm:text-base text-[#0f2d1e]/80 leading-relaxed font-medium">
           Proyectos comunitarios que impulsan a las familias. Parte de la utilidad se destina al apoyo de causas sociales, con total transparencia.
         </p>
 
         <div className="flex items-center justify-center gap-3">
-          <a href={REDES_SOCIALES.facebook} target="_blank" rel="noreferrer" className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-800/50 text-white transition-colors hover:bg-emerald-700/60" title="Facebook">
+          <a href={REDES_SOCIALES.facebook} target="_blank" rel="noreferrer" className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#0f2d1e] text-white transition-colors hover:bg-emerald-800" title="Facebook">
             <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" />
             </svg>
           </a>
-          <a href={REDES_SOCIALES.youtube} target="_blank" rel="noreferrer" className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-800/50 text-white transition-colors hover:bg-emerald-700/60" title="YouTube">
+          <a href={REDES_SOCIALES.youtube} target="_blank" rel="noreferrer" className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#0f2d1e] text-white transition-colors hover:bg-emerald-800" title="YouTube">
             <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
             </svg>
           </a>
-          <a href={REDES_SOCIALES.instagram} target="_blank" rel="noreferrer" className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-800/50 text-white transition-colors hover:bg-emerald-700/60" title="Instagram">
+          <a href={REDES_SOCIALES.instagram} target="_blank" rel="noreferrer" className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#0f2d1e] text-white transition-colors hover:bg-emerald-800" title="Instagram">
             <svg className="h-5 w-5 fill-none stroke-current stroke-2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
               <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
               <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
             </svg>
           </a>
-          <a href={REDES_SOCIALES.tiktok} target="_blank" rel="noreferrer" className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-800/50 text-white transition-colors hover:bg-emerald-700/60" title="TikTok">
+          <a href={REDES_SOCIALES.tiktok} target="_blank" rel="noreferrer" className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#0f2d1e] text-white transition-colors hover:bg-emerald-800" title="TikTok">
             <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.02 1.59 4.23.94 1.13 2.29 1.89 3.73 2.18l-.02 3.88c-1.63-.03-3.2-.55-4.51-1.52A7.83 7.83 0 0 1 16.43 7.5v8.32a7.83 7.83 0 0 1-3.32 6.42 7.91 7.91 0 0 1-8.73-.24 7.85 7.85 0 0 1-3.23-7.58 7.84 7.84 0 0 1 5.37-6.84V11.5a3.94 3.94 0 0 0-1.5 3.32 3.93 3.93 0 0 0 3.2 3.88 3.93 3.93 0 0 0 4.61-3.2c.04-.33.05-.66.05-.99V.02z" />
             </svg>
           </a>
         </div>
 
-        <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm sm:text-base font-bold text-emerald-100/90">
-          <a href="#iniciativas" className="hover:text-white transition-colors">Proyectos</a>
-          <a href="#publicidad" className="hover:text-white transition-colors">Publicidad</a>
-          <a href="#donaciones" className="hover:text-white transition-colors">Donaciones</a>
+        <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm sm:text-base font-bold text-[#0f2d1e]/80">
+          <a href="#iniciativas" className="hover:text-[#0f2d1e] transition-colors">Proyectos</a>
+          <a href="#publicidad" className="hover:text-[#0f2d1e] transition-colors">Publicidad</a>
+          <a href="#donaciones" className="hover:text-[#0f2d1e] transition-colors">Donaciones</a>
           <button
             onClick={() => setShowPrivacy(true)}
-            className="underline underline-offset-4 hover:text-white bg-transparent border-none cursor-pointer font-bold transition-colors"
+            className="underline underline-offset-4 hover:text-[#0f2d1e] bg-transparent border-none cursor-pointer font-bold transition-colors"
           >
             Aviso de Privacidad
           </button>
         </nav>
 
-        <p className="text-xs sm:text-sm text-emerald-100/60 pt-4 border-t border-emerald-800/40 max-w-sm mx-auto">
-          © {new Date().getFullYear()} DCUATES, un programa de CONEXIONES CON CAUSA. Todos los derechos reservados.
+        <p className="text-xs sm:text-sm text-[#0f2d1e]/60 pt-4 border-t border-[#0f2d1e]/20 max-w-sm mx-auto font-medium">
+          © {new Date().getFullYear()} DCUATES, un programa de CONEXIONES CON CAUSA ♥. Todos los derechos reservados.
         </p>
       </footer>
 
@@ -599,12 +654,12 @@ export default function App() {
 // 3. SUBCOMPONENTE: SITE HEADER
 // =========================================================================
 function SiteHeader() {
-  const [open, setOpen] = useState(false);
   return (
-    <header className="sticky top-0 z-40 border-b border-emerald-800/20 bg-white/95 backdrop-blur py-2 sm:py-3 px-4 shadow-sm text-slate-900 relative">
-      <div className="mx-auto flex flex-wrap items-center gap-y-2 max-w-6xl">
+    <header className="sticky top-0 z-40 border-b border-emerald-800/20 bg-white/95 backdrop-blur py-3 px-4 shadow-sm text-slate-900 relative">
+      <div className="mx-auto flex flex-col items-center gap-y-3 md:flex-row md:flex-wrap md:items-center max-w-6xl">
 
-        <a href="#inicio" className="flex items-center gap-3 shrink-0" onClick={() => setOpen(false)}>
+        {/* Logo + nombre — siempre primero */}
+        <a href="#inicio" className="order-1 flex items-center gap-3 shrink-0 self-start md:self-auto">
           <span className="flex h-24 w-24 sm:h-28 sm:w-28 items-center justify-center rounded-full overflow-hidden bg-[#0f2d1e] border-2 border-[#0f2d1e]/20 shadow-sm shrink-0">
             <img
               src="/images/logo-circular.png"
@@ -618,12 +673,9 @@ function SiteHeader() {
           </span>
           <span className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#0f2d1e]">DCUATES</span>
         </a>
-        <nav className="hidden md:flex items-center gap-6 text-xs font-black text-slate-600 lg:text-sm ml-8 lg:ml-12">
-          {NAV_LINKS.map(link => (
-            <a key={link.href} href={link.href} className="hover:text-emerald-700 transition-colors uppercase tracking-wide">{link.label}</a>
-          ))}
-        </nav>
-        <div className="flex items-center gap-2 sm:gap-3 ml-auto">
+
+        {/* Íconos de redes: en móvil aparecen arriba del menú de texto; en escritorio, a la derecha */}
+        <div className="order-2 md:order-3 flex items-center gap-2 sm:gap-3 md:ml-auto">
           <a href={REDES_SOCIALES.facebook} target="_blank" rel="noreferrer" className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="Facebook">
             <svg className="h-4 w-4 sm:h-5 sm:w-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" />
@@ -646,21 +698,15 @@ function SiteHeader() {
               <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.02 1.59 4.23.94 1.13 2.29 1.89 3.73 2.18l-.02 3.88c-1.63-.03-3.2-.55-4.51-1.52A7.83 7.83 0 0 1 16.43 7.5v8.32a7.83 7.83 0 0 1-3.32 6.42 7.91 7.91 0 0 1-8.73-.24 7.85 7.85 0 0 1-3.23-7.58 7.84 7.84 0 0 1 5.37-6.84V11.5a3.94 3.94 0 0 0-1.5 3.32 3.93 3.93 0 0 0 3.2 3.88 3.93 3.93 0 0 0 4.61-3.2c.04-.33.05-.66.05-.99V.02z" />
             </svg>
           </a>
-          <button onClick={() => setOpen(!open)} className="md:hidden font-bold text-xs bg-emerald-50 border border-emerald-800/20 px-3 py-2.5 rounded-lg text-emerald-950 shrink-0">
-            {open ? "CERRAR" : "MENÚ"}
-          </button>
         </div>
+
+        {/* Menú de texto: siempre visible (sin desplegable), centrado en móvil, entre logo e íconos en escritorio */}
+        <nav className="order-3 md:order-2 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 sm:gap-x-6 text-xs font-black text-slate-600 lg:text-sm md:ml-8 lg:ml-12">
+          {NAV_LINKS.map(link => (
+            <a key={link.href} href={link.href} className="hover:text-emerald-700 transition-colors uppercase tracking-wide text-center leading-tight">{link.label}</a>
+          ))}
+        </nav>
       </div>
-      {/* Menú móvil: anclado justo debajo del header (top-full), nunca se encima con el contenido */}
-      {open && (
-        <div className="absolute top-full inset-x-0 bg-white z-50 flex flex-col p-6 md:hidden border-t border-emerald-800/20 shadow-lg">
-          <nav className="flex flex-col gap-4 text-base font-bold">
-            {NAV_LINKS.map(link => (
-              <a key={link.href} href={link.href} onClick={() => setOpen(false)} className="border-b pb-2 uppercase text-slate-800 hover:text-emerald-700">{link.label}</a>
-            ))}
-          </nav>
-        </div>
-      )}
     </header>
   );
 }
@@ -748,8 +794,142 @@ function FormularioPublicidad() {
 }
 
 // =========================================================================
+// 4B. SUBCOMPONENTE: FORMULARIO DE VENTAS CON CAUSA
+// =========================================================================
+function FormularioVentasConCausa() {
+  const [contacto, setContacto] = useState("");
+  const [telefono, setTelefono] = useState("");
+  const [meInteresa, setMeInteresa] = useState("");
+  const [estoyBuscando, setEstoyBuscando] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const fecha = new Date().toLocaleString();
+
+    // Mismo patrón que FormularioPublicidad: se envía como
+    // application/x-www-form-urlencoded al Apps Script (doPost).
+    // Nota: el Apps Script necesita distinguir estos registros de los de
+    // Publicidad — por eso se agrega el campo "Tipo". Si el Sheet actual
+    // no lo contempla, conviene sumar una columna "Tipo" (o una pestaña
+    // aparte) en la hoja de cálculo para que no se mezclen los datos.
+    const datosFormulario = new URLSearchParams({
+      Tipo: "VentasConCausa",
+      Nombre: contacto,
+      Telefono: telefono,
+      MeInteresa: meInteresa,
+      EstoyBuscando: estoyBuscando,
+      Fecha: fecha
+    });
+
+    try {
+      await fetch(GOOGLE_SHEETS_URL, {
+        method: "POST",
+        mode: "no-cors",
+        body: datosFormulario
+      });
+    } catch (err) {
+      console.error("Error guardando respaldo en Sheets:", err);
+    }
+
+    const mensaje = `¡Hola DCUATES!\n\nEsto es lo que me interesa de Ventas con Causa:\n• Contacto: ${contacto}\n• Teléfono: ${telefono}\n• Me interesa: ${meInteresa || "No especificado"}\n• Estoy buscando: ${estoyBuscando || "No especificado"}`;
+    window.open(enlaceWhatsApp(mensaje), '_blank', 'noopener,noreferrer');
+
+    setContacto("");
+    setTelefono("");
+    setMeInteresa("");
+    setEstoyBuscando("");
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="bg-white text-slate-800 border-4 border-[#0f2d1e] p-6 rounded-3xl space-y-4 shadow-xl">
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-slate-700 mb-1">Nombre de contacto</label>
+          <input type="text" value={contacto} onChange={e => setContacto(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="Ej. María López" />
+        </div>
+        <div>
+          <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-slate-700 mb-1">Teléfono</label>
+          <input type="text" value={telefono} onChange={e => setTelefono(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="Ej. 5512345678" />
+        </div>
+      </div>
+      <div>
+        <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-emerald-800 mb-1">¿Qué artículo o servicio te interesa?</label>
+        <textarea value={meInteresa} onChange={e => setMeInteresa(e.target.value)} rows={2} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium resize-none" placeholder="Ej. Me interesan las artesanías bordadas" />
+      </div>
+      <div>
+        <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-emerald-800 mb-1">¿Qué estás buscando?</label>
+        <textarea value={estoyBuscando} onChange={e => setEstoyBuscando(e.target.value)} rows={2} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium resize-none" placeholder="Ej. Busco quién pueda hacer reparaciones de bicicletas" />
+      </div>
+      <button type="submit" className="w-full rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3.5 uppercase tracking-wider text-xs transition-all mt-2 shadow-md font-heading">
+        Enviar registro
+      </button>
+    </form>
+  );
+}
+
+// =========================================================================
 // 5. SUBCOMPONENTE: BARRA TICKER INFERIOR (negocios / mascotas / avisos / momentos)
 // =========================================================================
+// Una sola fila del ticker — recibe su propio índice para poder mostrar
+// dos filas simultáneas desfasadas entre sí (ver BarraTicker más abajo).
+function FilaTicker({ index, onClose, mostrarCerrar }) {
+  const item = TICKER_ITEMS[index];
+  const etiqueta = TICKER_ETIQUETAS[item.tipo];
+  const esExterno = item.enlace && item.enlace.startsWith("http");
+
+  return (
+    <div className="mx-auto max-w-6xl flex items-center gap-2 sm:gap-4 px-3 sm:px-4 py-1.5">
+
+      <span className="hidden sm:flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-emerald-300 shrink-0 border-r border-emerald-700/50 pr-3">
+        <span>{etiqueta.emoji}</span> {etiqueta.label}
+      </span>
+
+      <a
+        key={index}
+        href={item.enlace || "#"}
+        target={esExterno ? "_blank" : undefined}
+        rel={esExterno ? "noopener noreferrer" : undefined}
+        className="flex-1 flex items-center gap-3 text-white overflow-hidden min-w-0"
+      >
+        <span className="sm:hidden text-lg shrink-0">{etiqueta.emoji}</span>
+        {item.img && (
+          <img
+            src={item.img}
+            alt=""
+            className="h-8 w-8 sm:h-9 sm:w-9 rounded-lg object-cover shrink-0 border border-white/20"
+            onError={(e) => { e.target.style.display = 'none'; }}
+          />
+        )}
+        <span className="text-xs sm:text-sm font-bold truncate">
+          {item.texto || item.nombre}
+        </span>
+      </a>
+
+      <div className="hidden sm:flex items-center gap-1 shrink-0">
+        {TICKER_ITEMS.map((_, i) => (
+          <span
+            key={i}
+            className={`h-1.5 w-1.5 rounded-full transition-colors ${i === index ? "bg-emerald-300" : "bg-emerald-700/60"}`}
+          />
+        ))}
+      </div>
+
+      {mostrarCerrar && (
+        <button
+          onClick={onClose}
+          className="text-white/50 hover:text-white text-xl leading-none shrink-0 pl-1"
+          title="Cerrar barra"
+        >
+          ×
+        </button>
+      )}
+    </div>
+  );
+}
+
+// Barra ticker inferior fija, con DOS filas simultáneas que rotan de forma
+// independiente (desfasadas a la mitad del arreglo) para mostrar el doble
+// de contenido sin esperar tanto tiempo entre anuncios.
 function BarraTicker() {
   const [index, setIndex] = useState(0);
   const [visible, setVisible] = useState(true);
@@ -764,56 +944,14 @@ function BarraTicker() {
 
   if (!visible) return null;
 
-  const item = TICKER_ITEMS[index];
-  const etiqueta = TICKER_ETIQUETAS[item.tipo];
-  const esExterno = item.enlace && item.enlace.startsWith("http");
+  // La segunda fila va desfasada a la mitad del arreglo para no repetir
+  // exactamente el mismo anuncio que la primera fila al mismo tiempo.
+  const indexFila2 = (index + Math.floor(TICKER_ITEMS.length / 2)) % TICKER_ITEMS.length;
 
   return (
-    <div className="fixed bottom-0 inset-x-0 z-40 bg-[#17472d] border-t-2 border-emerald-700/50 shadow-[0_-4px_12px_rgba(0,0,0,0.25)]">
-      <div className="mx-auto max-w-6xl flex items-center gap-2 sm:gap-4 px-3 sm:px-4 py-2">
-
-        <span className="hidden sm:flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-emerald-300 shrink-0 border-r border-emerald-700/50 pr-3">
-          <span>{etiqueta.emoji}</span> {etiqueta.label}
-        </span>
-
-        <a
-          key={index}
-          href={item.enlace || "#"}
-          target={esExterno ? "_blank" : undefined}
-          rel={esExterno ? "noopener noreferrer" : undefined}
-          className="flex-1 flex items-center gap-3 text-white overflow-hidden min-w-0"
-        >
-          <span className="sm:hidden text-lg shrink-0">{etiqueta.emoji}</span>
-          {item.img && (
-            <img
-              src={item.img}
-              alt=""
-              className="h-9 w-9 sm:h-10 sm:w-10 rounded-lg object-cover shrink-0 border border-white/20"
-              onError={(e) => { e.target.style.display = 'none'; }}
-            />
-          )}
-          <span className="text-xs sm:text-sm font-bold truncate">
-            {item.texto || item.nombre}
-          </span>
-        </a>
-
-        <div className="hidden sm:flex items-center gap-1 shrink-0">
-          {TICKER_ITEMS.map((_, i) => (
-            <span
-              key={i}
-              className={`h-1.5 w-1.5 rounded-full transition-colors ${i === index ? "bg-emerald-300" : "bg-emerald-700/60"}`}
-            />
-          ))}
-        </div>
-
-        <button
-          onClick={() => setVisible(false)}
-          className="text-white/50 hover:text-white text-xl leading-none shrink-0 pl-1"
-          title="Cerrar barra"
-        >
-          ×
-        </button>
-      </div>
+    <div className="fixed bottom-0 inset-x-0 z-40 bg-[#17472d] border-t-2 border-emerald-700/50 shadow-[0_-4px_12px_rgba(0,0,0,0.25)] divide-y divide-emerald-800/40">
+      <FilaTicker index={index} mostrarCerrar={false} />
+      <FilaTicker index={indexFila2} onClose={() => setVisible(false)} mostrarCerrar={true} />
     </div>
   );
 }
