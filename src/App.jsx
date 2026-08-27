@@ -66,7 +66,7 @@ const INICIATIVAS_PRINCIPALES = [
     categoria: "APOYOS Y BENEFICIOS MUTUOS",
     titulo: "CÍRCULO DE CONFIANZA",
     descripcion: "Si eres una persona o negocio TOTALMENTE CONFIABLE que desea SUMAR con perfiles que están en la misma sintonía, o conoces personas o negocios que les gustaría formar parte de nuestro círculo, ¡serán muy BIENVENIDOS!",
-    puntos: ["Perfiles verificados por confianza", "Beneficios y apoyos mutuos", "Red exclusiva de contactos"],
+    puntos: ["Perfiles verificados por confianza", "Sinergia que multiplica", "Red exclusiva de contactos"],
     textoBoton: "Me interesa sumar",
     enlaceDirectoWA: enlaceWhatsApp("¡Hola DCUATES! Me interesa sumarme al Círculo de Confianza y sus Apoyos y Beneficios Mutuos.")
   },
@@ -137,7 +137,7 @@ export default function App() {
   const [showPrivacy, setShowPrivacy] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#1b4332] font-sans antialiased text-slate-900 selection:bg-emerald-500/30 relative">
+    <div className="min-h-screen bg-[#17472d] font-sans antialiased text-slate-900 selection:bg-emerald-500/30 relative">
 
       {/* Botón Flotante Permanente de WhatsApp — efecto 3D + anillo parpadeante + etiqueta */}
       <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3">
@@ -197,7 +197,7 @@ export default function App() {
               { t: "ALIANZAS SOLIDARIAS", h: "#iniciativas", img: "/images/Alianzas.png", puntos: [] },
               { t: "CÍRCULO DE CONFIANZA", h: "#circulo-confianza", img: "/images/Círculo.png", puntos: [] },
               { t: "RECOMIENDA, EVALÚA Y GANA", h: "#recomienda-evalua-gana", img: "/images/Recomienda.png", puntos: [] },
-              { t: "PUBLICIDAD GRATIS", h: "#publicidad", img: "/images/Publicidad.png", puntos: [] },
+              { t: "PUBLICIDAD GRATUITA", h: "#publicidad", img: "/images/Publicidad.png", puntos: [] },
               { t: "ASESORÍAS GRATUITAS", h: "#asesorias", img: "/images/Asesorías.png", puntos: [] },
               { t: "BAZAR Y COMERCIO", h: "#bazares", img: "/images/Bazar.png", puntos: [] },
               { t: "NOTICIAS DE BARRIO", h: "#noticias", img: "/images/Noticias.png", puntos: [] },
@@ -251,8 +251,8 @@ export default function App() {
             );
           })()}
 
-          <p className="lg:col-span-6 lg:col-start-5 text-center text-lg sm:text-xl font-black text-[#0f2d1e] uppercase tracking-wider pt-2">
-            ⚡ Proyectos Comunitarios DCUATES
+          <p className="lg:col-span-6 lg:col-start-5 flex items-center justify-center gap-3 text-center text-4xl sm:text-5xl font-black text-[#0f2d1e] uppercase tracking-tight leading-none pt-2">
+            <span>⭐</span> Proyectos Comunitarios DCUATES <span>⭐</span>
           </p>
 
         </div>
@@ -261,7 +261,7 @@ export default function App() {
       {/* Nota: el video de portada (YOUTUBE_VIDEO_ID) queda reservado para su propia sección — aún no incluido aquí */}
 
       {/* SECCIÓN 1: LOS 4 PROYECTOS BASE */}
-      <section id="iniciativas" className="bg-[#1b4332] text-white py-16 px-4 border-b-4 border-[#0f2d1e]">
+      <section id="iniciativas" className="bg-[#17472d] text-white py-16 px-4 border-b-4 border-[#0f2d1e]">
         <div className="mx-auto max-w-6xl">
           <h2 className="text-3xl sm:text-4xl font-black text-center uppercase tracking-tight mb-12 text-emerald-300">
             Nuestros Proyectos Originales
@@ -272,7 +272,9 @@ export default function App() {
               <div
                 id={item.id}
                 key={item.id}
-                className="scroll-mt-24 rounded-3xl border-4 border-[#0f2d1e] bg-white p-6 text-slate-800 shadow-xl flex flex-col justify-between transition-all hover:scale-[1.01] duration-200"
+                className={`scroll-mt-24 rounded-3xl border-4 border-[#0f2d1e] p-6 text-slate-800 shadow-xl flex flex-col justify-between transition-all hover:scale-[1.01] duration-200 ${
+                  item.id === "circulo-confianza" || item.id === "recomienda-evalua-gana" ? "bg-[#e8f5e9]" : "bg-white"
+                }`}
               >
                 <div>
                   <div className="flex items-center gap-3 mb-2">
@@ -315,7 +317,7 @@ export default function App() {
       </section>
 
       {/* SECCIÓN 2: LOS 4 NUEVOS PROYECTOS SOCIALES */}
-      <section id="nuevos-proyectos" className="bg-[#1b4332] text-white py-16 px-4 border-b-4 border-[#0f2d1e]">
+      <section id="nuevos-proyectos" className="bg-[#17472d] text-white py-16 px-4 border-b-4 border-[#0f2d1e]">
         <div className="mx-auto max-w-6xl">
           <h2 className="text-3xl sm:text-4xl font-black text-center uppercase tracking-tight mb-3 text-emerald-300">
             Nuevos Proyectos Sociales
@@ -385,7 +387,7 @@ export default function App() {
             <p className="text-base sm:text-lg text-slate-700 leading-relaxed text-justify font-bold">
               Cada donativo, del formato que decidas, nos ayuda a sostener y hacer crecer los proyectos que benefician a los negocios y familias latinas en conjunto con DCUATES.
             </p>
-            <div className="rounded-2xl bg-emerald-50 border-2 border-emerald-500/40 p-4 text-sm sm:text-base font-black text-emerald-900 leading-relaxed flex items-start gap-3 shadow-sm">
+            <div className="rounded-2xl bg-emerald-200 border-2 border-emerald-500/40 p-4 text-sm sm:text-base font-black text-emerald-900 leading-relaxed flex items-start gap-3 shadow-sm">
               <span className="text-xl">💡</span>
               <p className="text-justify uppercase tracking-wide">
                 Parte de la utilidad de los proyectos se destina al apoyo de causas sociales, con total transparencia. Rendimos cuentas de cómo se usa cada aportación.
@@ -425,7 +427,7 @@ export default function App() {
       </section>
 
       {/* SECCIÓN 4: FORMULARIO DE PUBLICIDAD */}
-      <section id="publicidad" className="bg-[#1b4332] text-white py-16 px-4">
+      <section id="publicidad" className="bg-[#17472d] text-white py-16 px-4">
         <div className="mx-auto max-w-2xl">
           <div className="text-center space-y-2 mb-8">
             <span className="inline-block rounded-full bg-emerald-900/60 px-5 py-2 text-lg sm:text-2xl font-black uppercase tracking-wider text-emerald-400">
@@ -443,17 +445,57 @@ export default function App() {
       </section>
 
       {/* FOOTER */}
-      <footer className="bg-slate-950 text-slate-400 py-10 text-center text-xs space-y-3 border-t border-emerald-950">
-        <p>© {new Date().getFullYear()} DCUATES Comunidad, un programa de CONEXIONES CON CAUSA ♥</p>
-        <p className="font-bold tracking-wide">TODOS LOS DERECHOS RESERVADOS</p>
-        <div className="pt-1">
+      <footer className="bg-[#17472d] text-emerald-100 py-12 px-4 text-center space-y-8">
+
+        <div className="flex items-center justify-center gap-3">
+          <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-800/50 font-black text-white text-lg shrink-0">DC</span>
+          <span className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-white">DCUATES</span>
+        </div>
+
+        <p className="max-w-xl mx-auto text-sm sm:text-base text-emerald-100/80 leading-relaxed">
+          Proyectos comunitarios que impulsan a las familias. Parte de la utilidad se destina al apoyo de causas sociales, con total transparencia.
+        </p>
+
+        <div className="flex items-center justify-center gap-3">
+          <a href={REDES_SOCIALES.facebook} target="_blank" rel="noreferrer" className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-800/50 text-white transition-colors hover:bg-emerald-700/60" title="Facebook">
+            <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" />
+            </svg>
+          </a>
+          <a href={REDES_SOCIALES.youtube} target="_blank" rel="noreferrer" className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-800/50 text-white transition-colors hover:bg-emerald-700/60" title="YouTube">
+            <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+            </svg>
+          </a>
+          <a href={REDES_SOCIALES.instagram} target="_blank" rel="noreferrer" className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-800/50 text-white transition-colors hover:bg-emerald-700/60" title="Instagram">
+            <svg className="h-5 w-5 fill-none stroke-current stroke-2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+            </svg>
+          </a>
+          <a href={REDES_SOCIALES.tiktok} target="_blank" rel="noreferrer" className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-800/50 text-white transition-colors hover:bg-emerald-700/60" title="TikTok">
+            <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.02 1.59 4.23.94 1.13 2.29 1.89 3.73 2.18l-.02 3.88c-1.63-.03-3.2-.55-4.51-1.52A7.83 7.83 0 0 1 16.43 7.5v8.32a7.83 7.83 0 0 1-3.32 6.42 7.91 7.91 0 0 1-8.73-.24 7.85 7.85 0 0 1-3.23-7.58 7.84 7.84 0 0 1 5.37-6.84V11.5a3.94 3.94 0 0 0-1.5 3.32 3.93 3.93 0 0 0 3.2 3.88 3.93 3.93 0 0 0 4.61-3.2c.04-.33.05-.66.05-.99V.02z" />
+            </svg>
+          </a>
+        </div>
+
+        <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm sm:text-base font-bold text-emerald-100/90">
+          <a href="#iniciativas" className="hover:text-white transition-colors">Proyectos</a>
+          <a href="#publicidad" className="hover:text-white transition-colors">Publicidad</a>
+          <a href="#donaciones" className="hover:text-white transition-colors">Donaciones</a>
           <button
             onClick={() => setShowPrivacy(true)}
-            className="text-emerald-400 hover:text-emerald-300 font-black bg-transparent border-none cursor-pointer text-sm sm:text-base tracking-wide transition-colors"
+            className="underline underline-offset-4 hover:text-white bg-transparent border-none cursor-pointer font-bold transition-colors"
           >
-            👉 VER AVISO DE PRIVACIDAD OFICIAL 👈
+            Aviso de Privacidad
           </button>
-        </div>
+        </nav>
+
+        <p className="text-xs sm:text-sm text-emerald-100/60 pt-4 border-t border-emerald-800/40 max-w-sm mx-auto">
+          © {new Date().getFullYear()} DCUATES, un programa de CONEXIONES CON CAUSA. Todos los derechos reservados.
+        </p>
       </footer>
 
       {/* MODAL DEL AVISO DE PRIVACIDAD */}
@@ -639,6 +681,7 @@ function FormularioPublicidad() {
     </form>
   );
 }
+
 
 
 
