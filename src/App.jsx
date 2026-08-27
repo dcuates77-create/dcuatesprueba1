@@ -39,7 +39,7 @@ const INICIATIVAS_PRINCIPALES = [
     categoria: "EDUCACIÓN Y DESARROLLO",
     titulo: "LA BIBLIOBICI Y AMIGOS",
     descripcion: "Préstamo gratuito de libros y materiales educativos para el desarrollo personal y social. La lectura que llega hasta tu colonia para fortalecer a la COMUNIDAD.",
-    puntos: ["Préstamo sin costo", "Materiales para todas las edades", "Fomento a la lectura"],
+    puntos: ["Préstamo sin costo", "Materiales para todas las edades", "Recibimos y hacemos donaciones"],
     textoBoton: "Quiero participar",
     enlaceDirectoWA: enlaceWhatsApp("¡Hola DCUATES! Me interesa participar en el proyecto de La Bibliobici y Amigos.")
   },
@@ -63,8 +63,8 @@ const INICIATIVAS_PRINCIPALES = [
   },
   {
     id: "publicidad-tarjeta",
-    categoria: "PROYECTO PRINCIPAL",
-    titulo: "PUBLICIDAD COMUNITARIA",
+    categoria: "APOYOS COMUNITARIOS",
+    titulo: "PUBLICIDAD GRATUITA",
     descripcion: "Difunde tu negocio, promociones y servicios de forma gratuita. Con aportación voluntaria ya ayudas a que la plataforma de DCUATES llegue a más familias.",
     puntos: ["Registro gratuito", "Comparte promociones e imágenes", "Más clientes de tu zona"],
     textoBoton: "Publicar mi negocio",
@@ -85,11 +85,11 @@ const NUEVOS_PROYECTOS_DATA = [
   },
   {
     id: "bazares",
-    categoria: "RENOVACIÓN ECONÓMICA",
-    titulo: "Bazares, Mercados y Tianguis",
-    descripcion: "Ventas caseras y de calle basadas en la confianza mutua para reactivar la economía de nuestras familias de forma directa.",
-    puntos: ["Comercio local seguro", "Barrio de confianza", "Reactivación económica"],
-    textoBoton: "Participar en bazar",
+    categoria: "VENTAS CON CAUSA",
+    titulo: "Comercios Físicos y Digitales",
+    descripcion: "Ventas caseras y de calle basadas en la confianza mutua para el apoyo de la economía familiar y solidaria.",
+    puntos: ["Comercio local seguro", "Barrio de confianza", "Apoyo a causas"],
+    textoBoton: "Incluir mi negocio",
     enlaceDirectoWA: enlaceWhatsApp("¡Hola DCUATES! Quiero obtener información para participar en los bazares y mercados.")
   },
   {
@@ -107,7 +107,7 @@ const NUEVOS_PROYECTOS_DATA = [
     titulo: "Bienestar, Cultura y Recreación",
     descripcion: "Actividades recreativas y talleres enfocados en el desarrollo integral, la salud mental y el esparcimiento familiar.",
     puntos: ["Desarrollo Personal y Social", "Salud Integral", "Disfrute Personal y Social"],
-    textoBoton: "Preguntar por talleres",
+    textoBoton: "Ver y sumar actividades",
     enlaceDirectoWA: enlaceWhatsApp("¡Hola DCUATES! Solicito información sobre los talleres de bienestar, cultura y recreación.")
   }
 ];
