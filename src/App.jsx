@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 // =========================================================================
 // 1. CONFIGURACIÓN CENTRALIZADA DE VARIABLES, REDES Y HOJA DE CÁLCULO
@@ -31,6 +31,26 @@ const NAV_LINKS = [
 function enlaceWhatsApp(mensaje) {
   return `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(mensaje)}`;
 }
+
+// Datos de EJEMPLO para la barra ticker inferior — reemplázalos por contenido real
+// cuando tengas fotos/avisos definitivos. Los 4 tipos rotan automáticamente.
+const TICKER_ITEMS = [
+  { tipo: "negocio", nombre: "Taquería El Sol — 20% en tu primera visita", img: "/images/ticker-negocio-1.png", enlace: enlaceWhatsApp("¡Hola! Vi la promoción de Taquería El Sol en DCUATES.") },
+  { tipo: "mascota", nombre: "Firulais — en búsqueda por la colonia centro", img: "/images/ticker-mascota-1.png", enlace: "#ecatepets" },
+  { tipo: "aviso", texto: "🎉 Bazar comunitario este sábado en la plaza principal, 10am–4pm" },
+  { tipo: "momento", nombre: "Entrega de libros de la Bibliobici, agosto 2026", img: "/images/ticker-momento-1.png", enlace: "#libros" },
+  { tipo: "negocio", nombre: "Estética Lupita — corte + peinado con descuento", img: "/images/ticker-negocio-2.png", enlace: enlaceWhatsApp("¡Hola! Vi la promoción de Estética Lupita en DCUATES.") },
+  { tipo: "mascota", nombre: "Michi — en adopción, ya vacunada y esterilizada", img: "/images/ticker-mascota-2.png", enlace: "#ecatepets" },
+  { tipo: "aviso", texto: "📚 Nueva alianza con la papelería del barrio: 10% para vecinos DCUATES" },
+  { tipo: "momento", nombre: "Taller de bienestar comunitario, julio 2026", img: "/images/ticker-momento-2.png", enlace: "#bienestar" }
+];
+
+const TICKER_ETIQUETAS = {
+  negocio: { emoji: "🏪", label: "Negocio Local" },
+  mascota: { emoji: "🐾", label: "Ecatepets" },
+  aviso: { emoji: "📢", label: "Aviso" },
+  momento: { emoji: "📸", label: "Momento DCUATES" }
+};
 
 // Arreglo de los 4 Proyectos Iniciales con Enlaces Directos de WhatsApp
 const INICIATIVAS_PRINCIPALES = [
@@ -137,10 +157,13 @@ export default function App() {
   const [showPrivacy, setShowPrivacy] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#17472d] font-sans antialiased text-slate-900 selection:bg-emerald-500/30 relative">
+    <div className="min-h-screen bg-[#17472d] font-sans antialiased text-slate-900 selection:bg-emerald-500/30 relative pb-16">
+
+      {/* Barra Ticker Inferior Fija — combina negocios, mascotas, avisos y momentos */}
+      <BarraTicker />
 
       {/* Botón Flotante Permanente de WhatsApp — efecto 3D + anillo parpadeante + etiqueta */}
-      <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3">
+      <div className="fixed bottom-20 sm:bottom-24 right-6 z-50 flex items-center gap-3">
         <span className="bg-emerald-100/60 text-emerald-900 text-[11px] sm:text-sm font-black uppercase tracking-wide px-3 py-2 rounded-full shadow-lg border border-emerald-700/20 whitespace-nowrap animate-pulse backdrop-blur-sm">
           Dudas y Atención
         </span>
@@ -681,6 +704,78 @@ function FormularioPublicidad() {
     </form>
   );
 }
+
+// =========================================================================
+// 5. SUBCOMPONENTE: BARRA TICKER INFERIOR (negocios / mascotas / avisos / momentos)
+// =========================================================================
+function BarraTicker() {
+  const [index, setIndex] = useState(0);
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    if (!visible) return;
+    const id = setInterval(() => {
+      setIndex((i) => (i + 1) % TICKER_ITEMS.length);
+    }, 4500);
+    return () => clearInterval(id);
+  }, [visible]);
+
+  if (!visible) return null;
+
+  const item = TICKER_ITEMS[index];
+  const etiqueta = TICKER_ETIQUETAS[item.tipo];
+  const esExterno = item.enlace && item.enlace.startsWith("http");
+
+  return (
+    <div className="fixed bottom-0 inset-x-0 z-40 bg-[#17472d] border-t-2 border-emerald-700/50 shadow-[0_-4px_12px_rgba(0,0,0,0.25)]">
+      <div className="mx-auto max-w-6xl flex items-center gap-2 sm:gap-4 px-3 sm:px-4 py-2">
+
+        <span className="hidden sm:flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-emerald-300 shrink-0 border-r border-emerald-700/50 pr-3">
+          <span>{etiqueta.emoji}</span> {etiqueta.label}
+        </span>
+
+        <a
+          key={index}
+          href={item.enlace || "#"}
+          target={esExterno ? "_blank" : undefined}
+          rel={esExterno ? "noopener noreferrer" : undefined}
+          className="flex-1 flex items-center gap-3 text-white overflow-hidden min-w-0"
+        >
+          <span className="sm:hidden text-lg shrink-0">{etiqueta.emoji}</span>
+          {item.img && (
+            <img
+              src={item.img}
+              alt=""
+              className="h-9 w-9 sm:h-10 sm:w-10 rounded-lg object-cover shrink-0 border border-white/20"
+              onError={(e) => { e.target.style.display = 'none'; }}
+            />
+          )}
+          <span className="text-xs sm:text-sm font-bold truncate">
+            {item.texto || item.nombre}
+          </span>
+        </a>
+
+        <div className="hidden sm:flex items-center gap-1 shrink-0">
+          {TICKER_ITEMS.map((_, i) => (
+            <span
+              key={i}
+              className={`h-1.5 w-1.5 rounded-full transition-colors ${i === index ? "bg-emerald-300" : "bg-emerald-700/60"}`}
+            />
+          ))}
+        </div>
+
+        <button
+          onClick={() => setVisible(false)}
+          className="text-white/50 hover:text-white text-xl leading-none shrink-0 pl-1"
+          title="Cerrar barra"
+        >
+          ×
+        </button>
+      </div>
+    </div>
+  );
+}
+
 
 
 
