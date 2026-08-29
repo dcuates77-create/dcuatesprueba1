@@ -150,16 +150,12 @@ const NUEVOS_PROYECTOS_DATA = [
   }
 ];
 
-// Datos de EJEMPLO para la pasarela de "Ventas con Causa" — reemplázalos por
-// fotos y artículos reales cuando los tengas. Cada tarjeta puede llevar
-// imagen o video (mismo patrón que YOUTUBE_VIDEO_ID: si "video" tiene valor,
-// se incrusta un iframe de YouTube en lugar de la imagen).
-const VENTAS_CON_CAUSA_ITEMS = [
-  { id: "vc1", nombre: "Artesanías bordadas a mano", precio: "Desde $150", img: "/images/ventas-causa-1.png" },
-  { id: "vc2", nombre: "Pan casero y repostería", precio: "Desde $60", img: "/images/ventas-causa-2.png" },
-  { id: "vc3", nombre: "Servicio de jardinería", precio: "Cotización directa", img: "/images/ventas-causa-3.png" },
-  { id: "vc4", nombre: "Ropa y accesorios de segunda mano", precio: "Desde $80", img: "/images/ventas-causa-4.png" }
-];
+// Catálogo de "Ventas con Causa" incrustado directamente desde Baserow.
+// Para actualizar los productos/servicios que se muestran en la página,
+// entra a tu cuenta de Baserow y edita la tabla — el sitio se refresca
+// solo, sin tocar este archivo. Si algún día cambias de galería pública,
+// solo reemplaza esta URL.
+const BASEROW_GALLERY_URL = "https://baserow.io/public/gallery/xCYm1NOc3A5wuJC1NeYlVYyVeY_w7O2tQdNRKcDsiyE";
 
 // =========================================================================
 // 2. COMPONENTE PRINCIPAL (INICIO DEL RENDERIZADO)
@@ -307,7 +303,7 @@ export default function App() {
                 id={item.id}
                 key={item.id}
                 className={`scroll-mt-24 rounded-3xl border-4 border-[#0f2d1e] p-6 text-slate-800 shadow-xl flex flex-col justify-between transition-all hover:scale-[1.01] duration-200 ${
-                  item.id === "circulo-confianza" || item.id === "recomienda-evalua-gana" ? "bg-[#e8f5e9]" : "bg-white"
+                  item.id === "libros" || item.id === "circulo-confianza" || item.id === "recomienda-evalua-gana" ? "bg-[#e8f5e9]" : "bg-white"
                 }`}
               >
                 <div>
@@ -422,28 +418,22 @@ export default function App() {
             </p>
           </div>
 
-          {/* Pasarela horizontal de imágenes/video — desliza en móvil, se ve completa en escritorio */}
-          <div className="flex gap-4 overflow-x-auto pb-4 mb-10 snap-x snap-mandatory">
-            {VENTAS_CON_CAUSA_ITEMS.map((item) => (
-              <div
-                key={item.id}
-                className="snap-start shrink-0 w-64 sm:w-72 rounded-2xl border-4 border-[#0f2d1e] bg-white overflow-hidden shadow-md"
-              >
-                <div className="aspect-square bg-emerald-100">
-                  <img
-                    src={item.img}
-                    alt={item.nombre}
-                    className="w-full h-full object-cover"
-                    onError={(e) => { e.target.style.display = 'none'; }}
-                  />
-                </div>
-                <div className="p-3">
-                  <p className="text-sm font-black text-[#0f2d1e] uppercase leading-tight">{item.nombre}</p>
-                  <p className="text-xs font-bold text-emerald-700 uppercase mt-1">{item.precio}</p>
-                </div>
-              </div>
-            ))}
+          {/* Catálogo incrustado desde Baserow (galería pública) — se actualiza solo
+              cuando editas la tabla en Baserow, sin tocar este código. */}
+          <div className="rounded-2xl border-4 border-[#0f2d1e] overflow-hidden shadow-md bg-white mb-4">
+            <iframe
+              src={BASEROW_GALLERY_URL}
+              title="Catálogo Ventas con Causa — DCUATES"
+              className="w-full h-[520px] sm:h-[560px]"
+              loading="lazy"
+            ></iframe>
           </div>
+          <p className="text-center text-xs sm:text-sm font-bold text-emerald-800 mb-10">
+            ¿No ves el catálogo arriba?{" "}
+            <a href={BASEROW_GALLERY_URL} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-900">
+              Ábrelo directamente aquí
+            </a>.
+          </p>
 
           <div className="max-w-xl mx-auto">
             <FormularioVentasConCausa />
@@ -539,6 +529,19 @@ export default function App() {
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   allowFullScreen
                 ></iframe>
+              </div>
+              <div className="mt-3 space-y-1.5">
+                <p className="text-sm sm:text-base font-black uppercase text-[#0f2d1e] leading-snug">
+                  Conoce la vida y obra de nuestro amigo y maestro de vida, Chuy, el Sapo Soñador aquí:
+                </p>
+                <a
+                  href="https://chuytrujillo.blogspot.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block text-sm sm:text-base font-black text-blue-700 hover:text-blue-900 underline underline-offset-2 transition-colors"
+                >
+                  https://chuytrujillo.blogspot.com/
+                </a>
               </div>
             </div>
           </div>
