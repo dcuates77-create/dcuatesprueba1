@@ -23,6 +23,7 @@ const NAV_LINKS = [
   { label: "Inicio", href: "#inicio" },
   { label: "Proyectos Base", href: "#iniciativas" },
   { label: "Nuevos Proyectos", href: "#nuevos-proyectos" },
+  { label: "Ventas con Causa", href: "#ventas-con-causa" },
   { label: "Donaciones", href: "#donaciones" },
   { label: "Publicidad Gratuita", href: "#publicidad" }
 ];
@@ -157,6 +158,28 @@ const NUEVOS_PROYECTOS_DATA = [
 // solo reemplaza esta URL.
 const BASEROW_GALLERY_URL = "https://baserow.io/public/gallery/xCYm1NOc3A5wuJC1NeYlVYyVeY_w7O2tQdNRKcDsiyE";
 
+// Catálogo de "Mascotas, Personas y Cosas Extraviadas" — a diferencia del
+// catálogo de Ventas con Causa (que se incrusta directo con un iframe),
+// esta pasarela SÍ es un carrusel propio (con autoplay, pausa y flechas
+// manuales), así que sus datos no pueden venir de un iframe — deben
+// cargarse como una lista.
+//
+// Por ahora estos son datos de EJEMPLO. Cuando tengas lista tu tabla de
+// Baserow especial para extraviados, la forma más simple de conectarla es:
+// 1) Crea en Baserow un "public grid view" (no gallery) para esa tabla.
+// 2) Copia aquí su ID en BASEROW_EXTRAVIADOS_VIEW_ID (lo que sigue después
+//    de /public/grid/ en la liga que te da Baserow al compartir).
+// 3) Avísame y conecto un fetch() a la API pública de esa vista para que
+//    EXTRAVIADOS_ITEMS se llene solo, sin tocar el resto del carrusel.
+const BASEROW_EXTRAVIADOS_VIEW_ID = ""; // pega aquí el ID cuando lo tengas
+
+const EXTRAVIADOS_ITEMS = [
+  { id: "ex1", tipo: "Mascota", nombre: "Firulais", descripcion: "Perrito café, orejas caídas, visto por última vez cerca de la colonia centro.", img: "/images/extraviado-1.png" },
+  { id: "ex2", tipo: "Persona", nombre: "Sr. Ramírez", descripcion: "Adulto mayor, salió de casa el martes por la tarde y no ha regresado.", img: "/images/extraviado-2.png" },
+  { id: "ex3", tipo: "Cosa", nombre: "Mochila escolar azul", descripcion: "Olvidada en la parada del camión sobre la avenida principal.", img: "/images/extraviado-3.png" },
+  { id: "ex4", tipo: "Mascota", nombre: "Michi", descripcion: "Gata blanca con manchas grises, muy asustadiza, extraviada desde el fin de semana.", img: "/images/extraviado-4.png" }
+];
+
 // =========================================================================
 // 2. COMPONENTE PRINCIPAL (INICIO DEL RENDERIZADO)
 // =========================================================================
@@ -223,15 +246,17 @@ export default function App() {
           {(() => {
             const BOTONES_PORTADA = [
               { t: "PRÉSTAMO GRATUITO DE LIBROS", h: "#libros", img: "/images/bb.png", puntos: ["GRATUITO", "PÍDELO CON UN SOLO CLIC ;)", "SE ACEPTAN DONACIONES DE LIBROS Y MÁS..."] },
-              { t: "ECATEPETS MASCOTAS", h: "#ecatepets", img: "/images/Ecatepets.png", puntos: [] },
-              { t: "ALIANZAS SOLIDARIAS", h: "#iniciativas", img: "/images/Alianzas.png", puntos: [] },
-              { t: "CÍRCULO DE CONFIANZA", h: "#circulo-confianza", img: "/images/Círculo.png", puntos: [] },
-              { t: "RECOMIENDA, EVALÚA Y GANA", h: "#recomienda-evalua-gana", img: "/images/Recomienda.png", puntos: [] },
-              { t: "PUBLICIDAD GRATUITA", h: "#publicidad", img: "/images/Publicidad.png", puntos: [] },
-              { t: "ASESORÍAS GRATUITAS", h: "#asesorias", img: "/images/Asesorías.png", puntos: [] },
-              { t: "BAZAR Y COMERCIO", h: "#bazares", img: "/images/Bazar.png", puntos: [] },
-              { t: "NOTICIAS DE BARRIO", h: "#noticias", img: "/images/Noticias.png", puntos: [] },
-              { t: "BIENESTAR Y RECREACIÓN", h: "#bienestar", img: "/images/Bienestar.png", puntos: [] }
+              { t: "ECATEPETS MASCOTAS", h: "#ecatepets", img: "/images/Ecatepets.png", puntos: ["DIFUSIÓN DE EXTRAVÍOS", "ADOPCIÓN RESPONSABLE", "CUIDADO Y CONCIENTIZACIÓN"] },
+              { t: "ALIANZAS SOLIDARIAS", h: "#iniciativas", img: "/images/Alianzas.png", puntos: ["COLABORACIÓN MUTUA", "RED DE CONTACTOS", "IMPACTO COMUNITARIO"] },
+              { t: "CÍRCULO DE CONFIANZA", h: "#circulo-confianza", img: "/images/Círculo.png", puntos: ["PERFILES VERIFICADOS POR CONFIANZA", "SINERGIA QUE MULTIPLICA", "RED EXCLUSIVA DE CONTACTOS"] },
+              { t: "RECOMIENDA, EVALÚA Y GANA", h: "#recomienda-evalua-gana", img: "/images/Recomienda.png", puntos: ["RECOMENDACIONES CON VALOR REAL", "RECONOCIMIENTO POR TU EXPERIENCIA", "MEJORA CONTINUA DE NEGOCIOS"] },
+              { t: "PUBLICIDAD GRATUITA", h: "#publicidad", img: "/images/Publicidad.png", puntos: ["REGISTRO GRATUITO", "COMPARTE PROMOCIONES E IMÁGENES", "MÁS CLIENTES DE TU ZONA"] },
+              { t: "ASESORÍAS GRATUITAS", h: "#asesorias", img: "/images/Asesorías.png", puntos: ["ASESORÍA GRATUITA", "APORTACIÓN VOLUNTARIA", "IMPULSO DE METAS"] },
+              { t: "BAZAR Y COMERCIO", h: "#bazares", img: "/images/Bazar.png", puntos: ["COMERCIO LOCAL SEGURO", "BARRIO DE CONFIANZA", "APOYO A CAUSAS"] },
+              { t: "NOTICIAS DE BARRIO", h: "#noticias", img: "/images/Noticias.png", puntos: ["EVENTOS CULTURALES", "CONVOCATORIAS VECINALES", "ACONTECIMIENTOS SOCIALES"] },
+              { t: "BIENESTAR Y RECREACIÓN", h: "#bienestar", img: "/images/Bienestar.png", puntos: ["DESARROLLO PERSONAL Y SOCIAL", "SALUD INTEGRAL", "DISFRUTE PERSONAL Y SOCIAL"] },
+              { t: "VENTAS CON CAUSA", h: "#ventas-con-causa", img: "/images/VentasConCausa.png", puntos: ["PRODUCTOS Y SERVICIOS LOCALES", "CATÁLOGO SIEMPRE ACTUALIZADO", "CONTACTO DIRECTO POR WHATSAPP"] },
+              { t: "APOYO VOLUNTARIO", h: "#donaciones", img: "/images/ApoyoVoluntario.png", puntos: ["ECONÓMICA, EN ESPECIE O TRUEQUE", "LABOR VOLUNTARIA", "TOTAL TRANSPARENCIA"] }
             ];
 
             const BotonProyecto = ({ btn }) => (
@@ -271,11 +296,9 @@ export default function App() {
                   {BOTONES_PORTADA.slice(0, 6).map((btn, idx) => <BotonProyecto key={idx} btn={btn} />)}
                 </div>
 
-                {/* COLUMNA 3: 4 botones — Nuevos Proyectos */}
-                <div className="lg:col-span-3 flex flex-col gap-3">
-                  <div className="grid grid-rows-4 gap-3 flex-1">
-                    {BOTONES_PORTADA.slice(6, 10).map((btn, idx) => <BotonProyecto key={idx} btn={btn} />)}
-                  </div>
+                {/* COLUMNA 3: 6 botones — Nuevos Proyectos + Ventas con Causa + Apoyo Voluntario */}
+                <div className="lg:col-span-3 grid grid-rows-6 gap-3">
+                  {BOTONES_PORTADA.slice(6, 12).map((btn, idx) => <BotonProyecto key={idx} btn={btn} />)}
                 </div>
               </>
             );
@@ -303,7 +326,7 @@ export default function App() {
                 id={item.id}
                 key={item.id}
                 className={`scroll-mt-24 rounded-3xl border-4 border-[#0f2d1e] p-6 text-slate-800 shadow-xl flex flex-col justify-between transition-all hover:scale-[1.01] duration-200 ${
-                  item.id === "libros" || item.id === "circulo-confianza" || item.id === "recomienda-evalua-gana" ? "bg-[#e8f5e9]" : "bg-white"
+                  item.id === "libros" || item.id === "alianzas-tarjeta" || item.id === "recomienda-evalua-gana" ? "bg-[#e8f5e9]" : "bg-white"
                 }`}
               >
                 <div>
@@ -361,7 +384,9 @@ export default function App() {
               <div
                 id={item.id}
                 key={item.id}
-                className="scroll-mt-24 rounded-3xl border-4 border-[#0f2d1e] bg-white p-6 text-slate-800 shadow-xl flex flex-col justify-between transition-all hover:scale-[1.01] duration-200"
+                className={`scroll-mt-24 rounded-3xl border-4 border-[#0f2d1e] p-6 text-slate-800 shadow-xl flex flex-col justify-between transition-all hover:scale-[1.01] duration-200 ${
+                  item.id === "asesorias" || item.id === "noticias" ? "bg-[#e8f5e9]" : "bg-white"
+                }`}
               >
                 <div>
                   <div className="flex items-center gap-3 mb-2">
@@ -438,6 +463,29 @@ export default function App() {
           <div className="max-w-xl mx-auto">
             <FormularioVentasConCausa />
           </div>
+
+          {/* Pasarela de mascotas, personas y cosas extraviadas */}
+          <div className="mt-14 max-w-3xl mx-auto">
+            <div className="text-center mb-6 space-y-2">
+              <span className="inline-block rounded-full bg-emerald-200 px-5 py-2 text-base sm:text-xl font-black uppercase tracking-wider text-emerald-800 shadow-sm">
+                🔎 Mascotas, Personas y Cosas Extraviadas
+              </span>
+              <p className="text-sm sm:text-base text-slate-700 font-bold max-w-xl mx-auto">
+                Ayuda a la comunidad reconociendo estos casos, o repórtanos uno nuevo.
+              </p>
+            </div>
+
+            <PasarelaExtraviados />
+
+            <a
+              href={enlaceWhatsApp("¡Hola DCUATES! Quiero reportar un caso de mascota, persona o cosa extraviada.")}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 block text-center rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3.5 uppercase tracking-wider text-xs sm:text-sm transition-all shadow-md font-heading"
+            >
+              Reportar un caso por WhatsApp
+            </a>
+          </div>
         </div>
       </section>
 
@@ -506,7 +554,8 @@ export default function App() {
             <div className="flex justify-center items-center shrink-0" aria-hidden="true">
               <svg
                 viewBox="0 0 100 60"
-                className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rotate-90 md:rotate-0 drop-shadow-md"
+                preserveAspectRatio="none"
+                className="w-14 h-24 sm:w-16 sm:h-28 md:w-20 md:h-32 rotate-90 md:rotate-0 drop-shadow-md"
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <path
@@ -530,19 +579,14 @@ export default function App() {
                   allowFullScreen
                 ></iframe>
               </div>
-              <div className="mt-3 space-y-1.5">
-                <p className="text-sm sm:text-base font-black uppercase text-[#0f2d1e] leading-snug">
-                  Conoce la vida y obra de nuestro amigo y maestro de vida, Chuy, el Sapo Soñador aquí:
-                </p>
-                <a
-                  href="https://chuytrujillo.blogspot.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block text-sm sm:text-base font-black text-blue-700 hover:text-blue-900 underline underline-offset-2 transition-colors"
-                >
-                  https://chuytrujillo.blogspot.com/
-                </a>
-              </div>
+              <a
+                href="https://chuytrujillo.blogspot.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 block cursor-pointer rounded-2xl border-4 border-[#0f2d1e] bg-[#e65100] hover:bg-[#bf360c] text-white font-black uppercase text-sm sm:text-base px-4 py-3.5 shadow-md transition-all hover:scale-[1.01] text-justify leading-snug"
+              >
+                Conoce la vida y obra de nuestro amigo y maestro de vida, Chuy, el Sapo Soñador aquí: https://chuytrujillo.blogspot.com/
+              </a>
             </div>
           </div>
 
@@ -856,7 +900,7 @@ function FormularioVentasConCausa() {
         </div>
       </div>
       <div>
-        <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-emerald-800 mb-1">¿Qué artículo o servicio te interesa?</label>
+        <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-emerald-800 mb-1">¿Qué artículo o servicio te interesa? (nombre y/o clave)</label>
         <textarea value={meInteresa} onChange={e => setMeInteresa(e.target.value)} rows={2} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium resize-none" placeholder="Ej. Me interesan las artesanías bordadas" />
       </div>
       <div>
@@ -867,6 +911,87 @@ function FormularioVentasConCausa() {
         Enviar registro
       </button>
     </form>
+  );
+}
+
+// =========================================================================
+// 4C. SUBCOMPONENTE: PASARELA DE MASCOTAS, PERSONAS Y COSAS EXTRAVIADAS
+// =========================================================================
+// Carrusel propio (no iframe) porque necesita moverse solo de derecha a
+// izquierda, pausarse, y dejar ir manualmente hacia adelante o atrás.
+function PasarelaExtraviados() {
+  const [index, setIndex] = useState(0);
+  const [pausado, setPausado] = useState(false);
+
+  useEffect(() => {
+    if (pausado) return;
+    const id = setInterval(() => {
+      setIndex((i) => (i + 1) % EXTRAVIADOS_ITEMS.length);
+    }, 4000);
+    return () => clearInterval(id);
+  }, [pausado]);
+
+  const anterior = () => { setIndex((i) => (i - 1 + EXTRAVIADOS_ITEMS.length) % EXTRAVIADOS_ITEMS.length); setPausado(true); };
+  const siguiente = () => { setIndex((i) => (i + 1) % EXTRAVIADOS_ITEMS.length); setPausado(true); };
+
+  const item = EXTRAVIADOS_ITEMS[index];
+
+  return (
+    <div className="rounded-2xl border-4 border-[#0f2d1e] bg-white overflow-hidden shadow-md">
+      <div className="relative flex items-center">
+
+        <button
+          onClick={anterior}
+          aria-label="Caso anterior"
+          className="absolute left-2 z-10 h-9 w-9 sm:h-10 sm:w-10 flex items-center justify-center rounded-full bg-white/90 border-2 border-[#0f2d1e] text-[#0f2d1e] font-black shadow-md hover:bg-emerald-50 transition-colors"
+        >
+          ‹
+        </button>
+
+        <div className="w-full grid sm:grid-cols-2">
+          <div className="aspect-video sm:aspect-square bg-emerald-100">
+            <img
+              src={item.img}
+              alt={item.nombre}
+              className="w-full h-full object-cover"
+              onError={(e) => { e.target.style.display = 'none'; }}
+            />
+          </div>
+          <div className="p-5 flex flex-col justify-center gap-2">
+            <span className="inline-block w-fit rounded-full bg-emerald-200 px-3 py-1 text-[10px] sm:text-xs font-black uppercase tracking-wider text-emerald-800">
+              {item.tipo} extraviad{item.tipo === "Persona" ? "a" : "o"}
+            </span>
+            <p className="text-lg sm:text-xl font-black text-[#0f2d1e] uppercase leading-tight">{item.nombre}</p>
+            <p className="text-sm text-slate-700 font-medium leading-relaxed">{item.descripcion}</p>
+          </div>
+        </div>
+
+        <button
+          onClick={siguiente}
+          aria-label="Siguiente caso"
+          className="absolute right-2 z-10 h-9 w-9 sm:h-10 sm:w-10 flex items-center justify-center rounded-full bg-white/90 border-2 border-[#0f2d1e] text-[#0f2d1e] font-black shadow-md hover:bg-emerald-50 transition-colors"
+        >
+          ›
+        </button>
+      </div>
+
+      <div className="flex items-center justify-center gap-2 py-3 border-t border-[#0f2d1e]/10 bg-emerald-50/60">
+        {EXTRAVIADOS_ITEMS.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => { setIndex(i); setPausado(true); }}
+            aria-label={`Ir al caso ${i + 1}`}
+            className={`h-2 w-2 rounded-full transition-colors ${i === index ? "bg-emerald-700" : "bg-emerald-700/30"}`}
+          />
+        ))}
+        <button
+          onClick={() => setPausado((p) => !p)}
+          className="ml-3 text-[10px] sm:text-xs font-black uppercase tracking-wider text-emerald-800 hover:text-emerald-900 underline underline-offset-2"
+        >
+          {pausado ? "▶ Reanudar" : "❚❚ Pausar"}
+        </button>
+      </div>
+    </div>
   );
 }
 
