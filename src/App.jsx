@@ -151,14 +151,10 @@ const NUEVOS_PROYECTOS_DATA = [
   }
 ];
 
-// Catálogo de "Ventas con Causa". El carrusel que se ve en la página usa
-// esta lista de EJEMPLO (mismo formato que EXTRAVIADOS_ITEMS, para poder
-// reutilizar el mismo componente de carrusel). BASEROW_GALLERY_URL se deja
-// como enlace de respaldo — "ver catálogo completo" — apuntando a tu
-// galería pública real en Baserow, donde sí puedes seguir editando los
-// productos sin tocar código. Cuando quieras que el carrusel también lea
-// directo de Baserow (en vez de estos datos de ejemplo), dime y conectamos
-// un fetch() a la API pública de esa tabla.
+// Catálogo de "Ventas con Causa". Mientras no esté conectado a Baserow
+// (ver BASEROW_TABLE_ID_VENTAS_CON_CAUSA abajo), el carrusel usa esta
+// lista de EJEMPLO como respaldo. BASEROW_GALLERY_URL se deja como
+// enlace — "ver catálogo completo" — apuntando a tu galería pública real.
 const BASEROW_GALLERY_URL = "https://baserow.io/public/gallery/xCYm1NOc3A5wuJC1NeYlVYyVeY_w7O2tQdNRKcDsiyE";
 
 const VENTAS_CON_CAUSA_ITEMS = [
@@ -168,27 +164,26 @@ const VENTAS_CON_CAUSA_ITEMS = [
   { id: "vc4", tipo: "Segunda mano", nombre: "Ropa y accesorios", descripcion: "Prendas en buen estado a precios accesibles. Nuevo inventario cada semana.", img: "/images/ventas-causa-4.png" }
 ];
 
-// Catálogo de "Mascotas, Personas y Cosas Extraviadas" — a diferencia del
-// catálogo de Ventas con Causa (que se incrusta directo con un iframe),
-// esta pasarela SÍ es un carrusel propio (con autoplay, pausa y flechas
-// manuales), así que sus datos no pueden venir de un iframe — deben
-// cargarse como una lista.
-//
-// Por ahora estos son datos de EJEMPLO. Cuando tengas lista tu tabla de
-// Baserow especial para extraviados, la forma más simple de conectarla es:
-// 1) Crea en Baserow un "public grid view" (no gallery) para esa tabla.
-// 2) Copia aquí su ID en BASEROW_EXTRAVIADOS_VIEW_ID (lo que sigue después
-//    de /public/grid/ en la liga que te da Baserow al compartir).
-// 3) Avísame y conecto un fetch() a la API pública de esa vista para que
-//    EXTRAVIADOS_ITEMS se llene solo, sin tocar el resto del carrusel.
-const BASEROW_EXTRAVIADOS_VIEW_ID = ""; // pega aquí el ID cuando lo tengas
-
 const EXTRAVIADOS_ITEMS = [
   { id: "ex1", tipo: "Mascota", nombre: "Firulais", descripcion: "Perrito café, orejas caídas, visto por última vez cerca de la colonia centro.", img: "/images/extraviado-1.png" },
   { id: "ex2", tipo: "Persona", nombre: "Sr. Ramírez", descripcion: "Adulto mayor, salió de casa el martes por la tarde y no ha regresado.", img: "/images/extraviado-2.png" },
   { id: "ex3", tipo: "Cosa", nombre: "Mochila escolar azul", descripcion: "Olvidada en la parada del camión sobre la avenida principal.", img: "/images/extraviado-3.png" },
   { id: "ex4", tipo: "Mascota", nombre: "Michi", descripcion: "Gata blanca con manchas grises, muy asustadiza, extraviada desde el fin de semana.", img: "/images/extraviado-4.png" }
 ];
+
+// =========================================================================
+// CONEXIÓN REAL A BASEROW (segura: el token vive en el servidor, ver
+// /api/baserow-rows.js, nunca en este archivo). Mientras el ID de una
+// tabla esté vacío ("") o la función /api/baserow-rows todavía no
+// responda datos, el carrusel correspondiente sigue mostrando su lista de
+// EJEMPLO de arriba — nada se rompe entretanto.
+//
+// Para activar el catálogo REAL de Ventas con Causa, pega aquí el Table ID
+// de tu tabla en Baserow (instrucciones de cómo encontrarlo, y cómo
+// configurar el token, están en /api/baserow-rows.js).
+const BASEROW_TABLE_ID_VENTAS_CON_CAUSA = ""; // pega aquí el Table ID cuando lo tengas
+const BASEROW_TABLE_ID_EXTRAVIADOS = "";      // ídem, cuando crees esa tabla en Baserow
+// =========================================================================
 
 // Galerías de EJEMPLO para la prueba de "pasarela en ventana emergente"
 // (ver GALERIAS_PROYECTOS y el modal correspondiente más abajo). Por ahora
@@ -537,7 +532,7 @@ export default function App() {
             <span className="inline-block rounded-full bg-emerald-200 px-5 py-2 text-lg sm:text-2xl font-black uppercase tracking-wider text-emerald-800 shadow-sm">
               🟢 Apoyo Voluntario
             </span>
-            <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-tight leading-none text-[#0f2d1e] font-heading">
+            <h2 className="text-4xl sm:text-5xl font-black uppercase tracking-tight leading-none text-[#0f2d1e] font-heading">
               TU APORTACIÓN IMPULSA A LA COMUNIDAD
             </h2>
             <p className="text-base sm:text-lg text-slate-700 leading-relaxed text-justify font-bold">
@@ -550,8 +545,8 @@ export default function App() {
 
           {/* Bloque 2: selecciona tu tipo de aportación + botones — fila 1 en escritorio (col. derecha) */}
           <div className="order-4 md:order-none md:col-start-6 md:col-span-7 md:row-start-1 space-y-3">
-            <p className="text-lg sm:text-2xl font-black uppercase tracking-widest text-[#0f2d1e]/80 mb-3 block">
-              Selecciona tu tipo de aportación:
+            <p className="text-xl sm:text-3xl font-black uppercase tracking-wide text-[#0f2d1e] mb-4 block leading-tight">
+              Selecciona el tipo de aportación que te agrade más:
             </p>
             {[
               { t: "Aportación Económica", d: "Solicita los datos bancarios de manera directa y segura.", m: "¡Hola DCUATES! Deseo realizar una Aportación Económica. ¿Me podrías proporcionar los datos seguros?" },
@@ -564,14 +559,21 @@ export default function App() {
                 href={enlaceWhatsApp(opc.m)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full text-left rounded-2xl border-4 border-[#0f2d1e] bg-[#e65100] hover:bg-[#bf360c] p-4 shadow-md transition-all hover:scale-[1.01] group duration-200 block"
+                className="w-full text-left rounded-2xl border-4 border-[#0f2d1e] bg-[#e65100] hover:bg-[#bf360c] p-4 sm:p-5 shadow-md transition-all hover:scale-[1.01] group duration-200 block"
               >
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center gap-3">
                   <div>
-                    <p className="text-lg sm:text-xl font-black text-white uppercase tracking-tight">{opc.t}</p>
-                    <p className="text-xs sm:text-sm font-bold text-[#0f2d1e] uppercase tracking-wide leading-none pt-1">{opc.d}</p>
+                    <p className="text-xl sm:text-2xl font-black text-white uppercase tracking-tight leading-tight">{opc.t}</p>
+                    <p className="text-sm sm:text-base font-bold text-[#0f2d1e] uppercase tracking-wide leading-snug pt-1">{opc.d}</p>
                   </div>
-                  <span className="text-xl text-white opacity-70 group-hover:opacity-100 transition-all pl-2">➔</span>
+                  <svg
+                    viewBox="0 0 100 60"
+                    preserveAspectRatio="none"
+                    className="w-8 h-8 sm:w-10 sm:h-10 shrink-0 opacity-90 group-hover:opacity-100 transition-all drop-shadow"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path d="M4 22 H58 V4 L96 30 L58 56 V38 H4 Z" fill="#ffffff" stroke="#0f2d1e" strokeWidth="6" strokeLinejoin="round" />
+                  </svg>
                 </div>
               </a>
             ))}
@@ -815,10 +817,16 @@ function SiteHeader() {
           </a>
         </div>
 
-        {/* Menú de texto: en móvil ocupa toda la fila de abajo; en escritorio va entre el logo y las redes */}
-        <nav className="order-3 md:order-2 w-full md:w-auto flex flex-wrap items-center justify-center gap-x-4 gap-y-1 sm:gap-x-6 text-xs font-black text-slate-600 lg:text-sm md:ml-8 lg:ml-12">
+        {/* Menú tipo pestañas: en móvil ocupa toda la fila de abajo; en escritorio va entre el logo y las redes */}
+        <nav className="order-3 md:order-2 w-full md:w-auto flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-black text-emerald-900 lg:text-sm md:ml-6 lg:ml-10">
           {NAV_LINKS.map(link => (
-            <a key={link.href} href={link.href} className="hover:text-emerald-700 transition-colors uppercase tracking-wide text-center leading-tight">{link.label}</a>
+            <a
+              key={link.href}
+              href={link.href}
+              className="rounded-full border-2 border-transparent bg-emerald-50 hover:bg-[#0f2d1e] hover:text-white hover:border-[#0f2d1e] transition-colors uppercase tracking-wide text-center leading-tight px-3 py-1.5 sm:px-4 sm:py-2"
+            >
+              {link.label}
+            </a>
           ))}
         </nav>
       </div>
@@ -1075,21 +1083,52 @@ function TarjetaCarrusel({ item, etiqueta }) {
   );
 }
 
+// Trae los renglones reales de una tabla de Baserow a través de nuestra
+// función serverless (/api/baserow-rows) — nunca habla con Baserow
+// directamente desde el navegador. Si "tableId" está vacío, o la petición
+// falla, o Baserow todavía no tiene filas, se queda con "itemsRespaldo"
+// (los datos de ejemplo) sin romper nada.
+function useCatalogoBaserow(tableId, itemsRespaldo) {
+  const [items, setItems] = useState(itemsRespaldo);
+
+  useEffect(() => {
+    if (!tableId) return; // sin Table ID configurado: nos quedamos con el respaldo
+    let cancelado = false;
+
+    fetch(`/api/baserow-rows?table=${encodeURIComponent(tableId)}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (!cancelado && Array.isArray(data.items) && data.items.length > 0) {
+          setItems(data.items);
+        }
+      })
+      .catch(() => {
+        // Sin conexión, token aún no configurado, etc. — nos quedamos con el respaldo.
+      });
+
+    return () => { cancelado = true; };
+  }, [tableId]);
+
+  return items;
+}
+
 function PasarelaExtraviados() {
+  const items = useCatalogoBaserow(BASEROW_TABLE_ID_EXTRAVIADOS, EXTRAVIADOS_ITEMS);
   return (
     <Carrusel
-      items={EXTRAVIADOS_ITEMS}
+      items={items}
       renderItem={(item) => (
-        <TarjetaCarrusel item={item} etiqueta={`${item.tipo} extraviad${item.tipo === "Persona" ? "a" : "o"}`} />
+        <TarjetaCarrusel item={item} etiqueta={item.tipo ? `${item.tipo} extraviad${item.tipo === "Persona" ? "a" : "o"}` : ""} />
       )}
     />
   );
 }
 
 function PasarelaVentasConCausa() {
+  const items = useCatalogoBaserow(BASEROW_TABLE_ID_VENTAS_CON_CAUSA, VENTAS_CON_CAUSA_ITEMS);
   return (
     <Carrusel
-      items={VENTAS_CON_CAUSA_ITEMS}
+      items={items}
       renderItem={(item) => (
         <TarjetaCarrusel item={item} etiqueta={item.tipo} />
       )}
@@ -1185,7 +1224,6 @@ function BarraTicker() {
     </div>
   );
 }
-
 
 
 
