@@ -34,7 +34,7 @@
 //    BASEROW_TABLE_ID_EXTRAVIADOS en el archivo principal).
 // -------------------------------------------------------------------
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   // Cache corto (5 min) para no golpear la API de Baserow en cada visita.
   res.setHeader("Cache-Control", "s-maxage=300, stale-while-revalidate=600");
 
