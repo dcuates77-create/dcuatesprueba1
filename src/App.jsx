@@ -181,8 +181,8 @@ const EXTRAVIADOS_ITEMS = [
 // Para activar el catálogo REAL de Ventas con Causa, pega aquí el Table ID
 // de tu tabla en Baserow (instrucciones de cómo encontrarlo, y cómo
 // configurar el token, están en /api/baserow-rows.js).
-const BASEROW_TABLE_ID_VENTAS_CON_CAUSA = ""; // pega aquí el Table ID cuando lo tengas
-const BASEROW_TABLE_ID_EXTRAVIADOS = "";      // ídem, cuando crees esa tabla en Baserow
+const BASEROW_TABLE_ID_VENTAS_CON_CAUSA = "1164149"; // tabla "Productos"
+const BASEROW_TABLE_ID_EXTRAVIADOS = "1165684";      // tabla "Servicios DC"
 // =========================================================================
 
 // Galerías de EJEMPLO para la prueba de "pasarela en ventana emergente"
