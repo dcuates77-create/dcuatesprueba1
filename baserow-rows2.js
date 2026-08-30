@@ -1,4 +1,4 @@
-// api/baserow-rows.js
+// api/baserow-rows2.js
 //
 // Función serverless de Vercel (no requiere Next.js: cualquier archivo
 // dentro de la carpeta /api en la raíz del proyecto se despliega solo).
