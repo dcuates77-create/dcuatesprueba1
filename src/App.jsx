@@ -24,7 +24,7 @@ const NAV_LINKS = [
   { label: "Proyectos Base", href: "#iniciativas" },
   { label: "Nuevos Proyectos", href: "#nuevos-proyectos" },
   { label: "Ventas con Causa", href: "#ventas-con-causa" },
-  { label: "Donaciones", href: "#donaciones" },
+  { label: "Apoyo Voluntario", href: "#donaciones" },
   { label: "Publicidad Gratuita", href: "#publicidad" }
 ];
 
@@ -151,12 +151,22 @@ const NUEVOS_PROYECTOS_DATA = [
   }
 ];
 
-// Catálogo de "Ventas con Causa" incrustado directamente desde Baserow.
-// Para actualizar los productos/servicios que se muestran en la página,
-// entra a tu cuenta de Baserow y edita la tabla — el sitio se refresca
-// solo, sin tocar este archivo. Si algún día cambias de galería pública,
-// solo reemplaza esta URL.
+// Catálogo de "Ventas con Causa". El carrusel que se ve en la página usa
+// esta lista de EJEMPLO (mismo formato que EXTRAVIADOS_ITEMS, para poder
+// reutilizar el mismo componente de carrusel). BASEROW_GALLERY_URL se deja
+// como enlace de respaldo — "ver catálogo completo" — apuntando a tu
+// galería pública real en Baserow, donde sí puedes seguir editando los
+// productos sin tocar código. Cuando quieras que el carrusel también lea
+// directo de Baserow (en vez de estos datos de ejemplo), dime y conectamos
+// un fetch() a la API pública de esa tabla.
 const BASEROW_GALLERY_URL = "https://baserow.io/public/gallery/xCYm1NOc3A5wuJC1NeYlVYyVeY_w7O2tQdNRKcDsiyE";
+
+const VENTAS_CON_CAUSA_ITEMS = [
+  { id: "vc1", tipo: "Artesanías", nombre: "Bordados hechos a mano", descripcion: "Piezas únicas bordadas por manos locales. Pregunta por diseños personalizados.", img: "/images/ventas-causa-1.png" },
+  { id: "vc2", tipo: "Alimentos", nombre: "Pan casero y repostería", descripcion: "Pedidos con un día de anticipación. Ideal para eventos y reuniones.", img: "/images/ventas-causa-2.png" },
+  { id: "vc3", tipo: "Servicios", nombre: "Jardinería a domicilio", descripcion: "Poda, mantenimiento y diseño de jardines. Cotización sin costo.", img: "/images/ventas-causa-3.png" },
+  { id: "vc4", tipo: "Segunda mano", nombre: "Ropa y accesorios", descripcion: "Prendas en buen estado a precios accesibles. Nuevo inventario cada semana.", img: "/images/ventas-causa-4.png" }
+];
 
 // Catálogo de "Mascotas, Personas y Cosas Extraviadas" — a diferencia del
 // catálogo de Ventas con Causa (que se incrusta directo con un iframe),
@@ -180,11 +190,36 @@ const EXTRAVIADOS_ITEMS = [
   { id: "ex4", tipo: "Mascota", nombre: "Michi", descripcion: "Gata blanca con manchas grises, muy asustadiza, extraviada desde el fin de semana.", img: "/images/extraviado-4.png" }
 ];
 
+// Galerías de EJEMPLO para la prueba de "pasarela en ventana emergente"
+// (ver GALERIAS_PROYECTOS y el modal correspondiente más abajo). Por ahora
+// solo Noticias y Bienestar la tienen, a modo de prueba — si el resultado
+// gusta, se puede replicar para cualquier otro proyecto agregando su propio
+// arreglo aquí y una entrada en GALERIAS_PROYECTOS.
+const NOTICIAS_GALERIA_ITEMS = [
+  { id: "not1", tipo: "Evento", nombre: "Feria cultural de agosto", descripcion: "Música en vivo, gastronomía local y actividades para toda la familia en la plaza principal.", img: "/images/noticias-1.png" },
+  { id: "not2", tipo: "Convocatoria", nombre: "Taller de muralismo vecinal", descripcion: "Convocatoria abierta para pintar un mural comunitario. Se proporcionan materiales.", img: "/images/noticias-2.png" },
+  { id: "not3", tipo: "Aviso", nombre: "Jornada de limpieza del parque", descripcion: "Súmate el próximo sábado a la jornada de limpieza y reforestación del parque de la colonia.", img: "/images/noticias-3.png" }
+];
+
+const BIENESTAR_GALERIA_ITEMS = [
+  { id: "bien1", tipo: "Taller", nombre: "Yoga al aire libre", descripcion: "Sesiones gratuitas los domingos por la mañana, para todos los niveles.", img: "/images/bienestar-1.png" },
+  { id: "bien2", tipo: "Actividad", nombre: "Grupo de caminata vecinal", descripcion: "Caminatas ligeras entre semana para fomentar la actividad física y la convivencia.", img: "/images/bienestar-2.png" },
+  { id: "bien3", tipo: "Charla", nombre: "Salud mental y comunidad", descripcion: "Plática abierta sobre bienestar emocional, con espacio para preguntas.", img: "/images/bienestar-3.png" }
+];
+
+// Mapa que conecta cada id de proyecto con su galería y título de modal —
+// así el botón "Ver galería" sabe qué mostrar sin más configuración.
+const GALERIAS_PROYECTOS = {
+  noticias: { titulo: "Agenda Cultural — Noticias de Barrio", items: NOTICIAS_GALERIA_ITEMS },
+  bienestar: { titulo: "Actividades de Bienestar, Cultura y Recreación", items: BIENESTAR_GALERIA_ITEMS }
+};
+
 // =========================================================================
 // 2. COMPONENTE PRINCIPAL (INICIO DEL RENDERIZADO)
 // =========================================================================
 export default function App() {
   const [showPrivacy, setShowPrivacy] = useState(false);
+  const [modalGaleria, setModalGaleria] = useState(null); // null | "noticias" | "bienestar"
 
   return (
     <div className="min-h-screen bg-[#17472d] font-sans antialiased text-slate-900 selection:bg-emerald-500/30 relative pb-28 sm:pb-24">
@@ -194,7 +229,7 @@ export default function App() {
 
       {/* Botón Flotante Permanente de WhatsApp — efecto 3D + anillo parpadeante + etiqueta */}
       <div className="fixed bottom-20 sm:bottom-24 right-6 z-50 flex items-center gap-3">
-        <span className="bg-emerald-100/60 text-emerald-900 text-[11px] sm:text-sm font-black uppercase tracking-wide px-3 py-2 rounded-full shadow-lg border border-emerald-700/20 whitespace-nowrap animate-pulse backdrop-blur-sm">
+        <span className="bg-[#25d366] text-white text-[11px] sm:text-sm font-black uppercase tracking-wide px-3 py-2 rounded-full shadow-lg border border-white/30 whitespace-nowrap animate-pulse">
           Dudas y Atención
         </span>
         <a
@@ -422,6 +457,16 @@ export default function App() {
                 >
                   {item.textoBoton}
                 </a>
+
+                {/* Prueba: botón que abre una pasarela en ventana emergente (solo Noticias y Bienestar, por ahora) */}
+                {GALERIAS_PROYECTOS[item.id] && (
+                  <button
+                    onClick={() => setModalGaleria(item.id)}
+                    className="w-full mt-2 text-center rounded-xl border-2 border-[#0f2d1e] text-[#0f2d1e] hover:bg-[#0f2d1e] hover:text-white font-black py-2.5 px-4 transition-colors uppercase tracking-wide text-xs sm:text-sm font-heading block"
+                  >
+                    📷 Ver galería
+                  </button>
+                )}
               </div>
             ))}
           </div>
@@ -443,20 +488,14 @@ export default function App() {
             </p>
           </div>
 
-          {/* Catálogo incrustado desde Baserow (galería pública) — se actualiza solo
-              cuando editas la tabla en Baserow, sin tocar este código. */}
-          <div className="rounded-2xl border-4 border-[#0f2d1e] overflow-hidden shadow-md bg-white mb-4">
-            <iframe
-              src={BASEROW_GALLERY_URL}
-              title="Catálogo Ventas con Causa — DCUATES"
-              className="w-full h-[520px] sm:h-[560px]"
-              loading="lazy"
-            ></iframe>
+          {/* Pasarela de Ventas con Causa — mismo formato de carrusel que Extraviados */}
+          <div className="max-w-3xl mx-auto mb-4">
+            <PasarelaVentasConCausa />
           </div>
           <p className="text-center text-xs sm:text-sm font-bold text-emerald-800 mb-10">
-            ¿No ves el catálogo arriba?{" "}
+            ¿Quieres ver el catálogo completo y siempre actualizado?{" "}
             <a href={BASEROW_GALLERY_URL} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-900">
-              Ábrelo directamente aquí
+              Ábrelo aquí
             </a>.
           </p>
 
@@ -510,7 +549,7 @@ export default function App() {
           </div>
 
           {/* Bloque 2: selecciona tu tipo de aportación + botones — fila 1 en escritorio (col. derecha) */}
-          <div className="order-4 md:order-none md:col-start-7 md:col-span-6 md:row-start-1 space-y-3">
+          <div className="order-4 md:order-none md:col-start-6 md:col-span-7 md:row-start-1 space-y-3">
             <p className="text-lg sm:text-2xl font-black uppercase tracking-widest text-[#0f2d1e]/80 mb-3 block">
               Selecciona tu tipo de aportación:
             </p>
@@ -540,22 +579,24 @@ export default function App() {
 
           {/* Bloque 3: transparencia — fila 2 en escritorio (col. izquierda), justo antes del video en móvil */}
           <div className="order-2 md:order-none md:col-start-1 md:col-span-5 md:row-start-2">
-            <div className="h-full rounded-2xl bg-emerald-200 border-2 border-emerald-500/40 p-4 text-sm sm:text-base font-black text-emerald-900 leading-relaxed flex items-start gap-3 shadow-sm">
-              <span className="text-xl">💡</span>
+            <div className="h-full rounded-2xl bg-emerald-200 border-2 border-emerald-500/40 p-5 sm:p-6 text-base sm:text-lg font-black text-emerald-900 leading-relaxed flex items-start gap-3 shadow-sm">
+              <span className="text-2xl">💡</span>
               <p className="text-justify uppercase tracking-wide">
                 Rendimos cuentas de cómo se usa cada aportación con total transparencia. Parte de la utilidad de nuestros proyectos y de lo que los amigos y la comunidad suman se destina al apoyo de causas sociales como esta gran causa y ejemplo de vida y de lo que se puede lograr con la suma de voluntades, talentos y corazones solidarios ♥
               </p>
             </div>
           </div>
 
-          {/* Bloque 4: flecha + video de Chuy — fila 2 en escritorio (col. derecha), justo después de la transparencia en móvil */}
-          <div className="order-3 md:order-none md:col-start-7 md:col-span-6 md:row-start-2 flex flex-col md:flex-row items-center gap-4 md:gap-6">
+          {/* Bloque 4: flecha + video de Chuy — fila 2 en escritorio (col. derecha), justo después de la transparencia en móvil.
+              col-start-6 (en vez de 7) para que la flecha quede pegada al cuadro de transparencia, sin columna vacía de por medio;
+              col-span-7 (en vez de 6) le da más ancho al video, y por lo tanto también más alto. */}
+          <div className="order-3 md:order-none md:col-start-6 md:col-span-7 md:row-start-2 flex flex-col md:flex-row items-center gap-2 md:gap-3">
             {/* Flecha con relleno naranja: apunta hacia abajo en móvil y hacia la derecha en escritorio */}
             <div className="flex justify-center items-center shrink-0" aria-hidden="true">
               <svg
                 viewBox="0 0 100 60"
                 preserveAspectRatio="none"
-                className="w-14 h-24 sm:w-16 sm:h-28 md:w-20 md:h-32 rotate-90 md:rotate-0 drop-shadow-md"
+                className="w-14 h-24 sm:w-16 sm:h-28 md:w-20 md:h-36 rotate-90 md:rotate-0 drop-shadow-md"
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <path
@@ -569,7 +610,7 @@ export default function App() {
             </div>
 
             <div className="w-full">
-              <div className="rounded-2xl overflow-hidden border-4 border-[#0f2d1e] shadow-lg bg-black aspect-video">
+              <div className="rounded-2xl overflow-hidden border-4 border-[#0f2d1e] shadow-lg bg-black aspect-[4/3] sm:aspect-[16/10]">
                 <iframe
                   className="w-full h-full"
                   src={`https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID}`}
@@ -620,7 +661,7 @@ export default function App() {
         </div>
 
         <p className="max-w-xl mx-auto text-sm sm:text-base text-[#0f2d1e]/80 leading-relaxed font-medium">
-          Proyectos comunitarios que impulsan a las familias. Parte de la utilidad se destina al apoyo de causas sociales, con total transparencia.
+          Proyectos SOCIALES Y EMPRENDEDORES que IMPULSAN a NUESTRAS COMUNIDADES. Parte de la utilidad se destina al apoyo de causas sociales, con total transparencia.
         </p>
 
         <div className="flex items-center justify-center gap-3">
@@ -660,8 +701,9 @@ export default function App() {
           </button>
         </nav>
 
-        <p className="text-xs sm:text-sm text-[#0f2d1e]/60 pt-4 border-t border-[#0f2d1e]/20 max-w-sm mx-auto font-medium">
-          © {new Date().getFullYear()} DCUATES, un programa de CONEXIONES CON CAUSA ♥. Todos los derechos reservados.
+        <p className="text-xs sm:text-sm text-[#0f2d1e]/60 pt-4 border-t border-[#0f2d1e]/20 max-w-md sm:max-w-lg mx-auto font-medium">
+          © {new Date().getFullYear()} DCUATES, un programa de CONEXIONES CON CAUSA ♥.<br />
+          Todos los derechos reservados.
         </p>
       </footer>
 
@@ -693,6 +735,32 @@ export default function App() {
         </div>
       )}
 
+      {/* MODAL DE GALERÍA (prueba: pasarela dentro de una ventana emergente) */}
+      {modalGaleria && GALERIAS_PROYECTOS[modalGaleria] && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
+          <div className="bg-[#e8f5e9] text-slate-900 rounded-2xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl flex flex-col max-h-[90vh]">
+            <div className="flex items-center justify-between border-b border-[#0f2d1e]/15 pb-3 mb-4">
+              <h3 className="text-lg sm:text-xl font-black uppercase tracking-tight text-[#0f2d1e] font-heading pr-4">
+                {GALERIAS_PROYECTOS[modalGaleria].titulo}
+              </h3>
+              <button
+                onClick={() => setModalGaleria(null)}
+                aria-label="Cerrar"
+                className="shrink-0 h-9 w-9 flex items-center justify-center rounded-full bg-[#0f2d1e] text-white font-black hover:bg-emerald-800 transition-colors"
+              >
+                ×
+              </button>
+            </div>
+            <div className="overflow-y-auto pr-1">
+              <Carrusel
+                items={GALERIAS_PROYECTOS[modalGaleria].items}
+                renderItem={(item) => <TarjetaCarrusel item={item} etiqueta={item.tipo} />}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
@@ -703,11 +771,11 @@ export default function App() {
 function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-emerald-800/20 bg-white/95 backdrop-blur py-3 px-4 shadow-sm text-slate-900 relative">
-      <div className="mx-auto flex flex-col items-center gap-y-3 md:flex-row md:flex-wrap md:items-center max-w-6xl">
+      <div className="mx-auto flex flex-wrap items-center gap-y-2 max-w-6xl">
 
-        {/* Logo + nombre — siempre primero */}
-        <a href="#inicio" className="order-1 flex items-center gap-3 shrink-0 self-start md:self-auto">
-          <span className="flex h-24 w-24 sm:h-28 sm:w-28 items-center justify-center rounded-full overflow-hidden bg-[#0f2d1e] border-2 border-[#0f2d1e]/20 shadow-sm shrink-0">
+        {/* Logo + nombre — siempre primero, en la misma fila que las redes en móvil */}
+        <a href="#inicio" className="order-1 flex items-center gap-3 shrink-0">
+          <span className="flex h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 items-center justify-center rounded-full overflow-hidden bg-[#0f2d1e] border-2 border-[#0f2d1e]/20 shadow-sm shrink-0">
             <img
               src="/images/logo-circular.png"
               alt="Logo DCUATES"
@@ -718,37 +786,37 @@ function SiteHeader() {
               }}
             />
           </span>
-          <span className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#0f2d1e]">DCUATES</span>
+          <span className="text-2xl sm:text-3xl md:text-4xl font-black uppercase tracking-tight text-[#0f2d1e]">DCUATES</span>
         </a>
 
-        {/* Íconos de redes: en móvil aparecen arriba del menú de texto; en escritorio, a la derecha */}
-        <div className="order-2 md:order-3 flex items-center gap-2 sm:gap-3 md:ml-auto">
-          <a href={REDES_SOCIALES.facebook} target="_blank" rel="noreferrer" className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="Facebook">
+        {/* Íconos de redes: comparten la primera fila con el logo (empujados a la derecha) en móvil; en escritorio, a la derecha del todo */}
+        <div className="order-2 md:order-3 ml-auto flex items-center gap-2 sm:gap-3">
+          <a href={REDES_SOCIALES.facebook} target="_blank" rel="noreferrer" className="flex h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="Facebook">
             <svg className="h-4 w-4 sm:h-5 sm:w-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" />
             </svg>
           </a>
-          <a href={REDES_SOCIALES.instagram} target="_blank" rel="noreferrer" className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="Instagram">
+          <a href={REDES_SOCIALES.instagram} target="_blank" rel="noreferrer" className="flex h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="Instagram">
             <svg className="h-4 w-4 sm:h-5 sm:w-5 fill-none stroke-current stroke-2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
               <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
               <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
             </svg>
           </a>
-          <a href={REDES_SOCIALES.youtube} target="_blank" rel="noreferrer" className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="YouTube">
+          <a href={REDES_SOCIALES.youtube} target="_blank" rel="noreferrer" className="flex h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="YouTube">
             <svg className="h-4 w-4 sm:h-5 sm:w-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
             </svg>
           </a>
-          <a href={REDES_SOCIALES.tiktok} target="_blank" rel="noreferrer" className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="TikTok">
+          <a href={REDES_SOCIALES.tiktok} target="_blank" rel="noreferrer" className="flex h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="TikTok">
             <svg className="h-4 w-4 sm:h-5 sm:w-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.02 1.59 4.23.94 1.13 2.29 1.89 3.73 2.18l-.02 3.88c-1.63-.03-3.2-.55-4.51-1.52A7.83 7.83 0 0 1 16.43 7.5v8.32a7.83 7.83 0 0 1-3.32 6.42 7.91 7.91 0 0 1-8.73-.24 7.85 7.85 0 0 1-3.23-7.58 7.84 7.84 0 0 1 5.37-6.84V11.5a3.94 3.94 0 0 0-1.5 3.32 3.93 3.93 0 0 0 3.2 3.88 3.93 3.93 0 0 0 4.61-3.2c.04-.33.05-.66.05-.99V.02z" />
             </svg>
           </a>
         </div>
 
-        {/* Menú de texto: siempre visible (sin desplegable), centrado en móvil, entre logo e íconos en escritorio */}
-        <nav className="order-3 md:order-2 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 sm:gap-x-6 text-xs font-black text-slate-600 lg:text-sm md:ml-8 lg:ml-12">
+        {/* Menú de texto: en móvil ocupa toda la fila de abajo; en escritorio va entre el logo y las redes */}
+        <nav className="order-3 md:order-2 w-full md:w-auto flex flex-wrap items-center justify-center gap-x-4 gap-y-1 sm:gap-x-6 text-xs font-black text-slate-600 lg:text-sm md:ml-8 lg:ml-12">
           {NAV_LINKS.map(link => (
             <a key={link.href} href={link.href} className="hover:text-emerald-700 transition-colors uppercase tracking-wide text-center leading-tight">{link.label}</a>
           ))}
@@ -915,26 +983,30 @@ function FormularioVentasConCausa() {
 }
 
 // =========================================================================
-// 4C. SUBCOMPONENTE: PASARELA DE MASCOTAS, PERSONAS Y COSAS EXTRAVIADAS
+// 4C. SUBCOMPONENTE GENÉRICO: CARRUSEL AUTOMÁTICO (con pausa y flechas manuales)
 // =========================================================================
-// Carrusel propio (no iframe) porque necesita moverse solo de derecha a
-// izquierda, pausarse, y dejar ir manualmente hacia adelante o atrás.
-function PasarelaExtraviados() {
+// Reutilizable: gira solo de derecha a izquierda cada "intervaloMs", se
+// puede pausar/reanudar, y se puede navegar manualmente con las flechas o
+// los puntos (al usar cualquier control manual, se pausa solo, para no
+// pelear con quien lo está viendo). "renderItem" decide cómo se ve cada
+// tarjeta — así el mismo carrusel sirve para Extraviados, Ventas con
+// Causa, o cualquier otra pasarela futura.
+function Carrusel({ items, renderItem, intervaloMs = 4000 }) {
   const [index, setIndex] = useState(0);
   const [pausado, setPausado] = useState(false);
 
   useEffect(() => {
     if (pausado) return;
     const id = setInterval(() => {
-      setIndex((i) => (i + 1) % EXTRAVIADOS_ITEMS.length);
-    }, 4000);
+      setIndex((i) => (i + 1) % items.length);
+    }, intervaloMs);
     return () => clearInterval(id);
-  }, [pausado]);
+  }, [pausado, items.length, intervaloMs]);
 
-  const anterior = () => { setIndex((i) => (i - 1 + EXTRAVIADOS_ITEMS.length) % EXTRAVIADOS_ITEMS.length); setPausado(true); };
-  const siguiente = () => { setIndex((i) => (i + 1) % EXTRAVIADOS_ITEMS.length); setPausado(true); };
+  const anterior = () => { setIndex((i) => (i - 1 + items.length) % items.length); setPausado(true); };
+  const siguiente = () => { setIndex((i) => (i + 1) % items.length); setPausado(true); };
 
-  const item = EXTRAVIADOS_ITEMS[index];
+  const item = items[index];
 
   return (
     <div className="rounded-2xl border-4 border-[#0f2d1e] bg-white overflow-hidden shadow-md">
@@ -942,33 +1014,17 @@ function PasarelaExtraviados() {
 
         <button
           onClick={anterior}
-          aria-label="Caso anterior"
+          aria-label="Anterior"
           className="absolute left-2 z-10 h-9 w-9 sm:h-10 sm:w-10 flex items-center justify-center rounded-full bg-white/90 border-2 border-[#0f2d1e] text-[#0f2d1e] font-black shadow-md hover:bg-emerald-50 transition-colors"
         >
           ‹
         </button>
 
-        <div className="w-full grid sm:grid-cols-2">
-          <div className="aspect-video sm:aspect-square bg-emerald-100">
-            <img
-              src={item.img}
-              alt={item.nombre}
-              className="w-full h-full object-cover"
-              onError={(e) => { e.target.style.display = 'none'; }}
-            />
-          </div>
-          <div className="p-5 flex flex-col justify-center gap-2">
-            <span className="inline-block w-fit rounded-full bg-emerald-200 px-3 py-1 text-[10px] sm:text-xs font-black uppercase tracking-wider text-emerald-800">
-              {item.tipo} extraviad{item.tipo === "Persona" ? "a" : "o"}
-            </span>
-            <p className="text-lg sm:text-xl font-black text-[#0f2d1e] uppercase leading-tight">{item.nombre}</p>
-            <p className="text-sm text-slate-700 font-medium leading-relaxed">{item.descripcion}</p>
-          </div>
-        </div>
+        {renderItem(item)}
 
         <button
           onClick={siguiente}
-          aria-label="Siguiente caso"
+          aria-label="Siguiente"
           className="absolute right-2 z-10 h-9 w-9 sm:h-10 sm:w-10 flex items-center justify-center rounded-full bg-white/90 border-2 border-[#0f2d1e] text-[#0f2d1e] font-black shadow-md hover:bg-emerald-50 transition-colors"
         >
           ›
@@ -976,11 +1032,11 @@ function PasarelaExtraviados() {
       </div>
 
       <div className="flex items-center justify-center gap-2 py-3 border-t border-[#0f2d1e]/10 bg-emerald-50/60">
-        {EXTRAVIADOS_ITEMS.map((_, i) => (
+        {items.map((_, i) => (
           <button
             key={i}
             onClick={() => { setIndex(i); setPausado(true); }}
-            aria-label={`Ir al caso ${i + 1}`}
+            aria-label={`Ir al elemento ${i + 1}`}
             className={`h-2 w-2 rounded-full transition-colors ${i === index ? "bg-emerald-700" : "bg-emerald-700/30"}`}
           />
         ))}
@@ -992,6 +1048,52 @@ function PasarelaExtraviados() {
         </button>
       </div>
     </div>
+  );
+}
+
+// Tarjeta compartida por ambas pasarelas (extraviados y ventas con causa) —
+// misma estructura visual, cambia solo la etiqueta y el pie de foto.
+function TarjetaCarrusel({ item, etiqueta }) {
+  return (
+    <div className="w-full grid sm:grid-cols-2">
+      <div className="aspect-video sm:aspect-square bg-emerald-100">
+        <img
+          src={item.img}
+          alt={item.nombre}
+          className="w-full h-full object-cover"
+          onError={(e) => { e.target.style.display = 'none'; }}
+        />
+      </div>
+      <div className="p-5 flex flex-col justify-center gap-2">
+        <span className="inline-block w-fit rounded-full bg-emerald-200 px-3 py-1 text-[10px] sm:text-xs font-black uppercase tracking-wider text-emerald-800">
+          {etiqueta}
+        </span>
+        <p className="text-lg sm:text-xl font-black text-[#0f2d1e] uppercase leading-tight">{item.nombre}</p>
+        <p className="text-sm text-slate-700 font-medium leading-relaxed">{item.descripcion}</p>
+      </div>
+    </div>
+  );
+}
+
+function PasarelaExtraviados() {
+  return (
+    <Carrusel
+      items={EXTRAVIADOS_ITEMS}
+      renderItem={(item) => (
+        <TarjetaCarrusel item={item} etiqueta={`${item.tipo} extraviad${item.tipo === "Persona" ? "a" : "o"}`} />
+      )}
+    />
+  );
+}
+
+function PasarelaVentasConCausa() {
+  return (
+    <Carrusel
+      items={VENTAS_CON_CAUSA_ITEMS}
+      renderItem={(item) => (
+        <TarjetaCarrusel item={item} etiqueta={item.tipo} />
+      )}
+    />
   );
 }
 
