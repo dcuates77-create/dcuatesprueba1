@@ -1077,6 +1077,9 @@ function TarjetaCarrusel({ item, etiqueta }) {
           {etiqueta}
         </span>
         <p className="text-lg sm:text-xl font-black text-[#0f2d1e] uppercase leading-tight">{item.nombre}</p>
+        {item.codigo && (
+          <p className="text-xs font-bold text-emerald-700 uppercase tracking-wide">Código: {item.codigo}</p>
+        )}
         <p className="text-sm text-slate-700 font-medium leading-relaxed">{item.descripcion}</p>
       </div>
     </div>
