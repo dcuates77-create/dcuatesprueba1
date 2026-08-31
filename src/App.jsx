@@ -999,7 +999,7 @@ function FormularioVentasConCausa() {
 // pelear con quien lo está viendo). "renderItem" decide cómo se ve cada
 // tarjeta — así el mismo carrusel sirve para Extraviados, Ventas con
 // Causa, o cualquier otra pasarela futura.
-function Carrusel({ items, renderItem, intervaloMs = 4000 }) {
+function Carrusel({ items, renderItem, intervaloMs = 2000 }) {
   const [index, setIndex] = useState(0);
   const [pausado, setPausado] = useState(false);
 
@@ -1061,7 +1061,7 @@ function Carrusel({ items, renderItem, intervaloMs = 4000 }) {
 
 // Tarjeta compartida por ambas pasarelas (extraviados y ventas con causa) —
 // misma estructura visual, cambia solo la etiqueta y el pie de foto.
-function TarjetaCarrusel({ item, etiqueta }) {
+function TarjetaCarrusel({ item, etiqueta, mostrarDetallesVenta = false }) {
   // Las fotos que vienen de Baserow (URLs de S3) pasan por nuestro propio
   // "puente" (/api/imagen-proxy) para evitar bloqueos del navegador del
   // visitante. Las rutas locales de marcador de posición (/images/...) se
@@ -1076,7 +1076,7 @@ function TarjetaCarrusel({ item, etiqueta }) {
         <img
           src={srcImagen}
           alt={item.nombre}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-contain"
           onError={(e) => { e.target.style.display = 'none'; }}
         />
       </div>
@@ -1089,6 +1089,21 @@ function TarjetaCarrusel({ item, etiqueta }) {
           <p className="text-xs font-bold text-emerald-700 uppercase tracking-wide">Código: {item.codigo}</p>
         )}
         <p className="text-sm text-slate-700 font-medium leading-relaxed">{item.descripcion}</p>
+        {mostrarDetallesVenta && (
+          <div className="mt-1 space-y-1">
+            {item.precio && (
+              <p className="text-base font-black text-[#0f2d1e]">
+                ${item.precio} <span className="font-medium text-xs text-slate-600">MXN</span>
+              </p>
+            )}
+            {item.proveedor && (
+              <p className="text-xs font-bold text-slate-600">Proveedor: {item.proveedor}</p>
+            )}
+            {item.notas && (
+              <p className="text-xs text-slate-500 italic">{item.notas}</p>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -1141,7 +1156,7 @@ function PasarelaVentasConCausa() {
     <Carrusel
       items={items}
       renderItem={(item) => (
-        <TarjetaCarrusel item={item} etiqueta={item.tipo} />
+        <TarjetaCarrusel item={item} etiqueta={item.tipo} mostrarDetallesVenta />
       )}
     />
   );
