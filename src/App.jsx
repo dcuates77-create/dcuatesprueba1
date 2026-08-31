@@ -1062,11 +1062,19 @@ function Carrusel({ items, renderItem, intervaloMs = 4000 }) {
 // Tarjeta compartida por ambas pasarelas (extraviados y ventas con causa) —
 // misma estructura visual, cambia solo la etiqueta y el pie de foto.
 function TarjetaCarrusel({ item, etiqueta }) {
+  // Las fotos que vienen de Baserow (URLs de S3) pasan por nuestro propio
+  // "puente" (/api/imagen-proxy) para evitar bloqueos del navegador del
+  // visitante. Las rutas locales de marcador de posición (/images/...) se
+  // usan tal cual, sin pasar por el puente.
+  const srcImagen = item.img && item.img.startsWith("http")
+    ? `/api/imagen-proxy?url=${encodeURIComponent(item.img)}`
+    : item.img;
+
   return (
     <div className="w-full grid sm:grid-cols-2">
       <div className="aspect-video sm:aspect-square bg-emerald-100">
         <img
-          src={item.img}
+          src={srcImagen}
           alt={item.nombre}
           className="w-full h-full object-cover"
           onError={(e) => { e.target.style.display = 'none'; }}
