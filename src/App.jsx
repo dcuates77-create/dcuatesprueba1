@@ -999,7 +999,7 @@ function FormularioVentasConCausa() {
 // pelear con quien lo está viendo). "renderItem" decide cómo se ve cada
 // tarjeta — así el mismo carrusel sirve para Extraviados, Ventas con
 // Causa, o cualquier otra pasarela futura.
-function Carrusel({ items, renderItem, intervaloMs = 3000 }) {
+function Carrusel({ items, renderItem, intervaloMs = 4000 }) {
   const [index, setIndex] = useState(0);
   const [pausado, setPausado] = useState(false);
 
