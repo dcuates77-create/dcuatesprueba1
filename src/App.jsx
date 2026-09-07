@@ -252,7 +252,7 @@ const BASEROW_TABLE_ID_EXTRAVIADOS = "1165684";      // tabla "Servicios DC"
 // misma tabla ENLACES (ver BASEROW_TABLE_ID_ENLACES más abajo).
 
 // Tabla "ENLACES" en Baserow (la que ya armaste con columnas VIDPORT,
-// RECASA, RECOMUN, RECMUSIC, RECLIBROS, RECVIDEOS, GALCULTURA, GALSALUD,
+// RECASA, RECOMUN, RECMUSIC, RECLIBROS, RECVIDEOSYMAS, GALCULTURA, GALSALUD,
 // etc.). Un solo ID de tabla alimenta el video de portada, las
 // recomendaciones, la música y las 2 galerías — cada quien lee su propia
 // columna. IMPORTANTE: esto asume que /api/baserow-rows.js devuelve las
@@ -284,7 +284,7 @@ const BIENESTAR_GALERIA_ITEMS = [
 // así el botón "Ver galería" sabe qué mostrar sin más configuración.
 const GALERIAS_PROYECTOS = {
   noticias: { titulo: "Agenda Cultural — Noticias de Barrio", items: NOTICIAS_GALERIA_ITEMS },
-  bienestar: { titulo: "Actividades de Bienestar, Cultura y Recreación", items: BIENESTAR_GALERIA_ITEMS }
+  bienestar: { titulo: "Actividades de Bienestar, Salud y Recreación", items: BIENESTAR_GALERIA_ITEMS }
 };
 
 // =========================================================================
@@ -398,7 +398,7 @@ export default function App() {
 
   const musicaLinks = primerosValores(filasEnlaces, "RECMUSIC", 5);
   const librosLinks = primerosValores(filasEnlaces, "RECLIBROS", 5);
-  const videosLinks = primerosValores(filasEnlaces, "RECVIDEOS", 6);
+  const videosLinks = primerosValores(filasEnlaces, "RECVIDEOSYMAS", 6);
 
   return (
     <div className="min-h-screen bg-[#17472d] font-sans antialiased text-slate-900 selection:bg-emerald-500/30 relative pb-28 sm:pb-24">
@@ -427,7 +427,13 @@ export default function App() {
 
       {/* Encabezado + ticker de frases, pegados juntos como una sola barra fija */}
       <div className="sticky top-0 z-40">
-        <SiteHeader onAbrirFAQ={() => setShowFAQ(true)} onAbrirPrivacidad={() => setShowPrivacy(true)} />
+        <SiteHeader
+          onAbrirFAQ={() => setShowFAQ(true)}
+          onAbrirPrivacidad={() => setShowPrivacy(true)}
+          musicaSonando={musicaSonando}
+          onAlternarMusica={alternarMusica}
+        />
+        <audio ref={audioRef} src={MUSICA_DCUATES_URL} loop onEnded={() => setMusicaSonando(false)} className="hidden" />
         <TickerFrases />
       </div>
 
@@ -630,7 +636,7 @@ export default function App() {
                       </li>
                     ))}
                   </ul>
-                  <p className="pt-2 font-bold">Si necesitas alguna recomendación en especial, ¡contáctanos!</p>
+                  <p className="pt-2 font-black uppercase text-emerald-300">Si necesitas alguna recomendación en especial, contáctanos !!!</p>
                 </BotonVerdeInfo>
 
                 <BotonVerdeInfo
@@ -1049,21 +1055,6 @@ export default function App() {
           </a>
         </div>
 
-        {/* Botón de música — reproduce/pausa el audio de fondo de DCUATES */}
-        <div>
-          <audio ref={audioRef} src={MUSICA_DCUATES_URL} loop onEnded={() => setMusicaSonando(false)} />
-          <button
-            type="button"
-            onClick={alternarMusica}
-            className="inline-flex items-center gap-2 rounded-full bg-[#17472d] hover:bg-[#0f2d1e] text-white font-black uppercase tracking-wide text-xs sm:text-sm px-5 py-3 shadow-md transition-colors"
-          >
-            <span>🎵</span>
-            {musicaSonando ? "Pausar Música DCUATES" : "Escucha Música DCUATES"}
-            <span>😊</span>
-            <span>🔊</span>
-          </button>
-        </div>
-
         <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm sm:text-base font-bold text-[#0f2d1e]/80">
           <a href="#quienes-somos" className="hover:text-[#0f2d1e] transition-colors">Quiénes Somos</a>
           <a href="#iniciativas" className="hover:text-[#0f2d1e] transition-colors">Proyectos</a>
@@ -1169,7 +1160,7 @@ export default function App() {
 // =========================================================================
 // 3. SUBCOMPONENTE: SITE HEADER
 // =========================================================================
-function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad }) {
+function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, musicaSonando, onAlternarMusica }) {
   const [menuMasAbierto, setMenuMasAbierto] = useState(false);
   return (
     <header className="border-b border-emerald-800/20 bg-white/95 backdrop-blur py-3 px-4 shadow-sm text-slate-900 relative">
@@ -1215,6 +1206,20 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad }) {
               <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.02 1.59 4.23.94 1.13 2.29 1.89 3.73 2.18l-.02 3.88c-1.63-.03-3.2-.55-4.51-1.52A7.83 7.83 0 0 1 16.43 7.5v8.32a7.83 7.83 0 0 1-3.32 6.42 7.91 7.91 0 0 1-8.73-.24 7.85 7.85 0 0 1-3.23-7.58 7.84 7.84 0 0 1 5.37-6.84V11.5a3.94 3.94 0 0 0-1.5 3.32 3.93 3.93 0 0 0 3.2 3.88 3.93 3.93 0 0 0 4.61-3.2c.04-.33.05-.66.05-.99V.02z" />
             </svg>
           </a>
+        </div>
+
+        {/* Botón de música — reproduce/pausa el audio de fondo de DCUATES.
+            Se movió aquí, justo debajo de los íconos de redes sociales del
+            menú de inicio (antes vivía en el pie de página). */}
+        <div className="order-2 md:order-3 w-full flex justify-end md:justify-start">
+          <button
+            type="button"
+            onClick={onAlternarMusica}
+            className="inline-flex items-center gap-1.5 rounded-full bg-[#17472d] hover:bg-[#0f2d1e] text-white font-black uppercase tracking-wide text-[10px] sm:text-xs px-3 py-1.5 shadow-sm transition-colors mt-1"
+          >
+            <span>🎵</span>
+            {musicaSonando ? "Pausar Música" : "Escucha Música DCUATES"}
+          </button>
         </div>
 
         {/* Menú reducido: 2 accesos directos + botón "MÁS" con el resto desplegado hacia abajo */}
@@ -1578,7 +1583,7 @@ function TarjetaCarrusel({ item, etiqueta, mostrarDetallesVenta = false }) {
 // (los datos de ejemplo) sin romper nada.
 // Trae los renglones "crudos" de la tabla ENLACES (uno por fila, con las
 // columnas tal cual las nombraste en Baserow: VIDPORT, RECASA, RECOMUN,
-// RECMUSIC, RECLIBROS, RECVIDEOS, GALCULTURA, GALSALUD, etc.). Si la tabla
+// RECMUSIC, RECLIBROS, RECVIDEOSYMAS, GALCULTURA, GALSALUD, etc.). Si la tabla
 // aún no responde o está vacía, regresa un arreglo vacío y quien la usa
 // se queda con su propio respaldo — nunca rompe la página.
 function useFilasEnlaces() {
@@ -1625,14 +1630,34 @@ function paresBaserow(filas, colNombre, colEnlace, max) {
     }));
 }
 
+// Saca la URL de una celda de Baserow sin importar si la columna es de
+// texto/URL plano (un string) o de tipo Archivo/Adjunto (Baserow entrega un
+// arreglo de objetos [{url, name, thumbnails...}] para ese tipo de columna,
+// como es el caso de GALCULTURA y GALSALUD).
+function urlDesdeCeldaBaserow(valor) {
+  if (!valor) return null;
+  if (Array.isArray(valor)) {
+    const primero = valor[0];
+    if (!primero) return null;
+    return primero.url || (primero.thumbnails && primero.thumbnails.card && primero.thumbnails.card.url) || null;
+  }
+  const texto = String(valor).trim();
+  return texto === "" ? null : texto;
+}
+
 // Arma items de galería {img, tipo, nombre} a partir de una columna que
-// solo trae URLs de imagen (ej. GALCULTURA, GALSALUD).
+// trae fotos — ya sea de tipo Archivo/Adjunto (GALCULTURA, GALSALUD) o de
+// texto plano con URLs.
 function galeriaDesdeColumna(filas, columna, max, etiqueta) {
-  return primerosValores(filas, columna, max).map((url, i) => ({
-    img: url,
-    tipo: etiqueta,
-    nombre: `${etiqueta} ${i + 1}`
-  }));
+  return filas
+    .map((f) => f && urlDesdeCeldaBaserow(f[columna]))
+    .filter(Boolean)
+    .slice(0, max)
+    .map((url, i) => ({
+      img: url,
+      tipo: etiqueta,
+      nombre: `${etiqueta} ${i + 1}`
+    }));
 }
 
 // Saca el ID de video de un enlace normal de YouTube (watch?v=, youtu.be/,
@@ -1718,6 +1743,12 @@ function BotonModal({ href, children, variante = "principal", onClick }) {
 // video (Nuestra Misión, Cómo Podemos Sumar, Preguntas Frecuentes, Aviso
 // de Privacidad). Al dar clic se expande hacia abajo mostrando su contenido.
 function BotonVerdeInfo({ titulo, abierto, onClick, children }) {
+  // Animación tipo "pergamino": en vez de mostrar/ocultar de golpe (lo que
+  // hacía que la página "saltara" al cerrar un botón y el siguiente
+  // brincara de lugar), se anima suavemente la altura del contenido con
+  // el truco de CSS Grid (0fr -> 1fr). Así el cierre se ve como un
+  // desenrollado suave y el resto de la columna se acomoda poco a poco,
+  // sin brincos ni saltos de scroll.
   return (
     <div className="rounded-xl bg-[#17472d] text-white shadow-md overflow-hidden">
       <button
@@ -1728,18 +1759,26 @@ function BotonVerdeInfo({ titulo, abierto, onClick, children }) {
         <span className="text-xs sm:text-sm font-black uppercase tracking-wide">{titulo}</span>
         <span className={`text-lg leading-none shrink-0 transition-transform ${abierto ? "rotate-45" : ""}`}>+</span>
       </button>
-      {abierto && (
-        <div className="px-4 pb-4 pt-1 text-xs sm:text-sm text-emerald-50 leading-relaxed space-y-2 border-t border-emerald-700/40">
-          {children}
-          <button
-            type="button"
-            onClick={onClick}
-            className="w-full mt-2 rounded-lg border-2 border-emerald-500/50 text-emerald-100 hover:bg-emerald-900/60 font-black uppercase tracking-wide text-[11px] sm:text-xs py-2 transition-colors"
-          >
-            Cerrar
-          </button>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateRows: abierto ? "1fr" : "0fr",
+          transition: "grid-template-rows 350ms ease-in-out"
+        }}
+      >
+        <div style={{ overflow: "hidden" }}>
+          <div className="px-4 pb-4 pt-1 text-xs sm:text-sm text-emerald-50 leading-relaxed space-y-2 border-t border-emerald-700/40">
+            {children}
+            <button
+              type="button"
+              onClick={onClick}
+              className="w-full mt-2 rounded-lg border-2 border-emerald-500/50 text-emerald-100 hover:bg-emerald-900/60 font-black uppercase tracking-wide text-[11px] sm:text-xs py-2 transition-colors"
+            >
+              Cerrar
+            </button>
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
