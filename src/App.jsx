@@ -887,13 +887,33 @@ export default function App() {
               <PasarelaVentasConCausa />
             </div>
             <div className="md:col-span-5 space-y-3">
-              <BotonVerdeInfo
-                titulo="Registra Aquí Tu Interés"
-                abierto={registroVentasAbierto}
-                onClick={() => setRegistroVentasAbierto((v) => !v)}
-              >
-                <FormularioVentasConCausa />
-              </BotonVerdeInfo>
+              <div className="rounded-xl border-2 border-[#0f2d1e] overflow-hidden shadow-sm">
+                <button
+                  type="button"
+                  onClick={() => setRegistroVentasAbierto((v) => !v)}
+                  className="w-full text-left bg-[#e65100] hover:bg-[#bf360c] p-3 transition-colors flex items-center justify-between gap-3"
+                >
+                  <p className="text-sm sm:text-base font-black text-white uppercase tracking-tight leading-tight">
+                    Si algo te gustó y deseas apartarlo o comprarlo, regístralo aquí
+                  </p>
+                  <span className={`shrink-0 transition-transform ${registroVentasAbierto ? "rotate-90" : ""}`}>
+                    <FlechaBlanca />
+                  </span>
+                </button>
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateRows: registroVentasAbierto ? "1fr" : "0fr",
+                    transition: "grid-template-rows 350ms ease-in-out"
+                  }}
+                >
+                  <div style={{ overflow: "hidden" }}>
+                    <div className="p-3 bg-white">
+                      <FormularioVentasConCausa />
+                    </div>
+                  </div>
+                </div>
+              </div>
               <a
                 href="https://whatsapp.com/channel/0029Vb8gAjd1dAvyGu9Jmv1i"
                 target="_blank"
@@ -1278,25 +1298,25 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, musicaSonando, onAlternarMu
             Causa y Apoyo Voluntario (antes vivían dentro del desplegable
             "Más"). Va debajo del renglón de accesos principales. */}
         <div className="order-5 w-full flex flex-wrap items-center justify-between gap-2 pt-2 mt-1 border-t border-emerald-800/10">
-          <button
-            type="button"
-            onClick={onAlternarMusica}
-            className="inline-flex items-center gap-1.5 rounded-full border-2 border-transparent bg-emerald-50 hover:bg-[#0f2d1e] hover:text-white hover:border-[#0f2d1e] transition-colors uppercase tracking-wide text-center leading-tight px-3 py-1.5 text-[11px] sm:text-xs font-black text-emerald-900"
-          >
-            <span>🎵</span>
-            {musicaSonando ? "Pausar Música" : "Escucha Música DCUATES"}
-          </button>
-          <div className="flex flex-wrap items-center justify-end gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-black text-emerald-900">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-black">
             {NAV_LINKS_FILA2.map(link => (
               <a
                 key={link.href}
                 href={link.href}
-                className="rounded-full border-2 border-transparent bg-emerald-50 hover:bg-[#0f2d1e] hover:text-white hover:border-[#0f2d1e] transition-colors uppercase tracking-wide text-center leading-tight px-3 py-1.5"
+                className="rounded-full border-2 border-transparent bg-[#17472d] hover:bg-[#0f2d1e] text-white transition-colors uppercase tracking-wide text-center leading-tight px-3 py-1.5"
               >
                 {link.label}
               </a>
             ))}
           </div>
+          <button
+            type="button"
+            onClick={onAlternarMusica}
+            className="inline-flex items-center gap-2 rounded-full bg-[#e65100] hover:bg-[#bf360c] text-white shadow-sm transition-colors uppercase tracking-wide text-center leading-tight px-5 py-2.5 text-xs sm:text-sm font-black"
+          >
+            <span>🎵</span>
+            {musicaSonando ? "Pausar Música" : "Escucha Música DCUATES"}
+          </button>
         </div>
 
         {/* Menú reducido: 2 accesos directos + botón "MÁS" con el resto desplegado hacia abajo */}
@@ -1305,7 +1325,7 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, musicaSonando, onAlternarMu
             <a
               key={link.href}
               href={link.href}
-              className="rounded-full border-2 border-transparent bg-emerald-50 hover:bg-[#0f2d1e] hover:text-white hover:border-[#0f2d1e] transition-colors uppercase tracking-wide text-center leading-tight px-3 py-1.5 sm:px-4 sm:py-2"
+              className="rounded-full border-2 border-transparent bg-[#17472d] hover:bg-[#0f2d1e] text-white transition-colors uppercase tracking-wide text-center leading-tight px-3 py-1.5 sm:px-4 sm:py-2"
             >
               {link.label}
             </a>
@@ -1315,7 +1335,7 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, musicaSonando, onAlternarMu
             <button
               type="button"
               onClick={() => setMenuMasAbierto((v) => !v)}
-              className="rounded-full border-2 border-transparent bg-emerald-50 hover:bg-[#0f2d1e] hover:text-white hover:border-[#0f2d1e] transition-colors uppercase tracking-wide text-center leading-tight px-3 py-1.5 sm:px-4 sm:py-2 flex items-center gap-1"
+              className="rounded-full border-2 border-transparent bg-[#17472d] hover:bg-[#0f2d1e] text-white transition-colors uppercase tracking-wide text-center leading-tight px-3 py-1.5 sm:px-4 sm:py-2 flex items-center gap-1"
             >
               Más
               <span className={`transition-transform ${menuMasAbierto ? "rotate-180" : ""}`}>▾</span>
@@ -1538,6 +1558,46 @@ function FlechaBlanca() {
     >
       <path d="M4 22 H58 V4 L96 30 L58 56 V38 H4 Z" fill="#ffffff" stroke="#0f2d1e" strokeWidth="6" strokeLinejoin="round" />
     </svg>
+  );
+}
+
+// Botón desplegable de color naranja (igual estilo que los botones-liga de
+// WhatsApp, pero con flecha giratoria en vez de link) — usado en "Ventas
+// con Causa" para el registro de interés.
+function BotonNaranjaDesplegable({ titulo, abierto, onClick, children }) {
+  return (
+    <div className="rounded-xl border-2 border-[#0f2d1e] bg-[#e65100] shadow-sm overflow-hidden">
+      <button
+        type="button"
+        onClick={onClick}
+        className="w-full flex items-center justify-between gap-3 p-3 text-left hover:bg-[#bf360c] transition-colors"
+      >
+        <p className="text-sm sm:text-base font-black text-white uppercase tracking-tight leading-tight">{titulo}</p>
+        <span className={`shrink-0 transition-transform ${abierto ? "rotate-90" : ""}`}>
+          <FlechaBlanca />
+        </span>
+      </button>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateRows: abierto ? "1fr" : "0fr",
+          transition: "grid-template-rows 350ms ease-in-out"
+        }}
+      >
+        <div style={{ overflow: "hidden" }}>
+          <div className="p-3 pt-2 bg-white">
+            {children}
+            <button
+              type="button"
+              onClick={onClick}
+              className="w-full mt-2 rounded-lg border-2 border-[#e65100] text-[#e65100] hover:bg-orange-50 font-black uppercase tracking-wide text-[11px] sm:text-xs py-2 transition-colors"
+            >
+              Cerrar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
