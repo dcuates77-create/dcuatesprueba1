@@ -51,8 +51,12 @@ const NAV_LINKS_PRINCIPALES = [
 ];
 const NAV_LINKS_MAS = [
   { label: "Quiénes Somos", href: "#quienes-somos" },
-  { label: "Alianzas Solidarias", href: "#alianzas-tarjeta" },
-  { label: "Nuevos Proyectos", href: "#nuevos-proyectos" },
+  { label: "Nuevos Proyectos", href: "#nuevos-proyectos" }
+];
+// Segunda fila del menú fijo (debajo de los accesos principales), a un
+// lado del botón de música.
+const NAV_LINKS_FILA2 = [
+  { label: "Alianzas Solidarias", href: "#iniciativas" },
   { label: "Ventas con Causa", href: "#ventas-con-causa" },
   { label: "Apoyo Voluntario", href: "#donaciones" }
 ];
@@ -400,6 +404,18 @@ export default function App() {
   const librosLinks = primerosValores(filasEnlaces, "RECLIBROS", 5);
   const videosLinks = primerosValores(filasEnlaces, "RECVIDEOSYMAS", 6);
 
+  // Audio de fondo real: la columna "MUSICA" en Baserow es de tipo
+  // Archivo/Adjunto (ahí subiste el mp3), así que se lee igual que las
+  // galerías. Si por algún motivo viene vacía, cae al archivo local de
+  // respaldo (MUSICA_DCUATES_URL).
+  const musicaFondoUrl = (() => {
+    for (const fila of filasEnlaces) {
+      const url = fila && urlDesdeCeldaBaserow(fila.MUSICA);
+      if (url) return url;
+    }
+    return MUSICA_DCUATES_URL;
+  })();
+
   return (
     <div className="min-h-screen bg-[#17472d] font-sans antialiased text-slate-900 selection:bg-emerald-500/30 relative pb-28 sm:pb-24">
 
@@ -433,12 +449,12 @@ export default function App() {
           musicaSonando={musicaSonando}
           onAlternarMusica={alternarMusica}
         />
-        <audio ref={audioRef} src={MUSICA_DCUATES_URL} loop onEnded={() => setMusicaSonando(false)} className="hidden" />
+        <audio ref={audioRef} src={musicaFondoUrl} loop onEnded={() => setMusicaSonando(false)} className="hidden" />
         <TickerFrases />
       </div>
 
       {/* SECCIÓN PORTADA / HERO — izquierda: título+texto+Quiénes Somos+Bibliobici a toda altura; derecha: cuadrícula de 12 botones (2 columnas en celular, 3 en escritorio = 3x4) */}
-      <section id="inicio" className="bg-[#e8f5e9] text-[#0f2d1e] py-8 px-4 sm:py-12 md:py-16 border-b-4 border-[#0f2d1e]">
+      <section id="inicio" className="scroll-mt-48 md:scroll-mt-36 bg-[#e8f5e9] text-[#0f2d1e] py-8 px-4 sm:py-12 md:py-16 border-b-4 border-[#0f2d1e]">
         <div className="mx-auto max-w-7xl grid gap-8 lg:grid-cols-12 lg:items-stretch">
 
           {/* Columna izquierda: título, texto, Quiénes Somos y la Bibliobici, todo a la misma altura que la cuadrícula de botones */}
@@ -460,7 +476,7 @@ export default function App() {
             </div>
 
             {/* QUIÉNES SOMOS — justo debajo de JUNTOS, resumido con "Mostrar más" */}
-            <div id="quienes-somos" className="scroll-mt-24 rounded-2xl bg-[#17472d] text-white p-4 sm:p-5">
+            <div id="quienes-somos" className="scroll-mt-48 md:scroll-mt-36 rounded-2xl bg-[#17472d] text-white p-4 sm:p-5">
               <span className="flex items-center gap-2 text-xl sm:text-2xl font-black uppercase tracking-wider text-emerald-400 mb-2">
                 <span className="text-3xl sm:text-4xl">✅</span> Quiénes Somos
               </span>
@@ -604,7 +620,15 @@ export default function App() {
                   <p className="font-bold">{COMO_SUMAR.cierre}</p>
                   <button
                     type="button"
-                    onClick={() => { setInfoAbierta(null); irASeccion("donaciones"); }}
+                    onClick={() => {
+                      setInfoAbierta(null);
+                      // Se espera a que termine la animación de cierre (350ms)
+                      // antes de hacer scroll: si se hace al mismo tiempo, la
+                      // página se recorre mientras el acordeón todavía se está
+                      // colapsando y el destino termina desfasado (por eso
+                      // llegaba casi al final de la sección en vez de al inicio).
+                      setTimeout(() => irASeccion("donaciones"), 380);
+                    }}
                     className="w-full text-center rounded-lg bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-2.5 px-3 uppercase tracking-wide text-[11px] sm:text-xs mt-1"
                   >
                     Ir a Apoyo Voluntario
@@ -698,7 +722,7 @@ export default function App() {
       </section>
 
       {/* SECCIÓN 1: LOS 4 PROYECTOS BASE */}
-      <section id="iniciativas" className="bg-[#17472d] text-white py-10 sm:py-16 px-4 border-b-4 border-[#0f2d1e]">
+      <section id="iniciativas" className="scroll-mt-48 md:scroll-mt-36 bg-[#17472d] text-white py-10 sm:py-16 px-4 border-b-4 border-[#0f2d1e]">
         <div className="mx-auto max-w-6xl">
           <h2 className="text-4xl sm:text-5xl font-black text-center uppercase tracking-tight mb-12 text-emerald-300">
             Nuestros Proyectos Originales
@@ -709,7 +733,7 @@ export default function App() {
               <div
                 id={item.id}
                 key={item.id}
-                className={`scroll-mt-24 rounded-3xl border-4 border-[#0f2d1e] p-6 text-slate-800 shadow-xl flex flex-col justify-between transition-all hover:scale-[1.01] duration-200 ${
+                className={`scroll-mt-48 md:scroll-mt-36 rounded-3xl border-4 border-[#0f2d1e] p-6 text-slate-800 shadow-xl flex flex-col justify-between transition-all hover:scale-[1.01] duration-200 ${
                   item.id === "libros" || item.id === "alianzas-tarjeta" || item.id === "recomienda-evalua-gana" ? "bg-[#e8f5e9]" : "bg-white"
                 }`}
               >
@@ -764,7 +788,7 @@ export default function App() {
       </section>
 
       {/* SECCIÓN 2: LOS 4 NUEVOS PROYECTOS SOCIALES */}
-      <section id="nuevos-proyectos" className="bg-[#17472d] text-white py-10 sm:py-16 px-4 border-b-4 border-[#0f2d1e]">
+      <section id="nuevos-proyectos" className="scroll-mt-48 md:scroll-mt-36 bg-[#17472d] text-white py-10 sm:py-16 px-4 border-b-4 border-[#0f2d1e]">
         <div className="mx-auto max-w-6xl">
           <h2 className="text-4xl sm:text-5xl font-black text-center uppercase tracking-tight mb-3 text-emerald-300">
             Nuevos Proyectos Sociales
@@ -778,7 +802,7 @@ export default function App() {
               <div
                 id={item.id}
                 key={item.id}
-                className={`scroll-mt-24 rounded-3xl border-4 border-[#0f2d1e] p-6 text-slate-800 shadow-xl flex flex-col justify-between transition-all hover:scale-[1.01] duration-200 ${
+                className={`scroll-mt-48 md:scroll-mt-36 rounded-3xl border-4 border-[#0f2d1e] p-6 text-slate-800 shadow-xl flex flex-col justify-between transition-all hover:scale-[1.01] duration-200 ${
                   item.id === "asesorias" || item.id === "noticias" ? "bg-[#e8f5e9]" : "bg-white"
                 }`}
               >
@@ -833,7 +857,7 @@ export default function App() {
       </section>
 
       {/* SECCIÓN: VENTAS CON CAUSA */}
-      <section id="ventas-con-causa" className="bg-[#e8f5e9] text-[#0f2d1e] py-10 sm:py-16 px-4 border-b-4 border-[#0f2d1e]">
+      <section id="ventas-con-causa" className="scroll-mt-48 md:scroll-mt-36 bg-[#e8f5e9] text-[#0f2d1e] py-10 sm:py-16 px-4 border-b-4 border-[#0f2d1e]">
         <div className="mx-auto max-w-6xl">
           <div className="text-center max-w-2xl mx-auto mb-10 space-y-3">
             <span className="inline-block rounded-full bg-emerald-200 px-5 py-2 text-lg sm:text-2xl font-black uppercase tracking-wider text-emerald-800 shadow-sm">
@@ -863,7 +887,7 @@ export default function App() {
           </div>
 
           {/* Pasarela de mascotas, personas y cosas extraviadas */}
-          <div id="extraviados-registro" className="scroll-mt-24 mt-14 max-w-3xl mx-auto">
+          <div id="extraviados-registro" className="scroll-mt-48 md:scroll-mt-36 mt-14 max-w-3xl mx-auto">
             <div className="text-center mb-6 space-y-2">
               <span className="inline-block rounded-full bg-emerald-200 px-5 py-2 text-base sm:text-xl font-black uppercase tracking-wider text-emerald-800 shadow-sm">
                 🔎 Mascotas, Personas y Cosas Extraviadas
@@ -888,7 +912,7 @@ export default function App() {
       </section>
 
       {/* SECCIÓN: APORTE VOLUNTARIO */}
-      <section id="donaciones" className="bg-[#e8f5e9] text-[#0f2d1e] py-12 sm:py-20 px-4 border-b-4 border-[#0f2d1e]">
+      <section id="donaciones" className="scroll-mt-48 md:scroll-mt-36 bg-[#e8f5e9] text-[#0f2d1e] py-12 sm:py-20 px-4 border-b-4 border-[#0f2d1e]">
         <div className="mx-auto max-w-6xl flex flex-col md:grid md:grid-cols-12 gap-y-8 md:gap-x-10 md:gap-y-10">
 
           {/* Bloque 1: intro + CTA — fila 1 en escritorio (col. izquierda) */}
@@ -1001,7 +1025,7 @@ export default function App() {
       </section>
 
       {/* SECCIÓN 4: FORMULARIO DE PUBLICIDAD */}
-      <section id="publicidad" className="bg-[#17472d] text-white py-10 sm:py-16 px-4">
+      <section id="publicidad" className="scroll-mt-48 md:scroll-mt-36 bg-[#17472d] text-white py-10 sm:py-16 px-4">
         <div className="mx-auto max-w-2xl">
           <div className="text-center space-y-2 mb-8">
             <span className="inline-block rounded-full bg-emerald-900/60 px-5 py-2 text-lg sm:text-2xl font-black uppercase tracking-wider text-emerald-400">
@@ -1208,18 +1232,30 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, musicaSonando, onAlternarMu
           </a>
         </div>
 
-        {/* Botón de música — reproduce/pausa el audio de fondo de DCUATES.
-            Se movió aquí, justo debajo de los íconos de redes sociales del
-            menú de inicio (antes vivía en el pie de página). */}
-        <div className="order-2 md:order-3 w-full flex justify-end md:justify-start">
+        {/* Segunda fila del menú fijo: botón de música a la izquierda y,
+            a su derecha, los accesos a Alianzas Solidarias, Ventas con
+            Causa y Apoyo Voluntario (antes vivían dentro del desplegable
+            "Más"). Va debajo del renglón de accesos principales. */}
+        <div className="order-5 w-full flex flex-wrap items-center justify-between gap-2 pt-2 mt-1 border-t border-emerald-800/10">
           <button
             type="button"
             onClick={onAlternarMusica}
-            className="inline-flex items-center gap-1.5 rounded-full bg-[#17472d] hover:bg-[#0f2d1e] text-white font-black uppercase tracking-wide text-[10px] sm:text-xs px-3 py-1.5 shadow-sm transition-colors mt-1"
+            className="inline-flex items-center gap-1.5 rounded-full bg-[#17472d] hover:bg-[#0f2d1e] text-white font-black uppercase tracking-wide text-[10px] sm:text-xs px-3 py-1.5 shadow-sm transition-colors"
           >
             <span>🎵</span>
             {musicaSonando ? "Pausar Música" : "Escucha Música DCUATES"}
           </button>
+          <div className="flex flex-wrap items-center justify-end gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-black text-emerald-900">
+            {NAV_LINKS_FILA2.map(link => (
+              <a
+                key={link.href}
+                href={link.href}
+                className="rounded-full border-2 border-transparent bg-emerald-50 hover:bg-[#0f2d1e] hover:text-white hover:border-[#0f2d1e] transition-colors uppercase tracking-wide text-center leading-tight px-3 py-1.5"
+              >
+                {link.label}
+              </a>
+            ))}
+          </div>
         </div>
 
         {/* Menú reducido: 2 accesos directos + botón "MÁS" con el resto desplegado hacia abajo */}
