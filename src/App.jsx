@@ -41,23 +41,33 @@ const RECOMENDACIONES_ESTRELLA = {
 // Mientras esté vacío, el botón se muestra pero no reproduce nada.
 const MUSICA_DCUATES_URL = "/audio/musica-dcuates.mp3";
 
-// Barra fija de navegación: 3 accesos directos + un menú "MÁS" con el
-// resto (se despliega hacia abajo). Para agregar/quitar algo del menú "MÁS",
+// Barra fija de navegación: accesos directos + un menú "MÁS" con el resto
+// (se despliega hacia abajo). Para agregar/quitar algo del menú "MÁS",
 // edita NAV_LINKS_MAS — no se necesita tocar el componente SiteHeader.
+// "MÁS" ahora abre directamente la ventana emergente de cada proyecto
+// (mismo sistema que los 12 botones naranjas de la portada), por eso usa
+// "modal" (el id en TODOS_LOS_PROYECTOS) en vez de "href".
 const NAV_LINKS_PRINCIPALES = [
   { label: "Inicio", href: "#inicio" },
   { label: "Proyectos", href: "#iniciativas" },
   { label: "Publicidad Gratuita", href: "#publicidad" }
 ];
 const NAV_LINKS_MAS = [
-  { label: "Quiénes Somos", href: "#quienes-somos" },
-  { label: "Nuevos Proyectos", href: "#nuevos-proyectos" }
+  { label: "Préstamo Gratuito de Libros", modal: "libros" },
+  { label: "Ecatepets Mascotas", modal: "ecatepets" },
+  { label: "Círculo de Confianza", modal: "circulo-confianza" },
+  { label: "Recomienda, Evalúa y Gana", modal: "recomienda-evalua-gana" },
+  { label: "Asesorías Gratuitas", modal: "asesorias" },
+  { label: "Bazar y Comercio", modal: "bazares" },
+  { label: "Noticias de Barrio", modal: "noticias" },
+  { label: "Bienestar y Recreación", modal: "bienestar" }
 ];
 // Segunda fila del menú fijo (debajo de los accesos principales), a un
-// lado del botón de música.
+// lado del botón de música. "MÁS" se movió aquí, al final.
 const NAV_LINKS_FILA2 = [
   { label: "Alianzas Solidarias", href: "#iniciativas" },
   { label: "Ventas con Causa", href: "#ventas-con-causa" },
+  { label: "Apoyo a Causas", href: "#extraviados-registro" },
   { label: "Apoyo Voluntario", href: "#donaciones" }
 ];
 
@@ -379,6 +389,12 @@ export default function App() {
   // Botón "Escucha Música DCUATES" del pie de página.
   const [musicaSonando, setMusicaSonando] = useState(false);
   const audioRef = useRef(null);
+  // Volumen de la música de fondo (0 a 1), controlado con el slider del
+  // header. Se aplica al <audio> cada vez que cambia.
+  const [volumen, setVolumen] = useState(0.8);
+  useEffect(() => {
+    if (audioRef.current) audioRef.current.volume = volumen;
+  }, [volumen]);
   const alternarMusica = () => {
     if (!audioRef.current) return;
     if (musicaSonando) {
@@ -406,6 +422,16 @@ export default function App() {
   const musicaLinks = primerosValores(filasEnlaces, "RECMUSIC", 5);
   const librosLinks = primerosValores(filasEnlaces, "RECLIBROS", 5);
   const videosLinks = primerosValores(filasEnlaces, "RECVIDEOSYMAS", 6);
+
+  // Enlaces de apoyo (columnas de Baserow con links de internet, de tipo
+  // texto plano). Se muestran los primeros 5 de cada una; para mostrar más
+  // basta con subir el número.
+  const apoyoCausaAnimalLinks = primerosValores(filasEnlaces, "APOYO CAUSA ANIMAL", 5);
+  const apoyoPersonasExtraviadasLinks = primerosValores(filasEnlaces, "APOYO PERSONAS EXTRAVIADAS", 5);
+  const apoyoCosasCasosLinks = primerosValores(filasEnlaces, "APOYO COSAS Y CASOS", 5);
+  const recomendacionesCompraLinks = primerosValores(filasEnlaces, "RECOMENDACIONES DE COMPRA", 5);
+  const recomendacionesVentaLinks = primerosValores(filasEnlaces, "RECOMENDACIONES DE VENTA", 5);
+  const compraVentaDcuatesLinks = primerosValores(filasEnlaces, "COMPRA-VENTA DCUATES", 5);
 
   // Audio de fondo real: la columna "MUSICA" en Baserow es de tipo
   // Archivo/Adjunto (ahí subiste el mp3), así que se lee igual que las
@@ -449,8 +475,11 @@ export default function App() {
         <SiteHeader
           onAbrirFAQ={() => setShowFAQ(true)}
           onAbrirPrivacidad={() => setShowPrivacy(true)}
+          onAbrirProyecto={(id) => setModalProyecto(id)}
           musicaSonando={musicaSonando}
           onAlternarMusica={alternarMusica}
+          volumen={volumen}
+          onCambiarVolumen={setVolumen}
         />
         <audio ref={audioRef} src={musicaFondoUrl} loop onEnded={() => setMusicaSonando(false)} className="hidden" />
         <TickerFrases />
@@ -887,33 +916,13 @@ export default function App() {
               <PasarelaVentasConCausa />
             </div>
             <div className="md:col-span-5 space-y-3">
-              <div className="rounded-xl border-2 border-[#0f2d1e] overflow-hidden shadow-sm">
-                <button
-                  type="button"
-                  onClick={() => setRegistroVentasAbierto((v) => !v)}
-                  className="w-full text-left bg-[#e65100] hover:bg-[#bf360c] p-3 transition-colors flex items-center justify-between gap-3"
-                >
-                  <p className="text-sm sm:text-base font-black text-white uppercase tracking-tight leading-tight">
-                    Si algo te gustó y deseas apartarlo o comprarlo, regístralo aquí
-                  </p>
-                  <span className={`shrink-0 transition-transform ${registroVentasAbierto ? "rotate-90" : ""}`}>
-                    <FlechaBlanca />
-                  </span>
-                </button>
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateRows: registroVentasAbierto ? "1fr" : "0fr",
-                    transition: "grid-template-rows 350ms ease-in-out"
-                  }}
-                >
-                  <div style={{ overflow: "hidden" }}>
-                    <div className="p-3 bg-white">
-                      <FormularioVentasConCausa />
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <BotonNaranjaDesplegable
+                titulo="Si algo te gustó y deseas apartarlo o comprarlo, regístralo aquí"
+                abierto={registroVentasAbierto}
+                onClick={() => setRegistroVentasAbierto((v) => !v)}
+              >
+                <FormularioVentasConCausa />
+              </BotonNaranjaDesplegable>
               <a
                 href="https://whatsapp.com/channel/0029Vb8gAjd1dAvyGu9Jmv1i"
                 target="_blank"
@@ -925,6 +934,63 @@ export default function App() {
                 </p>
                 <FlechaBlanca />
               </a>
+
+              {/* 3 botones nuevos — cada uno lista los primeros 5 enlaces de
+                  su columna correspondiente en Baserow. Para agregar más
+                  basta con subir el número en recomendacionesCompraLinks /
+                  recomendacionesVentaLinks / compraVentaDcuatesLinks (arriba
+                  en el código) — no hay límite real más que el que se
+                  configure ahí. */}
+              <BotonNaranjaDesplegable
+                titulo="Recomendaciones de Compra"
+                abierto={infoAbierta === "recomendaciones-compra"}
+                onClick={() => setInfoAbierta((v) => (v === "recomendaciones-compra" ? null : "recomendaciones-compra"))}
+              >
+                {recomendacionesCompraLinks.length === 0 && <p>Muy pronto encontrarás aquí recomendaciones de compra.</p>}
+                <ul className="space-y-1.5">
+                  {recomendacionesCompraLinks.map((enlace, i) => (
+                    <li key={i}>
+                      <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100] break-words">
+                        {enlace}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </BotonNaranjaDesplegable>
+
+              <BotonNaranjaDesplegable
+                titulo="Recomendaciones de Venta"
+                abierto={infoAbierta === "recomendaciones-venta"}
+                onClick={() => setInfoAbierta((v) => (v === "recomendaciones-venta" ? null : "recomendaciones-venta"))}
+              >
+                {recomendacionesVentaLinks.length === 0 && <p>Muy pronto encontrarás aquí recomendaciones de venta.</p>}
+                <ul className="space-y-1.5">
+                  {recomendacionesVentaLinks.map((enlace, i) => (
+                    <li key={i}>
+                      <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100] break-words">
+                        {enlace}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </BotonNaranjaDesplegable>
+
+              <BotonNaranjaDesplegable
+                titulo="Compra-Venta DCUATES"
+                abierto={infoAbierta === "compra-venta-dcuates"}
+                onClick={() => setInfoAbierta((v) => (v === "compra-venta-dcuates" ? null : "compra-venta-dcuates"))}
+              >
+                {compraVentaDcuatesLinks.length === 0 && <p>Muy pronto encontrarás aquí más opciones de compra-venta DCUATES.</p>}
+                <ul className="space-y-1.5">
+                  {compraVentaDcuatesLinks.map((enlace, i) => (
+                    <li key={i}>
+                      <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100] break-words">
+                        {enlace}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </BotonNaranjaDesplegable>
             </div>
           </div>
 
@@ -966,6 +1032,73 @@ export default function App() {
                   </p>
                   <FlechaBlanca />
                 </a>
+
+                {/* 3 botones adicionales de Apoyo a Causas. Cada uno lista
+                    los primeros 5 enlaces de su columna en Baserow — para
+                    mostrar más, solo hay que subir el número donde se
+                    calculan (apoyoCausaAnimalLinks / apoyoPersonasExtraviadasLinks
+                    / apoyoCosasCasosLinks, arriba en el código). */}
+                <BotonNaranjaDesplegable
+                  titulo="Apoyo a Causa Animal"
+                  abierto={infoAbierta === "apoyo-causa-animal"}
+                  onClick={() => setInfoAbierta((v) => (v === "apoyo-causa-animal" ? null : "apoyo-causa-animal"))}
+                >
+                  <p className="font-black uppercase text-[#0f2d1e] text-[11px] tracking-wide">La prevención es la mejor ayuda</p>
+                  <ul className="list-disc pl-4 space-y-1">
+                    <li>Esteriliza a tu mascota: es la forma más efectiva de evitar camadas no deseadas y abandono.</li>
+                    <li>Coloca collar con placa o microchip, por si se extravía.</li>
+                    <li>Vacunas y desparasitación al día — previenen enfermedades que también afectan a otros animales.</li>
+                    <li>Si ves un animal en la calle, no lo alimentes con lo que comemos nosotros; ofrece agua y contacta a un refugio o veterinario cercano.</li>
+                    <li>Adoptar, en vez de comprar, ayuda a que menos animales terminen en situación de calle.</li>
+                  </ul>
+                  <p className="pt-2 font-black uppercase text-[#0f2d1e] text-[11px] tracking-wide">Más Información de Apoyo</p>
+                  {apoyoCausaAnimalLinks.length === 0 && <p>Muy pronto encontrarás aquí más recursos de apoyo a causa animal.</p>}
+                  <ul className="space-y-1.5">
+                    {apoyoCausaAnimalLinks.map((enlace, i) => (
+                      <li key={i}>
+                        <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100] break-words">
+                          {enlace}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </BotonNaranjaDesplegable>
+
+                <BotonNaranjaDesplegable
+                  titulo="Apoyo a Personas Extraviadas"
+                  abierto={infoAbierta === "apoyo-personas-extraviadas"}
+                  onClick={() => setInfoAbierta((v) => (v === "apoyo-personas-extraviadas" ? null : "apoyo-personas-extraviadas"))}
+                >
+                  <p>Recursos, protocolos y contactos de apoyo para casos de personas extraviadas.</p>
+                  {apoyoPersonasExtraviadasLinks.length === 0 && <p>Muy pronto encontrarás aquí más recursos de apoyo.</p>}
+                  <ul className="space-y-1.5">
+                    {apoyoPersonasExtraviadasLinks.map((enlace, i) => (
+                      <li key={i}>
+                        <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100] break-words">
+                          {enlace}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </BotonNaranjaDesplegable>
+
+                <BotonNaranjaDesplegable
+                  titulo="Apoyo Cosas y Casos"
+                  abierto={infoAbierta === "apoyo-cosas-casos"}
+                  onClick={() => setInfoAbierta((v) => (v === "apoyo-cosas-casos" ? null : "apoyo-cosas-casos"))}
+                >
+                  <p>Recursos de apoyo para objetos extraviados y otros casos de la comunidad.</p>
+                  {apoyoCosasCasosLinks.length === 0 && <p>Muy pronto encontrarás aquí más recursos de apoyo.</p>}
+                  <ul className="space-y-1.5">
+                    {apoyoCosasCasosLinks.map((enlace, i) => (
+                      <li key={i}>
+                        <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100] break-words">
+                          {enlace}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </BotonNaranjaDesplegable>
               </div>
             </div>
           </div>
@@ -1143,6 +1276,7 @@ export default function App() {
         <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm sm:text-base font-bold text-[#0f2d1e]/80">
           <a href="#quienes-somos" className="hover:text-[#0f2d1e] transition-colors">Quiénes Somos</a>
           <a href="#iniciativas" className="hover:text-[#0f2d1e] transition-colors">Proyectos</a>
+          <a href="#nuevos-proyectos" className="hover:text-[#0f2d1e] transition-colors">Nuevos Proyectos</a>
           <a href="#publicidad" className="hover:text-[#0f2d1e] transition-colors">Publicidad</a>
           <a href="#donaciones" className="hover:text-[#0f2d1e] transition-colors">Donaciones</a>
           <button
@@ -1245,7 +1379,7 @@ export default function App() {
 // =========================================================================
 // 3. SUBCOMPONENTE: SITE HEADER
 // =========================================================================
-function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, musicaSonando, onAlternarMusica }) {
+function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, musicaSonando, onAlternarMusica, volumen, onCambiarVolumen }) {
   const [menuMasAbierto, setMenuMasAbierto] = useState(false);
   return (
     <header className="border-b border-emerald-800/20 bg-white/95 backdrop-blur py-3 px-4 shadow-sm text-slate-900 relative">
@@ -1293,10 +1427,12 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, musicaSonando, onAlternarMu
           </a>
         </div>
 
-        {/* Segunda fila del menú fijo: botón de música a la izquierda y,
-            a su derecha, los accesos a Alianzas Solidarias, Ventas con
-            Causa y Apoyo Voluntario (antes vivían dentro del desplegable
-            "Más"). Va debajo del renglón de accesos principales. */}
+        {/* Segunda fila del menú fijo: a la izquierda, Alianzas Solidarias /
+            Ventas con Causa / Apoyo a Causas / Apoyo Voluntario y, al
+            final de ese grupo, el botón "MÁS" (antes vivía en la primera
+            fila; ahora despliega los proyectos que no tienen acceso
+            directo propio). A la derecha, el botón de música con su
+            control de volumen. */}
         <div className="order-5 w-full flex flex-wrap items-center justify-between gap-2 pt-2 mt-1 border-t border-emerald-800/10">
           <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-black">
             {NAV_LINKS_FILA2.map(link => (
@@ -1308,18 +1444,73 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, musicaSonando, onAlternarMu
                 {link.label}
               </a>
             ))}
+
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setMenuMasAbierto((v) => !v)}
+                className="rounded-full border-2 border-transparent bg-[#17472d] hover:bg-[#0f2d1e] text-white transition-colors uppercase tracking-wide text-center leading-tight px-3 py-1.5 flex items-center gap-1"
+              >
+                Más
+                <span className={`transition-transform ${menuMasAbierto ? "rotate-180" : ""}`}>▾</span>
+              </button>
+
+              {menuMasAbierto && (
+                <>
+                  {/* Fondo invisible para poder cerrar el menú al tocar fuera */}
+                  <div className="fixed inset-0 z-30" onClick={() => setMenuMasAbierto(false)} />
+                  <div className="absolute left-0 top-full mt-2 z-40 w-64 rounded-2xl bg-white shadow-xl border border-emerald-800/10 py-2 flex flex-col max-h-[70vh] overflow-y-auto">
+                    {NAV_LINKS_MAS.map(link => (
+                      <button
+                        type="button"
+                        key={link.modal}
+                        onClick={() => { setMenuMasAbierto(false); onAbrirProyecto && onAbrirProyecto(link.modal); }}
+                        className="px-4 py-2.5 text-left uppercase tracking-wide text-[11px] sm:text-xs font-black text-emerald-900 hover:bg-emerald-50 transition-colors"
+                      >
+                        {link.label}
+                      </button>
+                    ))}
+                    <div className="border-t border-emerald-800/10 my-1" />
+                    <button
+                      type="button"
+                      onClick={() => { setMenuMasAbierto(false); onAbrirPrivacidad && onAbrirPrivacidad(); }}
+                      className="px-4 py-2.5 text-left uppercase tracking-wide text-[11px] sm:text-xs font-black text-emerald-900 hover:bg-emerald-50 transition-colors"
+                    >
+                      Aviso de Privacidad
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
-          <button
-            type="button"
-            onClick={onAlternarMusica}
-            className="inline-flex items-center gap-2 rounded-full bg-[#e65100] hover:bg-[#bf360c] text-white shadow-sm transition-colors uppercase tracking-wide text-center leading-tight px-5 py-2.5 text-xs sm:text-sm font-black"
-          >
-            <span>🎵</span>
-            {musicaSonando ? "Pausar Música" : "Escucha Música DCUATES"}
-          </button>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={onAlternarMusica}
+              className="inline-flex items-center gap-2 rounded-full bg-[#e65100] hover:bg-[#bf360c] text-white shadow-sm transition-colors uppercase tracking-wide text-center leading-tight px-5 py-2.5 text-xs sm:text-sm font-black"
+            >
+              <span>🎵</span>
+              {musicaSonando ? "Pausar Música" : "Escucha Música DCUATES"}
+            </button>
+            {/* Control de volumen — icono de bocina + control deslizable */}
+            <label className="flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1.5" title="Volumen">
+              <span aria-hidden="true">{volumen === 0 ? "🔇" : volumen < 0.5 ? "🔉" : "🔊"}</span>
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.05"
+                value={volumen}
+                onChange={(e) => onCambiarVolumen && onCambiarVolumen(parseFloat(e.target.value))}
+                className="w-14 sm:w-20 accent-[#17472d] cursor-pointer"
+                aria-label="Volumen de la música"
+              />
+            </label>
+          </div>
         </div>
 
-        {/* Menú reducido: 2 accesos directos + botón "MÁS" con el resto desplegado hacia abajo */}
+        {/* Menú reducido: accesos directos + Preguntas Frecuentes (antes aquí vivía "MÁS", que se movió al segundo renglón) */}
         <nav className="order-3 md:order-2 w-full md:w-auto flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-black text-emerald-900 lg:text-sm md:ml-6 lg:ml-10 relative">
           {NAV_LINKS_PRINCIPALES.map(link => (
             <a
@@ -1330,50 +1521,13 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, musicaSonando, onAlternarMu
               {link.label}
             </a>
           ))}
-
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => setMenuMasAbierto((v) => !v)}
-              className="rounded-full border-2 border-transparent bg-[#17472d] hover:bg-[#0f2d1e] text-white transition-colors uppercase tracking-wide text-center leading-tight px-3 py-1.5 sm:px-4 sm:py-2 flex items-center gap-1"
-            >
-              Más
-              <span className={`transition-transform ${menuMasAbierto ? "rotate-180" : ""}`}>▾</span>
-            </button>
-
-            {menuMasAbierto && (
-              <>
-                {/* Fondo invisible para poder cerrar el menú al tocar fuera */}
-                <div className="fixed inset-0 z-30" onClick={() => setMenuMasAbierto(false)} />
-                <div className="absolute right-0 md:left-0 top-full mt-2 z-40 w-56 rounded-2xl bg-white shadow-xl border border-emerald-800/10 py-2 flex flex-col">
-                  {NAV_LINKS_MAS.map(link => (
-                    <a
-                      key={link.href}
-                      href={link.href}
-                      onClick={() => setMenuMasAbierto(false)}
-                      className="px-4 py-2.5 text-left uppercase tracking-wide text-[11px] sm:text-xs font-black text-emerald-900 hover:bg-emerald-50 transition-colors"
-                    >
-                      {link.label}
-                    </a>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={() => { setMenuMasAbierto(false); onAbrirFAQ && onAbrirFAQ(); }}
-                    className="px-4 py-2.5 text-left uppercase tracking-wide text-[11px] sm:text-xs font-black text-emerald-900 hover:bg-emerald-50 transition-colors"
-                  >
-                    Preguntas Frecuentes
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => { setMenuMasAbierto(false); onAbrirPrivacidad && onAbrirPrivacidad(); }}
-                    className="px-4 py-2.5 text-left uppercase tracking-wide text-[11px] sm:text-xs font-black text-emerald-900 hover:bg-emerald-50 transition-colors"
-                  >
-                    Aviso de Privacidad
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
+          <button
+            type="button"
+            onClick={onAbrirFAQ}
+            className="rounded-full border-2 border-transparent bg-[#17472d] hover:bg-[#0f2d1e] text-white transition-colors uppercase tracking-wide text-center leading-tight px-3 py-1.5 sm:px-4 sm:py-2"
+          >
+            Preguntas Frecuentes
+          </button>
         </nav>
       </div>
     </header>
@@ -1558,6 +1712,40 @@ function FlechaBlanca() {
     >
       <path d="M4 22 H58 V4 L96 30 L58 56 V38 H4 Z" fill="#ffffff" stroke="#0f2d1e" strokeWidth="6" strokeLinejoin="round" />
     </svg>
+  );
+}
+
+// Botón naranja desplegable reutilizable: el título siempre se ve, y al
+// dar clic se abre suavemente el contenido de abajo (misma animación tipo
+// "pergamino" que los botones verdes). Se usa en Ventas con Causa y en
+// Apoyo a Causas.
+function BotonNaranjaDesplegable({ titulo, abierto, onClick, children }) {
+  return (
+    <div className="rounded-xl border-2 border-[#0f2d1e] overflow-hidden shadow-sm">
+      <button
+        type="button"
+        onClick={onClick}
+        className="w-full text-left bg-[#e65100] hover:bg-[#bf360c] p-3 transition-colors flex items-center justify-between gap-3"
+      >
+        <p className="text-sm sm:text-base font-black text-white uppercase tracking-tight leading-tight">{titulo}</p>
+        <span className={`shrink-0 transition-transform ${abierto ? "rotate-90" : ""}`}>
+          <FlechaBlanca />
+        </span>
+      </button>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateRows: abierto ? "1fr" : "0fr",
+          transition: "grid-template-rows 350ms ease-in-out"
+        }}
+      >
+        <div style={{ overflow: "hidden" }}>
+          <div className="p-3 bg-white text-xs sm:text-sm text-slate-700 leading-relaxed space-y-2">
+            {children}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
