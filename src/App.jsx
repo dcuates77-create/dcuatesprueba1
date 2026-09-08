@@ -1742,39 +1742,6 @@ function BotonNaranjaDesplegable({ titulo, abierto, onClick, children }) {
         <div style={{ overflow: "hidden" }}>
           <div className="p-3 bg-white text-xs sm:text-sm text-slate-700 leading-relaxed space-y-2">
             {children}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Botón desplegable de color naranja (igual estilo que los botones-liga de
-// WhatsApp, pero con flecha giratoria en vez de link) — usado en "Ventas
-// con Causa" para el registro de interés.
-function BotonNaranjaDesplegable({ titulo, abierto, onClick, children }) {
-  return (
-    <div className="rounded-xl border-2 border-[#0f2d1e] bg-[#e65100] shadow-sm overflow-hidden">
-      <button
-        type="button"
-        onClick={onClick}
-        className="w-full flex items-center justify-between gap-3 p-3 text-left hover:bg-[#bf360c] transition-colors"
-      >
-        <p className="text-sm sm:text-base font-black text-white uppercase tracking-tight leading-tight">{titulo}</p>
-        <span className={`shrink-0 transition-transform ${abierto ? "rotate-90" : ""}`}>
-          <FlechaBlanca />
-        </span>
-      </button>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateRows: abierto ? "1fr" : "0fr",
-          transition: "grid-template-rows 350ms ease-in-out"
-        }}
-      >
-        <div style={{ overflow: "hidden" }}>
-          <div className="p-3 pt-2 bg-white">
-            {children}
             <button
               type="button"
               onClick={onClick}
