@@ -373,6 +373,9 @@ export default function App() {
   // Cómo Podemos Sumar, Preguntas Frecuentes, Aviso de Privacidad) está
   // abierto junto al video. null = ninguno abierto; solo uno a la vez.
   const [infoAbierta, setInfoAbierta] = useState(null);
+  // Botón desplegable "Registra Aquí Tu Interés" en la sección de Ventas
+  // con Causa (a la derecha del carrusel).
+  const [registroVentasAbierto, setRegistroVentasAbierto] = useState(false);
   // Botón "Escucha Música DCUATES" del pie de página.
   const [musicaSonando, setMusicaSonando] = useState(false);
   const audioRef = useRef(null);
@@ -831,15 +834,20 @@ export default function App() {
                     ))}
                   </ul>
                 </div>
-                {/* Enlace directo a WhatsApp */}
-                <a
-                  href={item.enlaceDirectoWA}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full text-center rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3 px-4 shadow-md transition-colors uppercase tracking-wide text-xs sm:text-sm font-heading block"
-                >
-                  {item.textoBoton}
-                </a>
+                {/* Enlace directo a WhatsApp — se omite en Noticias y Bienestar
+                    (id con galería propia): ahí "Sumar Actividades" se quitó y
+                    en su lugar la galería trae su propio botón "Ver Más
+                    Actividades". */}
+                {!GALERIAS_PROYECTOS[item.id] && (
+                  <a
+                    href={item.enlaceDirectoWA}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full text-center rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3 px-4 shadow-md transition-colors uppercase tracking-wide text-xs sm:text-sm font-heading block"
+                  >
+                    {item.textoBoton}
+                  </a>
+                )}
 
                 {/* Prueba: botón que abre una pasarela en ventana emergente (solo Noticias y Bienestar, por ahora) */}
                 {GALERIAS_PROYECTOS[item.id] && (
@@ -871,23 +879,37 @@ export default function App() {
             </p>
           </div>
 
-          {/* Pasarela de Ventas con Causa — mismo formato de carrusel que Extraviados */}
-          <div className="max-w-3xl mx-auto mb-4">
-            <PasarelaVentasConCausa />
-          </div>
-          <p className="text-center text-xs sm:text-sm font-bold text-emerald-800 mb-10">
-            ¿Quieres ver el catálogo completo y siempre actualizado?{" "}
-            <a href={BASEROW_GALLERY_URL} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-900">
-              Ábrelo aquí
-            </a>.
-          </p>
-
-          <div className="max-w-xl mx-auto">
-            <FormularioVentasConCausa />
+          {/* Pasarela de Ventas con Causa — a la izquierda el carrusel, a la
+              derecha el registro (como botón desplegable) y el acceso al
+              catálogo/canal de WhatsApp. */}
+          <div className="grid gap-6 md:grid-cols-12 items-start max-w-5xl mx-auto mb-14">
+            <div className="md:col-span-7">
+              <PasarelaVentasConCausa />
+            </div>
+            <div className="md:col-span-5 space-y-3">
+              <BotonVerdeInfo
+                titulo="Registra Aquí Tu Interés"
+                abierto={registroVentasAbierto}
+                onClick={() => setRegistroVentasAbierto((v) => !v)}
+              >
+                <FormularioVentasConCausa />
+              </BotonVerdeInfo>
+              <a
+                href="https://whatsapp.com/channel/0029Vb8gAjd1dAvyGu9Jmv1i"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full text-left rounded-xl border-2 border-[#0f2d1e] bg-[#e65100] hover:bg-[#bf360c] p-3 shadow-sm transition-colors flex items-center justify-between gap-3"
+              >
+                <p className="text-sm sm:text-base font-black text-white uppercase tracking-tight leading-tight">
+                  Si quieres ver más productos y catálogos, da clic aquí !!!
+                </p>
+                <FlechaBlanca />
+              </a>
+            </div>
           </div>
 
           {/* Pasarela de mascotas, personas y cosas extraviadas */}
-          <div id="extraviados-registro" className="scroll-mt-48 md:scroll-mt-36 mt-14 max-w-3xl mx-auto">
+          <div id="extraviados-registro" className="scroll-mt-48 md:scroll-mt-36 mt-14 max-w-5xl mx-auto">
             <div className="text-center mb-6 space-y-2">
               <span className="inline-block rounded-full bg-emerald-200 px-5 py-2 text-base sm:text-xl font-black uppercase tracking-wider text-emerald-800 shadow-sm">
                 🔎 Mascotas, Personas y Cosas Extraviadas
@@ -897,16 +919,35 @@ export default function App() {
               </p>
             </div>
 
-            <PasarelaExtraviados />
-
-            <a
-              href={enlaceWhatsApp("¡Hola DCUATES! Quiero reportar un caso de mascota, persona o cosa extraviada.")}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-4 block text-center rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3.5 uppercase tracking-wider text-xs sm:text-sm transition-all shadow-md font-heading"
-            >
-              Reportar un caso por WhatsApp
-            </a>
+            <div className="grid gap-6 md:grid-cols-12 items-start">
+              <div className="md:col-span-7">
+                <PasarelaExtraviados />
+              </div>
+              <div className="md:col-span-5 space-y-3">
+                <a
+                  href="https://whatsapp.com/channel/0029Vb6OjCQGk1FkkmvSzP3S"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full text-left rounded-xl border-2 border-[#0f2d1e] bg-[#e65100] hover:bg-[#bf360c] p-3 shadow-sm transition-colors flex items-center justify-between gap-3"
+                >
+                  <p className="text-sm sm:text-base font-black text-white uppercase tracking-tight leading-tight">
+                    Ver Más Casos e Información de Valor
+                  </p>
+                  <FlechaBlanca />
+                </a>
+                <a
+                  href={enlaceWhatsApp("¡Hola DCUATES! Quiero reportar un caso de mascota, persona o cosa extraviada.")}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full text-left rounded-xl border-2 border-[#0f2d1e] bg-[#e65100] hover:bg-[#bf360c] p-3 shadow-sm transition-colors flex items-center justify-between gap-3"
+                >
+                  <p className="text-sm sm:text-base font-black text-white uppercase tracking-tight leading-tight">
+                    Reportar un Caso por WhatsApp
+                  </p>
+                  <FlechaBlanca />
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -1240,7 +1281,7 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, musicaSonando, onAlternarMu
           <button
             type="button"
             onClick={onAlternarMusica}
-            className="inline-flex items-center gap-1.5 rounded-full bg-[#17472d] hover:bg-[#0f2d1e] text-white font-black uppercase tracking-wide text-[10px] sm:text-xs px-3 py-1.5 shadow-sm transition-colors"
+            className="inline-flex items-center gap-1.5 rounded-full border-2 border-transparent bg-emerald-50 hover:bg-[#0f2d1e] hover:text-white hover:border-[#0f2d1e] transition-colors uppercase tracking-wide text-center leading-tight px-3 py-1.5 text-[11px] sm:text-xs font-black text-emerald-900"
           >
             <span>🎵</span>
             {musicaSonando ? "Pausar Música" : "Escucha Música DCUATES"}
@@ -1484,6 +1525,22 @@ function FormularioVentasConCausa() {
 // pelear con quien lo está viendo). "renderItem" decide cómo se ve cada
 // tarjeta — así el mismo carrusel sirve para Extraviados, Ventas con
 // Causa, o cualquier otra pasarela futura.
+// Flecha blanca reutilizable — el mismo diseño usado en los botones
+// naranjas de "Apoyo Voluntario", ahora reutilizado en otros botones que
+// invitan a dar clic (Ver Más Actividades, catálogos, Ecatepets, etc.).
+function FlechaBlanca() {
+  return (
+    <svg
+      viewBox="0 0 100 60"
+      preserveAspectRatio="none"
+      className="w-6 h-6 sm:w-8 sm:h-8 shrink-0 opacity-90 drop-shadow"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="M4 22 H58 V4 L96 30 L58 56 V38 H4 Z" fill="#ffffff" stroke="#0f2d1e" strokeWidth="6" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 function Carrusel({ items, renderItem, intervaloMs = 4000 }) {
   const [index, setIndex] = useState(0);
   const [pausado, setPausado] = useState(false);
@@ -1941,28 +1998,41 @@ function ContenidoModalProyecto({ id, onCerrar }) {
       </ul>
 
       {galeria && (
-        <div className="pt-1">
+        <div className="pt-1 space-y-3">
           <Carrusel
             items={galeria.items}
             renderItem={(item) => <TarjetaCarrusel item={item} etiqueta={item.tipo} />}
           />
+          <a
+            href="https://whatsapp.com/channel/0029VbDaZp0HltYE5xSajU36"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full text-left rounded-xl border-2 border-[#0f2d1e] bg-[#e65100] hover:bg-[#bf360c] p-3 shadow-sm transition-colors flex items-center justify-between gap-3"
+          >
+            <p className="text-sm sm:text-base font-black text-white uppercase tracking-tight leading-tight">
+              Ver Más Actividades
+            </p>
+            <FlechaBlanca />
+          </a>
         </div>
       )}
 
-      <div className="pt-1 space-y-2">
-        {proyecto.scrollDestino ? (
-          <BotonModal
-            onClick={() => {
-              onCerrar();
-              irASeccion(proyecto.scrollDestino);
-            }}
-          >
-            {proyecto.textoBoton}
-          </BotonModal>
-        ) : (
-          <BotonModal href={proyecto.enlaceDirectoWA}>{proyecto.textoBoton}</BotonModal>
-        )}
-      </div>
+      {!galeria && (
+        <div className="pt-1 space-y-2">
+          {proyecto.scrollDestino ? (
+            <BotonModal
+              onClick={() => {
+                onCerrar();
+                irASeccion(proyecto.scrollDestino);
+              }}
+            >
+              {proyecto.textoBoton}
+            </BotonModal>
+          ) : (
+            <BotonModal href={proyecto.enlaceDirectoWA}>{proyecto.textoBoton}</BotonModal>
+          )}
+        </div>
+      )}
     </div>
   );
 }
