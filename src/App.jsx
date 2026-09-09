@@ -951,7 +951,7 @@ export default function App() {
                   el código). Recomendación 4 y 5 ya están listas para
                   conectarse en cuanto existan sus columnas en Baserow. */}
               <BotonNaranjaDesplegable
-                titulo="Recomendación 1"
+                titulo="Recomendaciones de Compra"
                 abierto={infoAbierta === "recomendaciones-compra"}
                 onClick={() => setInfoAbierta((v) => (v === "recomendaciones-compra" ? null : "recomendaciones-compra"))}
               >
@@ -968,7 +968,7 @@ export default function App() {
               </BotonNaranjaDesplegable>
 
               <BotonNaranjaDesplegable
-                titulo="Recomendación 2"
+                titulo="Recomendaciones de Venta"
                 abierto={infoAbierta === "recomendaciones-venta"}
                 onClick={() => setInfoAbierta((v) => (v === "recomendaciones-venta" ? null : "recomendaciones-venta"))}
               >
@@ -985,7 +985,7 @@ export default function App() {
               </BotonNaranjaDesplegable>
 
               <BotonNaranjaDesplegable
-                titulo="Recomendación 3"
+                titulo="Compra-Venta DCUATES"
                 abierto={infoAbierta === "compra-venta-dcuates"}
                 onClick={() => setInfoAbierta((v) => (v === "compra-venta-dcuates" ? null : "compra-venta-dcuates"))}
               >
@@ -1083,7 +1083,7 @@ export default function App() {
                     para conectarse en cuanto existan sus columnas en
                     Baserow (APOYO 4 / APOYO 5). */}
                 <BotonNaranjaDesplegable
-                  titulo="Apoyo 1"
+                  titulo="Apoyo a Causa Animal"
                   abierto={infoAbierta === "apoyo-causa-animal"}
                   onClick={() => setInfoAbierta((v) => (v === "apoyo-causa-animal" ? null : "apoyo-causa-animal"))}
                 >
@@ -1101,7 +1101,7 @@ export default function App() {
                     {apoyoCausaAnimalLinks.map((enlace, i) => (
                       <li key={i}>
                         <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100] break-words">
-                          {enlace}
+                          Apoyo {i + 1}
                         </a>
                       </li>
                     ))}
@@ -1109,7 +1109,7 @@ export default function App() {
                 </BotonNaranjaDesplegable>
 
                 <BotonNaranjaDesplegable
-                  titulo="Apoyo 2"
+                  titulo="Apoyo a Personas Extraviadas"
                   abierto={infoAbierta === "apoyo-personas-extraviadas"}
                   onClick={() => setInfoAbierta((v) => (v === "apoyo-personas-extraviadas" ? null : "apoyo-personas-extraviadas"))}
                 >
@@ -1119,7 +1119,7 @@ export default function App() {
                     {apoyoPersonasExtraviadasLinks.map((enlace, i) => (
                       <li key={i}>
                         <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100] break-words">
-                          {enlace}
+                          Apoyo {i + 1}
                         </a>
                       </li>
                     ))}
@@ -1127,7 +1127,7 @@ export default function App() {
                 </BotonNaranjaDesplegable>
 
                 <BotonNaranjaDesplegable
-                  titulo="Apoyo 3"
+                  titulo="Apoyo Cosas y Casos"
                   abierto={infoAbierta === "apoyo-cosas-casos"}
                   onClick={() => setInfoAbierta((v) => (v === "apoyo-cosas-casos" ? null : "apoyo-cosas-casos"))}
                 >
@@ -1137,7 +1137,7 @@ export default function App() {
                     {apoyoCosasCasosLinks.map((enlace, i) => (
                       <li key={i}>
                         <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100] break-words">
-                          {enlace}
+                          Apoyo {i + 1}
                         </a>
                       </li>
                     ))}
@@ -1154,7 +1154,7 @@ export default function App() {
                     {apoyo4Links.map((enlace, i) => (
                       <li key={i}>
                         <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100] break-words">
-                          {enlace}
+                          Apoyo {i + 1}
                         </a>
                       </li>
                     ))}
@@ -1171,7 +1171,7 @@ export default function App() {
                     {apoyo5Links.map((enlace, i) => (
                       <li key={i}>
                         <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100] break-words">
-                          {enlace}
+                          Apoyo {i + 1}
                         </a>
                       </li>
                     ))}
@@ -1461,7 +1461,7 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, musicaSona
   const [menuMasAbierto, setMenuMasAbierto] = useState(false);
   const [volumenAbierto, setVolumenAbierto] = useState(false);
   return (
-    <header className="border-b border-emerald-800/20 bg-white/95 backdrop-blur py-3 px-4 shadow-sm text-slate-900 relative">
+    <header className="border-b border-emerald-800/20 bg-white/95 backdrop-blur py-2 px-4 shadow-sm text-slate-900 relative">
       <div className="mx-auto flex flex-wrap items-center gap-y-2 max-w-6xl">
 
         {/* Logo + nombre — siempre primero, en la misma fila que las redes en móvil */}
@@ -1512,8 +1512,8 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, musicaSona
             no tienen acceso directo propio). A la derecha, el botón de
             música compacto con su volumen desplegable hacia arriba (para
             no ocupar espacio de más). */}
-        <div className="order-5 w-full flex flex-wrap items-center justify-between gap-2 pt-2 mt-1 border-t border-emerald-800/10">
-          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[10px] sm:text-[11px] md:text-xs font-black">
+        <div className="order-5 w-full flex flex-wrap items-center justify-between gap-2 pt-1.5 mt-0.5 border-t border-emerald-800/10">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[10px] sm:text-[11px] md:text-xs font-black md:ml-6 lg:ml-10">
             {NAV_LINKS_FILA2.map(link => (
               <a
                 key={link.href}
