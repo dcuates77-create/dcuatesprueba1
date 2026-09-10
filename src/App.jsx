@@ -373,6 +373,9 @@ export default function App() {
   // null = cerrada; si tiene un id (ej. "libros", "ecatepets", "ventas-con-causa",
   // "donaciones") se abre con la información de ese proyecto.
   const [modalProyecto, setModalProyecto] = useState(null);
+  // Id de YouTube del video que se está viendo en grande (ventana flotante),
+  // al tocar una miniatura de la barra de videos de portada.
+  const [videoEnGrande, setVideoEnGrande] = useState(null);
   // Controla si el párrafo largo de la portada se ve completo o resumido
   // en pantallas pequeñas (para que se necesite menos scroll en celular).
   const [heroExpandido, setHeroExpandido] = useState(false);
@@ -408,7 +411,13 @@ export default function App() {
   // Filas "crudas" de la tabla ENLACES en Baserow — alimentan el video de
   // portada, las recomendaciones y el botón de Música/Libros/Pelis.
   const filasEnlaces = useFilasEnlaces();
-  const videoIdPortada = idYoutubeDesdeUrl(primerosValores(filasEnlaces, "VIDPORT", 1)[0]) || YOUTUBE_VIDEO_ID;
+  // Miniaturas de video de portada — igual que Recomendaciones: cada video
+  // puede tener un nombre en la columna "NOMBRE VIDPORT"; si no lo tiene,
+  // se numera solo como "Video 1", "Video 2"...
+  const videosPortada = paresBaserow(filasEnlaces, "NOMBRE VIDPORT", "VIDPORT", 8)
+    .map((v, i) => ({ id: idYoutubeDesdeUrl(v.enlace), nombre: v.nombre }))
+    .filter((v) => v.id);
+  const videosPortadaFinal = videosPortada.length > 0 ? videosPortada : [{ id: YOUTUBE_VIDEO_ID, nombre: "Video de presentación DCUATES" }];
 
   const recomendacionesDcuates = (() => {
     const desdeBaserow = paresBaserow(filasEnlaces, "Nombre Recocasa", "RECASA", 5);
@@ -626,15 +635,63 @@ export default function App() {
 
             {/* Video + 5 botones verdes, como continuación del mismo grid de 3 columnas de arriba */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 mt-3">
-              <div className="lg:col-span-2 rounded-2xl overflow-hidden border-4 border-[#0f2d1e]/30 shadow-lg aspect-video lg:aspect-auto">
-                <iframe
-                  className="w-full h-full"
-                  src={`https://www.youtube.com/embed/${videoIdPortada}`}
-                  title="Video de presentación DCUATES"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
+              <div className="lg:col-span-2 rounded-2xl overflow-hidden border-4 border-[#0f2d1e]/30 shadow-lg bg-[#0f2d1e] p-3">
+                <p className="text-white font-black uppercase text-xs sm:text-sm tracking-wide mb-2 px-1">
+                  🎬 Videos DCUATES — toca uno para verlo en grande
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 max-h-[420px] overflow-y-auto pr-1">
+                  {videosPortadaFinal.map((v, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => setVideoEnGrande(v.id)}
+                      className="group relative rounded-xl overflow-hidden border-2 border-white/10 hover:border-[#e65100] transition-colors bg-black/30 text-left"
+                    >
+                      <div className="aspect-video w-full overflow-hidden">
+                        <img
+                          src={`https://img.youtube.com/vi/${v.id}/hqdefault.jpg`}
+                          alt={v.nombre}
+                          loading="lazy"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                        />
+                      </div>
+                      <span className="absolute inset-0 flex items-center justify-center">
+                        <span className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-[#e65100]/90 flex items-center justify-center text-white text-base sm:text-lg shadow-md group-hover:bg-[#e65100]">▶</span>
+                      </span>
+                      <p className="px-2 py-1.5 text-[10px] sm:text-xs font-black text-white uppercase tracking-tight leading-tight">
+                        {v.nombre}
+                      </p>
+                    </button>
+                  ))}
+                </div>
               </div>
+
+              {videoEnGrande && (
+                <div
+                  className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 backdrop-blur-sm"
+                  onClick={() => setVideoEnGrande(null)}
+                >
+                  <div className="relative w-full max-w-3xl" onClick={(e) => e.stopPropagation()}>
+                    <button
+                      type="button"
+                      onClick={() => setVideoEnGrande(null)}
+                      className="absolute -top-10 right-0 text-white text-2xl font-black hover:text-[#e65100] transition-colors"
+                      aria-label="Cerrar video"
+                    >
+                      ✕
+                    </button>
+                    <div className="rounded-2xl overflow-hidden border-4 border-white/20 shadow-2xl aspect-video bg-black">
+                      <iframe
+                        className="w-full h-full"
+                        src={`https://www.youtube.com/embed/${videoEnGrande}?autoplay=1`}
+                        title="Video DCUATES"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <div className="lg:col-span-1 flex flex-col gap-2">
                 <BotonVerdeInfo
