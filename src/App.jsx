@@ -414,7 +414,7 @@ export default function App() {
   // Miniaturas de video de portada — igual que Recomendaciones: cada video
   // puede tener un nombre en la columna "NOMBRE VIDPORT"; si no lo tiene,
   // se numera solo como "Video 1", "Video 2"...
-  const videosPortada = paresBaserow(filasEnlaces, "NOMBRE VIDPORT", "VIDPORT", 8)
+  const videosPortada = paresBaserow(filasEnlaces, "NOMBRE VIDPORT", "VIDPORT", 12)
     .map((v, i) => ({ id: idYoutubeDesdeUrl(v.enlace), nombre: v.nombre }))
     .filter((v) => v.id);
   const videosPortadaFinal = videosPortada.length > 0 ? videosPortada : [{ id: YOUTUBE_VIDEO_ID, nombre: "Video de presentación DCUATES" }];
@@ -636,8 +636,10 @@ export default function App() {
             {/* Video + 5 botones verdes, como continuación del mismo grid de 3 columnas de arriba */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 mt-3">
               <div className="lg:col-span-2 rounded-2xl overflow-hidden border-4 border-[#0f2d1e]/30 shadow-lg bg-[#0f2d1e] p-3">
-                <p className="text-white font-black uppercase text-xs sm:text-sm tracking-wide mb-2 px-1">
-                  🎬 Videos DCUATES — toca uno para verlo en grande
+                <p className="text-white font-black uppercase text-xs sm:text-sm tracking-wide mb-2 px-1 text-center">
+                  💡 Videos DCUATES para Reflexionar
+                  <br className="sm:hidden" />
+                  <span className="block sm:inline sm:ml-1">🎥 🍿 😊 Toca cada uno para verlo en grande</span>
                 </p>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 max-h-[420px] overflow-y-auto pr-1">
                   {videosPortadaFinal.map((v, i) => (
@@ -1498,7 +1500,7 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, musicaSona
             música compacto con su volumen desplegable hacia arriba (para
             no ocupar espacio de más). */}
         <div className="order-5 w-full flex flex-wrap items-center justify-between gap-2 pt-1.5 mt-0.5 border-t border-emerald-800/10">
-          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[10px] sm:text-[11px] md:text-xs font-black md:ml-6 lg:ml-10">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[10px] sm:text-[11px] md:text-xs font-black md:flex-1 md:justify-end">
             {NAV_LINKS_FILA2.map(link => (
               <a
                 key={link.href}
@@ -1601,7 +1603,7 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, musicaSona
         </div>
 
         {/* Menú reducido: accesos directos + Apoyo Voluntario */}
-        <nav className="order-3 md:order-2 w-full md:w-auto flex flex-wrap items-center justify-start gap-1.5 sm:gap-2 text-[10px] sm:text-[11px] md:text-xs font-black text-emerald-900 md:ml-6 lg:ml-10 relative">
+        <nav className="order-3 md:order-2 w-full md:w-auto md:flex-1 flex flex-wrap items-center justify-start md:justify-end gap-1.5 sm:gap-2 text-[10px] sm:text-[11px] md:text-xs font-black text-emerald-900 relative">
           {NAV_LINKS_PRINCIPALES.map(link => (
             <a
               key={link.href}
