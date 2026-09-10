@@ -431,17 +431,13 @@ export default function App() {
   const apoyoCosasCasosLinks = primerosValores(filasEnlaces, "APOYO COSAS Y CASOS", 5);
   // Apoyo 4 y Apoyo 5 — columnas todavía no creadas en Baserow; en cuanto
   // se agreguen con estos nombres exactos, los botones las tomarán solas.
-  const apoyo4Links = primerosValores(filasEnlaces, "APOYO 4", 5);
-  const apoyo5Links = primerosValores(filasEnlaces, "APOYO 5", 5);
-  // Recomendación 4 y 5 en Ventas con Causa — columnas a crear en Baserow
-  // con estos nombres exactos (RECOMENDACION 4 / RECOMENDACION 5). Las
-  // primeras 3 ("Recomendación 1/2/3") siguen tomando sus columnas ya
-  // existentes: RECOMENDACIONES DE COMPRA / DE VENTA / COMPRA-VENTA DCUATES.
-  const recomendacion4Links = primerosValores(filasEnlaces, "RECOMENDACION 4", 5);
-  const recomendacion5Links = primerosValores(filasEnlaces, "RECOMENDACION 5", 5);
-  const recomendacionesCompraLinks = primerosValores(filasEnlaces, "RECOMENDACIONES DE COMPRA", 5);
-  const recomendacionesVentaLinks = primerosValores(filasEnlaces, "RECOMENDACIONES DE VENTA", 5);
-  const compraVentaDcuatesLinks = primerosValores(filasEnlaces, "COMPRA-VENTA DCUATES", 5);
+  // Recomendaciones de Compra/Venta/Compra-Venta DCUATES — igual que el
+  // botón verde de Recomendaciones del inicio: cada liga puede tener un
+  // nombre en una columna "NOMBRE ..." de Baserow; si no lo tiene, se
+  // muestra "Recomendación 1", "2"... automáticamente.
+  const recomendacionesCompra = paresBaserow(filasEnlaces, "NOMBRE RECOMENDACIONES DE COMPRA", "RECOMENDACIONES DE COMPRA", 5);
+  const recomendacionesVenta = paresBaserow(filasEnlaces, "NOMBRE RECOMENDACIONES DE VENTA", "RECOMENDACIONES DE VENTA", 5);
+  const compraVentaDcuates = paresBaserow(filasEnlaces, "NOMBRE COMPRA-VENTA DCUATES", "COMPRA-VENTA DCUATES", 5);
 
   // Audio de fondo real: la columna "MUSICA" en Baserow es de tipo
   // Archivo/Adjunto (ahí subiste el mp3), así que se lee igual que las
@@ -945,22 +941,22 @@ export default function App() {
                 <FlechaBlanca />
               </a>
 
-              {/* Recomendación 1 a 5 — cada uno lista los primeros 5 enlaces
-                  de su columna en Baserow. Para agregar más basta con subir
-                  el número en recomendacionesCompraLinks / etc. (arriba en
-                  el código). Recomendación 4 y 5 ya están listas para
-                  conectarse en cuanto existan sus columnas en Baserow. */}
+              {/* Recomendaciones de Compra/Venta/Compra-Venta DCUATES —
+                  igual que el botón verde de Recomendaciones del inicio:
+                  muestran el nombre de cada liga (columna "NOMBRE ...");
+                  si esa columna no existe o está vacía en una fila, se
+                  numeran solas como "Recomendación 1, 2...". */}
               <BotonNaranjaDesplegable
                 titulo="Recomendaciones de Compra"
                 abierto={infoAbierta === "recomendaciones-compra"}
                 onClick={() => setInfoAbierta((v) => (v === "recomendaciones-compra" ? null : "recomendaciones-compra"))}
               >
-                {recomendacionesCompraLinks.length === 0 && <p>Muy pronto encontrarás aquí recomendaciones de compra.</p>}
+                {recomendacionesCompra.length === 0 && <p>Muy pronto encontrarás aquí recomendaciones de compra.</p>}
                 <ul className="space-y-1.5">
-                  {recomendacionesCompraLinks.map((enlace, i) => (
+                  {recomendacionesCompra.map((r, i) => (
                     <li key={i}>
-                      <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100] break-words">
-                        {enlace}
+                      <a href={r.enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100]">
+                        {r.nombre}
                       </a>
                     </li>
                   ))}
@@ -972,12 +968,12 @@ export default function App() {
                 abierto={infoAbierta === "recomendaciones-venta"}
                 onClick={() => setInfoAbierta((v) => (v === "recomendaciones-venta" ? null : "recomendaciones-venta"))}
               >
-                {recomendacionesVentaLinks.length === 0 && <p>Muy pronto encontrarás aquí recomendaciones de venta.</p>}
+                {recomendacionesVenta.length === 0 && <p>Muy pronto encontrarás aquí recomendaciones de venta.</p>}
                 <ul className="space-y-1.5">
-                  {recomendacionesVentaLinks.map((enlace, i) => (
+                  {recomendacionesVenta.map((r, i) => (
                     <li key={i}>
-                      <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100] break-words">
-                        {enlace}
+                      <a href={r.enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100]">
+                        {r.nombre}
                       </a>
                     </li>
                   ))}
@@ -989,46 +985,12 @@ export default function App() {
                 abierto={infoAbierta === "compra-venta-dcuates"}
                 onClick={() => setInfoAbierta((v) => (v === "compra-venta-dcuates" ? null : "compra-venta-dcuates"))}
               >
-                {compraVentaDcuatesLinks.length === 0 && <p>Muy pronto encontrarás aquí más opciones de compra-venta DCUATES.</p>}
+                {compraVentaDcuates.length === 0 && <p>Muy pronto encontrarás aquí más opciones de compra-venta DCUATES.</p>}
                 <ul className="space-y-1.5">
-                  {compraVentaDcuatesLinks.map((enlace, i) => (
+                  {compraVentaDcuates.map((r, i) => (
                     <li key={i}>
-                      <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100] break-words">
-                        {enlace}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </BotonNaranjaDesplegable>
-
-              <BotonNaranjaDesplegable
-                titulo="Recomendación 4"
-                abierto={infoAbierta === "recomendacion-4"}
-                onClick={() => setInfoAbierta((v) => (v === "recomendacion-4" ? null : "recomendacion-4"))}
-              >
-                {recomendacion4Links.length === 0 && <p>Muy pronto encontrarás aquí más recomendaciones.</p>}
-                <ul className="space-y-1.5">
-                  {recomendacion4Links.map((enlace, i) => (
-                    <li key={i}>
-                      <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100] break-words">
-                        {enlace}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </BotonNaranjaDesplegable>
-
-              <BotonNaranjaDesplegable
-                titulo="Recomendación 5"
-                abierto={infoAbierta === "recomendacion-5"}
-                onClick={() => setInfoAbierta((v) => (v === "recomendacion-5" ? null : "recomendacion-5"))}
-              >
-                {recomendacion5Links.length === 0 && <p>Muy pronto encontrarás aquí más recomendaciones.</p>}
-                <ul className="space-y-1.5">
-                  {recomendacion5Links.map((enlace, i) => (
-                    <li key={i}>
-                      <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100] break-words">
-                        {enlace}
+                      <a href={r.enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100]">
+                        {r.nombre}
                       </a>
                     </li>
                   ))}
@@ -1135,40 +1097,6 @@ export default function App() {
                   {apoyoCosasCasosLinks.length === 0 && <p>Muy pronto encontrarás aquí más recursos de apoyo.</p>}
                   <ul className="space-y-1.5">
                     {apoyoCosasCasosLinks.map((enlace, i) => (
-                      <li key={i}>
-                        <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100] break-words">
-                          Apoyo {i + 1}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </BotonNaranjaDesplegable>
-
-                <BotonNaranjaDesplegable
-                  titulo="Apoyo 4"
-                  abierto={infoAbierta === "apoyo-4"}
-                  onClick={() => setInfoAbierta((v) => (v === "apoyo-4" ? null : "apoyo-4"))}
-                >
-                  {apoyo4Links.length === 0 && <p>Muy pronto encontrarás aquí más recursos de apoyo.</p>}
-                  <ul className="space-y-1.5">
-                    {apoyo4Links.map((enlace, i) => (
-                      <li key={i}>
-                        <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100] break-words">
-                          Apoyo {i + 1}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </BotonNaranjaDesplegable>
-
-                <BotonNaranjaDesplegable
-                  titulo="Apoyo 5"
-                  abierto={infoAbierta === "apoyo-5"}
-                  onClick={() => setInfoAbierta((v) => (v === "apoyo-5" ? null : "apoyo-5"))}
-                >
-                  {apoyo5Links.length === 0 && <p>Muy pronto encontrarás aquí más recursos de apoyo.</p>}
-                  <ul className="space-y-1.5">
-                    {apoyo5Links.map((enlace, i) => (
                       <li key={i}>
                         <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100] break-words">
                           Apoyo {i + 1}
@@ -1616,7 +1544,7 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, musicaSona
         </div>
 
         {/* Menú reducido: accesos directos + Apoyo Voluntario */}
-        <nav className="order-3 md:order-2 w-full md:w-auto flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 text-[10px] sm:text-[11px] md:text-xs font-black text-emerald-900 md:ml-6 lg:ml-10 relative">
+        <nav className="order-3 md:order-2 w-full md:w-auto flex flex-wrap items-center justify-start gap-1.5 sm:gap-2 text-[10px] sm:text-[11px] md:text-xs font-black text-emerald-900 md:ml-6 lg:ml-10 relative">
           {NAV_LINKS_PRINCIPALES.map(link => (
             <a
               key={link.href}
