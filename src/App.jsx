@@ -398,6 +398,10 @@ export default function App() {
   // Controla si el bloque de "Quiénes Somos" se ve resumido (3 líneas) o
   // completo, con su propio botón "Mostrar más".
   const [quienesExpandido, setQuienesExpandido] = useState(false);
+  // Tarjetas "Nuestra Misión" y "Cómo Podemos Sumar" — mismo formato que
+  // Quiénes Somos (expandir/mostrar más), ya no son botones verdes.
+  const [misionExpandida, setMisionExpandida] = useState(false);
+  const [comoSumarExpandida, setComoSumarExpandida] = useState(false);
   // Controla cuál de los 4 botones verdes desplegables (Nuestra Misión,
   // Cómo Podemos Sumar, Preguntas Frecuentes, Aviso de Privacidad) está
   // abierto junto al video. null = ninguno abierto; solo uno a la vez.
@@ -576,6 +580,62 @@ export default function App() {
               </button>
             </div>
 
+            {/* NUESTRA MISIÓN — mismo formato que Quiénes Somos, justo debajo */}
+            <div className="rounded-2xl bg-[#17472d] text-white p-4 sm:p-5">
+              <span className="flex items-center gap-2 text-xl sm:text-2xl font-black uppercase tracking-wider text-emerald-400 mb-2">
+                <span className="text-3xl sm:text-4xl">🎯</span> Nuestra Misión
+              </span>
+              <div className={`overflow-hidden ${misionExpandida ? "max-h-none" : "max-h-[5.6em]"}`}>
+                <p className="text-sm sm:text-base text-emerald-50 leading-relaxed font-medium">
+                  <strong>Misión:</strong> {MISION_VISION.mision}
+                </p>
+                <p className="text-sm sm:text-base text-emerald-50 leading-relaxed font-medium pt-2">
+                  <strong>Visión:</strong> {MISION_VISION.vision}
+                </p>
+                <p className="text-xs sm:text-sm text-emerald-200/80 italic leading-relaxed pt-3">
+                  <strong className="not-italic">Filosofía:</strong> {MISION_VISION.filosofia}
+                </p>
+                <p className="text-sm sm:text-base font-black uppercase text-white bg-[#0f2d1e]/60 border-2 border-emerald-500/40 rounded-2xl py-4 px-4 mt-3 leading-snug">
+                  Mucha gente pequeña, en lugares pequeños, haciendo cosas pequeñas, puede cambiar el mundo (Eduardo Galeano)
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setMisionExpandida((v) => !v)}
+                className="text-xs font-black uppercase text-emerald-300 underline underline-offset-2 mt-2"
+              >
+                {misionExpandida ? "Mostrar menos" : "Mostrar más"}
+              </button>
+            </div>
+
+            {/* CÓMO PODEMOS SUMAR — mismo formato, justo debajo de Misión */}
+            <div className="rounded-2xl bg-[#17472d] text-white p-4 sm:p-5">
+              <span className="flex items-center gap-2 text-xl sm:text-2xl font-black uppercase tracking-wider text-emerald-400 mb-2">
+                <span className="text-3xl sm:text-4xl">🤝</span> Cómo Podemos Sumar
+              </span>
+              <div className={`overflow-hidden ${comoSumarExpandida ? "max-h-none" : "max-h-[5.6em]"}`}>
+                <p className="text-sm sm:text-base text-emerald-50 leading-relaxed font-medium">{COMO_SUMAR.intro}</p>
+                <p className="text-sm sm:text-base text-emerald-50 leading-relaxed font-medium pt-2">{COMO_SUMAR.ventajas}</p>
+                <p className="text-sm sm:text-base font-bold text-emerald-100 pt-2">{COMO_SUMAR.cierre}</p>
+              </div>
+              <div className="flex items-center gap-3 flex-wrap mt-2">
+                <button
+                  type="button"
+                  onClick={() => setComoSumarExpandida((v) => !v)}
+                  className="text-xs font-black uppercase text-emerald-300 underline underline-offset-2"
+                >
+                  {comoSumarExpandida ? "Mostrar menos" : "Mostrar más"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTimeout(() => irASeccion("donaciones"), 50)}
+                  className="rounded-lg bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-2 px-3 uppercase tracking-wide text-[11px] sm:text-xs"
+                >
+                  Ir a Apoyo Voluntario
+                </button>
+              </div>
+            </div>
+
             {/* Bibliobici — cubre el espacio restante hasta la altura de la última fila de botones */}
             <div className="rounded-2xl overflow-hidden border-4 border-[#0f2d1e]/30 shadow-lg h-56 sm:h-72 lg:h-auto lg:flex-1">
               <img
@@ -654,15 +714,15 @@ export default function App() {
               );
             })()}
 
-            {/* Video + 5 botones verdes, como continuación del mismo grid de 3 columnas de arriba */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 mt-3">
-              <div className="lg:col-span-2 rounded-2xl overflow-hidden border-4 border-[#0f2d1e]/30 shadow-lg bg-[#0f2d1e] p-3">
+            {/* Video a todo el ancho + 3 botones verdes restantes en fila debajo */}
+            <div className="mt-3">
+              <div className="rounded-2xl overflow-hidden border-4 border-[#0f2d1e]/30 shadow-lg bg-[#0f2d1e] p-3">
                 <p className="text-white font-black uppercase text-xs sm:text-sm tracking-wide mb-2 px-1 text-center">
                   💡 Videos DCUATES para Reflexionar
                   <br className="sm:hidden" />
                   <span className="block sm:inline sm:ml-1">🎥 🍿 😊 Toca cada uno para verlo en grande</span>
                 </p>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3 max-h-[420px] overflow-y-auto pr-1">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 max-h-[420px] overflow-y-auto pr-1">
                   {videosPortadaFinal.map((v, i) => (
                     <button
                       key={i}
@@ -716,43 +776,10 @@ export default function App() {
                 </div>
               )}
 
-              <div className="lg:col-span-1 flex flex-col gap-2">
-                <BotonVerdeInfo
-                  titulo="Nuestra Misión"
-                  abierto={infoAbierta === "mision"}
-                  onClick={() => setInfoAbierta((v) => (v === "mision" ? null : "mision"))}
-                >
-                  <p><strong>Misión:</strong> {MISION_VISION.mision}</p>
-                  <p><strong>Visión:</strong> {MISION_VISION.vision}</p>
-                  <p className="italic"><strong className="not-italic">Filosofía:</strong> {MISION_VISION.filosofia}</p>
-                  <p className="font-black uppercase text-emerald-300">Mucha gente pequeña, en lugares pequeños, haciendo cosas pequeñas, puede cambiar el mundo (Eduardo Galeano)</p>
-                </BotonVerdeInfo>
-
-                <BotonVerdeInfo
-                  titulo="Cómo Podemos Sumar"
-                  abierto={infoAbierta === "sumar"}
-                  onClick={() => setInfoAbierta((v) => (v === "sumar" ? null : "sumar"))}
-                >
-                  <p>{COMO_SUMAR.intro}</p>
-                  <p>{COMO_SUMAR.ventajas}</p>
-                  <p className="font-bold">{COMO_SUMAR.cierre}</p>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setInfoAbierta(null);
-                      // Se espera a que termine la animación de cierre (350ms)
-                      // antes de hacer scroll: si se hace al mismo tiempo, la
-                      // página se recorre mientras el acordeón todavía se está
-                      // colapsando y el destino termina desfasado (por eso
-                      // llegaba casi al final de la sección en vez de al inicio).
-                      setTimeout(() => irASeccion("donaciones"), 380);
-                    }}
-                    className="w-full text-center rounded-lg bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-2.5 px-3 uppercase tracking-wide text-[11px] sm:text-xs mt-1"
-                  >
-                    Ir a Apoyo Voluntario
-                  </button>
-                </BotonVerdeInfo>
-
+              {/* Recomendaciones / Música-Libros-Pelis / Preguntas Frecuentes,
+                  en fila horizontal debajo del video (antes eran una columna
+                  al lado del video). */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-3">
                 <BotonVerdeInfo
                   titulo="Recomendaciones ⭐⭐⭐⭐⭐"
                   abierto={infoAbierta === "recomendaciones"}
@@ -779,21 +806,6 @@ export default function App() {
                     ))}
                   </ul>
                   <p className="pt-2 font-black uppercase text-emerald-300">Si necesitas alguna recomendación en especial, contáctanos !!!</p>
-                </BotonVerdeInfo>
-
-                <BotonVerdeInfo
-                  titulo="Preguntas Frecuentes"
-                  abierto={infoAbierta === "faq"}
-                  onClick={() => setInfoAbierta((v) => (v === "faq" ? null : "faq"))}
-                >
-                  <div className="space-y-2">
-                    {FAQ_ITEMS.map((f, i) => (
-                      <details key={i} className="rounded-lg bg-emerald-900/40 px-3 py-2">
-                        <summary className="cursor-pointer text-xs sm:text-sm font-bold">{f.pregunta}</summary>
-                        <p className="mt-1 text-xs text-emerald-100/90 leading-relaxed">{f.respuesta}</p>
-                      </details>
-                    ))}
-                  </div>
                 </BotonVerdeInfo>
 
                 <BotonVerdeInfo
@@ -831,6 +843,21 @@ export default function App() {
                       </li>
                     ))}
                   </ul>
+                </BotonVerdeInfo>
+
+                <BotonVerdeInfo
+                  titulo="Preguntas Frecuentes"
+                  abierto={infoAbierta === "faq"}
+                  onClick={() => setInfoAbierta((v) => (v === "faq" ? null : "faq"))}
+                >
+                  <div className="space-y-2">
+                    {FAQ_ITEMS.map((f, i) => (
+                      <details key={i} className="rounded-lg bg-emerald-900/40 px-3 py-2">
+                        <summary className="cursor-pointer text-xs sm:text-sm font-bold">{f.pregunta}</summary>
+                        <p className="mt-1 text-xs text-emerald-100/90 leading-relaxed">{f.respuesta}</p>
+                      </details>
+                    ))}
+                  </div>
                 </BotonVerdeInfo>
               </div>
             </div>
@@ -1469,6 +1496,10 @@ export default function App() {
 function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, musicaSonando, onAlternarMusica, volumen, onCambiarVolumen }) {
   const [menuMasAbierto, setMenuMasAbierto] = useState(false);
   const [volumenAbierto, setVolumenAbierto] = useState(false);
+  // Menú móvil: en celular, las 2 filas de botones se esconden dentro de
+  // este menú de hamburguesa para no ocupar tanto espacio fijo; en
+  // escritorio no se usa (ahí se ven las 2 filas de siempre).
+  const [menuMovilAbierto, setMenuMovilAbierto] = useState(false);
   return (
     <header className="border-b border-emerald-800/20 bg-white/95 backdrop-blur py-2 px-4 shadow-sm text-slate-900 relative">
       <div className="mx-auto flex flex-wrap items-center gap-y-2 max-w-6xl">
@@ -1521,7 +1552,86 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, musicaSona
             no tienen acceso directo propio). A la derecha, el botón de
             música compacto con su volumen desplegable hacia arriba (para
             no ocupar espacio de más). */}
-        <div className="order-5 w-full flex flex-wrap items-center justify-between gap-2 pt-1.5 mt-0.5 border-t border-emerald-800/10">
+        {/* Menú móvil (hamburguesa) — junta todo lo de las 2 filas de
+            escritorio en un solo botón + panel desplegable, para ahorrar
+            espacio fijo en celular. Solo se ve por debajo de "md". */}
+        <div className="md:hidden order-3 w-full relative">
+          <button
+            type="button"
+            onClick={() => setMenuMovilAbierto((v) => !v)}
+            className="w-full flex items-center justify-between gap-2 rounded-xl bg-[#17472d] hover:bg-[#0f2d1e] text-white font-black uppercase tracking-wide text-xs px-4 py-2.5 transition-colors"
+          >
+            <span>☰ Menú</span>
+            <span className={`transition-transform ${menuMovilAbierto ? "rotate-180" : ""}`}>▾</span>
+          </button>
+
+          {menuMovilAbierto && (
+            <div className="mt-2 rounded-2xl bg-white shadow-xl border border-emerald-800/10 p-3 flex flex-col gap-1.5 max-h-[70vh] overflow-y-auto">
+              {[...NAV_LINKS_PRINCIPALES, ...NAV_LINKS_FILA2].map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setMenuMovilAbierto(false)}
+                  className="rounded-lg bg-[#17472d] hover:bg-[#0f2d1e] text-white uppercase tracking-wide text-[11px] font-black text-center py-2.5 transition-colors"
+                >
+                  {link.label}
+                </a>
+              ))}
+              <button
+                type="button"
+                onClick={() => { setMenuMovilAbierto(false); onAbrirFAQ && onAbrirFAQ(); }}
+                className="rounded-lg bg-[#17472d] hover:bg-[#0f2d1e] text-white uppercase tracking-wide text-[11px] font-black text-center py-2.5 transition-colors"
+              >
+                Preguntas Frecuentes
+              </button>
+
+              <div className="border-t border-emerald-800/10 my-1" />
+              <p className="text-[10px] font-black uppercase text-emerald-800/70 px-1">Más proyectos</p>
+              {NAV_LINKS_MAS.map((link) => (
+                <button
+                  type="button"
+                  key={link.modal}
+                  onClick={() => { setMenuMovilAbierto(false); onAbrirProyecto && onAbrirProyecto(link.modal); }}
+                  className="rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-900 uppercase tracking-wide text-[11px] font-black text-center py-2.5 transition-colors"
+                >
+                  {link.label}
+                </button>
+              ))}
+              <button
+                type="button"
+                onClick={() => { setMenuMovilAbierto(false); onAbrirPrivacidad && onAbrirPrivacidad(); }}
+                className="rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-900 uppercase tracking-wide text-[11px] font-black text-center py-2.5 transition-colors"
+              >
+                Aviso de Privacidad
+              </button>
+
+              <div className="border-t border-emerald-800/10 my-1" />
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={onAlternarMusica}
+                  className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-full bg-[#e65100] hover:bg-[#bf360c] text-white uppercase tracking-wide text-[11px] font-black py-2.5 transition-colors"
+                >
+                  <span>🎵</span>
+                  {musicaSonando ? "Pausar" : "Música Dcuates"}
+                </button>
+                <span className="shrink-0">{volumen === 0 ? "🔇" : volumen < 0.5 ? "🔉" : "🔊"}</span>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.05"
+                  value={volumen}
+                  onChange={(e) => onCambiarVolumen && onCambiarVolumen(parseFloat(e.target.value))}
+                  className="w-16 accent-[#17472d] cursor-pointer shrink-0"
+                  aria-label="Volumen de la música"
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="hidden md:flex order-5 w-full flex-wrap items-center justify-between gap-2 pt-1.5 mt-0.5 border-t border-emerald-800/10">
           <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[10px] sm:text-[11px] md:text-xs font-black md:flex-1 md:justify-end md:pr-6 lg:pr-8">
             {NAV_LINKS_FILA2.map(link => (
               <a
@@ -1625,7 +1735,7 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, musicaSona
         </div>
 
         {/* Menú reducido: accesos directos + Apoyo Voluntario */}
-        <nav className="order-3 md:order-2 w-full md:w-auto md:flex-1 flex flex-wrap items-center justify-start md:justify-end gap-1.5 sm:gap-2 text-[10px] sm:text-[11px] md:text-xs font-black text-emerald-900 md:pr-6 lg:pr-8 relative">
+        <nav className="hidden md:flex order-3 md:order-2 md:w-auto md:flex-1 flex-wrap items-center justify-start md:justify-end gap-1.5 sm:gap-2 text-[10px] sm:text-[11px] md:text-xs font-black text-emerald-900 md:pr-6 lg:pr-8 relative">
           {NAV_LINKS_PRINCIPALES.map(link => (
             <a
               key={link.href}
@@ -2517,24 +2627,36 @@ function BarraTicker() {
   const [index, setIndex] = useState(0);
   const [visible, setVisible] = useState(true);
 
+  // Anuncios desde Baserow (sin tocar código): crea en la tabla ENLACES 2
+  // columnas de texto — "NOMBRE TICKER" y "ENLACE TICKER" — una fila por
+  // anuncio. En cuanto haya al menos una fila con esas 2 columnas llenas,
+  // sustituyen automáticamente a los anuncios de ejemplo de abajo.
+  const filasEnlaces = useFilasEnlaces();
+  const tickerBaserow = paresBaserow(filasEnlaces, "NOMBRE TICKER", "ENLACE TICKER", 20).map((t) => ({
+    tipo: "aviso",
+    texto: t.nombre,
+    enlace: t.enlace
+  }));
+  const itemsTicker = tickerBaserow.length > 0 ? tickerBaserow : TICKER_ITEMS;
+
   useEffect(() => {
     if (!visible) return;
     const id = setInterval(() => {
-      setIndex((i) => (i + 1) % TICKER_ITEMS.length);
+      setIndex((i) => (i + 1) % itemsTicker.length);
     }, 4500);
     return () => clearInterval(id);
-  }, [visible]);
+  }, [visible, itemsTicker.length]);
 
   if (!visible) return null;
 
   // La segunda fila va desfasada a la mitad del arreglo para no repetir
   // exactamente el mismo anuncio que la primera fila al mismo tiempo.
-  const indexFila2 = (index + Math.floor(TICKER_ITEMS.length / 2)) % TICKER_ITEMS.length;
+  const indexFila2 = (index + Math.floor(itemsTicker.length / 2)) % itemsTicker.length;
 
   return (
     <div className="fixed bottom-0 inset-x-0 z-40 bg-[#17472d] border-t-2 border-emerald-700/50 shadow-[0_-4px_12px_rgba(0,0,0,0.25)] divide-y divide-emerald-800/40">
-      <FilaTicker items={TICKER_ITEMS} index={index} mostrarCerrar={false} />
-      <FilaTicker items={TICKER_ITEMS} index={indexFila2} onClose={() => setVisible(false)} mostrarCerrar={true} />
+      <FilaTicker items={itemsTicker} index={index} mostrarCerrar={false} />
+      <FilaTicker items={itemsTicker} index={indexFila2} onClose={() => setVisible(false)} mostrarCerrar={true} />
     </div>
   );
 }
