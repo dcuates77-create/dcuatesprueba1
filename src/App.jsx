@@ -41,19 +41,25 @@ const RECOMENDACIONES_ESTRELLA = {
 // Mientras esté vacío, el botón se muestra pero no reproduce nada.
 const MUSICA_DCUATES_URL = "/audio/musica-dcuates.mp3";
 
-// Barra fija de navegación: accesos directos + un menú "MÁS" con el resto
-// (se despliega hacia abajo). Para agregar/quitar algo del menú "MÁS",
-// edita NAV_LINKS_MAS — no se necesita tocar el componente SiteHeader.
-// "MÁS" ahora abre directamente la ventana emergente de cada proyecto
-// (mismo sistema que los 12 botones naranjas de la portada), por eso usa
-// "modal" (el id en TODOS_LOS_PROYECTOS) en vez de "href".
+// Barra fija de navegación: una sola fila de accesos directos + un menú
+// "MÁS" con todo lo demás (se despliega hacia abajo). Para agregar/quitar
+// algo del menú "MÁS", edita NAV_LINKS_MAS — no se necesita tocar el
+// componente SiteHeader. Cada elemento de NAV_LINKS_MAS puede ser:
+// - { label, href }   -> enlace normal a una sección de la página
+// - { label, action: "faq" } -> abre la ventana de Preguntas Frecuentes
+// - { label, modal }  -> abre la ventana emergente de ese proyecto (mismo
+//   id que en TODOS_LOS_PROYECTOS)
 const NAV_LINKS_PRINCIPALES = [
   { label: "Inicio", href: "#inicio" },
-  { label: "Proyectos", href: "#iniciativas" },
   { label: "Publicidad Gratuita", href: "#publicidad" },
-  { label: "Apoyo Voluntario", href: "#donaciones" }
+  { label: "Apoyo Voluntario", href: "#donaciones" },
+  { label: "Ventas con Causa", href: "#ventas-con-causa" }
 ];
 const NAV_LINKS_MAS = [
+  { label: "Proyectos", href: "#iniciativas" },
+  { label: "Alianzas Solidarias", href: "#iniciativas" },
+  { label: "Apoyo a Causas", href: "#extraviados-registro" },
+  { label: "Preguntas Frecuentes", action: "faq" },
   { label: "Préstamo Gratuito de Libros", modal: "libros" },
   { label: "Ecatepets Mascotas", modal: "ecatepets" },
   { label: "Círculo de Confianza", modal: "circulo-confianza" },
@@ -62,13 +68,6 @@ const NAV_LINKS_MAS = [
   { label: "Bazar y Comercio", modal: "bazares" },
   { label: "Noticias de Barrio", modal: "noticias" },
   { label: "Bienestar y Recreación", modal: "bienestar" }
-];
-// Segunda fila del menú fijo (debajo de los accesos principales), a un
-// lado del botón de música. "MÁS" se movió aquí, al final.
-const NAV_LINKS_FILA2 = [
-  { label: "Alianzas Solidarias", href: "#iniciativas" },
-  { label: "Ventas con Causa", href: "#ventas-con-causa" },
-  { label: "Apoyo a Causas", href: "#extraviados-registro" }
 ];
 
 // Función helper para armar enlaces directos de WhatsApp de forma consistente
@@ -401,7 +400,6 @@ export default function App() {
   // Tarjetas "Nuestra Misión" y "Cómo Podemos Sumar" — mismo formato que
   // Quiénes Somos (expandir/mostrar más), ya no son botones verdes.
   const [misionExpandida, setMisionExpandida] = useState(false);
-  const [comoSumarExpandida, setComoSumarExpandida] = useState(false);
   // Controla cuál de los 4 botones verdes desplegables (Nuestra Misión,
   // Cómo Podemos Sumar, Preguntas Frecuentes, Aviso de Privacidad) está
   // abierto junto al video. null = ninguno abierto; solo uno a la vez.
@@ -608,24 +606,18 @@ export default function App() {
               </button>
             </div>
 
-            {/* CÓMO PODEMOS SUMAR — mismo formato, justo debajo de Misión */}
+            {/* CÓMO PODEMOS SUMAR — mismo formato, justo debajo de Misión.
+                Sin truncar: el texto se ve siempre completo. */}
             <div className="rounded-2xl bg-[#17472d] text-white p-4 sm:p-5">
               <span className="flex items-center gap-2 text-xl sm:text-2xl font-black uppercase tracking-wider text-emerald-400 mb-2">
                 <span className="text-3xl sm:text-4xl">🤝</span> Cómo Podemos Sumar
               </span>
-              <div className={`overflow-hidden ${comoSumarExpandida ? "max-h-none" : "max-h-[5.6em]"}`}>
+              <div>
                 <p className="text-sm sm:text-base text-emerald-50 leading-relaxed font-medium">{COMO_SUMAR.intro}</p>
                 <p className="text-sm sm:text-base text-emerald-50 leading-relaxed font-medium pt-2">{COMO_SUMAR.ventajas}</p>
                 <p className="text-sm sm:text-base font-bold text-emerald-100 pt-2">{COMO_SUMAR.cierre}</p>
               </div>
-              <div className="flex items-center gap-3 flex-wrap mt-2">
-                <button
-                  type="button"
-                  onClick={() => setComoSumarExpandida((v) => !v)}
-                  className="text-xs font-black uppercase text-emerald-300 underline underline-offset-2"
-                >
-                  {comoSumarExpandida ? "Mostrar menos" : "Mostrar más"}
-                </button>
+              <div className="mt-3">
                 <button
                   type="button"
                   onClick={() => setTimeout(() => irASeccion("donaciones"), 50)}
@@ -637,11 +629,11 @@ export default function App() {
             </div>
 
             {/* Bibliobici — cubre el espacio restante hasta la altura de la última fila de botones */}
-            <div className="rounded-2xl overflow-hidden border-4 border-[#0f2d1e]/30 shadow-lg h-56 sm:h-72 lg:h-auto lg:flex-1">
+            <div className="rounded-2xl overflow-hidden border-4 border-[#0f2d1e]/30 shadow-lg h-56 sm:h-72 lg:h-auto lg:flex-1 bg-[#0f2d1e]/5">
               <img
                 src="/images/bibliobici-movil.png"
                 alt="Bibliobici Móvil DCUATES en la comunidad"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain"
                 onError={(e) => {
                   e.target.style.display = 'none';
                   e.target.parentElement.innerHTML = '<div class="p-12 text-center text-[#0f2d1e]/70 font-bold uppercase text-xs tracking-wider bg-emerald-50 h-full flex items-center justify-center">📷 [Espacio para Foto de la Bibliobici]</div>';
@@ -1350,6 +1342,8 @@ export default function App() {
         </div>
       </section>
 
+      <BarraPatrocinadores />
+
       {/* FOOTER */}
       <footer className="bg-[#e8f5e9] text-[#0f2d1e] py-12 px-4 text-center space-y-8 border-t-4 border-[#0f2d1e]">
 
@@ -1496,10 +1490,6 @@ export default function App() {
 function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, musicaSonando, onAlternarMusica, volumen, onCambiarVolumen }) {
   const [menuMasAbierto, setMenuMasAbierto] = useState(false);
   const [volumenAbierto, setVolumenAbierto] = useState(false);
-  // Menú móvil: en celular, las 2 filas de botones se esconden dentro de
-  // este menú de hamburguesa para no ocupar tanto espacio fijo; en
-  // escritorio no se usa (ahí se ven las 2 filas de siempre).
-  const [menuMovilAbierto, setMenuMovilAbierto] = useState(false);
   return (
     <header className="border-b border-emerald-800/20 bg-white/95 backdrop-blur py-2 px-4 shadow-sm text-slate-900 relative">
       <div className="mx-auto flex flex-wrap items-center gap-y-2 max-w-6xl">
@@ -1546,94 +1536,12 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, musicaSona
           </a>
         </div>
 
-        {/* Segunda fila del menú fijo: a la izquierda, Alianzas Solidarias /
-            Ventas con Causa / Apoyo a Causas / Preguntas Frecuentes y, al
-            final de ese grupo, el botón "MÁS" (despliega los proyectos que
-            no tienen acceso directo propio). A la derecha, el botón de
-            música compacto con su volumen desplegable hacia arriba (para
-            no ocupar espacio de más). */}
-        {/* Menú móvil (hamburguesa) — junta todo lo de las 2 filas de
-            escritorio en un solo botón + panel desplegable, para ahorrar
-            espacio fijo en celular. Solo se ve por debajo de "md". */}
-        <div className="md:hidden order-3 w-full relative">
-          <button
-            type="button"
-            onClick={() => setMenuMovilAbierto((v) => !v)}
-            className="w-full flex items-center justify-between gap-2 rounded-xl bg-[#17472d] hover:bg-[#0f2d1e] text-white font-black uppercase tracking-wide text-xs px-4 py-2.5 transition-colors"
-          >
-            <span>☰ Menú</span>
-            <span className={`transition-transform ${menuMovilAbierto ? "rotate-180" : ""}`}>▾</span>
-          </button>
-
-          {menuMovilAbierto && (
-            <div className="mt-2 rounded-2xl bg-white shadow-xl border border-emerald-800/10 p-3 flex flex-col gap-1.5 max-h-[70vh] overflow-y-auto">
-              {[...NAV_LINKS_PRINCIPALES, ...NAV_LINKS_FILA2].map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setMenuMovilAbierto(false)}
-                  className="rounded-lg bg-[#17472d] hover:bg-[#0f2d1e] text-white uppercase tracking-wide text-[11px] font-black text-center py-2.5 transition-colors"
-                >
-                  {link.label}
-                </a>
-              ))}
-              <button
-                type="button"
-                onClick={() => { setMenuMovilAbierto(false); onAbrirFAQ && onAbrirFAQ(); }}
-                className="rounded-lg bg-[#17472d] hover:bg-[#0f2d1e] text-white uppercase tracking-wide text-[11px] font-black text-center py-2.5 transition-colors"
-              >
-                Preguntas Frecuentes
-              </button>
-
-              <div className="border-t border-emerald-800/10 my-1" />
-              <p className="text-[10px] font-black uppercase text-emerald-800/70 px-1">Más proyectos</p>
-              {NAV_LINKS_MAS.map((link) => (
-                <button
-                  type="button"
-                  key={link.modal}
-                  onClick={() => { setMenuMovilAbierto(false); onAbrirProyecto && onAbrirProyecto(link.modal); }}
-                  className="rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-900 uppercase tracking-wide text-[11px] font-black text-center py-2.5 transition-colors"
-                >
-                  {link.label}
-                </button>
-              ))}
-              <button
-                type="button"
-                onClick={() => { setMenuMovilAbierto(false); onAbrirPrivacidad && onAbrirPrivacidad(); }}
-                className="rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-900 uppercase tracking-wide text-[11px] font-black text-center py-2.5 transition-colors"
-              >
-                Aviso de Privacidad
-              </button>
-
-              <div className="border-t border-emerald-800/10 my-1" />
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={onAlternarMusica}
-                  className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-full bg-[#e65100] hover:bg-[#bf360c] text-white uppercase tracking-wide text-[11px] font-black py-2.5 transition-colors"
-                >
-                  <span>🎵</span>
-                  {musicaSonando ? "Pausar" : "Música Dcuates"}
-                </button>
-                <span className="shrink-0">{volumen === 0 ? "🔇" : volumen < 0.5 ? "🔉" : "🔊"}</span>
-                <input
-                  type="range"
-                  min="0"
-                  max="1"
-                  step="0.05"
-                  value={volumen}
-                  onChange={(e) => onCambiarVolumen && onCambiarVolumen(parseFloat(e.target.value))}
-                  className="w-16 accent-[#17472d] cursor-pointer shrink-0"
-                  aria-label="Volumen de la música"
-                />
-              </div>
-            </div>
-          )}
-        </div>
-
-        <div className="hidden md:flex order-5 w-full flex-wrap items-center justify-between gap-2 pt-1.5 mt-0.5 border-t border-emerald-800/10">
-          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[10px] sm:text-[11px] md:text-xs font-black md:flex-1 md:justify-end md:pr-6 lg:pr-8">
-            {NAV_LINKS_FILA2.map(link => (
+        {/* Fila única de menú: accesos directos + MÁS (con todo lo demás)
+            a la izquierda, música a la derecha. Siempre visible (sin
+            hamburguesa), se envuelve sola si no cabe en una línea. */}
+        <div className="order-3 w-full flex flex-wrap items-center justify-between gap-2 pt-1.5 mt-0.5 border-t border-emerald-800/10">
+          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[10px] sm:text-[11px] md:text-xs font-black">
+            {NAV_LINKS_PRINCIPALES.map(link => (
               <a
                 key={link.href}
                 href={link.href}
@@ -1642,13 +1550,6 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, musicaSona
                 {link.label}
               </a>
             ))}
-            <button
-              type="button"
-              onClick={onAbrirFAQ}
-              className="rounded-full border-2 border-transparent bg-[#17472d] hover:bg-[#0f2d1e] text-white transition-colors uppercase tracking-wide text-center leading-tight px-3 py-1.5"
-            >
-              Preguntas Frecuentes
-            </button>
 
             <div className="relative">
               <button
@@ -1664,17 +1565,32 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, musicaSona
                 <>
                   {/* Fondo invisible para poder cerrar el menú al tocar fuera */}
                   <div className="fixed inset-0 z-30" onClick={() => setMenuMasAbierto(false)} />
-                  <div className="absolute left-0 top-full mt-2 z-40 w-64 rounded-2xl bg-white shadow-xl border border-emerald-800/10 py-2 flex flex-col max-h-[70vh] overflow-y-auto">
-                    {NAV_LINKS_MAS.map(link => (
-                      <button
-                        type="button"
-                        key={link.modal}
-                        onClick={() => { setMenuMasAbierto(false); onAbrirProyecto && onAbrirProyecto(link.modal); }}
-                        className="px-4 py-2.5 text-left uppercase tracking-wide text-[11px] sm:text-xs font-black text-emerald-900 hover:bg-emerald-50 transition-colors"
-                      >
-                        {link.label}
-                      </button>
-                    ))}
+                  <div className="absolute right-0 top-full mt-2 z-40 w-64 rounded-2xl bg-white shadow-xl border border-emerald-800/10 py-2 flex flex-col max-h-[70vh] overflow-y-auto">
+                    {NAV_LINKS_MAS.map((link) =>
+                      link.href ? (
+                        <a
+                          key={link.label}
+                          href={link.href}
+                          onClick={() => setMenuMasAbierto(false)}
+                          className="px-4 py-2.5 text-left uppercase tracking-wide text-[11px] sm:text-xs font-black text-emerald-900 hover:bg-emerald-50 transition-colors"
+                        >
+                          {link.label}
+                        </a>
+                      ) : (
+                        <button
+                          type="button"
+                          key={link.label}
+                          onClick={() => {
+                            setMenuMasAbierto(false);
+                            if (link.action === "faq") onAbrirFAQ && onAbrirFAQ();
+                            else if (link.modal) onAbrirProyecto && onAbrirProyecto(link.modal);
+                          }}
+                          className="px-4 py-2.5 text-left uppercase tracking-wide text-[11px] sm:text-xs font-black text-emerald-900 hover:bg-emerald-50 transition-colors"
+                        >
+                          {link.label}
+                        </button>
+                      )
+                    )}
                     <div className="border-t border-emerald-800/10 my-1" />
                     <button
                       type="button"
@@ -1733,19 +1649,6 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, musicaSona
             )}
           </div>
         </div>
-
-        {/* Menú reducido: accesos directos + Apoyo Voluntario */}
-        <nav className="hidden md:flex order-3 md:order-2 md:w-auto md:flex-1 flex-wrap items-center justify-start md:justify-end gap-1.5 sm:gap-2 text-[10px] sm:text-[11px] md:text-xs font-black text-emerald-900 md:pr-6 lg:pr-8 relative">
-          {NAV_LINKS_PRINCIPALES.map(link => (
-            <a
-              key={link.href}
-              href={link.href}
-              className="rounded-full border-2 border-transparent bg-[#17472d] hover:bg-[#0f2d1e] text-white transition-colors uppercase tracking-wide text-center leading-tight px-3 py-1.5"
-            >
-              {link.label}
-            </a>
-          ))}
-        </nav>
       </div>
     </header>
   );
@@ -2602,19 +2505,31 @@ function TickerFrases() {
   const [index, setIndex] = useState(0);
   const [visible, setVisible] = useState(true);
 
+  // Frases desde Baserow (sin tocar código): crea en la tabla ENLACES 2
+  // columnas de texto — "FRASE TICKER" y "ENLACE FRASE TICKER" — una fila
+  // por frase. En cuanto haya al menos una fila con esas 2 columnas
+  // llenas, sustituyen a las frases de ejemplo de abajo.
+  const filasEnlaces = useFilasEnlaces();
+  const frasesBaserow = paresBaserow(filasEnlaces, "FRASE TICKER", "ENLACE FRASE TICKER", 20).map((f) => ({
+    tipo: "frase",
+    texto: f.nombre,
+    enlace: f.enlace
+  }));
+  const itemsFrases = frasesBaserow.length > 0 ? frasesBaserow : TICKER_FRASES;
+
   useEffect(() => {
     if (!visible) return;
     const id = setInterval(() => {
-      setIndex((i) => (i + 1) % TICKER_FRASES.length);
+      setIndex((i) => (i + 1) % itemsFrases.length);
     }, 5000);
     return () => clearInterval(id);
-  }, [visible]);
+  }, [visible, itemsFrases.length]);
 
   if (!visible) return null;
 
   return (
     <div className="bg-[#0f2d1e] border-b-2 border-emerald-700/50">
-      <FilaTicker items={TICKER_FRASES} index={index} onClose={() => setVisible(false)} mostrarCerrar={true} />
+      <FilaTicker items={itemsFrases} index={index} onClose={() => setVisible(false)} mostrarCerrar={true} />
     </div>
   );
 }
@@ -2623,6 +2538,125 @@ function TickerFrases() {
 // mascotas y avisos comunitarios. Dos filas simultáneas que rotan de forma
 // independiente (desfasadas a la mitad del arreglo) para mostrar el doble
 // de contenido sin esperar tanto tiempo entre anuncios.
+// Barra de patrocinadores/aliados — una tira ancha y deslizable de
+// imágenes reducidas; al tocar una se amplía en una ventana flotante
+// (mismo patrón que la barra de videos). Se alimenta de 3 columnas en la
+// tabla ENLACES de Baserow: "PATROCINADORES" (Archivo/Adjunto — la
+// imagen), "NOMBRE PATROCINADORES" (texto) y "ENLACE PATROCINADORES"
+// (texto, opcional). Si "ENLACE PATROCINADORES" es una liga de YouTube, al
+// tocar la miniatura se abre el video en grande (igual que en la barra de
+// videos); si es cualquier otra liga (una web, un PDF, un documento), se
+// abre en una pestaña nueva; si no hay ninguna liga, solo se amplía la
+// imagen. No aparece nada en la página si todavía no hay ninguna fila con
+// imagen en "PATROCINADORES".
+function BarraPatrocinadores() {
+  const filasEnlaces = useFilasEnlaces();
+  const [imagenEnGrande, setImagenEnGrande] = useState(null);
+  const [videoEnGrande, setVideoEnGrande] = useState(null);
+
+  const items = filasEnlaces
+    .map((f) => ({
+      img: f && urlDesdeCeldaBaserow(f["PATROCINADORES"]),
+      nombre: (f && f["NOMBRE PATROCINADORES"]) || "",
+      enlace: (f && f["ENLACE PATROCINADORES"]) || ""
+    }))
+    .filter((it) => it.img)
+    .slice(0, 20);
+
+  if (items.length === 0) return null;
+
+  const alTocar = (item) => {
+    const idYt = item.enlace ? idYoutubeDesdeUrl(item.enlace) : null;
+    if (idYt) {
+      setVideoEnGrande(idYt);
+    } else if (item.enlace && item.enlace.startsWith("http")) {
+      window.open(item.enlace, "_blank", "noopener,noreferrer");
+    } else {
+      setImagenEnGrande(item.img);
+    }
+  };
+
+  return (
+    <div className="bg-[#17472d] py-5 px-4 border-t-4 border-b-4 border-[#0f2d1e]">
+      <div className="mx-auto max-w-6xl">
+        <p className="text-emerald-300 font-black uppercase text-xs sm:text-sm tracking-wide text-center mb-3">
+          🤝 Patrocinadores y Aliados DCUATES
+        </p>
+        <div className="flex items-center gap-3 overflow-x-auto pb-2 px-1 snap-x snap-mandatory">
+          {items.map((item, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => alTocar(item)}
+              className="shrink-0 snap-start w-24 sm:w-28 group"
+              title={item.nombre || "Ver más grande"}
+            >
+              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-xl overflow-hidden border-2 border-white/10 group-hover:border-[#e65100] transition-colors bg-black/20">
+                <img
+                  src={item.img}
+                  alt={item.nombre}
+                  loading="lazy"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                  onError={(e) => { e.target.style.display = 'none'; }}
+                />
+              </div>
+              {item.nombre && (
+                <p className="text-white text-[10px] font-bold text-center mt-1 truncate">{item.nombre}</p>
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {imagenEnGrande && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 backdrop-blur-sm"
+          onClick={() => setImagenEnGrande(null)}
+        >
+          <div className="relative max-w-3xl w-full" onClick={(e) => e.stopPropagation()}>
+            <button
+              type="button"
+              onClick={() => setImagenEnGrande(null)}
+              className="absolute -top-10 right-0 text-white text-2xl font-black hover:text-[#e65100] transition-colors"
+              aria-label="Cerrar imagen"
+            >
+              ✕
+            </button>
+            <img src={imagenEnGrande} alt="" className="w-full h-auto rounded-2xl border-4 border-white/20 shadow-2xl" />
+          </div>
+        </div>
+      )}
+
+      {videoEnGrande && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 backdrop-blur-sm"
+          onClick={() => setVideoEnGrande(null)}
+        >
+          <div className="relative w-full max-w-3xl" onClick={(e) => e.stopPropagation()}>
+            <button
+              type="button"
+              onClick={() => setVideoEnGrande(null)}
+              className="absolute -top-10 right-0 text-white text-2xl font-black hover:text-[#e65100] transition-colors"
+              aria-label="Cerrar video"
+            >
+              ✕
+            </button>
+            <div className="rounded-2xl overflow-hidden border-4 border-white/20 shadow-2xl aspect-video bg-black">
+              <iframe
+                className="w-full h-full"
+                src={`https://www.youtube.com/embed/${videoEnGrande}?autoplay=1`}
+                title="Video DCUATES"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function BarraTicker() {
   const [index, setIndex] = useState(0);
   const [visible, setVisible] = useState(true);
