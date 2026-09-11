@@ -131,7 +131,7 @@ const INICIATIVAS_PRINCIPALES = [
     enlaceDirectoWA: enlaceWhatsApp("¡Hola DCUATES! Me interesa participar en el proyecto de La Bibliobici y Amigos."),
     segundoBoton: {
       titulo: "Ver Libros y Materiales en Préstamo, Trueque, Donación y Más...",
-      enlace: "https://chat.whatsapp.com/F2Rdvu5ueSlJ0YuDYGi8VL"
+      enlace: "https://whatsapp.com/channel/0029VbE8Mri4Crfe0r8cuj2n"
     }
   },
   {
@@ -1026,70 +1026,61 @@ export default function App() {
                   muestran el nombre de cada liga (columna "NOMBRE ...");
                   si esa columna no existe o está vacía en una fila, se
                   numeran solas como "Recomendación 1, 2...". */}
-              {/* Recomendaciones de Compra/Venta/Compra-Venta DCUATES — en
-                  pestañas (una sola tarjeta) en vez de 3 bloques apilados.
-                  Igual que el botón verde de Recomendaciones del inicio:
+              {/* Recomendaciones de Compra/Venta/Compra-Venta DCUATES —
+                  igual que el botón verde de Recomendaciones del inicio:
                   muestran el nombre de cada liga (columna "NOMBRE ...");
                   si esa columna no existe o está vacía en una fila, se
                   numeran solas como "Recomendación 1, 2...". */}
-              <PestanasNaranja
-                tabs={[
-                  {
-                    id: "recomendaciones-compra",
-                    titulo: "Recomendaciones de Compra",
-                    contenido: (
-                      <>
-                        {recomendacionesCompra.length === 0 && <p>Muy pronto encontrarás aquí recomendaciones de compra.</p>}
-                        <ul className="space-y-1.5">
-                          {recomendacionesCompra.map((r, i) => (
-                            <li key={i}>
-                              <a href={r.enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100]">
-                                {r.nombre}
-                              </a>
-                            </li>
-                          ))}
-                        </ul>
-                      </>
-                    )
-                  },
-                  {
-                    id: "recomendaciones-venta",
-                    titulo: "Recomendaciones de Venta",
-                    contenido: (
-                      <>
-                        {recomendacionesVenta.length === 0 && <p>Muy pronto encontrarás aquí recomendaciones de venta.</p>}
-                        <ul className="space-y-1.5">
-                          {recomendacionesVenta.map((r, i) => (
-                            <li key={i}>
-                              <a href={r.enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100]">
-                                {r.nombre}
-                              </a>
-                            </li>
-                          ))}
-                        </ul>
-                      </>
-                    )
-                  },
-                  {
-                    id: "compra-venta-dcuates",
-                    titulo: "Compra-Venta DCUATES",
-                    contenido: (
-                      <>
-                        {compraVentaDcuates.length === 0 && <p>Muy pronto encontrarás aquí más opciones de compra-venta DCUATES.</p>}
-                        <ul className="space-y-1.5">
-                          {compraVentaDcuates.map((r, i) => (
-                            <li key={i}>
-                              <a href={r.enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100]">
-                                {r.nombre}
-                              </a>
-                            </li>
-                          ))}
-                        </ul>
-                      </>
-                    )
-                  }
-                ]}
-              />
+              <BotonNaranjaDesplegable
+                titulo="Recomendaciones de Compra"
+                abierto={infoAbierta === "recomendaciones-compra"}
+                onClick={() => setInfoAbierta((v) => (v === "recomendaciones-compra" ? null : "recomendaciones-compra"))}
+              >
+                {recomendacionesCompra.length === 0 && <p>Muy pronto encontrarás aquí recomendaciones de compra.</p>}
+                <ul className="space-y-1.5">
+                  {recomendacionesCompra.map((r, i) => (
+                    <li key={i}>
+                      <a href={r.enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100]">
+                        {r.nombre}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </BotonNaranjaDesplegable>
+
+              <BotonNaranjaDesplegable
+                titulo="Recomendaciones de Venta"
+                abierto={infoAbierta === "recomendaciones-venta"}
+                onClick={() => setInfoAbierta((v) => (v === "recomendaciones-venta" ? null : "recomendaciones-venta"))}
+              >
+                {recomendacionesVenta.length === 0 && <p>Muy pronto encontrarás aquí recomendaciones de venta.</p>}
+                <ul className="space-y-1.5">
+                  {recomendacionesVenta.map((r, i) => (
+                    <li key={i}>
+                      <a href={r.enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100]">
+                        {r.nombre}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </BotonNaranjaDesplegable>
+
+              <BotonNaranjaDesplegable
+                titulo="Compra-Venta DCUATES"
+                abierto={infoAbierta === "compra-venta-dcuates"}
+                onClick={() => setInfoAbierta((v) => (v === "compra-venta-dcuates" ? null : "compra-venta-dcuates"))}
+              >
+                {compraVentaDcuates.length === 0 && <p>Muy pronto encontrarás aquí más opciones de compra-venta DCUATES.</p>}
+                <ul className="space-y-1.5">
+                  {compraVentaDcuates.map((r, i) => (
+                    <li key={i}>
+                      <a href={r.enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100]">
+                        {r.nombre}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </BotonNaranjaDesplegable>
             </div>
           </div>
 
@@ -1133,78 +1124,68 @@ export default function App() {
                 </a>
 
                 {/* Apoyo a Causa Animal / Personas Extraviadas / Cosas y
-                    Casos — en pestañas (una sola tarjeta) en vez de 3
-                    bloques apilados, para no alargar tanto la columna en
-                    el celular. */}
-                <PestanasNaranja
-                  tabs={[
-                    {
-                      id: "apoyo-causa-animal",
-                      titulo: "Apoyo a Causa Animal",
-                      contenido: (
-                        <>
-                          <p className="font-black uppercase text-[#0f2d1e] text-[11px] tracking-wide">La prevención es la mejor ayuda</p>
-                          <ul className="list-disc pl-4 space-y-1">
-                            <li>Esteriliza a tu mascota: es la forma más efectiva de evitar camadas no deseadas y abandono.</li>
-                            <li>Coloca collar con placa o microchip, por si se extravía.</li>
-                            <li>Vacunas y desparasitación al día — previenen enfermedades que también afectan a otros animales.</li>
-                            <li>Si ves un animal en la calle, no lo alimentes con lo que comemos nosotros; ofrece agua y contacta a un refugio o veterinario cercano.</li>
-                            <li>Adoptar, en vez de comprar, ayuda a que menos animales terminen en situación de calle.</li>
-                          </ul>
-                          <p className="pt-2 font-black uppercase text-[#0f2d1e] text-[11px] tracking-wide">Más Información de Apoyo</p>
-                          {apoyoCausaAnimalLinks.length === 0 && <p>Muy pronto encontrarás aquí más recursos de apoyo a causa animal.</p>}
-                          <ul className="space-y-1.5">
-                            {apoyoCausaAnimalLinks.map((enlace, i) => (
-                              <li key={i}>
-                                <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100] break-words">
-                                  Apoyo {i + 1}
-                                </a>
-                              </li>
-                            ))}
-                          </ul>
-                        </>
-                      )
-                    },
-                    {
-                      id: "apoyo-personas-extraviadas",
-                      titulo: "Apoyo a Personas Extraviadas",
-                      contenido: (
-                        <>
-                          <p>Recursos, protocolos y contactos de apoyo para casos de personas extraviadas.</p>
-                          {apoyoPersonasExtraviadasLinks.length === 0 && <p>Muy pronto encontrarás aquí más recursos de apoyo.</p>}
-                          <ul className="space-y-1.5">
-                            {apoyoPersonasExtraviadasLinks.map((enlace, i) => (
-                              <li key={i}>
-                                <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100] break-words">
-                                  Apoyo {i + 1}
-                                </a>
-                              </li>
-                            ))}
-                          </ul>
-                        </>
-                      )
-                    },
-                    {
-                      id: "apoyo-cosas-casos",
-                      titulo: "Apoyo Cosas y Casos",
-                      contenido: (
-                        <>
-                          <p>Recursos de apoyo para objetos extraviados y otros casos de la comunidad.</p>
-                          {apoyoCosasCasosLinks.length === 0 && <p>Muy pronto encontrarás aquí más recursos de apoyo.</p>}
-                          <ul className="space-y-1.5">
-                            {apoyoCosasCasosLinks.map((enlace, i) => (
-                              <li key={i}>
-                                <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100] break-words">
-                                  Apoyo {i + 1}
-                                </a>
-                              </li>
-                            ))}
-                          </ul>
-                        </>
-                      )
-                    }
-                  ]}
-                />
+                    Casos. */}
+                <BotonNaranjaDesplegable
+                  titulo="Apoyo a Causa Animal"
+                  abierto={infoAbierta === "apoyo-causa-animal"}
+                  onClick={() => setInfoAbierta((v) => (v === "apoyo-causa-animal" ? null : "apoyo-causa-animal"))}
+                >
+                  <p className="font-black uppercase text-[#0f2d1e] text-[11px] tracking-wide">La prevención es la mejor ayuda</p>
+                  <ul className="list-disc pl-4 space-y-1">
+                    <li>Esteriliza a tu mascota: es la forma más efectiva de evitar camadas no deseadas y abandono.</li>
+                    <li>Coloca collar con placa o microchip, por si se extravía.</li>
+                    <li>Vacunas y desparasitación al día — previenen enfermedades que también afectan a otros animales.</li>
+                    <li>Si ves un animal en la calle, no lo alimentes con lo que comemos nosotros; ofrece agua y contacta a un refugio o veterinario cercano.</li>
+                    <li>Adoptar, en vez de comprar, ayuda a que menos animales terminen en situación de calle.</li>
+                  </ul>
+                  <p className="pt-2 font-black uppercase text-[#0f2d1e] text-[11px] tracking-wide">Más Información de Apoyo</p>
+                  {apoyoCausaAnimalLinks.length === 0 && <p>Muy pronto encontrarás aquí más recursos de apoyo a causa animal.</p>}
+                  <ul className="space-y-1.5">
+                    {apoyoCausaAnimalLinks.map((enlace, i) => (
+                      <li key={i}>
+                        <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100] break-words">
+                          Apoyo {i + 1}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </BotonNaranjaDesplegable>
+
+                <BotonNaranjaDesplegable
+                  titulo="Apoyo a Personas Extraviadas"
+                  abierto={infoAbierta === "apoyo-personas-extraviadas"}
+                  onClick={() => setInfoAbierta((v) => (v === "apoyo-personas-extraviadas" ? null : "apoyo-personas-extraviadas"))}
+                >
+                  <p>Recursos, protocolos y contactos de apoyo para casos de personas extraviadas.</p>
+                  {apoyoPersonasExtraviadasLinks.length === 0 && <p>Muy pronto encontrarás aquí más recursos de apoyo.</p>}
+                  <ul className="space-y-1.5">
+                    {apoyoPersonasExtraviadasLinks.map((enlace, i) => (
+                      <li key={i}>
+                        <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100] break-words">
+                          Apoyo {i + 1}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </BotonNaranjaDesplegable>
+
+                <BotonNaranjaDesplegable
+                  titulo="Apoyo Cosas y Casos"
+                  abierto={infoAbierta === "apoyo-cosas-casos"}
+                  onClick={() => setInfoAbierta((v) => (v === "apoyo-cosas-casos" ? null : "apoyo-cosas-casos"))}
+                >
+                  <p>Recursos de apoyo para objetos extraviados y otros casos de la comunidad.</p>
+                  {apoyoCosasCasosLinks.length === 0 && <p>Muy pronto encontrarás aquí más recursos de apoyo.</p>}
+                  <ul className="space-y-1.5">
+                    {apoyoCosasCasosLinks.map((enlace, i) => (
+                      <li key={i}>
+                        <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100] break-words">
+                          Apoyo {i + 1}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </BotonNaranjaDesplegable>
               </div>
             </div>
           </div>
@@ -1882,37 +1863,6 @@ function BotonNaranjaDesplegable({ titulo, abierto, onClick, children }) {
   );
 }
 
-// Pestañas naranjas — alternativa más compacta a 3 BotonNaranjaDesplegable
-// apilados: una sola tarjeta con 3 pestañas arriba; al tocar una se cambia
-// el contenido de abajo, sin alargar tanto la columna en el celular.
-function PestanasNaranja({ tabs }) {
-  const [activa, setActiva] = useState(tabs[0] ? tabs[0].id : null);
-  const tabActiva = tabs.find((t) => t.id === activa) || tabs[0];
-  return (
-    <div className="rounded-xl border-2 border-[#0f2d1e] overflow-hidden shadow-sm">
-      <div className="flex bg-[#e65100]">
-        {tabs.map((t) => (
-          <button
-            key={t.id}
-            type="button"
-            onClick={() => setActiva(t.id)}
-            className={`flex-1 text-center px-1.5 py-2.5 text-[9px] sm:text-[11px] font-black uppercase tracking-tight leading-tight transition-colors ${
-              tabActiva && t.id === tabActiva.id ? "bg-[#bf360c] text-white" : "text-white/75 hover:bg-[#bf360c]/50"
-            }`}
-          >
-            {t.titulo}
-          </button>
-        ))}
-      </div>
-      {tabActiva && (
-        <div className="p-3 bg-white text-xs sm:text-sm text-slate-700 leading-relaxed space-y-2">
-          {tabActiva.contenido}
-        </div>
-      )}
-    </div>
-  );
-}
-
 function Carrusel({ items, renderItem, intervaloMs = 4000 }) {
   const [index, setIndex] = useState(0);
   const [pausado, setPausado] = useState(false);
@@ -2318,12 +2268,30 @@ function ContenidoModalProyecto({ id, onCerrar }) {
           </a>
         </p>
         <div className="space-y-2 pt-1">
-          <BotonModal href={enlaceWhatsApp("¡Hola DCUATES! Quiero ofrecer un producto o servicio en Ventas con Causa.")}>
-            Publicar mi producto o servicio
-          </BotonModal>
-          <BotonModal href={enlaceWhatsApp("¡Hola DCUATES! Quiero reportar un caso de mascota, persona o cosa extraviada.")} variante="secundario">
-            Reportar caso extraviado
-          </BotonModal>
+          <button
+            type="button"
+            onClick={() => {
+              onCerrar();
+              irASeccion("publicidad");
+            }}
+            className="w-full text-left rounded-xl border-2 border-[#0f2d1e] bg-[#e65100] hover:bg-[#bf360c] p-3 shadow-sm transition-colors flex items-center justify-between gap-3"
+          >
+            <p className="text-sm sm:text-base font-black text-white uppercase tracking-tight leading-tight">
+              Publicar mi Producto o Servicio
+            </p>
+            <FlechaBlanca />
+          </button>
+          <a
+            href={enlaceWhatsApp("¡Hola DCUATES! Me interesa un producto o servicio de Ventas con Causa, su código es: ")}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full text-left rounded-xl border-2 border-[#0f2d1e] bg-[#e65100] hover:bg-[#bf360c] p-3 shadow-sm transition-colors flex items-center justify-between gap-3"
+          >
+            <p className="text-sm sm:text-base font-black text-white uppercase tracking-tight leading-tight">
+              Si Te Interesa Algo, Envía su Código Aquí
+            </p>
+            <FlechaBlanca />
+          </a>
         </div>
       </div>
     );
