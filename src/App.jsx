@@ -309,6 +309,29 @@ const BIENESTAR_GALERIA_ITEMS = [
   { id: "bien3", tipo: "Charla", nombre: "Salud mental y comunidad", descripcion: "Plática abierta sobre bienestar emocional, con espacio para preguntas.", img: "/images/bienestar-3.png" }
 ];
 
+// 3 secciones naranjas nuevas, debajo de los botones verdes (Historias,
+// Cupones/Promos y Patrocinadores/Alianzas). Cada arreglo alimenta su
+// propio carrusel — reemplaza estas fotos/textos de EJEMPLO por las reales
+// cuando las tengas. Misma estructura que las galerías de arriba, así que
+// también se pueden conectar a Baserow más adelante si se desea.
+const HISTORIAS_DCUATES_ITEMS = [
+  { id: "hist1", tipo: "Historia", nombre: "El renacer de la Panadería Café Sol", descripcion: "Cómo una alianza vecinal ayudó a reabrir sus puertas después de un momento difícil.", img: "/images/historias-1.png" },
+  { id: "hist2", tipo: "Historia", nombre: "De la calle a un hogar: la adopción de Firulais", descripcion: "Una historia de Ecatepets con final feliz gracias a la red de vecinos.", img: "/images/historias-2.png" },
+  { id: "hist3", tipo: "Historia", nombre: "Voluntarios que cambian vidas", descripcion: "El testimonio de una familia apoyada por la comunidad DCUATES.", img: "/images/historias-3.png" }
+];
+
+const CUPONES_PROMOS_ITEMS = [
+  { id: "cup1", tipo: "Cupón", nombre: "20% en tu primera visita — Taquería El Sol", descripcion: "Válido presentando este cupón digital directo desde tu celular.", img: "/images/cupones-1.png" },
+  { id: "cup2", tipo: "Promo", nombre: "2x1 en tu primera consulta de asesoría", descripcion: "Cupo limitado — agenda tu lugar directo por WhatsApp.", img: "/images/cupones-2.png" },
+  { id: "cup3", tipo: "Promo", nombre: "Descuento en Ventas con Causa", descripcion: "Pregunta por la promoción vigente del mes en el catálogo.", img: "/images/cupones-3.png" }
+];
+
+const PATROCINADORES_ALIANZAS_ITEMS = [
+  { id: "aliado1", tipo: "Aliado", nombre: "Panadería Café Sol", descripcion: "Aliado fundador de la Bibliobici Móvil DCUATES.", img: "/images/aliados-1.png" },
+  { id: "aliado2", tipo: "Patrocinador", nombre: "Refugio Animal Ecatepec", descripcion: "Apoya activamente la difusión de Ecatepets.", img: "/images/aliados-2.png" },
+  { id: "aliado3", tipo: "Aliado", nombre: "Conexiones con Causa", descripcion: "Organización impulsora del programa DCUATES.", img: "/images/aliados-3.png" }
+];
+
 // Mapa que conecta cada id de proyecto con su galería y título de modal —
 // así el botón "Ver galería" sabe qué mostrar sin más configuración.
 const GALERIAS_PROYECTOS = {
@@ -633,7 +656,7 @@ export default function App() {
               <img
                 src="/images/bibliobici-movil.png"
                 alt="Bibliobici Móvil DCUATES en la comunidad"
-                className="w-full h-full object-contain"
+                className="w-full h-full object-cover"
                 onError={(e) => {
                   e.target.style.display = 'none';
                   e.target.parentElement.innerHTML = '<div class="p-12 text-center text-[#0f2d1e]/70 font-bold uppercase text-xs tracking-wider bg-emerald-50 h-full flex items-center justify-center">📷 [Espacio para Foto de la Bibliobici]</div>';
@@ -710,9 +733,9 @@ export default function App() {
             <div className="mt-3">
               <div className="rounded-2xl overflow-hidden border-4 border-[#0f2d1e]/30 shadow-lg bg-[#0f2d1e] p-3">
                 <p className="text-white font-black uppercase text-xs sm:text-sm tracking-wide mb-2 px-1 text-center">
-                  💡 Videos DCUATES para Reflexionar
+                  Historias y reflexiones DCUATES que INSPIRAN 💡
                   <br className="sm:hidden" />
-                  <span className="block sm:inline sm:ml-1">🎥 🍿 😊 Toca cada uno para verlo en grande</span>
+                  <span className="block sm:inline sm:ml-1">Dales clic para ampliarlos y disfrutarlos 🎥 🍿 😊</span>
                 </p>
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 max-h-[420px] overflow-y-auto pr-1">
                   {videosPortadaFinal.map((v, i) => (
@@ -838,7 +861,7 @@ export default function App() {
                 </BotonVerdeInfo>
 
                 <BotonVerdeInfo
-                  titulo="Preguntas Frecuentes"
+                  titulo="Preguntas Frecuentes ❓💬"
                   abierto={infoAbierta === "faq"}
                   onClick={() => setInfoAbierta((v) => (v === "faq" ? null : "faq"))}
                 >
@@ -851,6 +874,32 @@ export default function App() {
                     ))}
                   </div>
                 </BotonVerdeInfo>
+              </div>
+
+              {/* 3 secciones naranjas nuevas, debajo de los botones verdes —
+                  mismo estilo que las cajas de proyectos, cada una con sus
+                  puntos representativos y un carrusel de fotos + texto. */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
+                {[
+                  { titulo: "Historias DCUATES", puntos: ["Testimonios reales", "Historias con causa", "Inspiración comunitaria"], items: HISTORIAS_DCUATES_ITEMS },
+                  { titulo: "Cupones, Promos y Más", puntos: ["Descuentos exclusivos", "Promociones locales", "Se actualiza cada mes"], items: CUPONES_PROMOS_ITEMS },
+                  { titulo: "Patrocinadores y Alianzas DCUATES", puntos: ["Negocios aliados", "Organizaciones que apoyan", "¡Gracias por sumar!"], items: PATROCINADORES_ALIANZAS_ITEMS }
+                ].map((caja, i) => (
+                  <div key={i} className="rounded-2xl bg-[#e65100] text-white shadow-md overflow-hidden flex flex-col">
+                    <div className="px-3 pt-3 pb-2 text-center border-b border-white/20">
+                      <h4 className="uppercase font-black text-sm sm:text-base leading-tight">{caja.titulo}</h4>
+                      <ul className="text-[10px] sm:text-xs font-bold mt-1 space-y-0.5">
+                        {caja.puntos.map((p) => <li key={p}>* {p}</li>)}
+                      </ul>
+                    </div>
+                    <div className="p-2 bg-black/10 flex-1">
+                      <Carrusel
+                        items={caja.items}
+                        renderItem={(item) => <TarjetaCarrusel item={item} etiqueta={item.tipo} />}
+                      />
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -1457,7 +1506,7 @@ export default function App() {
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="text-xl font-bold uppercase tracking-tight border-b pb-3 mb-4 text-emerald-800 font-heading">
-              Preguntas Frecuentes
+              Preguntas Frecuentes ❓💬
             </h3>
             <div className="overflow-y-auto space-y-3 pr-2">
               {FAQ_ITEMS.map((f, i) => (
