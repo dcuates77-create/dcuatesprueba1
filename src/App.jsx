@@ -876,29 +876,42 @@ export default function App() {
                 </BotonVerdeInfo>
               </div>
 
-              {/* 3 secciones naranjas nuevas, debajo de los botones verdes —
-                  mismo estilo que las cajas de proyectos, cada una con sus
-                  puntos representativos y un carrusel de fotos + texto. */}
+              {/* 3 botones naranjas nuevos — mismo estilo que los de arriba,
+                  cada uno abre su propio modal con el carrusel adentro (el
+                  logo de cada uno se agrega después en /public/images/,
+                  con el mismo nombre de archivo que aquí abajo). */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
                 {[
-                  { titulo: "Historias DCUATES", puntos: ["Testimonios reales", "Historias con causa", "Inspiración comunitaria"], items: HISTORIAS_DCUATES_ITEMS },
-                  { titulo: "Cupones, Promos y Más", puntos: ["Descuentos exclusivos", "Promociones locales", "Se actualiza cada mes"], items: CUPONES_PROMOS_ITEMS },
-                  { titulo: "Patrocinadores y Alianzas DCUATES", puntos: ["Negocios aliados", "Organizaciones que apoyan", "¡Gracias por sumar!"], items: PATROCINADORES_ALIANZAS_ITEMS }
-                ].map((caja, i) => (
-                  <div key={i} className="rounded-2xl bg-[#e65100] text-white shadow-md overflow-hidden flex flex-col">
-                    <div className="px-3 pt-3 pb-2 text-center border-b border-white/20">
-                      <h4 className="uppercase font-black text-sm sm:text-base leading-tight">{caja.titulo}</h4>
-                      <ul className="text-[10px] sm:text-xs font-bold mt-1 space-y-0.5">
-                        {caja.puntos.map((p) => <li key={p}>* {p}</li>)}
+                  { t: "HISTORIAS DCUATES", modal: "historias-dcuates", img: "/images/HistoriasDCUATES.png", puntos: ["TESTIMONIOS REALES", "HISTORIAS CON CAUSA", "INSPIRACIÓN COMUNITARIA"] },
+                  { t: "CUPONES, PROMOS Y MÁS", modal: "cupones-promos", img: "/images/CuponesPromos.png", puntos: ["DESCUENTOS EXCLUSIVOS", "PROMOCIONES LOCALES", "SE ACTUALIZA CADA MES"] },
+                  { t: "PATROCINADORES Y ALIANZAS DCUATES", modal: "patrocinadores-alianzas", img: "/images/PatrocinadoresAlianzas.png", puntos: ["NEGOCIOS ALIADOS", "ORGANIZACIONES QUE APOYAN", "¡GRACIAS POR SUMAR!"] }
+                ].map((btn, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setModalProyecto(btn.modal)}
+                    className="flex flex-col rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white shadow-md transition-all hover:scale-[1.02] overflow-hidden font-heading text-left w-full"
+                  >
+                    <div className="px-2 pt-3 pb-1 text-center border-b border-white/20">
+                      <h4 className="uppercase font-black leading-tight text-sm sm:text-base lg:text-lg">
+                        {btn.t}
+                      </h4>
+                    </div>
+                    <div className="flex flex-1 items-center gap-2 px-2 py-2">
+                      <div className="w-2/5 h-full flex items-center justify-center">
+                        <img
+                          src={btn.img}
+                          alt=""
+                          loading="lazy"
+                          className="max-h-16 sm:max-h-20 w-auto object-contain drop-shadow"
+                          onError={(e) => { e.target.style.display = 'none'; }}
+                        />
+                      </div>
+                      <ul className="w-3/5 space-y-1 text-left text-[10px] sm:text-xs font-bold leading-snug">
+                        {btn.puntos.map((p, i) => <li key={i}>* {p}</li>)}
                       </ul>
                     </div>
-                    <div className="p-2 bg-black/10 flex-1">
-                      <Carrusel
-                        items={caja.items}
-                        renderItem={(item) => <TarjetaCarrusel item={item} etiqueta={item.tipo} />}
-                      />
-                    </div>
-                  </div>
+                  </button>
                 ))}
               </div>
             </div>
@@ -1559,8 +1572,52 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, musicaSona
           <span className="text-2xl sm:text-3xl md:text-4xl font-black uppercase tracking-tight text-[#0f2d1e]">DCUATES</span>
         </a>
 
-        {/* Íconos de redes: comparten la primera fila con el logo (empujados a la derecha) en móvil; en escritorio, a la derecha del todo */}
+        {/* Íconos de redes: comparten la primera fila con el logo (empujados a la derecha) en móvil; en escritorio, a la derecha del todo. La música va justo a la izquierda de los íconos, bien pegada, para no ocupar una fila extra en el celular. */}
         <div className="order-2 md:order-3 ml-auto flex items-center gap-2 sm:gap-3">
+
+          {/* Música — botón compacto; el volumen se despliega hacia abajo
+              en una tarjetita flotante, sin ocupar espacio propio. */}
+          <div className="relative mr-3">
+            <div className="inline-flex items-center rounded-full bg-[#e65100] text-white shadow-sm overflow-hidden">
+              <button
+                type="button"
+                onClick={onAlternarMusica}
+                className="hover:bg-[#bf360c] transition-colors uppercase tracking-wide text-center leading-tight px-2.5 py-1.5 text-[10px] sm:text-[11px] font-black flex items-center gap-1"
+              >
+                <span>🎵</span>
+                <span className="hidden sm:inline">{musicaSonando ? "Pausar" : "Música Dcuates"}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setVolumenAbierto((v) => !v)}
+                className="hover:bg-[#bf360c] transition-colors px-2 py-1.5 border-l border-white/30"
+                aria-label="Ajustar volumen"
+                title="Volumen"
+              >
+                {volumen === 0 ? "🔇" : volumen < 0.5 ? "🔉" : "🔊"}
+              </button>
+            </div>
+
+            {volumenAbierto && (
+              <>
+                <div className="fixed inset-0 z-30" onClick={() => setVolumenAbierto(false)} />
+                <div className="absolute right-0 top-full mt-2 z-40 rounded-xl bg-white shadow-xl border border-emerald-800/10 px-3 py-2.5 flex items-center gap-2">
+                  <span aria-hidden="true">{volumen === 0 ? "🔇" : volumen < 0.5 ? "🔉" : "🔊"}</span>
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.05"
+                    value={volumen}
+                    onChange={(e) => onCambiarVolumen && onCambiarVolumen(parseFloat(e.target.value))}
+                    className="w-24 accent-[#17472d] cursor-pointer"
+                    aria-label="Volumen de la música"
+                  />
+                </div>
+              </>
+            )}
+          </div>
+
           <a href={REDES_SOCIALES.facebook} target="_blank" rel="noreferrer" className="flex h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="Facebook">
             <svg className="h-4 w-4 sm:h-5 sm:w-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" />
@@ -1585,10 +1642,8 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, musicaSona
           </a>
         </div>
 
-        {/* Fila única de menú: accesos directos + MÁS (con todo lo demás)
-            a la izquierda, música a la derecha. Siempre visible (sin
-            hamburguesa), se envuelve sola si no cabe en una línea. */}
-        <div className="order-3 w-full flex flex-wrap items-center justify-between gap-2 pt-1.5 mt-0.5 border-t border-emerald-800/10">
+        {/* Fila única de menú: accesos directos + MÁS (con todo lo demás). */}
+        <div className="order-3 w-full flex flex-wrap items-center gap-2 pt-1.5 mt-0.5 border-t border-emerald-800/10">
           <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[10px] sm:text-[11px] md:text-xs font-black">
             {NAV_LINKS_PRINCIPALES.map(link => (
               <a
@@ -1652,50 +1707,6 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, musicaSona
                 </>
               )}
             </div>
-          </div>
-
-          {/* Música — botón compacto; el volumen se despliega hacia
-              arriba en una tarjetita flotante, para no ocupar espacio del
-              renglón cuando no se está usando. */}
-          <div className="relative">
-            <div className="inline-flex items-center rounded-full bg-[#e65100] text-white shadow-sm overflow-hidden">
-              <button
-                type="button"
-                onClick={onAlternarMusica}
-                className="hover:bg-[#bf360c] transition-colors uppercase tracking-wide text-center leading-tight px-3 py-1.5 text-[10px] sm:text-[11px] md:text-xs font-black flex items-center gap-1.5"
-              >
-                <span>🎵</span>
-                {musicaSonando ? "Pausar" : "Música Dcuates"}
-              </button>
-              <button
-                type="button"
-                onClick={() => setVolumenAbierto((v) => !v)}
-                className="hover:bg-[#bf360c] transition-colors px-2.5 py-1.5 border-l border-white/30"
-                aria-label="Ajustar volumen"
-                title="Volumen"
-              >
-                {volumen === 0 ? "🔇" : volumen < 0.5 ? "🔉" : "🔊"}
-              </button>
-            </div>
-
-            {volumenAbierto && (
-              <>
-                <div className="fixed inset-0 z-30" onClick={() => setVolumenAbierto(false)} />
-                <div className="absolute right-0 bottom-full mb-2 z-40 rounded-xl bg-white shadow-xl border border-emerald-800/10 px-3 py-2.5 flex items-center gap-2">
-                  <span aria-hidden="true">{volumen === 0 ? "🔇" : volumen < 0.5 ? "🔉" : "🔊"}</span>
-                  <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.05"
-                    value={volumen}
-                    onChange={(e) => onCambiarVolumen && onCambiarVolumen(parseFloat(e.target.value))}
-                    className="w-24 accent-[#17472d] cursor-pointer"
-                    aria-label="Volumen de la música"
-                  />
-                </div>
-              </>
-            )}
           </div>
         </div>
       </div>
@@ -2398,6 +2409,36 @@ function ContenidoModalProyecto({ id, onCerrar }) {
             </a>
           ))}
         </div>
+      </div>
+    );
+  }
+
+  // Caso especial 3: los 3 botones nuevos (Historias, Cupones/Promos,
+  // Patrocinadores/Alianzas) — mismo formato: título, puntos y su carrusel.
+  const CAJAS_NARANJAS_NUEVAS = {
+    "historias-dcuates": { titulo: "Historias DCUATES", puntos: ["Testimonios reales", "Historias con causa", "Inspiración comunitaria"], items: HISTORIAS_DCUATES_ITEMS },
+    "cupones-promos": { titulo: "Cupones, Promos y Más", puntos: ["Descuentos exclusivos", "Promociones locales", "Se actualiza cada mes"], items: CUPONES_PROMOS_ITEMS },
+    "patrocinadores-alianzas": { titulo: "Patrocinadores y Alianzas DCUATES", puntos: ["Negocios aliados", "Organizaciones que apoyan", "¡Gracias por sumar!"], items: PATROCINADORES_ALIANZAS_ITEMS }
+  };
+  if (CAJAS_NARANJAS_NUEVAS[id]) {
+    const caja = CAJAS_NARANJAS_NUEVAS[id];
+    return (
+      <div className="space-y-4">
+        <h3 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#0f2d1e]">
+          {caja.titulo}
+        </h3>
+        <ul className="space-y-2">
+          {caja.puntos.map((punto, i) => (
+            <li key={i} className="flex items-center gap-2 text-sm font-bold text-slate-700 uppercase">
+              <span className="h-2 w-2 rounded-full bg-[#00c853] flex-shrink-0" />
+              {punto}
+            </li>
+          ))}
+        </ul>
+        <Carrusel
+          items={caja.items}
+          renderItem={(item) => <TarjetaCarrusel item={item} etiqueta={item.tipo} />}
+        />
       </div>
     );
   }
