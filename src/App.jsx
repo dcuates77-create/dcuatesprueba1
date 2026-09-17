@@ -60,6 +60,7 @@ const NAV_LINKS_MAS = [
   { label: "Alianzas Solidarias", href: "#iniciativas" },
   { label: "Apoyo a Causas", href: "#extraviados-registro" },
   { label: "Preguntas Frecuentes", action: "faq" },
+  { label: "Sugerencias y Quejas", action: "sugerencias" },
   { label: "Préstamo Gratuito de Libros", modal: "libros" },
   { label: "Ecatepets Mascotas", modal: "ecatepets" },
   { label: "Círculo de Confianza", modal: "circulo-confianza" },
@@ -401,6 +402,95 @@ const FAQ_ITEMS = [
   { pregunta: "¿Cómo me entero de las noticias y actividades nuevas?", respuesta: "Sigue nuestras redes sociales (Facebook, Instagram, YouTube y TikTok) y revisa el botón de \"Noticias de Barrio\" en la portada; ahí publicamos convocatorias y eventos." }
 ];
 
+// Navegación por Necesidades — botón flotante naranja (arriba a la derecha)
+// que agrupa TODAS las preguntas por necesidad del visitante en 4 categorías.
+// Cada pregunta lleva a un "modal" (mismo id que en TODOS_LOS_PROYECTOS o en
+// las 3 cajas naranjas nuevas), o a una "action" especial ("comparte" abre el
+// formulario de Conocer y Compartir Más), o a un "enlace" directo (para las
+// necesidades "próximamente" que aún no tienen su propia sección/modal).
+const NECESIDADES_GRUPOS = [
+  {
+    id: "mascotas",
+    titulo: "Mascotas",
+    preguntas: [
+      { texto: "¿Perdiste a tu mascota?", modal: "ecatepets" },
+      { texto: "¿Quieres adoptar una mascota?", modal: "ecatepets" },
+      { texto: "¿Rescataste a un peludito y no sabes qué hacer?", modal: "ecatepets" },
+      { texto: "¿Buscas una recomendación de atención veterinaria de confianza? (próximamente)", enlace: enlaceWhatsApp("¡Hola DCUATES! Busco una recomendación de atención veterinaria de confianza.") },
+      { texto: "¿Buscas accesorios, alimentos o productos de calidad para tu mascota? (próximamente)", enlace: enlaceWhatsApp("¡Hola DCUATES! Busco accesorios, alimentos o productos de calidad para mi mascota.") }
+    ]
+  },
+  {
+    id: "negocios",
+    titulo: "Negocios",
+    preguntas: [
+      { texto: "¿Tienes un negocio y quieres más clientes de tu zona?", modal: "publicidad-tarjeta" },
+      { texto: "¿Quieres anunciar una promoción o evento de tu negocio?", modal: "publicidad-tarjeta" },
+      { texto: "¿Buscas aliados o proveedores de confianza para crecer?", modal: "alianzas-tarjeta" },
+      { texto: "¿Quieres vender o comprar algo de segunda mano de forma segura?", modal: "bazares" },
+      { texto: "¿Buscas un bazar comunitario donde participar?", modal: "bazares" },
+      { texto: "¿Buscas un producto o servicio local que también apoye una causa?", modal: "ventas-con-causa" },
+      { texto: "¿Quieres vender tu producto o servicio con causa?", modal: "ventas-con-causa" },
+      { texto: "¿Buscas descuentos en negocios locales?", modal: "cupones-promos" },
+      { texto: "¿Tu negocio quiere patrocinar o aliarse con DCUATES?", modal: "patrocinadores-alianzas" },
+      { texto: "¿Buscas trabajo o quieres ofrecer una vacante? (próximamente)", enlace: enlaceWhatsApp("¡Hola DCUATES! Me interesa la futura bolsa de empleo comunitaria.") }
+    ]
+  },
+  {
+    id: "apoyos-mutuos",
+    titulo: "Beneficios y Apoyos Mutuos",
+    preguntas: [
+      { texto: "¿Buscas un libro o material educativo prestado?", modal: "libros" },
+      { texto: "¿Tienes libros para donar o intercambiar?", modal: "libros" },
+      { texto: "¿Necesitas un servicio y quieres una recomendación de confianza?", modal: "circulo-confianza" },
+      { texto: "¿Quieres unirte a una red de apoyo mutuo?", modal: "circulo-confianza" },
+      { texto: "¿Tuviste una experiencia con un negocio y quieres compartirla?", modal: "recomienda-evalua-gana" },
+      { texto: "¿Quieres apoyar con dinero, en especie, trueque o tu tiempo?", modal: "donaciones" },
+      { texto: "¿Tú o tu familia necesitan apoyo y no saben a quién acudir?", modal: "donaciones" },
+      { texto: "¿Quieres avisar o enterarte de algo importante de tu colonia? (próximamente)", enlace: enlaceWhatsApp("¡Hola DCUATES! Quiero compartir o enterarme de alertas de mi colonia.") }
+    ]
+  },
+  {
+    id: "conocer-mas",
+    titulo: "Conocer y Compartir Más",
+    preguntas: [
+      { texto: "¿Necesitas orientación (legal, de negocio, personal)?", modal: "asesorias" },
+      { texto: "¿Tienes conocimientos que quieras compartir como asesor voluntario?", modal: "asesorias" },
+      { texto: "¿Quieres inspirarte con testimonios reales de la comunidad?", modal: "historias-dcuates" },
+      { texto: "¿Tienes una historia que quieras compartir?", modal: "historias-dcuates" },
+      { texto: "¿Quieres enterarte de eventos y convocatorias de tu colonia?", modal: "noticias" },
+      { texto: "¿Tienes una noticia o evento que quieras compartir?", modal: "noticias" },
+      { texto: "¿Buscas actividades para tu salud física o mental?", modal: "bienestar" },
+      { texto: "¿Quieres organizarte o sumarte a una actividad recreativa comunitaria?", modal: "bienestar" },
+      { texto: "¿Qué te gustaría o necesitas que compartiéramos, y qué te gustaría compartir tú?", action: "comparte" }
+    ]
+  }
+];
+
+// Botón "Recibe Beneficios" del encabezado — abre un mini formulario de
+// intereses y arma un mensaje de WhatsApp con lo seleccionado (sin backend:
+// tú decides después si lo que envías es un boletín periódico o avisos
+// puntuales). Para agregar/quitar un interés, solo edita este arreglo.
+const INTERESES_BENEFICIOS = [
+  "Promociones y negocios locales",
+  "Mascotas (adopciones y extravíos)",
+  "Noticias y eventos del barrio",
+  "Bienestar y actividades comunitarias",
+  "Otros Beneficios y Apoyos/Voluntariado"
+];
+
+// Reto/Momento DCUATES — bloque de contenido con periodicidad ABIERTA (no
+// se actualiza en fecha fija; edítalo cuando tengas un reto, dinámica o
+// momento comunitario nuevo que compartir). Mientras "imagen" esté vacía o
+// no cargue, se ve un espacio genérico en su lugar.
+const RETO_DEL_MOMENTO = {
+  titulo: "Reto DCUATES del Momento",
+  descripcion: "Participa en la dinámica actual de la comunidad y comparte tu momento con nosotros.",
+  imagen: "/images/reto-del-momento.png",
+  textoBoton: "Quiero participar",
+  enlaceDirectoWA: enlaceWhatsApp("¡Hola DCUATES! Quiero participar en el Reto/Momento DCUATES actual.")
+};
+
 // =========================================================================
 // 2. COMPONENTE PRINCIPAL (INICIO DEL RENDERIZADO)
 // =========================================================================
@@ -411,6 +501,10 @@ export default function App() {
   // null = cerrada; si tiene un id (ej. "libros", "ecatepets", "ventas-con-causa",
   // "donaciones") se abre con la información de ese proyecto.
   const [modalProyecto, setModalProyecto] = useState(null);
+  // Formulario emergente reutilizable: null = cerrado; "sugerencias" abre el
+  // de Sugerencias y Quejas (pie de página / menú "MÁS"); "comparte" abre el
+  // de Conocer y Compartir Más (desde el botón de Necesidades).
+  const [modalFormulario, setModalFormulario] = useState(null);
   // Id de YouTube del video que se está viendo en grande (ventana flotante),
   // al tocar una miniatura de la barra de videos de portada.
   const [videoEnGrande, setVideoEnGrande] = useState(null);
@@ -530,12 +624,24 @@ export default function App() {
         </a>
       </div>
 
+      {/* Botón Flotante de Navegación por Necesidades — arriba a la derecha,
+          naranja y parpadeante (mismo efecto que el de WhatsApp, en la
+          esquina opuesta para no encimarse). Agrupa TODAS las preguntas por
+          necesidad en 4 categorías desplegables. Si en tu celular llegara a
+          verse encimado con el encabezado, solo ajusta el "top-24" de aquí
+          abajo (mismo tipo de ajuste que ya hiciste antes con min-w-0). */}
+      <BotonNecesidades
+        onAbrirProyecto={(id) => setModalProyecto(id)}
+        onAccionEspecial={(accion) => setModalFormulario(accion)}
+      />
+
       {/* Encabezado + ticker de frases, pegados juntos como una sola barra fija */}
       <div className="sticky top-0 z-40">
         <SiteHeader
           onAbrirFAQ={() => setShowFAQ(true)}
           onAbrirPrivacidad={() => setShowPrivacy(true)}
           onAbrirProyecto={(id) => setModalProyecto(id)}
+          onAbrirSugerencias={() => setModalFormulario("sugerencias")}
           musicaSonando={musicaSonando}
           onAlternarMusica={alternarMusica}
           volumen={volumen}
@@ -917,6 +1023,37 @@ export default function App() {
             </div>
           </div>
 
+        </div>
+      </section>
+
+      {/* RETO / MOMENTO DCUATES — periodicidad ABIERTA (edita RETO_DEL_MOMENTO
+          arriba cuando tengas contenido nuevo; no depende de una fecha fija). */}
+      <section id="reto-dcuates" className="scroll-mt-48 md:scroll-mt-36 bg-[#e8f5e9] text-[#0f2d1e] py-8 px-4 border-b-4 border-[#0f2d1e]">
+        <div className="mx-auto max-w-4xl rounded-2xl bg-[#17472d] text-white p-4 sm:p-6 flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+          <div className="w-full sm:w-40 h-32 sm:h-40 rounded-xl overflow-hidden shrink-0 bg-[#0f2d1e]/40">
+            <img
+              src={RETO_DEL_MOMENTO.imagen}
+              alt={RETO_DEL_MOMENTO.titulo}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.parentElement.innerHTML = '<div class="w-full h-full flex items-center justify-center text-emerald-200/70 font-bold uppercase text-[10px] tracking-wider text-center px-2">[Foto del Reto/Momento]</div>';
+              }}
+            />
+          </div>
+          <div className="flex-1 text-center sm:text-left">
+            <p className="text-xs font-black uppercase tracking-wider text-emerald-400 mb-1">🌟 Reto/Momento DCUATES</p>
+            <h3 className="text-xl sm:text-2xl font-black uppercase tracking-tight leading-tight">{RETO_DEL_MOMENTO.titulo}</h3>
+            <p className="text-sm text-emerald-50 leading-relaxed font-medium mt-1">{RETO_DEL_MOMENTO.descripcion}</p>
+          </div>
+          <a
+            href={RETO_DEL_MOMENTO.enlaceDirectoWA}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shrink-0 rounded-lg bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-2.5 px-4 uppercase tracking-wide text-xs whitespace-nowrap"
+          >
+            {RETO_DEL_MOMENTO.textoBoton}
+          </a>
         </div>
       </section>
 
@@ -1456,6 +1593,12 @@ export default function App() {
             Preguntas Frecuentes
           </button>
           <button
+            onClick={() => setModalFormulario("sugerencias")}
+            className="underline underline-offset-4 hover:text-[#0f2d1e] bg-transparent border-none cursor-pointer font-bold transition-colors"
+          >
+            Sugerencias y Quejas
+          </button>
+          <button
             onClick={() => setShowPrivacy(true)}
             className="underline underline-offset-4 hover:text-[#0f2d1e] bg-transparent border-none cursor-pointer font-bold transition-colors"
           >
@@ -1542,6 +1685,27 @@ export default function App() {
         </div>
       )}
 
+      {/* MODAL DE FORMULARIO REUTILIZABLE — Sugerencias y Quejas / Conocer y
+          Compartir Más. Ambos arman un mensaje de WhatsApp, sin backend. */}
+      {modalFormulario === "sugerencias" && (
+        <ModalFormularioWhatsApp
+          titulo="Sugerencias y Quejas"
+          descripcion="Tu opinión nos ayuda a mejorar. Cuéntanos qué tienes en mente:"
+          opciones={["Sugerencia", "Queja", "Reporte de error en la página", "Otro"]}
+          placeholder="Escribe aquí tu mensaje..."
+          onCerrar={() => setModalFormulario(null)}
+        />
+      )}
+      {modalFormulario === "comparte" && (
+        <ModalFormularioWhatsApp
+          titulo="Conocer y Compartir Más"
+          descripcion="¿Qué te gustaría o necesitas que compartiéramos, y qué te gustaría compartir tú?"
+          opciones={["Quiero que compartan sobre", "Quiero compartir algo"]}
+          placeholder="Cuéntanos..."
+          onCerrar={() => setModalFormulario(null)}
+        />
+      )}
+
     </div>
   );
 }
@@ -1549,7 +1713,7 @@ export default function App() {
 // =========================================================================
 // 3. SUBCOMPONENTE: SITE HEADER
 // =========================================================================
-function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, musicaSonando, onAlternarMusica, volumen, onCambiarVolumen }) {
+function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSugerencias, musicaSonando, onAlternarMusica, volumen, onCambiarVolumen }) {
   const [menuMasAbierto, setMenuMasAbierto] = useState(false);
   const [volumenAbierto, setVolumenAbierto] = useState(false);
   return (
@@ -1574,6 +1738,11 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, musicaSona
 
         {/* Íconos de redes: comparten la primera fila con el logo (empujados a la derecha) en móvil; en escritorio, a la derecha del todo. La música va justo a la izquierda de los íconos, bien pegada, para no ocupar una fila extra en el celular. */}
         <div className="order-2 md:order-3 ml-auto flex items-center gap-2 sm:gap-3">
+
+          {/* Recibe Beneficios — suscripción por WhatsApp con intereses.
+              Nombre elegido para comunicar "valor" y no confundirse con
+              alertas/emergencias. Ver INTERESES_BENEFICIOS arriba. */}
+          <BotonRecibeBeneficios />
 
           {/* Música — botón compacto; el volumen se despliega hacia abajo
               en una tarjetita flotante, sin ocupar espacio propio. */}
@@ -1687,6 +1856,7 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, musicaSona
                           onClick={() => {
                             setMenuMasAbierto(false);
                             if (link.action === "faq") onAbrirFAQ && onAbrirFAQ();
+                            else if (link.action === "sugerencias") onAbrirSugerencias && onAbrirSugerencias();
                             else if (link.modal) onAbrirProyecto && onAbrirProyecto(link.modal);
                           }}
                           className="px-4 py-2.5 text-left uppercase tracking-wide text-[11px] sm:text-xs font-black text-emerald-900 hover:bg-emerald-50 transition-colors"
@@ -1711,6 +1881,203 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, musicaSona
         </div>
       </div>
     </header>
+  );
+}
+
+// =========================================================================
+// 3B. SUBCOMPONENTE: BOTÓN FLOTANTE DE NAVEGACIÓN POR NECESIDADES
+// =========================================================================
+// Botón naranja parpadeante (arriba a la derecha) con menú de 2 niveles:
+// toca el botón para ver las 4 categorías, toca una categoría para ver sus
+// preguntas, toca una pregunta para ir directo al modal/sección/WhatsApp
+// correspondiente (ver NECESIDADES_GRUPOS arriba). Se autogestiona su propio
+// estado — solo necesita los 2 callbacks para abrir el modal de proyecto o
+// una acción especial (por ahora, solo "comparte").
+function BotonNecesidades({ onAbrirProyecto, onAccionEspecial }) {
+  const [abierto, setAbierto] = useState(false);
+  const [grupoAbierto, setGrupoAbierto] = useState(null);
+
+  const cerrarTodo = () => {
+    setAbierto(false);
+    setGrupoAbierto(null);
+  };
+
+  const alTocarPregunta = (p) => {
+    cerrarTodo();
+    if (p.modal) onAbrirProyecto && onAbrirProyecto(p.modal);
+    else if (p.action) onAccionEspecial && onAccionEspecial(p.action);
+    else if (p.enlace) window.open(p.enlace, "_blank", "noopener,noreferrer");
+  };
+
+  return (
+    <>
+      <div className="fixed top-24 sm:top-28 right-5 sm:right-6 z-50">
+        <button
+          type="button"
+          onClick={() => setAbierto((v) => !v)}
+          className="relative flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[#ff9248] to-[#e65100] text-white shadow-[0_10px_20px_rgba(0,0,0,0.35),inset_0_-3px_6px_rgba(0,0,0,0.25),inset_0_3px_4px_rgba(255,255,255,0.4)] transition-all hover:scale-110 active:scale-95 border-2 border-white/40"
+          title="¿Qué necesitas hoy?"
+          aria-label="¿Qué necesitas hoy?"
+        >
+          <span className="absolute inset-0 rounded-full bg-[#e65100] animate-ping opacity-60"></span>
+          <span className="relative z-10 text-2xl font-black drop-shadow">?</span>
+        </button>
+      </div>
+
+      {abierto && (
+        <div
+          className="fixed inset-0 z-50 flex items-start justify-end bg-black/50 p-4 pt-40 sm:pt-44"
+          onClick={cerrarTodo}
+        >
+          <div
+            className="bg-white text-slate-900 rounded-2xl shadow-2xl max-w-sm w-full max-h-[70vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-4 border-b border-emerald-100 flex items-center justify-between gap-3">
+              <p className="font-black uppercase text-[#0f2d1e] text-sm">¿Qué necesitas hoy?</p>
+              <button type="button" onClick={cerrarTodo} aria-label="Cerrar" className="h-7 w-7 flex items-center justify-center rounded-full bg-[#0f2d1e] text-white font-black hover:bg-emerald-800 transition-colors shrink-0">×</button>
+            </div>
+            {NECESIDADES_GRUPOS.map((grupo) => (
+              <div key={grupo.id} className="border-b border-emerald-50 last:border-0">
+                <button
+                  type="button"
+                  onClick={() => setGrupoAbierto((g) => (g === grupo.id ? null : grupo.id))}
+                  className="w-full flex items-center justify-between px-4 py-3 text-left font-black uppercase text-xs text-emerald-900 hover:bg-emerald-50 transition-colors"
+                >
+                  {grupo.titulo}
+                  <span className={`transition-transform ${grupoAbierto === grupo.id ? "rotate-180" : ""}`}>▾</span>
+                </button>
+                {grupoAbierto === grupo.id && (
+                  <div className="pb-2">
+                    {grupo.preguntas.map((p, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => alTocarPregunta(p)}
+                        className="w-full text-left px-6 py-2 text-xs text-slate-600 hover:bg-emerald-50 hover:text-emerald-900 transition-colors leading-snug"
+                      >
+                        {p.texto}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+// Botón "Recibe Beneficios" del encabezado — abre un mini formulario de
+// intereses (ver INTERESES_BENEFICIOS arriba) y arma el mensaje de WhatsApp
+// con lo que la persona seleccionó.
+function BotonRecibeBeneficios() {
+  const [abierto, setAbierto] = useState(false);
+  const [seleccion, setSeleccion] = useState([]);
+
+  const alternar = (interes) => {
+    setSeleccion((prev) => (prev.includes(interes) ? prev.filter((i) => i !== interes) : [...prev, interes]));
+  };
+
+  const enviar = () => {
+    const lista = seleccion.length > 0 ? seleccion.join(", ") : "todas las novedades";
+    window.open(enlaceWhatsApp(`¡Hola DCUATES! Quiero recibir información de valor sobre: ${lista}.`), "_blank", "noopener,noreferrer");
+    setAbierto(false);
+    setSeleccion([]);
+  };
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setAbierto((v) => !v)}
+        className="rounded-full bg-[#17472d] hover:bg-[#0f2d1e] text-white shadow-sm px-2.5 py-1.5 text-[10px] sm:text-[11px] font-black uppercase tracking-wide"
+      >
+        Recibe Beneficios
+      </button>
+
+      {abierto && (
+        <>
+          <div className="fixed inset-0 z-30" onClick={() => setAbierto(false)} />
+          <div className="absolute right-0 top-full mt-2 z-40 w-72 rounded-2xl bg-white shadow-xl border border-emerald-800/10 p-4">
+            <p className="text-xs font-black uppercase text-[#0f2d1e] mb-3">¿Qué te interesa recibir?</p>
+            <div className="space-y-2">
+              {INTERESES_BENEFICIOS.map((interes) => (
+                <label key={interes} className="flex items-start gap-2 text-xs font-medium text-slate-700 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={seleccion.includes(interes)}
+                    onChange={() => alternar(interes)}
+                    className="mt-0.5 accent-[#17472d]"
+                  />
+                  {interes}
+                </label>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={enviar}
+              className="mt-4 w-full rounded-lg bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-2 text-[11px] uppercase tracking-wide transition-colors"
+            >
+              Suscribirme por WhatsApp
+            </button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+// Modal de formulario reutilizable — mismo componente para "Sugerencias y
+// Quejas" y para "Conocer y Compartir Más" (Necesidades). Ambos arman un
+// mensaje de WhatsApp con la opción elegida + el texto libre.
+function ModalFormularioWhatsApp({ titulo, descripcion, opciones, placeholder, onCerrar }) {
+  const [opcion, setOpcion] = useState(opciones[0]);
+  const [mensaje, setMensaje] = useState("");
+  const [error, setError] = useState("");
+
+  const enviar = () => {
+    if (!mensaje.trim()) {
+      setError("Escribe un mensaje antes de enviar.");
+      return;
+    }
+    window.open(enlaceWhatsApp(`¡Hola DCUATES! ${opcion}: ${mensaje.trim()}`), "_blank", "noopener,noreferrer");
+    onCerrar();
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm" onClick={onCerrar}>
+      <div className="bg-white text-slate-900 rounded-2xl max-w-md w-full p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+        <h3 className="text-xl font-bold uppercase tracking-tight border-b pb-3 mb-4 text-emerald-800 font-heading">
+          {titulo}
+        </h3>
+        <p className="text-sm text-slate-600 leading-relaxed font-medium mb-3">{descripcion}</p>
+        <select
+          value={opcion}
+          onChange={(e) => setOpcion(e.target.value)}
+          className="w-full rounded-lg border border-emerald-200 px-3 py-2 text-sm mb-3 text-slate-700"
+        >
+          {opciones.map((o) => <option key={o} value={o}>{o}</option>)}
+        </select>
+        <textarea
+          value={mensaje}
+          onChange={(e) => { setMensaje(e.target.value); if (error) setError(""); }}
+          rows={4}
+          placeholder={placeholder}
+          className="w-full rounded-lg border border-emerald-200 px-3 py-2 text-sm mb-1 text-slate-700"
+        />
+        {error && <p className="text-xs text-red-600 font-bold mb-3">{error}</p>}
+        <button
+          type="button"
+          onClick={enviar}
+          className="mt-3 w-full rounded-xl bg-emerald-700 text-white font-black py-3.5 text-center transition-colors hover:bg-emerald-800 uppercase text-xs tracking-wider font-heading"
+        >
+          Enviar por WhatsApp
+        </button>
+      </div>
+    </div>
   );
 }
 
