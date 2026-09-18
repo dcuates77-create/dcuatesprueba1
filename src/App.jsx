@@ -1629,7 +1629,9 @@ export default function App() {
         </div>
       </section>
 
-      <BarraPatrocinadores />
+      <div className="mt-[1.5cm] mb-[0.5cm]">
+        <BarraPatrocinadores />
+      </div>
 
       {/* FOOTER */}
       <footer className="bg-[#e8f5e9] text-[#0f2d1e] py-12 px-4 text-center space-y-8 border-t-4 border-[#0f2d1e]">
@@ -1825,7 +1827,7 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSug
         </a>
 
         {/* Íconos de redes: comparten la primera fila con el logo (empujados a la derecha) en móvil; en escritorio, a la derecha del todo. Orden: Música, Avisos y Beneficios, Compartir Más, redes — mismo alto y tamaño de letra en los 4. */}
-        <div className="order-2 md:order-3 ml-auto flex flex-wrap items-center gap-2 sm:gap-3">
+        <div className="order-2 md:order-3 ml-auto flex flex-wrap items-center gap-1.5 sm:gap-3">
 
           {/* Música — botón compacto; el volumen se despliega hacia abajo
               en una tarjetita flotante, sin ocupar espacio propio. */}
@@ -1834,10 +1836,12 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSug
               <button
                 type="button"
                 onClick={onAlternarMusica}
+                aria-label="Música Dcuates"
+                title="Música Dcuates"
                 className="hover:bg-[#bf360c] transition-colors uppercase tracking-wide text-center leading-tight px-2.5 py-1.5 text-[10px] sm:text-[11px] font-black flex items-center gap-1"
               >
-                <span>🎵</span>
-                <span className="hidden sm:inline">{musicaSonando ? "Pausar" : "Música Dcuates"}</span>
+                <span className="sm:hidden" aria-hidden="true">{musicaSonando ? "⏸" : "▶"}</span>
+                <span className="hidden sm:inline">🎵 {musicaSonando ? "Pausar" : "Música Dcuates"}</span>
               </button>
               <button
                 type="button"
@@ -1884,24 +1888,24 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSug
             <span aria-hidden="true">🌟</span>
           </button>
 
-          <a href={REDES_SOCIALES.facebook} target="_blank" rel="noreferrer" className="flex h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="Facebook">
+          <a href={REDES_SOCIALES.facebook} target="_blank" rel="noreferrer" className="flex h-7 w-7 sm:h-9 sm:w-9 md:h-10 md:w-10 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="Facebook">
             <svg className="h-4 w-4 sm:h-5 sm:w-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" />
             </svg>
           </a>
-          <a href={REDES_SOCIALES.instagram} target="_blank" rel="noreferrer" className="flex h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="Instagram">
+          <a href={REDES_SOCIALES.instagram} target="_blank" rel="noreferrer" className="flex h-7 w-7 sm:h-9 sm:w-9 md:h-10 md:w-10 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="Instagram">
             <svg className="h-4 w-4 sm:h-5 sm:w-5 fill-none stroke-current stroke-2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
               <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
               <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
             </svg>
           </a>
-          <a href={REDES_SOCIALES.youtube} target="_blank" rel="noreferrer" className="flex h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="YouTube">
+          <a href={REDES_SOCIALES.youtube} target="_blank" rel="noreferrer" className="flex h-7 w-7 sm:h-9 sm:w-9 md:h-10 md:w-10 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="YouTube">
             <svg className="h-4 w-4 sm:h-5 sm:w-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
             </svg>
           </a>
-          <a href={REDES_SOCIALES.tiktok} target="_blank" rel="noreferrer" className="flex h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="TikTok">
+          <a href={REDES_SOCIALES.tiktok} target="_blank" rel="noreferrer" className="flex h-7 w-7 sm:h-9 sm:w-9 md:h-10 md:w-10 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="TikTok">
             <svg className="h-4 w-4 sm:h-5 sm:w-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.02 1.59 4.23.94 1.13 2.29 1.89 3.73 2.18l-.02 3.88c-1.63-.03-3.2-.55-4.51-1.52A7.83 7.83 0 0 1 16.43 7.5v8.32a7.83 7.83 0 0 1-3.32 6.42 7.91 7.91 0 0 1-8.73-.24 7.85 7.85 0 0 1-3.23-7.58 7.84 7.84 0 0 1 5.37-6.84V11.5a3.94 3.94 0 0 0-1.5 3.32 3.93 3.93 0 0 0 3.2 3.88 3.93 3.93 0 0 0 4.61-3.2c.04-.33.05-.66.05-.99V.02z" />
             </svg>
@@ -3142,8 +3146,8 @@ function BarraPatrocinadores() {
   return (
     <div className="bg-[#17472d] py-5 px-4 border-t-4 border-b-4 border-[#0f2d1e]">
       <div className="mx-auto max-w-6xl">
-        <p className="text-emerald-300 font-black uppercase text-xs sm:text-sm tracking-wide text-center mb-3">
-          🤝 Patrocinadores y Aliados DCUATES
+        <p className="text-emerald-300 font-black uppercase text-xs sm:text-sm tracking-wide text-center mb-3 px-2 leading-snug">
+          Muchas gracias a nuestros Patrocinadores y Amigos por su valiosa confianza y apoyo ⭐⭐⭐⭐⭐
         </p>
         <div className="flex items-center gap-3 overflow-x-auto pb-2 px-1 snap-x snap-mandatory">
           {items.map((item, i) => (
@@ -3151,10 +3155,10 @@ function BarraPatrocinadores() {
               key={i}
               type="button"
               onClick={() => alTocar(item)}
-              className="shrink-0 snap-start w-24 sm:w-28 group"
+              className="shrink-0 snap-start w-32 sm:w-40 group"
               title={item.nombre || "Ver más grande"}
             >
-              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-xl overflow-hidden border-2 border-white/10 group-hover:border-[#e65100] transition-colors bg-black/20">
+              <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-xl overflow-hidden border-2 border-white/10 group-hover:border-[#e65100] transition-colors bg-black/20">
                 <img
                   src={item.img}
                   alt={item.nombre}
