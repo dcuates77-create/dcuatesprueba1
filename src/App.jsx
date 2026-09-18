@@ -654,19 +654,11 @@ export default function App() {
         </a>
       </div>
 
-      {/* Botón Flotante de Navegación por Necesidades — arriba a la derecha,
-          naranja y parpadeante (mismo efecto que el de WhatsApp, en la
-          esquina opuesta para no encimarse). Agrupa TODAS las preguntas por
-          necesidad en 4 categorías desplegables. Si en tu celular llegara a
-          verse encimado con el encabezado, solo ajusta el "top-24" de aquí
-          abajo (mismo tipo de ajuste que ya hiciste antes con min-w-0). */}
-      <BotonNecesidades
-        onAbrirProyecto={(id) => setModalProyecto(id)}
-        onAccionEspecial={(accion) => setModalFormulario(accion)}
-      />
-
-      {/* Encabezado + ticker de frases, pegados juntos como una sola barra fija */}
-      <div className="sticky top-0 z-40">
+      {/* Encabezado + ticker de frases, pegados juntos como una sola barra fija.
+          "relative" para poder anclar el botón de Necesidades justo debajo
+          (top-full), pegado al borde inferior, y que se mueva junto con todo
+          el bloque al hacer scroll (igual que el header, que es sticky). */}
+      <div className="sticky top-0 z-40 relative">
         <SiteHeader
           onAbrirFAQ={() => setShowFAQ(true)}
           onAbrirPrivacidad={() => setShowPrivacy(true)}
@@ -680,6 +672,15 @@ export default function App() {
         />
         <audio ref={audioRef} loop onEnded={() => setMusicaSonando(false)} className="hidden" />
         <TickerFrases />
+
+        {/* Botón de Navegación por Necesidades — pegado justo debajo de la
+            barra de frases (mismo espacio que el de WhatsApp guarda con la
+            barra inferior). Al ser "absolute" dentro de este contenedor
+            "sticky", se mueve junto con el encabezado al hacer scroll. */}
+        <BotonNecesidades
+          onAbrirProyecto={(id) => setModalProyecto(id)}
+          onAccionEspecial={(accion) => setModalFormulario(accion)}
+        />
       </div>
 
       {/* SECCIÓN PORTADA / HERO — izquierda: título+texto+Quiénes Somos+Bibliobici a toda altura; derecha: cuadrícula de 12 botones (2 columnas en celular, 3 en escritorio = 3x4) */}
@@ -1785,7 +1786,7 @@ export default function App() {
       )}
       {modalFormulario === "comparte" && (
         <ModalFormularioWhatsApp
-          titulo="Conocer y Compartir Más"
+          titulo="Compartir"
           descripcion="¿Qué te gustaría o necesitas que compartiéramos, y qué te gustaría compartir tú?"
           opciones={["Quiero que compartan más o también sobre", "Quiero compartir algo"]}
           placeholder="Cuéntanos..."
@@ -1824,12 +1825,12 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSug
         </a>
 
         {/* Íconos de redes: comparten la primera fila con el logo (empujados a la derecha) en móvil; en escritorio, a la derecha del todo. Orden: Música, Avisos y Beneficios, Compartir Más, redes — mismo alto y tamaño de letra en los 4. */}
-        <div className="order-2 md:order-3 ml-auto flex items-center gap-2 sm:gap-3">
+        <div className="order-2 md:order-3 ml-auto flex flex-wrap items-center gap-2 sm:gap-3">
 
           {/* Música — botón compacto; el volumen se despliega hacia abajo
               en una tarjetita flotante, sin ocupar espacio propio. */}
           <div className="relative">
-            <div className="inline-flex items-center rounded-full bg-[#e65100] text-white shadow-sm overflow-hidden">
+            <div className="inline-flex items-center rounded-full bg-[#e65100] text-white shadow-sm overflow-hidden min-h-[30px] sm:min-h-[34px]">
               <button
                 type="button"
                 onClick={onAlternarMusica}
@@ -1876,7 +1877,7 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSug
           <button
             type="button"
             onClick={() => onAbrirComparte && onAbrirComparte()}
-            className="rounded-full bg-[#e65100] hover:bg-[#bf360c] text-white shadow-sm px-2.5 py-1.5 text-[10px] sm:text-[11px] font-black uppercase tracking-wide transition-colors flex items-center gap-1"
+            className="rounded-full bg-[#e65100] hover:bg-[#bf360c] text-white shadow-sm px-2.5 py-1.5 text-[10px] sm:text-[11px] font-black uppercase tracking-wide transition-colors flex items-center gap-1 min-h-[30px] sm:min-h-[34px]"
           >
             <span className="hidden sm:inline">Compartir Más</span>
             <span className="sm:hidden">Compartir</span>
@@ -1983,12 +1984,14 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSug
 // =========================================================================
 // 3B. SUBCOMPONENTE: BOTÓN FLOTANTE DE NAVEGACIÓN POR NECESIDADES
 // =========================================================================
-// Botón naranja parpadeante (arriba a la derecha) con menú de 2 niveles:
-// toca el botón para ver las 4 categorías, toca una categoría para ver sus
-// preguntas, toca una pregunta para ir directo al modal/sección/WhatsApp
-// correspondiente (ver NECESIDADES_GRUPOS arriba). Se autogestiona su propio
-// estado — solo necesita los 2 callbacks para abrir el modal de proyecto o
-// una acción especial (por ahora, solo "comparte").
+// Botón naranja parpadeante, pegado justo debajo de la barra de frases (ver
+// dónde se renderiza en App(), dentro del contenedor "sticky" del
+// encabezado) con menú de 2 niveles: toca el botón para ver las 4
+// categorías, toca una categoría para ver sus preguntas, toca una pregunta
+// para ir directo al modal/sección/WhatsApp correspondiente (ver
+// NECESIDADES_GRUPOS arriba). Se autogestiona su propio estado — solo
+// necesita los 2 callbacks para abrir el modal de proyecto o una acción
+// especial (por ahora, solo "comparte").
 function BotonNecesidades({ onAbrirProyecto, onAccionEspecial }) {
   const [abierto, setAbierto] = useState(false);
   const [grupoAbierto, setGrupoAbierto] = useState(null);
@@ -2007,7 +2010,7 @@ function BotonNecesidades({ onAbrirProyecto, onAccionEspecial }) {
 
   return (
     <>
-      <div className="fixed top-20 sm:top-24 right-5 sm:right-6 z-50 flex items-center gap-2">
+      <div className="absolute top-full right-5 sm:right-6 mt-1.5 sm:mt-2 z-50 flex items-center gap-2">
         <span className="bg-[#e65100] text-white text-[10px] sm:text-xs font-black uppercase tracking-wide px-2.5 py-1.5 rounded-full shadow-lg border border-white/30 whitespace-nowrap animate-pulse">
           ¿Qué necesitas hoy?
         </span>
@@ -2045,7 +2048,7 @@ function BotonNecesidades({ onAbrirProyecto, onAccionEspecial }) {
                   className="w-full flex items-center justify-between px-4 py-3 text-left font-black uppercase text-xs text-emerald-900 hover:bg-emerald-50 transition-colors"
                 >
                   {grupo.titulo}
-                  <span className={`transition-transform ${grupoAbierto === grupo.id ? "rotate-180" : ""}`}>▾</span>
+                  <span className={`text-lg font-black leading-none transition-transform ${grupoAbierto === grupo.id ? "rotate-45" : ""}`}>+</span>
                 </button>
                 {grupoAbierto === grupo.id && (
                   <div className="pb-1">
@@ -2094,7 +2097,7 @@ function BotonRecibeBeneficios() {
       <button
         type="button"
         onClick={() => setAbierto((v) => !v)}
-        className="rounded-full bg-[#e65100] hover:bg-[#bf360c] text-white shadow-sm px-2.5 py-1.5 text-[10px] sm:text-[11px] font-black uppercase tracking-wide transition-colors flex items-center gap-1"
+        className="rounded-full bg-[#e65100] hover:bg-[#bf360c] text-white shadow-sm px-2.5 py-1.5 text-[10px] sm:text-[11px] font-black uppercase tracking-wide transition-colors flex items-center gap-1 min-h-[30px] sm:min-h-[34px]"
       >
         <span className="hidden sm:inline">Avisos y Beneficios</span>
         <span className="sm:hidden">Avisos</span>
