@@ -490,17 +490,26 @@ const INTERESES_BENEFICIOS = [
   "Otros Beneficios y Apoyos/Voluntariado"
 ];
 
-// Reto/Momento DCUATES — bloque de contenido con periodicidad ABIERTA (no
-// se actualiza en fecha fija; edítalo cuando tengas un reto, dinámica o
-// momento comunitario nuevo que compartir). Mientras "imagen" esté vacía o
-// no cargue, se ve un espacio genérico en su lugar.
-const RETO_DEL_MOMENTO = {
-  titulo: "Reto DCUATES del Momento",
-  descripcion: "Participa en la dinámica actual de la comunidad y comparte tu momento con nosotros.",
-  imagen: "/images/reto-del-momento.png",
-  textoBoton: "Quiero participar",
-  enlaceDirectoWA: enlaceWhatsApp("¡Hola DCUATES! Quiero participar en el Reto/Momento DCUATES actual.")
-};
+// Retos, Regalos y Reconocimientos DCUATES — 3 botones naranjas que arman
+// un mensaje de WhatsApp distinto cada uno. Para cambiar el texto o el
+// ícono de alguno, solo edita este arreglo (mismo patrón que los demás).
+const RETOS_REGALOS_ITEMS = [
+  {
+    titulo: "RETOS que nos hacen MEJORES !!!",
+    icono: "🎯",
+    enlace: enlaceWhatsApp("¡Hola DCUATES! Quiero proponer o participar en un Reto que nos haga mejores.")
+  },
+  {
+    titulo: "REGALOS que motivan",
+    icono: "🎁",
+    enlace: enlaceWhatsApp("¡Hola DCUATES! Tengo una propuesta de Regalo que motive a la comunidad.")
+  },
+  {
+    titulo: "RECONOCIMIENTO a quienes nos INSPIRAN",
+    icono: "🏅",
+    enlace: enlaceWhatsApp("¡Hola DCUATES! Quiero proponer a alguien para un Reconocimiento que inspira.")
+  }
+];
 
 // =========================================================================
 // 2. COMPONENTE PRINCIPAL (INICIO DEL RENDERIZADO)
@@ -514,7 +523,7 @@ export default function App() {
   const [modalProyecto, setModalProyecto] = useState(null);
   // Formulario emergente reutilizable: null = cerrado; "sugerencias" abre el
   // de Sugerencias y Quejas (pie de página / menú "MÁS"); "comparte" abre el
-  // de Conocer y Compartir Más (desde el botón naranja "Quiero Más" del encabezado).
+  // de Conocer y Compartir Más (desde el botón naranja "Compartir Más" del encabezado).
   const [modalFormulario, setModalFormulario] = useState(null);
   // Id de YouTube del video que se está viendo en grande (ventana flotante),
   // al tocar una miniatura de la barra de videos de portada.
@@ -568,6 +577,16 @@ export default function App() {
     .map((v, i) => ({ id: idYoutubeDesdeUrl(v.enlace), nombre: v.nombre }))
     .filter((v) => v.id);
   const videosPortadaFinal = videosPortada.length > 0 ? videosPortada : [{ id: YOUTUBE_VIDEO_ID, nombre: "Video de presentación DCUATES" }];
+
+  // Retos, Regalos y Reconocimientos — carrusel de fotos desde la columna
+  // "RETOSGALERIA" (Archivo/Adjunto, igual que "MUSICA") y videos
+  // relacionados desde "NOMBRE RETOSVID" / "RETOSVID" (mismo patrón que
+  // los videos de portada). Mientras no subas nada a esas columnas, estas
+  // listas simplemente salen vacías y la sección lo indica.
+  const galeriaRetos = galeriaDesdeColumna(filasEnlaces, "RETOSGALERIA", 10, "Retos");
+  const videosRetos = paresBaserow(filasEnlaces, "NOMBRE RETOSVID", "RETOSVID", 8)
+    .map((v) => ({ id: idYoutubeDesdeUrl(v.enlace), nombre: v.nombre }))
+    .filter((v) => v.id);
 
   const recomendacionesDcuates = (() => {
     const desdeBaserow = paresBaserow(filasEnlaces, "Nombre Recocasa", "RECASA", 5);
@@ -847,38 +866,86 @@ export default function App() {
               );
             })()}
 
-            {/* Video a todo el ancho + 3 botones verdes restantes en fila debajo */}
+            {/* Retos, Regalos y Reconocimientos DCUATES — 3 columnas: botones
+                naranjas | carrusel de fotos (Baserow: RETOSGALERIA) | videos
+                relacionados (Baserow: NOMBRE RETOSVID / RETOSVID). */}
             <div className="mt-3">
               <div className="rounded-2xl overflow-hidden border-4 border-[#0f2d1e]/30 shadow-lg bg-[#0f2d1e] p-3">
                 <p className="text-white font-black uppercase text-xs sm:text-sm tracking-wide mb-2 px-1 text-center">
-                  Historias y reflexiones DCUATES que INSPIRAN 💡
+                  🔎 Retos, Regalos y Reconocimientos DCUATES
                   <br className="sm:hidden" />
-                  <span className="block sm:inline sm:ml-1">Dales clic para ampliarlos y disfrutarlos 🎥 🍿 😊</span>
+                  <span className="block sm:inline sm:ml-1 normal-case font-bold text-emerald-100">Porque todo lo bueno merece ser compartido y reconocido, envíanos tus propuestas</span>
                 </p>
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3 max-h-[420px] overflow-y-auto pr-1">
-                  {videosPortadaFinal.map((v, i) => (
-                    <button
-                      key={i}
-                      type="button"
-                      onClick={() => setVideoEnGrande(v.id)}
-                      className="group relative rounded-xl overflow-hidden border-2 border-white/10 hover:border-[#e65100] transition-colors bg-black/30 text-left"
-                    >
-                      <div className="aspect-video w-full overflow-hidden">
-                        <img
-                          src={`https://img.youtube.com/vi/${v.id}/hqdefault.jpg`}
-                          alt={v.nombre}
-                          loading="lazy"
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                        />
-                      </div>
-                      <span className="absolute inset-0 flex items-center justify-center">
-                        <span className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-[#e65100]/90 flex items-center justify-center text-white text-base sm:text-lg shadow-md group-hover:bg-[#e65100]">▶</span>
-                      </span>
-                      <p className="px-2 py-1.5 text-[10px] sm:text-xs font-black text-white uppercase tracking-tight leading-tight">
-                        {v.nombre}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+                  {/* Columna 1: los 3 botones naranjas */}
+                  <div className="flex flex-col gap-2">
+                    {RETOS_REGALOS_ITEMS.map((item, i) => (
+                      <a
+                        key={i}
+                        href={item.enlace}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-between gap-2 rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black uppercase text-xs sm:text-sm leading-tight px-4 py-3.5 transition-colors"
+                      >
+                        <span>{item.titulo}</span>
+                        <span className="text-xl shrink-0" aria-hidden="true">{item.icono}</span>
+                      </a>
+                    ))}
+                  </div>
+
+                  {/* Columna 2: carrusel de fotos (RETOSGALERIA en Baserow) */}
+                  <div className="rounded-xl overflow-hidden bg-white/5 border border-white/10 flex items-center justify-center min-h-[180px]">
+                    {galeriaRetos.length > 0 ? (
+                      <Carrusel
+                        items={galeriaRetos}
+                        renderItem={(item) => (
+                          <img
+                            src={resolverSrcImagen(item.img)}
+                            alt={item.nombre}
+                            loading="lazy"
+                            className="w-full aspect-square object-cover"
+                          />
+                        )}
+                      />
+                    ) : (
+                      <p className="text-emerald-200/70 text-[10px] font-bold uppercase tracking-wide text-center px-4">
+                        Sube fotos a la columna "RETOSGALERIA" en Baserow para verlas aquí
                       </p>
-                    </button>
-                  ))}
+                    )}
+                  </div>
+
+                  {/* Columna 3: videos relacionados (NOMBRE RETOSVID / RETOSVID) */}
+                  <div className="rounded-xl bg-white/5 border border-white/10 p-2 flex flex-col gap-2 max-h-[260px] lg:max-h-none overflow-y-auto">
+                    {videosRetos.length > 0 ? (
+                      videosRetos.map((v, i) => (
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() => setVideoEnGrande(v.id)}
+                          className="group relative rounded-lg overflow-hidden border-2 border-white/10 hover:border-[#e65100] transition-colors bg-black/30 text-left shrink-0"
+                        >
+                          <div className="aspect-video w-full overflow-hidden">
+                            <img
+                              src={`https://img.youtube.com/vi/${v.id}/hqdefault.jpg`}
+                              alt={v.nombre}
+                              loading="lazy"
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                            />
+                          </div>
+                          <span className="absolute inset-0 flex items-center justify-center">
+                            <span className="w-8 h-8 rounded-full bg-[#e65100]/90 flex items-center justify-center text-white text-sm shadow-md group-hover:bg-[#e65100]">▶</span>
+                          </span>
+                          <p className="px-2 py-1 text-[10px] font-black text-white uppercase tracking-tight leading-tight">
+                            {v.nombre}
+                          </p>
+                        </button>
+                      ))
+                    ) : (
+                      <p className="text-emerald-200/70 text-[10px] font-bold uppercase tracking-wide text-center px-2 py-6">
+                        Sube videos con las columnas "NOMBRE RETOSVID" y "RETOSVID" en Baserow para verlos aquí
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -1038,34 +1105,42 @@ export default function App() {
         </div>
       </section>
 
-      {/* RETO / MOMENTO DCUATES — periodicidad ABIERTA (edita RETO_DEL_MOMENTO
-          arriba cuando tengas contenido nuevo; no depende de una fecha fija). */}
-      <section id="reto-dcuates" className="scroll-mt-48 md:scroll-mt-36 bg-[#e8f5e9] text-[#0f2d1e] py-8 px-4 border-b-4 border-[#0f2d1e]">
-        <div className="mx-auto max-w-4xl rounded-2xl bg-[#17472d] text-white p-4 sm:p-6 flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
-          <div className="w-full sm:w-40 h-32 sm:h-40 rounded-xl overflow-hidden shrink-0 bg-[#0f2d1e]/40">
-            <img
-              src={RETO_DEL_MOMENTO.imagen}
-              alt={RETO_DEL_MOMENTO.titulo}
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                e.target.style.display = 'none';
-                e.target.parentElement.innerHTML = '<div class="w-full h-full flex items-center justify-center text-emerald-200/70 font-bold uppercase text-[10px] tracking-wider text-center px-2">[Foto del Reto/Momento]</div>';
-              }}
-            />
+      {/* HISTORIAS Y REFLEXIONES DCUATES — movida aquí (antes vivía dentro
+          del hero); ahora como barra horizontal de 1-2 videos de alto, con
+          scroll lateral para ver más. Sigue tomando sus videos de las
+          columnas "NOMBRE VIDPORT" / "VIDPORT" en Baserow. */}
+      <section id="historias-reflexiones" className="scroll-mt-48 md:scroll-mt-36 bg-[#0f2d1e] py-6 px-4 border-b-4 border-[#0f2d1e]">
+        <div className="mx-auto max-w-6xl">
+          <p className="text-white font-black uppercase text-xs sm:text-sm tracking-wide mb-2 px-1 text-center">
+            Historias y reflexiones DCUATES que INSPIRAN 💡
+            <br className="sm:hidden" />
+            <span className="block sm:inline sm:ml-1">Dales clic para ampliarlos y disfrutarlos 🎥 🍿 😊</span>
+          </p>
+          <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-1">
+            {videosPortadaFinal.map((v, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => setVideoEnGrande(v.id)}
+                className="group relative rounded-xl overflow-hidden border-2 border-white/10 hover:border-[#e65100] transition-colors bg-black/30 text-left w-40 sm:w-56 shrink-0"
+              >
+                <div className="aspect-video w-full overflow-hidden">
+                  <img
+                    src={`https://img.youtube.com/vi/${v.id}/hqdefault.jpg`}
+                    alt={v.nombre}
+                    loading="lazy"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                  />
+                </div>
+                <span className="absolute inset-0 flex items-center justify-center">
+                  <span className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-[#e65100]/90 flex items-center justify-center text-white text-base sm:text-lg shadow-md group-hover:bg-[#e65100]">▶</span>
+                </span>
+                <p className="px-2 py-1.5 text-[10px] sm:text-xs font-black text-white uppercase tracking-tight leading-tight">
+                  {v.nombre}
+                </p>
+              </button>
+            ))}
           </div>
-          <div className="flex-1 text-center sm:text-left">
-            <p className="text-xs font-black uppercase tracking-wider text-emerald-400 mb-1">🌟 Reto/Momento DCUATES</p>
-            <h3 className="text-xl sm:text-2xl font-black uppercase tracking-tight leading-tight">{RETO_DEL_MOMENTO.titulo}</h3>
-            <p className="text-sm text-emerald-50 leading-relaxed font-medium mt-1">{RETO_DEL_MOMENTO.descripcion}</p>
-          </div>
-          <a
-            href={RETO_DEL_MOMENTO.enlaceDirectoWA}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="shrink-0 rounded-lg bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-2.5 px-4 uppercase tracking-wide text-xs whitespace-nowrap"
-          >
-            {RETO_DEL_MOMENTO.textoBoton}
-          </a>
         </div>
       </section>
 
@@ -1748,12 +1823,12 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSug
           <span className="text-2xl sm:text-3xl md:text-4xl font-black uppercase tracking-tight text-[#0f2d1e]">DCUATES</span>
         </a>
 
-        {/* Íconos de redes: comparten la primera fila con el logo (empujados a la derecha) en móvil; en escritorio, a la derecha del todo. La música va justo a la izquierda de los íconos, bien pegada, para no ocupar una fila extra en el celular. */}
-        <div className="order-2 md:order-4 ml-auto flex items-center gap-2 sm:gap-3">
+        {/* Íconos de redes: comparten la primera fila con el logo (empujados a la derecha) en móvil; en escritorio, a la derecha del todo. Orden: Música, Avisos y Beneficios, Compartir Más, redes — mismo alto y tamaño de letra en los 4. */}
+        <div className="order-2 md:order-3 ml-auto flex items-center gap-2 sm:gap-3">
 
           {/* Música — botón compacto; el volumen se despliega hacia abajo
               en una tarjetita flotante, sin ocupar espacio propio. */}
-          <div className="relative mr-3">
+          <div className="relative">
             <div className="inline-flex items-center rounded-full bg-[#e65100] text-white shadow-sm overflow-hidden">
               <button
                 type="button"
@@ -1794,6 +1869,20 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSug
             )}
           </div>
 
+          {/* Avisos y Beneficios — suscripción por WhatsApp con intereses. */}
+          <BotonRecibeBeneficios />
+
+          {/* Compartir Más — abre el formulario de Conocer y Compartir Más. */}
+          <button
+            type="button"
+            onClick={() => onAbrirComparte && onAbrirComparte()}
+            className="rounded-full bg-[#e65100] hover:bg-[#bf360c] text-white shadow-sm px-2.5 py-1.5 text-[10px] sm:text-[11px] font-black uppercase tracking-wide transition-colors flex items-center gap-1"
+          >
+            <span className="hidden sm:inline">Compartir Más</span>
+            <span className="sm:hidden">Compartir</span>
+            <span aria-hidden="true">🌟</span>
+          </button>
+
           <a href={REDES_SOCIALES.facebook} target="_blank" rel="noreferrer" className="flex h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="Facebook">
             <svg className="h-4 w-4 sm:h-5 sm:w-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" />
@@ -1818,24 +1907,8 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSug
           </a>
         </div>
 
-        {/* Fila naranja: Recibe Beneficios + Quiero Más — su propia fila en
-            móvil, junto al botón parpadeante de Necesidades (flotante, ver
-            <BotonNecesidades/> en App()). En escritorio se acomodan en la
-            misma fila que los íconos de redes (ml-auto los empuja a la
-            derecha del todo). */}
-        <div className="order-3 md:order-3 w-full md:w-auto md:ml-auto flex items-center gap-2 pt-1.5 md:pt-0 mt-0.5 md:mt-0 border-t md:border-t-0 border-emerald-800/10">
-          <BotonRecibeBeneficios />
-          <button
-            type="button"
-            onClick={() => onAbrirComparte && onAbrirComparte()}
-            className="rounded-full bg-[#e65100] hover:bg-[#bf360c] text-white shadow-sm px-2.5 py-1.5 text-[10px] sm:text-[11px] font-black uppercase tracking-wide transition-colors"
-          >
-            Quiero Más
-          </button>
-        </div>
-
         {/* Fila única de menú: accesos directos + MÁS (con todo lo demás). */}
-        <div className="order-4 w-full flex flex-wrap items-center gap-2 pt-1.5 mt-0.5 border-t border-emerald-800/10">
+        <div className="order-3 w-full flex flex-wrap items-center gap-2 pt-1.5 mt-0.5 border-t border-emerald-800/10">
           <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[10px] sm:text-[11px] md:text-xs font-black">
             {NAV_LINKS_PRINCIPALES.map(link => (
               <a
@@ -2021,9 +2094,11 @@ function BotonRecibeBeneficios() {
       <button
         type="button"
         onClick={() => setAbierto((v) => !v)}
-        className="rounded-full bg-[#17472d] hover:bg-[#0f2d1e] text-white shadow-sm px-2.5 py-1.5 text-[10px] sm:text-[11px] font-black uppercase tracking-wide"
+        className="rounded-full bg-[#e65100] hover:bg-[#bf360c] text-white shadow-sm px-2.5 py-1.5 text-[10px] sm:text-[11px] font-black uppercase tracking-wide transition-colors flex items-center gap-1"
       >
-        Recibe Beneficios
+        <span className="hidden sm:inline">Avisos y Beneficios</span>
+        <span className="sm:hidden">Avisos</span>
+        <span aria-hidden="true">💌</span>
       </button>
 
       {abierto && (
