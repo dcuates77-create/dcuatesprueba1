@@ -403,66 +403,77 @@ const FAQ_ITEMS = [
 ];
 
 // Navegación por Necesidades — botón flotante naranja (arriba a la derecha)
-// que agrupa TODAS las preguntas por necesidad del visitante en 4 categorías.
+// que agrupa TODAS las preguntas por necesidad del visitante en 4 categorías,
+// cada una con su propio color (a partir de los logos de cada sección).
 // Cada pregunta lleva a un "modal" (mismo id que en TODOS_LOS_PROYECTOS o en
-// las 3 cajas naranjas nuevas), o a una "action" especial ("comparte" abre el
-// formulario de Conocer y Compartir Más), o a un "enlace" directo (para las
-// necesidades "próximamente" que aún no tienen su propia sección/modal).
+// las 3 cajas naranjas nuevas), o a un "enlace" directo (para las necesidades
+// "próximamente" que aún no tienen su propia sección/modal).
 const NECESIDADES_GRUPOS = [
   {
     id: "mascotas",
     titulo: "Mascotas",
+    colorClaro: "#fbeaf0",
+    colorFuerte: "#ed93b1",
+    colorTexto: "#4b1528",
     preguntas: [
-      { texto: "¿Perdiste a tu mascota?", modal: "ecatepets" },
-      { texto: "¿Quieres adoptar una mascota?", modal: "ecatepets" },
-      { texto: "¿Rescataste a un peludito y no sabes qué hacer?", modal: "ecatepets" },
-      { texto: "¿Buscas una recomendación de atención veterinaria de confianza? (próximamente)", enlace: enlaceWhatsApp("¡Hola DCUATES! Busco una recomendación de atención veterinaria de confianza.") },
-      { texto: "¿Buscas accesorios, alimentos o productos de calidad para tu mascota? (próximamente)", enlace: enlaceWhatsApp("¡Hola DCUATES! Busco accesorios, alimentos o productos de calidad para mi mascota.") }
+      { texto: "Perdí a mi mascota", modal: "ecatepets" },
+      { texto: "Quiero adoptar una mascota", modal: "ecatepets" },
+      { texto: "Rescaté a un peludito y no sé qué hacer", modal: "ecatepets" },
+      { texto: "Busco una recomendación de atención veterinaria de confianza (próximamente)", enlace: enlaceWhatsApp("¡Hola DCUATES! Busco una recomendación de atención veterinaria de confianza.") },
+      { texto: "Busco accesorios, alimentos o productos de calidad para mi mascota (próximamente)", enlace: enlaceWhatsApp("¡Hola DCUATES! Busco accesorios, alimentos o productos de calidad para mi mascota.") }
     ]
   },
   {
     id: "negocios",
     titulo: "Negocios",
+    colorClaro: "#faece7",
+    colorFuerte: "#f0997b",
+    colorTexto: "#4a1b0c",
     preguntas: [
-      { texto: "¿Tienes un negocio y quieres más clientes de tu zona?", modal: "publicidad-tarjeta" },
-      { texto: "¿Quieres anunciar una promoción o evento de tu negocio?", modal: "publicidad-tarjeta" },
-      { texto: "¿Buscas aliados o proveedores de confianza para crecer?", modal: "alianzas-tarjeta" },
-      { texto: "¿Quieres vender o comprar algo de segunda mano de forma segura?", modal: "bazares" },
-      { texto: "¿Buscas un bazar comunitario donde participar?", modal: "bazares" },
-      { texto: "¿Buscas un producto o servicio local que también apoye una causa?", modal: "ventas-con-causa" },
-      { texto: "¿Quieres vender tu producto o servicio con causa?", modal: "ventas-con-causa" },
-      { texto: "¿Buscas descuentos en negocios locales?", modal: "cupones-promos" },
-      { texto: "¿Tu negocio quiere patrocinar o aliarse con DCUATES?", modal: "patrocinadores-alianzas" },
-      { texto: "¿Buscas trabajo o quieres ofrecer una vacante? (próximamente)", enlace: enlaceWhatsApp("¡Hola DCUATES! Me interesa la futura bolsa de empleo comunitaria.") }
+      { texto: "Tengo un negocio y quiero más clientes de mi zona", modal: "publicidad-tarjeta" },
+      { texto: "Quiero anunciar una promoción o evento de mi negocio", modal: "publicidad-tarjeta" },
+      { texto: "Busco aliados o proveedores de confianza para crecer", modal: "alianzas-tarjeta" },
+      { texto: "Quiero vender o comprar algo de segunda mano de forma segura", modal: "bazares" },
+      { texto: "Busco un bazar comunitario donde participar", modal: "bazares" },
+      { texto: "Busco un producto o servicio local que también apoye una causa", modal: "ventas-con-causa" },
+      { texto: "Quiero vender mi producto o servicio con causa", modal: "ventas-con-causa" },
+      { texto: "Busco descuentos en negocios locales", modal: "cupones-promos" },
+      { texto: "Mi negocio quiere patrocinar o aliarse con DCUATES", modal: "patrocinadores-alianzas" },
+      { texto: "Busco trabajo o quiero ofrecer una vacante (próximamente)", enlace: enlaceWhatsApp("¡Hola DCUATES! Me interesa la futura bolsa de empleo comunitaria.") }
     ]
   },
   {
     id: "apoyos-mutuos",
     titulo: "Beneficios y Apoyos Mutuos",
+    colorClaro: "#e1f5ee",
+    colorFuerte: "#5dcaa5",
+    colorTexto: "#04342c",
     preguntas: [
-      { texto: "¿Buscas un libro o material educativo prestado?", modal: "libros" },
-      { texto: "¿Tienes libros para donar o intercambiar?", modal: "libros" },
-      { texto: "¿Necesitas un servicio y quieres una recomendación de confianza?", modal: "circulo-confianza" },
-      { texto: "¿Quieres unirte a una red de apoyo mutuo?", modal: "circulo-confianza" },
-      { texto: "¿Tuviste una experiencia con un negocio y quieres compartirla?", modal: "recomienda-evalua-gana" },
-      { texto: "¿Quieres apoyar con dinero, en especie, trueque o tu tiempo?", modal: "donaciones" },
-      { texto: "¿Tú o tu familia necesitan apoyo y no saben a quién acudir?", modal: "donaciones" },
-      { texto: "¿Quieres avisar o enterarte de algo importante de tu colonia? (próximamente)", enlace: enlaceWhatsApp("¡Hola DCUATES! Quiero compartir o enterarme de alertas de mi colonia.") }
+      { texto: "Busco un libro o material educativo prestado", modal: "libros" },
+      { texto: "Tengo libros para donar o intercambiar", modal: "libros" },
+      { texto: "Necesito un servicio y quiero una recomendación de confianza", modal: "circulo-confianza" },
+      { texto: "Quiero unirme a una red de apoyo mutuo", modal: "circulo-confianza" },
+      { texto: "Tuve una experiencia con un negocio y quiero compartirla", modal: "recomienda-evalua-gana" },
+      { texto: "Quiero apoyar con dinero, en especie, trueque o mi tiempo", modal: "donaciones" },
+      { texto: "Mi familia o yo necesitamos apoyo y no sabemos a quién acudir", modal: "donaciones" },
+      { texto: "Quiero avisar o enterarme de algo importante de mi colonia (próximamente)", enlace: enlaceWhatsApp("¡Hola DCUATES! Quiero compartir o enterarme de alertas de mi colonia.") }
     ]
   },
   {
     id: "conocer-mas",
     titulo: "Conocer y Compartir Más",
+    colorClaro: "#eeedfe",
+    colorFuerte: "#afa9ec",
+    colorTexto: "#26215c",
     preguntas: [
-      { texto: "¿Necesitas orientación (legal, de negocio, personal)?", modal: "asesorias" },
-      { texto: "¿Tienes conocimientos que quieras compartir como asesor voluntario?", modal: "asesorias" },
-      { texto: "¿Quieres inspirarte con testimonios reales de la comunidad?", modal: "historias-dcuates" },
-      { texto: "¿Tienes una historia que quieras compartir?", modal: "historias-dcuates" },
-      { texto: "¿Quieres enterarte de eventos y convocatorias de tu colonia?", modal: "noticias" },
-      { texto: "¿Tienes una noticia o evento que quieras compartir?", modal: "noticias" },
-      { texto: "¿Buscas actividades para tu salud física o mental?", modal: "bienestar" },
-      { texto: "¿Quieres organizarte o sumarte a una actividad recreativa comunitaria?", modal: "bienestar" },
-      { texto: "¿Qué te gustaría o necesitas que compartiéramos, y qué te gustaría compartir tú?", action: "comparte" }
+      { texto: "Necesito orientación (legal, de negocio, personal)", modal: "asesorias" },
+      { texto: "Tengo conocimientos que quiero compartir como asesor voluntario", modal: "asesorias" },
+      { texto: "Quiero inspirarme con testimonios reales de la comunidad", modal: "historias-dcuates" },
+      { texto: "Tengo una historia que quiero compartir", modal: "historias-dcuates" },
+      { texto: "Quiero enterarme de eventos y convocatorias de mi colonia", modal: "noticias" },
+      { texto: "Tengo una noticia o evento que quiero compartir", modal: "noticias" },
+      { texto: "Busco actividades para mi salud física o mental", modal: "bienestar" },
+      { texto: "Quiero organizarme o sumarme a una actividad recreativa comunitaria", modal: "bienestar" }
     ]
   }
 ];
@@ -503,7 +514,7 @@ export default function App() {
   const [modalProyecto, setModalProyecto] = useState(null);
   // Formulario emergente reutilizable: null = cerrado; "sugerencias" abre el
   // de Sugerencias y Quejas (pie de página / menú "MÁS"); "comparte" abre el
-  // de Conocer y Compartir Más (desde el botón de Necesidades).
+  // de Conocer y Compartir Más (desde el botón naranja "Quiero Más" del encabezado).
   const [modalFormulario, setModalFormulario] = useState(null);
   // Id de YouTube del video que se está viendo en grande (ventana flotante),
   // al tocar una miniatura de la barra de videos de portada.
@@ -642,6 +653,7 @@ export default function App() {
           onAbrirPrivacidad={() => setShowPrivacy(true)}
           onAbrirProyecto={(id) => setModalProyecto(id)}
           onAbrirSugerencias={() => setModalFormulario("sugerencias")}
+          onAbrirComparte={() => setModalFormulario("comparte")}
           musicaSonando={musicaSonando}
           onAlternarMusica={alternarMusica}
           volumen={volumen}
@@ -1700,7 +1712,7 @@ export default function App() {
         <ModalFormularioWhatsApp
           titulo="Conocer y Compartir Más"
           descripcion="¿Qué te gustaría o necesitas que compartiéramos, y qué te gustaría compartir tú?"
-          opciones={["Quiero que compartan sobre", "Quiero compartir algo"]}
+          opciones={["Quiero que compartan más o también sobre", "Quiero compartir algo"]}
           placeholder="Cuéntanos..."
           onCerrar={() => setModalFormulario(null)}
         />
@@ -1713,7 +1725,7 @@ export default function App() {
 // =========================================================================
 // 3. SUBCOMPONENTE: SITE HEADER
 // =========================================================================
-function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSugerencias, musicaSonando, onAlternarMusica, volumen, onCambiarVolumen }) {
+function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSugerencias, onAbrirComparte, musicaSonando, onAlternarMusica, volumen, onCambiarVolumen }) {
   const [menuMasAbierto, setMenuMasAbierto] = useState(false);
   const [volumenAbierto, setVolumenAbierto] = useState(false);
   return (
@@ -1737,12 +1749,7 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSug
         </a>
 
         {/* Íconos de redes: comparten la primera fila con el logo (empujados a la derecha) en móvil; en escritorio, a la derecha del todo. La música va justo a la izquierda de los íconos, bien pegada, para no ocupar una fila extra en el celular. */}
-        <div className="order-2 md:order-3 ml-auto flex items-center gap-2 sm:gap-3">
-
-          {/* Recibe Beneficios — suscripción por WhatsApp con intereses.
-              Nombre elegido para comunicar "valor" y no confundirse con
-              alertas/emergencias. Ver INTERESES_BENEFICIOS arriba. */}
-          <BotonRecibeBeneficios />
+        <div className="order-2 md:order-4 ml-auto flex items-center gap-2 sm:gap-3">
 
           {/* Música — botón compacto; el volumen se despliega hacia abajo
               en una tarjetita flotante, sin ocupar espacio propio. */}
@@ -1811,8 +1818,24 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSug
           </a>
         </div>
 
+        {/* Fila naranja: Recibe Beneficios + Quiero Más — su propia fila en
+            móvil, junto al botón parpadeante de Necesidades (flotante, ver
+            <BotonNecesidades/> en App()). En escritorio se acomodan en la
+            misma fila que los íconos de redes (ml-auto los empuja a la
+            derecha del todo). */}
+        <div className="order-3 md:order-3 w-full md:w-auto md:ml-auto flex items-center gap-2 pt-1.5 md:pt-0 mt-0.5 md:mt-0 border-t md:border-t-0 border-emerald-800/10">
+          <BotonRecibeBeneficios />
+          <button
+            type="button"
+            onClick={() => onAbrirComparte && onAbrirComparte()}
+            className="rounded-full bg-[#e65100] hover:bg-[#bf360c] text-white shadow-sm px-2.5 py-1.5 text-[10px] sm:text-[11px] font-black uppercase tracking-wide transition-colors"
+          >
+            Quiero Más
+          </button>
+        </div>
+
         {/* Fila única de menú: accesos directos + MÁS (con todo lo demás). */}
-        <div className="order-3 w-full flex flex-wrap items-center gap-2 pt-1.5 mt-0.5 border-t border-emerald-800/10">
+        <div className="order-4 w-full flex flex-wrap items-center gap-2 pt-1.5 mt-0.5 border-t border-emerald-800/10">
           <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[10px] sm:text-[11px] md:text-xs font-black">
             {NAV_LINKS_PRINCIPALES.map(link => (
               <a
@@ -1911,11 +1934,14 @@ function BotonNecesidades({ onAbrirProyecto, onAccionEspecial }) {
 
   return (
     <>
-      <div className="fixed top-24 sm:top-28 right-5 sm:right-6 z-50">
+      <div className="fixed top-20 sm:top-24 right-5 sm:right-6 z-50 flex items-center gap-2">
+        <span className="bg-[#e65100] text-white text-[10px] sm:text-xs font-black uppercase tracking-wide px-2.5 py-1.5 rounded-full shadow-lg border border-white/30 whitespace-nowrap animate-pulse">
+          ¿Qué necesitas hoy?
+        </span>
         <button
           type="button"
           onClick={() => setAbierto((v) => !v)}
-          className="relative flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[#ff9248] to-[#e65100] text-white shadow-[0_10px_20px_rgba(0,0,0,0.35),inset_0_-3px_6px_rgba(0,0,0,0.25),inset_0_3px_4px_rgba(255,255,255,0.4)] transition-all hover:scale-110 active:scale-95 border-2 border-white/40"
+          className="relative flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[#ff9248] to-[#e65100] text-white shadow-[0_10px_20px_rgba(0,0,0,0.35),inset_0_-3px_6px_rgba(0,0,0,0.25),inset_0_3px_4px_rgba(255,255,255,0.4)] transition-all hover:scale-110 active:scale-95 border-2 border-white/40 shrink-0"
           title="¿Qué necesitas hoy?"
           aria-label="¿Qué necesitas hoy?"
         >
@@ -1942,19 +1968,21 @@ function BotonNecesidades({ onAbrirProyecto, onAccionEspecial }) {
                 <button
                   type="button"
                   onClick={() => setGrupoAbierto((g) => (g === grupo.id ? null : grupo.id))}
+                  style={grupoAbierto === grupo.id ? { backgroundColor: grupo.colorFuerte, color: grupo.colorTexto } : undefined}
                   className="w-full flex items-center justify-between px-4 py-3 text-left font-black uppercase text-xs text-emerald-900 hover:bg-emerald-50 transition-colors"
                 >
                   {grupo.titulo}
                   <span className={`transition-transform ${grupoAbierto === grupo.id ? "rotate-180" : ""}`}>▾</span>
                 </button>
                 {grupoAbierto === grupo.id && (
-                  <div className="pb-2">
+                  <div className="pb-1">
                     {grupo.preguntas.map((p, i) => (
                       <button
                         key={i}
                         type="button"
                         onClick={() => alTocarPregunta(p)}
-                        className="w-full text-left px-6 py-2 text-xs text-slate-600 hover:bg-emerald-50 hover:text-emerald-900 transition-colors leading-snug"
+                        style={{ backgroundColor: i % 2 === 0 ? grupo.colorClaro : "#ffffff", color: grupo.colorTexto }}
+                        className="w-full text-left px-5 py-3 text-sm font-bold hover:brightness-95 transition-all leading-snug"
                       >
                         {p.texto}
                       </button>
@@ -2005,7 +2033,7 @@ function BotonRecibeBeneficios() {
             <p className="text-xs font-black uppercase text-[#0f2d1e] mb-3">¿Qué te interesa recibir?</p>
             <div className="space-y-2">
               {INTERESES_BENEFICIOS.map((interes) => (
-                <label key={interes} className="flex items-start gap-2 text-xs font-medium text-slate-700 cursor-pointer">
+                <label key={interes} className="flex items-start gap-2 text-xs font-bold text-slate-800 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={seleccion.includes(interes)}
