@@ -1829,12 +1829,12 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSug
 
         {/* Fila única de menú: accesos directos + MÁS (con todo lo demás). */}
         <div className="order-3 w-full flex flex-wrap items-center gap-2 pt-1.5 mt-0.5 border-t border-emerald-800/10">
-          <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[10px] sm:text-[11px] md:text-xs font-black">
+          <div className="flex flex-wrap items-center gap-1 sm:gap-2 text-[9px] sm:text-[11px] md:text-xs font-black">
             {NAV_LINKS_PRINCIPALES.map(link => (
               <a
                 key={link.href}
                 href={link.href}
-                className="rounded-full border-2 border-transparent bg-[#17472d] hover:bg-[#0f2d1e] text-white transition-colors uppercase tracking-wide text-center leading-tight px-3 py-1.5"
+                className="rounded-full border-2 border-transparent bg-[#17472d] hover:bg-[#0f2d1e] text-white transition-colors uppercase tracking-wide text-center leading-tight px-2 sm:px-3 py-1.5"
               >
                 {link.label}
               </a>
@@ -1844,7 +1844,7 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSug
               <button
                 type="button"
                 onClick={() => setMenuMasAbierto((v) => !v)}
-                className="rounded-full border-2 border-transparent bg-[#17472d] hover:bg-[#0f2d1e] text-white transition-colors uppercase tracking-wide text-center leading-tight px-3 py-1.5 flex items-center gap-1"
+                className="rounded-full border-2 border-transparent bg-[#17472d] hover:bg-[#0f2d1e] text-white transition-colors uppercase tracking-wide text-center leading-tight px-2 sm:px-3 py-1.5 flex items-center gap-1"
               >
                 Más
                 <span className={`transition-transform ${menuMasAbierto ? "rotate-180" : ""}`}>▾</span>
@@ -2024,13 +2024,18 @@ function BotonRecibeBeneficios() {
       </button>
 
       {abierto && (
-        <>
-          <div className="fixed inset-0 z-30" onClick={() => setAbierto(false)} />
-          <div className="absolute right-0 top-full mt-2 z-40 w-72 rounded-2xl bg-white shadow-xl border border-emerald-800/10 p-4">
-            <p className="text-xs font-black uppercase text-[#0f2d1e] mb-3">¿Qué te interesa recibir?</p>
-            <div className="space-y-2">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
+          onClick={() => setAbierto(false)}
+        >
+          <div
+            className="bg-white text-slate-900 rounded-2xl max-w-sm w-full p-6 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="text-sm font-black uppercase text-[#0f2d1e] mb-3">¿Qué te interesa recibir?</p>
+            <div className="space-y-2.5">
               {INTERESES_BENEFICIOS.map((interes) => (
-                <label key={interes} className="flex items-start gap-2 text-xs font-bold text-slate-800 cursor-pointer">
+                <label key={interes} className="flex items-start gap-2 text-sm font-bold text-slate-800 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={seleccion.includes(interes)}
@@ -2044,12 +2049,12 @@ function BotonRecibeBeneficios() {
             <button
               type="button"
               onClick={enviar}
-              className="mt-4 w-full rounded-lg bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-2 text-[11px] uppercase tracking-wide transition-colors"
+              className="mt-5 w-full rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3 text-xs uppercase tracking-wide transition-colors"
             >
               Suscribirme por WhatsApp
             </button>
           </div>
-        </>
+        </div>
       )}
     </div>
   );
@@ -3045,9 +3050,11 @@ function BarraPatrocinadores() {
     .filter((it) => it.img)
     .slice(0, 20);
 
-  // Carrusel automático: cada 2.5s se desliza a la siguiente imagen sola
-  // (scrollIntoView, sin necesitar medir anchos a mano). Se pausa en
-  // cuanto la persona toca/desliza la tira manualmente.
+  // Carrusel automático: cada 2.5s se desliza a la siguiente imagen sola.
+  // Mueve el "scrollLeft" del propio contenedor directamente (nunca
+  // scrollIntoView, que puede arrastrar también el scroll de la página
+  // completa si la barra no está a la vista). Se pausa en cuanto la
+  // persona toca/desliza la tira manualmente.
   const scrollRef = useRef(null);
   const [indiceAuto, setIndiceAuto] = useState(0);
   const [autoPausado, setAutoPausado] = useState(false);
@@ -3061,7 +3068,9 @@ function BarraPatrocinadores() {
   useEffect(() => {
     const contenedor = scrollRef.current;
     const hijo = contenedor && contenedor.children[indiceAuto];
-    if (hijo) hijo.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+    if (!contenedor || !hijo) return;
+    const objetivo = hijo.offsetLeft - (contenedor.clientWidth - hijo.clientWidth) / 2;
+    contenedor.scrollTo({ left: Math.max(0, objetivo), behavior: "smooth" });
   }, [indiceAuto]);
 
   if (items.length === 0) return null;
