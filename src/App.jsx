@@ -51,12 +51,12 @@ const MUSICA_DCUATES_URL = "/audio/musica-dcuates.mp3";
 //   id que en TODOS_LOS_PROYECTOS)
 const NAV_LINKS_PRINCIPALES = [
   { label: "Inicio", href: "#inicio" },
-  { label: "Publicidad Gratuita", href: "#publicidad" },
-  { label: "Apoyo Voluntario", href: "#donaciones" },
-  { label: "Ventas con Causa", href: "#ventas-con-causa" }
+  { label: "Proyectos", href: "#iniciativas" },
+  { label: "Apoyo Voluntario", href: "#donaciones" }
 ];
 const NAV_LINKS_MAS = [
-  { label: "Proyectos", href: "#iniciativas" },
+  { label: "Publicidad Gratuita", href: "#publicidad" },
+  { label: "Ventas con Causa", href: "#ventas-con-causa" },
   { label: "Alianzas Solidarias", href: "#iniciativas" },
   { label: "Apoyo a Causas", href: "#extraviados-registro" },
   { label: "Preguntas Frecuentes", action: "faq" },
@@ -544,28 +544,6 @@ export default function App() {
   // Botón desplegable "Registra Aquí Tu Interés" en la sección de Ventas
   // con Causa (a la derecha del carrusel).
   const [registroVentasAbierto, setRegistroVentasAbierto] = useState(false);
-  // Botón "Escucha Música DCUATES" del pie de página.
-  const [musicaSonando, setMusicaSonando] = useState(false);
-  const audioRef = useRef(null);
-  // Volumen de la música de fondo (0 a 1), controlado con el slider del
-  // header. Se aplica al <audio> cada vez que cambia.
-  const [volumen, setVolumen] = useState(0.8);
-  useEffect(() => {
-    if (audioRef.current) audioRef.current.volume = volumen;
-  }, [volumen]);
-  const alternarMusica = () => {
-    if (!audioRef.current) return;
-    if (musicaSonando) {
-      audioRef.current.pause();
-    } else {
-      // Música bajo demanda: el <audio> no trae "src" de inicio (para no
-      // descargar el mp3 si nadie lo escucha); se lo ponemos hasta el
-      // primer play.
-      if (!audioRef.current.src) audioRef.current.src = musicaFondoUrl;
-      audioRef.current.play().catch(() => {});
-    }
-    setMusicaSonando((v) => !v);
-  };
 
   // Filas "crudas" de la tabla ENLACES en Baserow — alimentan el video de
   // portada, las recomendaciones y el botón de Música/Libros/Pelis.
@@ -617,18 +595,6 @@ export default function App() {
   const recomendacionesVenta = paresBaserow(filasEnlaces, "NOMBRE RECOMENDACIONES DE VENTA", "RECOMENDACIONES DE VENTA", 5);
   const compraVentaDcuates = paresBaserow(filasEnlaces, "NOMBRE COMPRA-VENTA DCUATES", "COMPRA-VENTA DCUATES", 5);
 
-  // Audio de fondo real: la columna "MUSICA" en Baserow es de tipo
-  // Archivo/Adjunto (ahí subiste el mp3), así que se lee igual que las
-  // galerías. Si por algún motivo viene vacía, cae al archivo local de
-  // respaldo (MUSICA_DCUATES_URL).
-  const musicaFondoUrl = (() => {
-    for (const fila of filasEnlaces) {
-      const url = fila && urlDesdeCeldaBaserow(fila.MUSICA);
-      if (url) return url;
-    }
-    return MUSICA_DCUATES_URL;
-  })();
-
   return (
     <div className="min-h-screen bg-[#17472d] font-sans antialiased text-slate-900 selection:bg-emerald-500/30 relative pb-28 sm:pb-24">
 
@@ -665,12 +631,7 @@ export default function App() {
           onAbrirProyecto={(id) => setModalProyecto(id)}
           onAbrirSugerencias={() => setModalFormulario("sugerencias")}
           onAbrirComparte={() => setModalFormulario("comparte")}
-          musicaSonando={musicaSonando}
-          onAlternarMusica={alternarMusica}
-          volumen={volumen}
-          onCambiarVolumen={setVolumen}
         />
-        <audio ref={audioRef} loop onEnded={() => setMusicaSonando(false)} className="hidden" />
         <TickerFrases />
 
         {/* Botón de Navegación por Necesidades — pegado justo debajo de la
@@ -1803,9 +1764,8 @@ export default function App() {
 // =========================================================================
 // 3. SUBCOMPONENTE: SITE HEADER
 // =========================================================================
-function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSugerencias, onAbrirComparte, musicaSonando, onAlternarMusica, volumen, onCambiarVolumen }) {
+function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSugerencias, onAbrirComparte }) {
   const [menuMasAbierto, setMenuMasAbierto] = useState(false);
-  const [volumenAbierto, setVolumenAbierto] = useState(false);
   return (
     <header className="border-b border-emerald-800/20 bg-white/95 backdrop-blur py-2 px-4 shadow-sm text-slate-900 relative">
       <div className="mx-auto flex flex-wrap items-center gap-y-2 max-w-6xl">
@@ -1826,53 +1786,8 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSug
           <span className="text-2xl sm:text-3xl md:text-4xl font-black uppercase tracking-tight text-[#0f2d1e]">DCUATES</span>
         </a>
 
-        {/* Íconos de redes: comparten la primera fila con el logo (empujados a la derecha) en móvil; en escritorio, a la derecha del todo. Orden: Música, Avisos y Beneficios, Compartir Más, redes — mismo alto y tamaño de letra en los 4. */}
+        {/* Íconos de redes: comparten la primera fila con el logo (empujados a la derecha) en móvil; en escritorio, a la derecha del todo. Orden: Avisos y Beneficios, Compartir Más, redes — mismo alto y tamaño de letra. */}
         <div className="order-2 md:order-3 ml-auto flex flex-wrap items-center gap-1.5 sm:gap-3">
-
-          {/* Música — botón compacto; el volumen se despliega hacia abajo
-              en una tarjetita flotante, sin ocupar espacio propio. */}
-          <div className="relative">
-            <div className="inline-flex items-center rounded-full bg-[#e65100] text-white shadow-sm overflow-hidden min-h-[30px] sm:min-h-[34px]">
-              <button
-                type="button"
-                onClick={onAlternarMusica}
-                aria-label="Música Dcuates"
-                title="Música Dcuates"
-                className="hover:bg-[#bf360c] transition-colors uppercase tracking-wide text-center leading-tight px-2.5 py-1.5 text-[10px] sm:text-[11px] font-black flex items-center gap-1"
-              >
-                <span className="sm:hidden" aria-hidden="true">{musicaSonando ? "⏸" : "▶"}</span>
-                <span className="hidden sm:inline">🎵 {musicaSonando ? "Pausar" : "Música Dcuates"}</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setVolumenAbierto((v) => !v)}
-                className="hover:bg-[#bf360c] transition-colors px-2 py-1.5 border-l border-white/30"
-                aria-label="Ajustar volumen"
-                title="Volumen"
-              >
-                {volumen === 0 ? "🔇" : volumen < 0.5 ? "🔉" : "🔊"}
-              </button>
-            </div>
-
-            {volumenAbierto && (
-              <>
-                <div className="fixed inset-0 z-30" onClick={() => setVolumenAbierto(false)} />
-                <div className="absolute right-0 top-full mt-2 z-40 rounded-xl bg-white shadow-xl border border-emerald-800/10 px-3 py-2.5 flex items-center gap-2">
-                  <span aria-hidden="true">{volumen === 0 ? "🔇" : volumen < 0.5 ? "🔉" : "🔊"}</span>
-                  <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.05"
-                    value={volumen}
-                    onChange={(e) => onCambiarVolumen && onCambiarVolumen(parseFloat(e.target.value))}
-                    className="w-24 accent-[#17472d] cursor-pointer"
-                    aria-label="Volumen de la música"
-                  />
-                </div>
-              </>
-            )}
-          </div>
 
           {/* Avisos y Beneficios — suscripción por WhatsApp con intereses. */}
           <BotonRecibeBeneficios />
@@ -3130,6 +3045,25 @@ function BarraPatrocinadores() {
     .filter((it) => it.img)
     .slice(0, 20);
 
+  // Carrusel automático: cada 2.5s se desliza a la siguiente imagen sola
+  // (scrollIntoView, sin necesitar medir anchos a mano). Se pausa en
+  // cuanto la persona toca/desliza la tira manualmente.
+  const scrollRef = useRef(null);
+  const [indiceAuto, setIndiceAuto] = useState(0);
+  const [autoPausado, setAutoPausado] = useState(false);
+  useEffect(() => {
+    if (autoPausado || items.length === 0) return;
+    const id = setInterval(() => {
+      setIndiceAuto((i) => (i + 1) % items.length);
+    }, 2500);
+    return () => clearInterval(id);
+  }, [autoPausado, items.length]);
+  useEffect(() => {
+    const contenedor = scrollRef.current;
+    const hijo = contenedor && contenedor.children[indiceAuto];
+    if (hijo) hijo.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+  }, [indiceAuto]);
+
   if (items.length === 0) return null;
 
   const alTocar = (item) => {
@@ -3146,10 +3080,14 @@ function BarraPatrocinadores() {
   return (
     <div className="bg-[#17472d] py-5 px-4 border-t-4 border-b-4 border-[#0f2d1e]">
       <div className="mx-auto max-w-6xl">
-        <p className="text-emerald-300 font-black uppercase text-xs sm:text-sm tracking-wide text-center mb-3 px-2 leading-snug">
+        <p className="text-emerald-300 font-black uppercase text-lg sm:text-2xl tracking-wide text-center mb-3 px-2 leading-snug">
           Muchas gracias a nuestros Patrocinadores y Amigos por su valiosa confianza y apoyo ⭐⭐⭐⭐⭐
         </p>
-        <div className="flex items-center gap-3 overflow-x-auto pb-2 px-1 snap-x snap-mandatory">
+        <div
+          ref={scrollRef}
+          onPointerDown={() => setAutoPausado(true)}
+          className="flex items-center gap-3 overflow-x-auto pb-2 px-1 snap-x snap-mandatory"
+        >
           {items.map((item, i) => (
             <button
               key={i}
