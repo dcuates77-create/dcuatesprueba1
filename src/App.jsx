@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 
 // =========================================================================
-// 1. CONFIGURACIÓN CENTRALIZADA DE VARIABLES, REDES Y HOJA DE CÁLCULO y BORRADO DE TODOS LOS ANTERIORES JSX CAMBIOS VIDEOS CLON7 DEL CLON6
+// 1. CONFIGURACIÓN CENTRALIZADA DE VARIABLES, REDES Y HOJA DE CÁLCULO y BORRADO DE TODOS LOS ANTERIORES JSX CAMBIOS VIDEOS
 // =========================================================================
 const GOOGLE_SHEETS_URL = "https://script.google.com/macros/s/AKfycbxngMxuH03w0rI7AyJHRap9QCVf_Xs5roypGXnnkSGr_22SyfxWAVAiH614r1eGC2DW2g/exec";
 
@@ -51,13 +51,13 @@ const MUSICA_DCUATES_URL = "/audio/musica-dcuates.mp3";
 //   id que en TODOS_LOS_PROYECTOS)
 const NAV_LINKS_PRINCIPALES = [
   { label: "Inicio", href: "#inicio" },
-  { label: "Proyectos", href: "#iniciativas" },
+  { label: "Proyectos", href: "#inicio" },
   { label: "Apoyo Voluntario", href: "#donaciones" }
 ];
 const NAV_LINKS_MAS = [
   { label: "Publicidad Gratuita", href: "#publicidad" },
   { label: "Ventas con Causa", href: "#ventas-con-causa" },
-  { label: "Alianzas Solidarias", href: "#iniciativas" },
+  { label: "Alianzas Solidarias", modal: "alianzas-tarjeta" },
   { label: "Apoyo a Causas", href: "#extraviados-registro" },
   { label: "Preguntas Frecuentes", action: "faq" },
   { label: "Sugerencias y Quejas", action: "sugerencias" },
@@ -1106,146 +1106,6 @@ export default function App() {
         </div>
       </section>
 
-      {/* SECCIÓN 1: LOS 4 PROYECTOS BASE */}
-      <section id="iniciativas" className="scroll-mt-48 md:scroll-mt-36 bg-[#17472d] text-white py-10 sm:py-16 px-4 border-b-4 border-[#0f2d1e]">
-        <div className="mx-auto max-w-6xl">
-          <h2 className="text-4xl sm:text-5xl font-black text-center uppercase tracking-tight mb-12 text-emerald-300">
-            Nuestros Proyectos Originales
-          </h2>
-
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2">
-            {INICIATIVAS_PRINCIPALES.map((item) => (
-              <div
-                id={item.id}
-                key={item.id}
-                className={`scroll-mt-48 md:scroll-mt-36 rounded-3xl border-4 border-[#0f2d1e] p-6 text-slate-800 shadow-xl flex flex-col justify-between transition-all hover:scale-[1.01] duration-200 ${
-                  item.id === "libros" || item.id === "alianzas-tarjeta" || item.id === "recomienda-evalua-gana" ? "bg-[#e8f5e9]" : "bg-white"
-                }`}
-              >
-                <div>
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="text-[#0f2d1e]">
-                      <p className="text-sm sm:text-lg font-black uppercase text-amber-700 tracking-wider">
-                        {item.categoria}
-                      </p>
-                      <h3 className="text-2xl sm:text-3xl font-black text-[#0f2d1e] uppercase tracking-tight leading-tight">
-                        {item.titulo}
-                      </h3>
-                    </div>
-                  </div>
-
-                  <p className="text-sm sm:text-base text-slate-600 leading-relaxed text-justify mb-4 pt-2 font-medium">
-                    {item.descripcion}
-                  </p>
-
-                  <ul className="space-y-2 mb-6 pl-1">
-                    {item.puntos.map((punto, pIdx) => (
-                      <li key={pIdx} className="flex items-center gap-2 text-sm sm:text-base font-bold text-slate-700 uppercase">
-                        <span className="h-2 w-2 rounded-full bg-[#00c853] flex-shrink-0" />
-                        {punto}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                {/* Botón de acción: scroll a un registro/formulario, o WhatsApp directo */}
-                {item.scrollDestino ? (
-                  <button
-                    type="button"
-                    onClick={() => irASeccion(item.scrollDestino)}
-                    className="w-full text-center rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3 px-4 shadow-md transition-colors uppercase tracking-wide text-xs sm:text-sm font-heading block"
-                  >
-                    {item.textoBoton}
-                  </button>
-                ) : (
-                  <a
-                    href={item.enlaceDirectoWA}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full text-center rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3 px-4 shadow-md transition-colors uppercase tracking-wide text-xs sm:text-sm font-heading block"
-                  >
-                    {item.textoBoton}
-                  </a>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* SECCIÓN 2: LOS 4 NUEVOS PROYECTOS SOCIALES */}
-      <section id="nuevos-proyectos" className="scroll-mt-48 md:scroll-mt-36 bg-[#17472d] text-white py-10 sm:py-16 px-4 border-b-4 border-[#0f2d1e]">
-        <div className="mx-auto max-w-6xl">
-          <h2 className="text-4xl sm:text-5xl font-black text-center uppercase tracking-tight mb-3 text-emerald-300">
-            Nuevos Proyectos Sociales
-          </h2>
-          <p className="text-center text-emerald-200/80 mb-12 max-w-xl mx-auto text-xs sm:text-sm font-bold uppercase tracking-wide">
-            Ampliamos nuestro impacto con cuatro nuevos canales comunitarios unificados.
-          </p>
-
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2">
-            {NUEVOS_PROYECTOS_DATA.map((item) => (
-              <div
-                id={item.id}
-                key={item.id}
-                className={`scroll-mt-48 md:scroll-mt-36 rounded-3xl border-4 border-[#0f2d1e] p-6 text-slate-800 shadow-xl flex flex-col justify-between transition-all hover:scale-[1.01] duration-200 ${
-                  item.id === "asesorias" || item.id === "noticias" ? "bg-[#e8f5e9]" : "bg-white"
-                }`}
-              >
-                <div>
-                  <div className="flex items-center gap-3 mb-2">
-                    <div>
-                      <p className="text-sm sm:text-lg font-black uppercase text-amber-700 tracking-wider">
-                        {item.categoria}
-                      </p>
-                      <h3 className="text-2xl sm:text-3xl font-black text-[#0f2d1e] uppercase tracking-tight leading-tight">
-                        {item.titulo}
-                      </h3>
-                    </div>
-                  </div>
-
-                  <p className="text-sm sm:text-base text-slate-600 leading-relaxed text-justify mb-4 pt-2 font-medium">
-                    {item.descripcion}
-                  </p>
-
-                  <ul className="space-y-2 mb-6 pl-1">
-                    {item.puntos.map((punto, pIdx) => (
-                      <li key={pIdx} className="flex items-center gap-2 text-sm sm:text-base font-bold text-slate-700 uppercase">
-                        <span className="h-2 w-2 rounded-full bg-[#00c853] flex-shrink-0" />
-                        {punto}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                {/* Enlace directo a WhatsApp — se omite en Noticias y Bienestar
-                    (id con galería propia): ahí "Sumar Actividades" se quitó y
-                    en su lugar la galería trae su propio botón "Ver Más
-                    Actividades". */}
-                {!GALERIAS_PROYECTOS[item.id] && (
-                  <a
-                    href={item.enlaceDirectoWA}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full text-center rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3 px-4 shadow-md transition-colors uppercase tracking-wide text-xs sm:text-sm font-heading block"
-                  >
-                    {item.textoBoton}
-                  </a>
-                )}
-
-                {/* Prueba: botón que abre una pasarela en ventana emergente (solo Noticias y Bienestar, por ahora) */}
-                {GALERIAS_PROYECTOS[item.id] && (
-                  <button
-                    onClick={() => setModalProyecto(item.id)}
-                    className="w-full mt-2 text-center rounded-xl border-2 border-[#0f2d1e] text-[#0f2d1e] hover:bg-[#0f2d1e] hover:text-white font-black py-2.5 px-4 transition-colors uppercase tracking-wide text-xs sm:text-sm font-heading block"
-                  >
-                    📷 Ver galería
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* SECCIÓN: VENTAS CON CAUSA */}
       <section id="ventas-con-causa" className="scroll-mt-48 md:scroll-mt-36 bg-[#e8f5e9] text-[#0f2d1e] py-10 sm:py-16 px-4 border-b-4 border-[#0f2d1e]">
         <div className="mx-auto max-w-6xl">
@@ -1633,7 +1493,7 @@ export default function App() {
 
         <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm sm:text-base font-bold text-[#0f2d1e]/80">
           <a href="#quienes-somos" className="hover:text-[#0f2d1e] transition-colors">Quiénes Somos</a>
-          <a href="#iniciativas" className="hover:text-[#0f2d1e] transition-colors">Proyectos</a>
+          <a href="#inicio" className="hover:text-[#0f2d1e] transition-colors">Proyectos</a>
           <a href="#nuevos-proyectos" className="hover:text-[#0f2d1e] transition-colors">Nuevos Proyectos</a>
           <a href="#publicidad" className="hover:text-[#0f2d1e] transition-colors">Publicidad</a>
           <a href="#donaciones" className="hover:text-[#0f2d1e] transition-colors">Donaciones</a>
