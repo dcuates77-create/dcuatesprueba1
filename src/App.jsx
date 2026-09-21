@@ -550,21 +550,23 @@ export default function App() {
   const filasEnlaces = useFilasEnlaces();
   // Miniaturas de video de portada — igual que Recomendaciones: cada video
   // puede tener un nombre en la columna "NOMBRE VIDPORT"; si no lo tiene,
-  // se numera solo como "Video 1", "Video 2"...
+  // se numera solo como "Video 1", "Video 2"... Reconoce YouTube y TikTok
+  // (ver detectarVideo más abajo en el archivo).
   const videosPortada = paresBaserow(filasEnlaces, "NOMBRE VIDPORT", "VIDPORT", 12)
-    .map((v, i) => ({ id: idYoutubeDesdeUrl(v.enlace), nombre: v.nombre }))
-    .filter((v) => v.id);
-  const videosPortadaFinal = videosPortada.length > 0 ? videosPortada : [{ id: YOUTUBE_VIDEO_ID, nombre: "Video de presentación DCUATES" }];
+    .map((v) => ({ video: detectarVideo(v.enlace), nombre: v.nombre }))
+    .filter((v) => v.video);
+  const videosPortadaFinal = videosPortada.length > 0 ? videosPortada : [{ video: { plataforma: "youtube", id: YOUTUBE_VIDEO_ID }, nombre: "Video de presentación DCUATES" }];
 
   // Retos, Regalos y Reconocimientos — carrusel de fotos desde la columna
   // "RETOSGALERIA" (Archivo/Adjunto, igual que "MUSICA") y videos
   // relacionados desde "NOMBRE RETOSVID" / "RETOSVID" (mismo patrón que
-  // los videos de portada). Mientras no subas nada a esas columnas, estas
-  // listas simplemente salen vacías y la sección lo indica.
+  // los videos de portada, también reconoce YouTube y TikTok). Mientras no
+  // subas nada a esas columnas, estas listas simplemente salen vacías y la
+  // sección lo indica.
   const galeriaRetos = galeriaDesdeColumna(filasEnlaces, "RETOSGALERIA", 10, "Retos");
   const videosRetos = paresBaserow(filasEnlaces, "NOMBRE RETOSVID", "RETOSVID", 8)
-    .map((v) => ({ id: idYoutubeDesdeUrl(v.enlace), nombre: v.nombre }))
-    .filter((v) => v.id);
+    .map((v) => ({ video: detectarVideo(v.enlace), nombre: v.nombre }))
+    .filter((v) => v.video);
 
   const recomendacionesDcuates = (() => {
     const desdeBaserow = paresBaserow(filasEnlaces, "Nombre Recocasa", "RECASA", 5);
@@ -883,16 +885,11 @@ export default function App() {
                         <button
                           key={i}
                           type="button"
-                          onClick={() => setVideoEnGrande(v.id)}
+                          onClick={() => setVideoEnGrande(v.video)}
                           className="group relative rounded-lg overflow-hidden border-2 border-white/10 hover:border-[#e65100] transition-colors bg-black/30 text-left shrink-0"
                         >
                           <div className="aspect-video w-full overflow-hidden">
-                            <img
-                              src={`https://img.youtube.com/vi/${v.id}/hqdefault.jpg`}
-                              alt={v.nombre}
-                              loading="lazy"
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                            />
+                            <MiniaturaVideo video={v.video} nombre={v.nombre} />
                           </div>
                           <span className="absolute inset-0 flex items-center justify-center">
                             <span className="w-8 h-8 rounded-full bg-[#e65100]/90 flex items-center justify-center text-white text-sm shadow-md group-hover:bg-[#e65100]">▶</span>
@@ -926,13 +923,7 @@ export default function App() {
                       ✕
                     </button>
                     <div className="rounded-2xl overflow-hidden border-4 border-white/20 shadow-2xl aspect-video bg-black">
-                      <iframe
-                        className="w-full h-full"
-                        src={`https://www.youtube.com/embed/${videoEnGrande}?autoplay=1`}
-                        title="Video DCUATES"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                      />
+                      <IframeVideo video={videoEnGrande} className="w-full h-full" />
                     </div>
                   </div>
                 </div>
@@ -1083,16 +1074,11 @@ export default function App() {
               <button
                 key={i}
                 type="button"
-                onClick={() => setVideoEnGrande(v.id)}
+                onClick={() => setVideoEnGrande(v.video)}
                 className="group relative rounded-xl overflow-hidden border-2 border-white/10 hover:border-[#e65100] transition-colors bg-black/30 text-left w-40 sm:w-56 shrink-0"
               >
                 <div className="aspect-video w-full overflow-hidden">
-                  <img
-                    src={`https://img.youtube.com/vi/${v.id}/hqdefault.jpg`}
-                    alt={v.nombre}
-                    loading="lazy"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                  />
+                  <MiniaturaVideo video={v.video} nombre={v.nombre} />
                 </div>
                 <span className="absolute inset-0 flex items-center justify-center">
                   <span className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-[#e65100]/90 flex items-center justify-center text-white text-base sm:text-lg shadow-md group-hover:bg-[#e65100]">▶</span>
@@ -2445,6 +2431,70 @@ function idYoutubeDesdeUrl(url) {
   return m ? m[1] : null;
 }
 
+// Detecta de qué plataforma es un link de video normal (el mismo que
+// copiarías para compartir por WhatsApp — NO el código de incrustación) y
+// saca su id, para poder armar el reproductor correcto de cada una.
+// Reconoce YouTube (incluye Shorts) y TikTok. Ojo: los links cortos de
+// TikTok (vm.tiktok.com/XXXX) no funcionan aquí porque no traen el id en
+// la URL — hay que usar el link largo (tiktok.com/@usuario/video/123...).
+// Devuelve null si no reconoce ninguna plataforma.
+function detectarVideo(url) {
+  if (!url) return null;
+  const idYt = idYoutubeDesdeUrl(url);
+  if (idYt) return { plataforma: "youtube", id: idYt };
+  const tt = String(url).match(/tiktok\.com\/(?:@[\w.-]+\/video\/|embed\/(?:v2\/)?)(\d+)/);
+  if (tt) return { plataforma: "tiktok", id: tt[1] };
+  return null;
+}
+
+// Arma el iframe correcto según la plataforma detectada por detectarVideo().
+function IframeVideo({ video, className }) {
+  if (video.plataforma === "tiktok") {
+    return (
+      <iframe
+        className={className}
+        src={`https://www.tiktok.com/embed/v2/${video.id}`}
+        title="Video de TikTok"
+        allow="autoplay; encrypted-media; picture-in-picture"
+        allowFullScreen
+      />
+    );
+  }
+  return (
+    <iframe
+      className={className}
+      src={`https://www.youtube.com/embed/${video.id}?autoplay=1`}
+      title="Video"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      allowFullScreen
+    />
+  );
+}
+
+// Miniatura de un video: para YouTube usamos su miniatura pública real; para
+// TikTok no hay una URL de miniatura simple sin hacer una petición aparte,
+// así que mostramos una tarjeta con su logo — igual de clicable.
+function MiniaturaVideo({ video, nombre }) {
+  if (video.plataforma === "tiktok") {
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-center gap-1.5 bg-gradient-to-br from-[#111] to-[#000]">
+        <svg viewBox="0 0 24 24" className="h-8 w-8 fill-white" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.02 1.59 4.23.94 1.13 2.29 1.89 3.73 2.18l-.02 3.88c-1.63-.03-3.2-.55-4.51-1.52A7.83 7.83 0 0 1 16.43 7.5v8.32a7.83 7.83 0 0 1-3.32 6.42 7.91 7.91 0 0 1-8.73-.24 7.85 7.85 0 0 1-3.23-7.58 7.84 7.84 0 0 1 5.37-6.84V11.5a3.94 3.94 0 0 0-1.5 3.32 3.93 3.93 0 0 0 3.2 3.88 3.93 3.93 0 0 0 4.61-3.2c.04-.33.05-.66.05-.99V.02z" />
+        </svg>
+        <span className="text-white text-[9px] font-black uppercase tracking-wide">Ver en TikTok</span>
+      </div>
+    );
+  }
+  return (
+    <img
+      src={`https://img.youtube.com/vi/${video.id}/hqdefault.jpg`}
+      alt={nombre}
+      loading="lazy"
+      className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+    />
+  );
+}
+
 function useCatalogoBaserow(tableId, itemsRespaldo) {
   const [items, setItems] = useState(itemsRespaldo);
 
@@ -2936,9 +2986,9 @@ function BarraPatrocinadores() {
   if (items.length === 0) return null;
 
   const alTocar = (item) => {
-    const idYt = item.enlace ? idYoutubeDesdeUrl(item.enlace) : null;
-    if (idYt) {
-      setVideoEnGrande(idYt);
+    const video = item.enlace ? detectarVideo(item.enlace) : null;
+    if (video) {
+      setVideoEnGrande(video);
     } else if (item.enlace && item.enlace.startsWith("http")) {
       window.open(item.enlace, "_blank", "noopener,noreferrer");
     } else {
@@ -3016,13 +3066,7 @@ function BarraPatrocinadores() {
               ✕
             </button>
             <div className="rounded-2xl overflow-hidden border-4 border-white/20 shadow-2xl aspect-video bg-black">
-              <iframe
-                className="w-full h-full"
-                src={`https://www.youtube.com/embed/${videoEnGrande}?autoplay=1`}
-                title="Video DCUATES"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
+              <IframeVideo video={videoEnGrande} className="w-full h-full" />
             </div>
           </div>
         </div>
