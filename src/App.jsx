@@ -556,17 +556,23 @@ export default function App() {
     .map((v) => ({ video: detectarVideo(v.enlace), nombre: v.nombre }))
     .filter((v) => v.video);
   const videosPortadaFinal = videosPortada.length > 0 ? videosPortada : [{ video: { plataforma: "youtube", id: YOUTUBE_VIDEO_ID }, nombre: "Video de presentación DCUATES" }];
+  // Rotación automática de la barra de Historias y reflexiones (misma
+  // lógica que Patrocinadores): se pausa sola en cuanto alguien la toca.
+  const carruselHistorias = useCarruselAutomatico(videosPortadaFinal.length);
 
   // Retos, Regalos y Reconocimientos — carrusel de fotos desde la columna
   // "RETOSGALERIA" (Archivo/Adjunto, igual que "MUSICA") y videos
   // relacionados desde "NOMBRE RETOSVID" / "RETOSVID" (mismo patrón que
-  // los videos de portada, también reconoce YouTube y TikTok). Mientras no
-  // subas nada a esas columnas, estas listas simplemente salen vacías y la
-  // sección lo indica.
+  // los videos de portada, también reconoce YouTube, TikTok y Facebook).
+  // Mientras no subas nada a esas columnas, estas listas simplemente salen
+  // vacías y la sección lo indica.
   const galeriaRetos = galeriaDesdeColumna(filasEnlaces, "RETOSGALERIA", 10, "Retos");
   const videosRetos = paresBaserow(filasEnlaces, "NOMBRE RETOSVID", "RETOSVID", 8)
     .map((v) => ({ video: detectarVideo(v.enlace), nombre: v.nombre }))
     .filter((v) => v.video);
+  // Rotación automática de la tira de videos de Retos (misma lógica que
+  // Historias y Patrocinadores).
+  const { scrollRef: scrollRetosVideosRef, onPointerDown: onPointerDownRetosVideos } = useCarruselAutomatico(videosRetos.length);
 
   const recomendacionesDcuates = (() => {
     const desdeBaserow = paresBaserow(filasEnlaces, "Nombre Recocasa", "RECASA", 5);
@@ -878,29 +884,35 @@ export default function App() {
                     )}
                   </div>
 
-                  {/* Columna 3: videos relacionados (NOMBRE RETOSVID / RETOSVID) */}
-                  <div className="rounded-xl bg-white/5 border border-white/10 p-2 flex flex-col gap-2 max-h-[260px] lg:max-h-none overflow-y-auto">
+                  {/* Columna 3: videos relacionados (NOMBRE RETOSVID / RETOSVID) — tira horizontal con rotación automática */}
+                  <div className="rounded-xl bg-white/5 border border-white/10 p-2 min-h-[180px] flex items-center">
                     {videosRetos.length > 0 ? (
-                      videosRetos.map((v, i) => (
-                        <button
-                          key={i}
-                          type="button"
-                          onClick={() => setVideoEnGrande(v.video)}
-                          className="group relative rounded-lg overflow-hidden border-2 border-white/10 hover:border-[#e65100] transition-colors bg-black/30 text-left shrink-0"
-                        >
-                          <div className="aspect-video w-full overflow-hidden">
-                            <MiniaturaVideo video={v.video} nombre={v.nombre} />
-                          </div>
-                          <span className="absolute inset-0 flex items-center justify-center">
-                            <span className="w-8 h-8 rounded-full bg-[#e65100]/90 flex items-center justify-center text-white text-sm shadow-md group-hover:bg-[#e65100]">▶</span>
-                          </span>
-                          <p className="px-2 py-1 text-[10px] font-black text-white uppercase tracking-tight leading-tight">
-                            {v.nombre}
-                          </p>
-                        </button>
-                      ))
+                      <div
+                        ref={scrollRetosVideosRef}
+                        onPointerDown={onPointerDownRetosVideos}
+                        className="flex gap-2 overflow-x-auto pb-1 w-full"
+                      >
+                        {videosRetos.map((v, i) => (
+                          <button
+                            key={i}
+                            type="button"
+                            onClick={() => setVideoEnGrande(v.video)}
+                            className="group relative rounded-lg overflow-hidden border-2 border-white/10 hover:border-[#e65100] transition-colors bg-black/30 text-left shrink-0 w-32"
+                          >
+                            <div className="aspect-video w-full overflow-hidden">
+                              <MiniaturaVideo video={v.video} nombre={v.nombre} />
+                            </div>
+                            <span className="absolute inset-0 flex items-center justify-center">
+                              <span className="w-8 h-8 rounded-full bg-[#e65100]/90 flex items-center justify-center text-white text-sm shadow-md group-hover:bg-[#e65100]">▶</span>
+                            </span>
+                            <p className="px-2 py-1 text-[10px] font-black text-white uppercase tracking-tight leading-tight">
+                              {v.nombre}
+                            </p>
+                          </button>
+                        ))}
+                      </div>
                     ) : (
-                      <p className="text-emerald-200/70 text-[10px] font-bold uppercase tracking-wide text-center px-2 py-6">
+                      <p className="text-emerald-200/70 text-[10px] font-bold uppercase tracking-wide text-center px-2 py-6 w-full">
                         Sube videos con las columnas "NOMBRE RETOSVID" y "RETOSVID" en Baserow para verlos aquí
                       </p>
                     )}
@@ -1069,7 +1081,11 @@ export default function App() {
             <br className="sm:hidden" />
             <span className="block sm:inline sm:ml-1">Dales clic para ampliarlos y disfrutarlos 🎥 🍿 😊</span>
           </p>
-          <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-1">
+          <div
+            ref={carruselHistorias.scrollRef}
+            onPointerDown={carruselHistorias.onPointerDown}
+            className="flex gap-2 sm:gap-3 overflow-x-auto pb-1"
+          >
             {videosPortadaFinal.map((v, i) => (
               <button
                 key={i}
@@ -2444,6 +2460,13 @@ function detectarVideo(url) {
   if (idYt) return { plataforma: "youtube", id: idYt };
   const tt = String(url).match(/tiktok\.com\/(?:@[\w.-]+\/video\/|embed\/(?:v2\/)?)(\d+)/);
   if (tt) return { plataforma: "tiktok", id: tt[1] };
+  // Facebook no trabaja con un "id" simple como YouTube/TikTok — su
+  // reproductor incrustado necesita el link completo tal cual. Ojo: los
+  // links cortos "fb.watch/XXXX" sí funcionan aquí (a diferencia de los
+  // cortos de TikTok), porque el reproductor de Facebook los resuelve solo.
+  if (/facebook\.com|fb\.watch/.test(String(url))) {
+    return { plataforma: "facebook", url: String(url) };
+  }
   return null;
 }
 
@@ -2460,6 +2483,17 @@ function IframeVideo({ video, className }) {
       />
     );
   }
+  if (video.plataforma === "facebook") {
+    return (
+      <iframe
+        className={className}
+        src={`https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(video.url)}&show_text=false&autoplay=true`}
+        title="Video de Facebook"
+        allow="autoplay; encrypted-media; picture-in-picture; web-share"
+        allowFullScreen
+      />
+    );
+  }
   return (
     <iframe
       className={className}
@@ -2472,8 +2506,9 @@ function IframeVideo({ video, className }) {
 }
 
 // Miniatura de un video: para YouTube usamos su miniatura pública real; para
-// TikTok no hay una URL de miniatura simple sin hacer una petición aparte,
-// así que mostramos una tarjeta con su logo — igual de clicable.
+// TikTok y Facebook no hay una URL de miniatura simple sin hacer una
+// petición aparte, así que mostramos una tarjeta con su logo — igual de
+// clicable.
 function MiniaturaVideo({ video, nombre }) {
   if (video.plataforma === "tiktok") {
     return (
@@ -2485,6 +2520,16 @@ function MiniaturaVideo({ video, nombre }) {
       </div>
     );
   }
+  if (video.plataforma === "facebook") {
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-center gap-1.5 bg-gradient-to-br from-[#1a3a6e] to-[#0d1f3d]">
+        <svg viewBox="0 0 24 24" className="h-8 w-8 fill-white" xmlns="http://www.w3.org/2000/svg">
+          <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" />
+        </svg>
+        <span className="text-white text-[9px] font-black uppercase tracking-wide">Ver en Facebook</span>
+      </div>
+    );
+  }
   return (
     <img
       src={`https://img.youtube.com/vi/${video.id}/hqdefault.jpg`}
@@ -2493,6 +2538,32 @@ function MiniaturaVideo({ video, nombre }) {
       className="w-full h-full object-cover group-hover:scale-105 transition-transform"
     />
   );
+}
+
+// Carrusel automático genérico y reutilizable — cada "intervaloMs" avanza
+// solo al siguiente elemento (moviendo el "scrollLeft" del contenedor
+// directamente, nunca scrollIntoView, para no arrastrar el scroll de la
+// página). Se pausa en cuanto la persona toca/desliza a mano. Lo usan
+// Patrocinadores, Historias y reflexiones, y los videos de Retos.
+function useCarruselAutomatico(cantidad, intervaloMs = 2500) {
+  const scrollRef = useRef(null);
+  const [indiceAuto, setIndiceAuto] = useState(0);
+  const [pausado, setPausado] = useState(false);
+  useEffect(() => {
+    if (pausado || cantidad <= 1) return;
+    const id = setInterval(() => {
+      setIndiceAuto((i) => (i + 1) % cantidad);
+    }, intervaloMs);
+    return () => clearInterval(id);
+  }, [pausado, cantidad, intervaloMs]);
+  useEffect(() => {
+    const contenedor = scrollRef.current;
+    const hijo = contenedor && contenedor.children[indiceAuto];
+    if (!contenedor || !hijo) return;
+    const objetivo = hijo.offsetLeft - (contenedor.clientWidth - hijo.clientWidth) / 2;
+    contenedor.scrollTo({ left: Math.max(0, objetivo), behavior: "smooth" });
+  }, [indiceAuto]);
+  return { scrollRef, onPointerDown: () => setPausado(true) };
 }
 
 function useCatalogoBaserow(tableId, itemsRespaldo) {
@@ -2960,28 +3031,7 @@ function BarraPatrocinadores() {
     .filter((it) => it.img)
     .slice(0, 20);
 
-  // Carrusel automático: cada 2.5s se desliza a la siguiente imagen sola.
-  // Mueve el "scrollLeft" del propio contenedor directamente (nunca
-  // scrollIntoView, que puede arrastrar también el scroll de la página
-  // completa si la barra no está a la vista). Se pausa en cuanto la
-  // persona toca/desliza la tira manualmente.
-  const scrollRef = useRef(null);
-  const [indiceAuto, setIndiceAuto] = useState(0);
-  const [autoPausado, setAutoPausado] = useState(false);
-  useEffect(() => {
-    if (autoPausado || items.length === 0) return;
-    const id = setInterval(() => {
-      setIndiceAuto((i) => (i + 1) % items.length);
-    }, 2500);
-    return () => clearInterval(id);
-  }, [autoPausado, items.length]);
-  useEffect(() => {
-    const contenedor = scrollRef.current;
-    const hijo = contenedor && contenedor.children[indiceAuto];
-    if (!contenedor || !hijo) return;
-    const objetivo = hijo.offsetLeft - (contenedor.clientWidth - hijo.clientWidth) / 2;
-    contenedor.scrollTo({ left: Math.max(0, objetivo), behavior: "smooth" });
-  }, [indiceAuto]);
+  const { scrollRef, onPointerDown } = useCarruselAutomatico(items.length);
 
   if (items.length === 0) return null;
 
@@ -3004,7 +3054,7 @@ function BarraPatrocinadores() {
         </p>
         <div
           ref={scrollRef}
-          onPointerDown={() => setAutoPausado(true)}
+          onPointerDown={onPointerDown}
           className="flex items-center gap-3 overflow-x-auto pb-2 px-1 snap-x snap-mandatory"
         >
           {items.map((item, i) => (
