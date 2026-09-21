@@ -2460,6 +2460,8 @@ function detectarVideo(url) {
   if (idYt) return { plataforma: "youtube", id: idYt };
   const tt = String(url).match(/tiktok\.com\/(?:@[\w.-]+\/video\/|embed\/(?:v2\/)?)(\d+)/);
   if (tt) return { plataforma: "tiktok", id: tt[1] };
+  const vm = String(url).match(/vimeo\.com\/(?:video\/)?(\d+)/);
+  if (vm) return { plataforma: "vimeo", id: vm[1] };
   // Facebook no trabaja con un "id" simple como YouTube/TikTok — su
   // reproductor incrustado necesita el link completo tal cual. Ojo: los
   // links cortos "fb.watch/XXXX" sí funcionan aquí (a diferencia de los
@@ -2494,6 +2496,17 @@ function IframeVideo({ video, className }) {
       />
     );
   }
+  if (video.plataforma === "vimeo") {
+    return (
+      <iframe
+        className={className}
+        src={`https://player.vimeo.com/video/${video.id}?autoplay=1`}
+        title="Video de Vimeo"
+        allow="autoplay; fullscreen; picture-in-picture"
+        allowFullScreen
+      />
+    );
+  }
   return (
     <iframe
       className={className}
@@ -2506,7 +2519,7 @@ function IframeVideo({ video, className }) {
 }
 
 // Miniatura de un video: para YouTube usamos su miniatura pública real; para
-// TikTok y Facebook no hay una URL de miniatura simple sin hacer una
+// TikTok, Facebook y Vimeo no hay una URL de miniatura simple sin hacer una
 // petición aparte, así que mostramos una tarjeta con su logo — igual de
 // clicable.
 function MiniaturaVideo({ video, nombre }) {
@@ -2527,6 +2540,16 @@ function MiniaturaVideo({ video, nombre }) {
           <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" />
         </svg>
         <span className="text-white text-[9px] font-black uppercase tracking-wide">Ver en Facebook</span>
+      </div>
+    );
+  }
+  if (video.plataforma === "vimeo") {
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-center gap-1.5 bg-gradient-to-br from-[#0a1e26] to-[#062832]">
+        <svg viewBox="0 0 24 24" className="h-8 w-8 fill-white" xmlns="http://www.w3.org/2000/svg">
+          <path d="M23.977 6.416c-.105 2.338-1.739 5.543-4.894 9.609-3.268 4.247-6.026 6.37-8.29 6.37-1.409 0-2.578-1.294-3.553-3.881-.646-2.361-1.291-4.729-1.937-7.089-.717-2.588-1.488-3.881-2.309-3.881-.178 0-.806.378-1.878 1.132l-1.116-1.436c1.191-1.049 2.371-2.089 3.554-3.131 1.601-1.379 2.798-2.101 3.598-2.174 1.884-.183 3.044 1.11 3.479 3.881.472 2.994.798 4.858.977 5.593.539 2.442 1.132 3.667 1.777 3.667.502 0 1.256-.796 2.257-2.394 1.005-1.596 1.545-2.807 1.622-3.639.147-1.379-.401-2.077-1.625-2.077-.578 0-1.174.132-1.786.396 1.191-3.9 3.462-5.79 6.809-5.687 2.478.074 3.65 1.677 3.517 4.788z" />
+        </svg>
+        <span className="text-white text-[9px] font-black uppercase tracking-wide">Ver en Vimeo</span>
       </div>
     );
   }
