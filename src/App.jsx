@@ -552,7 +552,7 @@ export default function App() {
   // puede tener un nombre en la columna "NOMBRE VIDPORT"; si no lo tiene,
   // se numera solo como "Video 1", "Video 2"... Reconoce YouTube y TikTok
   // (ver detectarVideo más abajo en el archivo).
-  const videosPortada = paresBaserow(filasEnlaces, "NOMBRE VIDPORT", "VIDPORT", 12)
+  const videosPortada = paresBaserow(filasEnlaces, "NOMBRE VIDPORT", "VIDPORT", 20)
     .map((v) => ({ video: detectarVideo(v.enlace), nombre: v.nombre }))
     .filter((v) => v.video);
   const videosPortadaFinal = videosPortada.length > 0 ? videosPortada : [{ video: { plataforma: "youtube", id: YOUTUBE_VIDEO_ID }, nombre: "Video de presentación DCUATES" }];
