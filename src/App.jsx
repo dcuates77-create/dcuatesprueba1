@@ -12,6 +12,19 @@ const WHATSAPP_NUMERO = "525520696627";
 // (el ID es lo que va después de "v=" en la URL normal de YouTube)
 const YOUTUBE_VIDEO_ID = "SUnE27QnnyI";
 
+// Clave de acceso del candado que protege el botón "Únete a Nuestra Red de
+// Confianza" dentro de Círculo de Confianza — cámbiala aquí cuando quieras.
+// AVISO: esto NO es seguridad real (cualquiera puede verla si revisa el
+// código fuente de la página), solo filtra visitas casuales.
+const CLAVE_CIRCULO_CONFIANZA = "confianza2026";
+
+// Mapa de negocios locales — embed de Google Maps / My Maps, se muestra
+// debajo de los botones de Historias, Cupones y Patrocinadores. Para
+// agregar, quitar o mover un negocio, edita el mapa directamente en Google
+// Maps/My Maps y pega aquí el nuevo link de "Insertar un mapa" (src del
+// iframe); no hace falta tocar nada más en el código.
+const MAPA_NEGOCIOS_EMBED_URL = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15034.541076557625!2d-99.00223799999999!3d19.600120500000003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1ee234c038987%3A0x4b578513910d8103!2sJardines%20de%20Morelos%2C%20Ecatepec%20de%20Morelos%2C%20M%C3%A9x.!5e0!3m2!1ses!2smx!4v1790129394750!5m2!1ses!2smx";
+
 const REDES_SOCIALES = {
   facebook: "https://www.facebook.com/abelzarem/",
   instagram: "https://www.instagram.com/conexionesconcausa/",
@@ -59,6 +72,7 @@ const NAV_LINKS_MAS = [
   { label: "Ventas con Causa", href: "#ventas-con-causa" },
   { label: "Alianzas Solidarias", modal: "alianzas-tarjeta" },
   { label: "Apoyo a Causas", href: "#extraviados-registro" },
+  { label: "Mapa del Sitio", action: "mapa-sitio" },
   { label: "Preguntas Frecuentes", action: "faq" },
   { label: "Sugerencias y Quejas", action: "sugerencias" },
   { label: "Préstamo Gratuito de Libros", modal: "libros" },
@@ -173,7 +187,10 @@ const INICIATIVAS_PRINCIPALES = [
     enlaceDirectoWA: enlaceWhatsApp("¡Hola DCUATES! Me interesa sumarme al Círculo de Confianza y sus Apoyos y Beneficios Mutuos."),
     segundoBoton: {
       titulo: "Únete a Nuestra Red de Confianza (Con Clave de Acceso)",
-      enlace: "https://chat.whatsapp.com/F2Rdvu5ueSlJ0YuDYGi8VL"
+      enlace: "https://chat.whatsapp.com/F2Rdvu5ueSlJ0YuDYGi8VL",
+      // Al tener "claveAcceso", este botón sale bloqueado con un candado en
+      // vez de abrir el enlace directo (ver BotonModalProtegido más abajo).
+      claveAcceso: CLAVE_CIRCULO_CONFIANZA
     }
   },
   {
@@ -349,6 +366,35 @@ const GALERIAS_PROYECTOS = {
 // =========================================================================
 const TODOS_LOS_PROYECTOS = [...INICIATIVAS_PRINCIPALES, ...NUEVOS_PROYECTOS_DATA];
 
+// Los mismos 12 botones naranjas de la cuadrícula de portada — se sacó a
+// nivel de archivo (antes vivía solo dentro del JSX de la portada) para
+// poder reutilizarlo también en el Mapa de Sitio. "modal" = id que se
+// busca en TODOS_LOS_PROYECTOS (o los 2 casos especiales
+// "ventas-con-causa" / "donaciones") para llenar la ventana emergente.
+// "h" se conserva solo como respaldo por si JavaScript llegara a fallar
+// (accesibilidad).
+const BOTONES_PORTADA = [
+  { t: "PRÉSTAMO GRATUITO DE LIBROS", h: "#libros", modal: "libros", img: "/images/bb.png", puntos: ["GRATUITO", "PÍDELO CON UN SOLO CLIC ;)", "SE ACEPTAN DONACIONES DE LIBROS Y MÁS..."] },
+  { t: "ECATEPETS MASCOTAS", h: "#ecatepets", modal: "ecatepets", img: "/images/Ecatepets.png", puntos: ["DIFUSIÓN DE EXTRAVÍOS", "ADOPCIÓN RESPONSABLE", "CUIDADO Y CONCIENTIZACIÓN"] },
+  { t: "ALIANZAS SOLIDARIAS", h: "#iniciativas", modal: "alianzas-tarjeta", img: "/images/Alianzas.png", puntos: ["COLABORACIÓN MUTUA", "RED DE CONTACTOS", "IMPACTO COMUNITARIO"] },
+  { t: "CÍRCULO DE CONFIANZA", h: "#circulo-confianza", modal: "circulo-confianza", img: "/images/Círculo.png", puntos: ["PERFILES VERIFICADOS POR CONFIANZA", "SINERGIA QUE MULTIPLICA", "RED EXCLUSIVA DE CONTACTOS"] },
+  { t: "RECOMIENDA, EVALÚA Y GANA", h: "#recomienda-evalua-gana", modal: "recomienda-evalua-gana", img: "/images/Recomienda.png", puntos: ["RECOMENDACIONES CON VALOR REAL", "RECONOCIMIENTO POR TU EXPERIENCIA", "MEJORA CONTINUA DE NEGOCIOS"] },
+  { t: "PUBLICIDAD GRATUITA", h: "#publicidad", modal: "publicidad-tarjeta", img: "/images/Publicidad2.png", puntos: ["REGISTRO GRATUITO", "COMPARTE PROMOCIONES E IMÁGENES", "MÁS CLIENTES DE TU ZONA"] },
+  { t: "ASESORÍAS GRATUITAS", h: "#asesorias", modal: "asesorias", img: "/images/Asesorías.png", puntos: ["ASESORÍA GRATUITA", "APORTACIÓN VOLUNTARIA", "IMPULSO DE METAS"] },
+  { t: "BAZAR Y COMERCIO", h: "#bazares", modal: "bazares", img: "/images/Bazar.png", puntos: ["COMERCIO LOCAL SEGURO", "BARRIO DE CONFIANZA", "APOYO A CAUSAS"] },
+  { t: "NOTICIAS DE BARRIO", h: "#noticias", modal: "noticias", img: "/images/Noticias.png", puntos: ["EVENTOS CULTURALES", "CONVOCATORIAS VECINALES", "ACONTECIMIENTOS SOCIALES"] },
+  { t: "BIENESTAR Y RECREACIÓN", h: "#bienestar", modal: "bienestar", img: "/images/Bienestar.png", puntos: ["DESARROLLO PERSONAL Y SOCIAL", "SALUD INTEGRAL", "DISFRUTE PERSONAL Y SOCIAL"] },
+  { t: "VENTAS CON CAUSA", h: "#ventas-con-causa", modal: "ventas-con-causa", img: "/images/VentasConCausa.png", puntos: ["PRODUCTOS Y SERVICIOS LOCALES", "CATÁLOGO SIEMPRE ACTUALIZADO", "CONTACTO DIRECTO POR WHATSAPP"] },
+  { t: "APOYO VOLUNTARIO", h: "#donaciones", modal: "donaciones", img: "/images/ApoyoVoluntario.png", puntos: ["ECONÓMICA, EN ESPECIE O TRUEQUE", "LABOR VOLUNTARIA", "TOTAL TRANSPARENCIA"] }
+];
+
+// Items extra del Mapa de Sitio que NO abren un modal de proyecto, sino
+// una acción especial (igual que en NAV_LINKS_MAS): FAQ y Sugerencias.
+const MAPA_SITIO_EXTRA = [
+  { t: "PREGUNTAS FRECUENTES", accion: "faq", emoji: "❓" },
+  { t: "SUGERENCIAS Y QUEJAS", accion: "sugerencias", emoji: "💬" }
+];
+
 // Las 4 formas de aportación — se reutilizan aquí y en la sección de Apoyo
 // Voluntario más abajo, para no tener el mismo texto escrito dos veces.
 const OPCIONES_APORTACION = [
@@ -517,6 +563,9 @@ const RETOS_REGALOS_ITEMS = [
 export default function App() {
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [showFAQ, setShowFAQ] = useState(false);
+  // Modal del Mapa de Sitio — tarjetas con acceso directo a todo lo que
+  // hay en la página (accesible desde el pie de página y el menú "Más").
+  const [showMapaSitio, setShowMapaSitio] = useState(false);
   // Ventana emergente única para los 12 botones naranjas de portada.
   // null = cerrada; si tiene un id (ej. "libros", "ecatepets", "ventas-con-causa",
   // "donaciones") se abre con la información de ese proyecto.
@@ -639,6 +688,7 @@ export default function App() {
           onAbrirProyecto={(id) => setModalProyecto(id)}
           onAbrirSugerencias={() => setModalFormulario("sugerencias")}
           onAbrirComparte={() => setModalFormulario("comparte")}
+          onAbrirMapaSitio={() => setShowMapaSitio(true)}
         />
         <TickerFrases />
 
@@ -778,25 +828,9 @@ export default function App() {
               <span>⭐</span> Proyectos Comunitarios DCUATES <span>⭐</span>
             </p>
             {(() => {
-              // "modal" = id que se busca en TODOS_LOS_PROYECTOS (o los 2 casos
-              // especiales "ventas-con-causa" / "donaciones") para llenar la
-              // ventana emergente. "h" se conserva solo como respaldo por si
-              // JavaScript llegara a fallar (accesibilidad).
-              const BOTONES_PORTADA = [
-                { t: "PRÉSTAMO GRATUITO DE LIBROS", h: "#libros", modal: "libros", img: "/images/bb.png", puntos: ["GRATUITO", "PÍDELO CON UN SOLO CLIC ;)", "SE ACEPTAN DONACIONES DE LIBROS Y MÁS..."] },
-                { t: "ECATEPETS MASCOTAS", h: "#ecatepets", modal: "ecatepets", img: "/images/Ecatepets.png", puntos: ["DIFUSIÓN DE EXTRAVÍOS", "ADOPCIÓN RESPONSABLE", "CUIDADO Y CONCIENTIZACIÓN"] },
-                { t: "ALIANZAS SOLIDARIAS", h: "#iniciativas", modal: "alianzas-tarjeta", img: "/images/Alianzas.png", puntos: ["COLABORACIÓN MUTUA", "RED DE CONTACTOS", "IMPACTO COMUNITARIO"] },
-                { t: "CÍRCULO DE CONFIANZA", h: "#circulo-confianza", modal: "circulo-confianza", img: "/images/Círculo.png", puntos: ["PERFILES VERIFICADOS POR CONFIANZA", "SINERGIA QUE MULTIPLICA", "RED EXCLUSIVA DE CONTACTOS"] },
-                { t: "RECOMIENDA, EVALÚA Y GANA", h: "#recomienda-evalua-gana", modal: "recomienda-evalua-gana", img: "/images/Recomienda.png", puntos: ["RECOMENDACIONES CON VALOR REAL", "RECONOCIMIENTO POR TU EXPERIENCIA", "MEJORA CONTINUA DE NEGOCIOS"] },
-                { t: "PUBLICIDAD GRATUITA", h: "#publicidad", modal: "publicidad-tarjeta", img: "/images/Publicidad2.png", puntos: ["REGISTRO GRATUITO", "COMPARTE PROMOCIONES E IMÁGENES", "MÁS CLIENTES DE TU ZONA"] },
-                { t: "ASESORÍAS GRATUITAS", h: "#asesorias", modal: "asesorias", img: "/images/Asesorías.png", puntos: ["ASESORÍA GRATUITA", "APORTACIÓN VOLUNTARIA", "IMPULSO DE METAS"] },
-                { t: "BAZAR Y COMERCIO", h: "#bazares", modal: "bazares", img: "/images/Bazar.png", puntos: ["COMERCIO LOCAL SEGURO", "BARRIO DE CONFIANZA", "APOYO A CAUSAS"] },
-                { t: "NOTICIAS DE BARRIO", h: "#noticias", modal: "noticias", img: "/images/Noticias.png", puntos: ["EVENTOS CULTURALES", "CONVOCATORIAS VECINALES", "ACONTECIMIENTOS SOCIALES"] },
-                { t: "BIENESTAR Y RECREACIÓN", h: "#bienestar", modal: "bienestar", img: "/images/Bienestar.png", puntos: ["DESARROLLO PERSONAL Y SOCIAL", "SALUD INTEGRAL", "DISFRUTE PERSONAL Y SOCIAL"] },
-                { t: "VENTAS CON CAUSA", h: "#ventas-con-causa", modal: "ventas-con-causa", img: "/images/VentasConCausa.png", puntos: ["PRODUCTOS Y SERVICIOS LOCALES", "CATÁLOGO SIEMPRE ACTUALIZADO", "CONTACTO DIRECTO POR WHATSAPP"] },
-                { t: "APOYO VOLUNTARIO", h: "#donaciones", modal: "donaciones", img: "/images/ApoyoVoluntario.png", puntos: ["ECONÓMICA, EN ESPECIE O TRUEQUE", "LABOR VOLUNTARIA", "TOTAL TRANSPARENCIA"] }
-              ];
-
+              // BOTONES_PORTADA ahora vive a nivel de archivo (ver arriba,
+              // cerca de TODOS_LOS_PROYECTOS) para poder reutilizarse
+              // también en el Mapa de Sitio.
               const BotonProyecto = ({ btn }) => (
                 <button
                   type="button"
@@ -1063,6 +1097,26 @@ export default function App() {
                     </div>
                   </button>
                 ))}
+              </div>
+
+              {/* Mapa de Negocios Locales — embed de Google Maps/My Maps.
+                  Para agregar/editar negocios no se toca este código: se
+                  edita el mapa en Google Maps/My Maps y se actualiza la
+                  constante MAPA_NEGOCIOS_EMBED_URL arriba del archivo. */}
+              <div className="mt-3 rounded-2xl overflow-hidden border-4 border-[#0f2d1e]/30 shadow-lg">
+                <div className="bg-[#0f2d1e] px-3 py-2">
+                  <p className="text-white font-black uppercase text-xs sm:text-sm tracking-wide text-center">
+                    📍 Mapa de Negocios Locales Aliados
+                  </p>
+                </div>
+                <iframe
+                  src={MAPA_NEGOCIOS_EMBED_URL}
+                  className="w-full h-64 sm:h-80"
+                  style={{ border: 0 }}
+                  loading="lazy"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  title="Mapa de negocios locales DCUATES"
+                />
               </div>
             </div>
           </div>
@@ -1500,6 +1554,12 @@ export default function App() {
           <a href="#publicidad" className="hover:text-[#0f2d1e] transition-colors">Publicidad</a>
           <a href="#donaciones" className="hover:text-[#0f2d1e] transition-colors">Donaciones</a>
           <button
+            onClick={() => setShowMapaSitio(true)}
+            className="underline underline-offset-4 hover:text-[#0f2d1e] bg-transparent border-none cursor-pointer font-bold transition-colors"
+          >
+            Mapa del Sitio
+          </button>
+          <button
             onClick={() => setShowFAQ(true)}
             className="underline underline-offset-4 hover:text-[#0f2d1e] bg-transparent border-none cursor-pointer font-bold transition-colors"
           >
@@ -1598,6 +1658,16 @@ export default function App() {
         </div>
       )}
 
+      {/* MODAL DEL MAPA DE SITIO */}
+      {showMapaSitio && (
+        <ModalMapaSitio
+          onCerrar={() => setShowMapaSitio(false)}
+          onAbrirProyecto={(id) => setModalProyecto(id)}
+          onAbrirFAQ={() => setShowFAQ(true)}
+          onAbrirSugerencias={() => setModalFormulario("sugerencias")}
+        />
+      )}
+
       {/* MODAL DE FORMULARIO REUTILIZABLE — Sugerencias y Quejas / Conocer y
           Compartir Más. Ambos arman un mensaje de WhatsApp, sin backend. */}
       {modalFormulario === "sugerencias" && (
@@ -1626,7 +1696,7 @@ export default function App() {
 // =========================================================================
 // 3. SUBCOMPONENTE: SITE HEADER
 // =========================================================================
-function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSugerencias, onAbrirComparte }) {
+function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSugerencias, onAbrirComparte, onAbrirMapaSitio }) {
   const [menuMasAbierto, setMenuMasAbierto] = useState(false);
   return (
     <header className="border-b border-emerald-800/20 bg-white/95 py-2 px-4 shadow-sm text-slate-900 relative">
@@ -1735,6 +1805,7 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSug
                             setMenuMasAbierto(false);
                             if (link.action === "faq") onAbrirFAQ && onAbrirFAQ();
                             else if (link.action === "sugerencias") onAbrirSugerencias && onAbrirSugerencias();
+                            else if (link.action === "mapa-sitio") onAbrirMapaSitio && onAbrirMapaSitio();
                             else if (link.modal) onAbrirProyecto && onAbrirProyecto(link.modal);
                           }}
                           className="px-4 py-2.5 text-left uppercase tracking-wide text-[11px] sm:text-xs font-black text-emerald-900 hover:bg-emerald-50 transition-colors"
@@ -2447,6 +2518,15 @@ function idYoutubeDesdeUrl(url) {
   return m ? m[1] : null;
 }
 
+// Detecta si un enlace apunta a un PDF (por su extensión), para mostrarlo
+// en el visor interno (VisorPDF/BarraPatrocinadores) en vez de abrirlo en
+// una pestaña nueva. Funciona con links que terminan en ".pdf" o que
+// llevan ".pdf" seguido de parámetros (ej. "...archivo.pdf?dl=1").
+function esPDF(url) {
+  if (!url) return false;
+  return /\.pdf(\?|#|$)/i.test(String(url));
+}
+
 // Detecta de qué plataforma es un link de video normal (el mismo que
 // copiarías para compartir por WhatsApp — NO el código de incrustación) y
 // saca su id, para poder armar el reproductor correcto de cada una.
@@ -2657,6 +2737,126 @@ function BotonModal({ href, children, variante = "principal", onClick }) {
     <button type="button" onClick={onClick} className={`${base} ${estilos}`}>
       {children}
     </button>
+  );
+}
+
+// Versión "con candado" de BotonModal — se usa para cualquier botón que
+// necesite una clave de acceso antes de mostrarse (hoy: "Únete a Nuestra
+// Red de Confianza" en Círculo de Confianza). Mientras no se escriba la
+// clave correcta, en vez del botón real se ve un candado con un campo de
+// texto. AVISO: esto NO es seguridad real, solo filtra visitas casuales —
+// la clave queda visible en el código fuente de la página.
+function BotonModalProtegido({ href, children, clave }) {
+  const [desbloqueado, setDesbloqueado] = useState(false);
+  const [intento, setIntento] = useState("");
+  const [error, setError] = useState(false);
+
+  if (desbloqueado) {
+    return <BotonModal href={href}>{children}</BotonModal>;
+  }
+
+  const verificar = () => {
+    if (intento.trim().toLowerCase() === String(clave).toLowerCase()) {
+      setDesbloqueado(true);
+      setError(false);
+    } else {
+      setError(true);
+    }
+  };
+
+  return (
+    <div className="w-full rounded-xl border-2 border-dashed border-[#0f2d1e]/40 bg-[#0f2d1e]/5 p-3 space-y-2">
+      <p className="text-xs sm:text-sm font-black uppercase text-[#0f2d1e] flex items-center gap-1.5 leading-tight">
+        🔒 {children}
+      </p>
+      <div className="flex gap-2">
+        <input
+          type="password"
+          value={intento}
+          onChange={(e) => { setIntento(e.target.value); setError(false); }}
+          onKeyDown={(e) => e.key === "Enter" && verificar()}
+          placeholder="Clave de acceso"
+          className="flex-1 rounded-lg border-2 border-[#0f2d1e]/30 px-3 py-2 text-sm focus:outline-none focus:border-[#0f2d1e]"
+        />
+        <button
+          type="button"
+          onClick={verificar}
+          className="shrink-0 rounded-lg bg-[#0f2d1e] hover:bg-emerald-800 text-white px-4 text-xs font-black uppercase tracking-wide transition-colors"
+        >
+          Entrar
+        </button>
+      </div>
+      {error && (
+        <p className="text-xs font-bold text-red-600">Clave incorrecta, intenta de nuevo.</p>
+      )}
+    </div>
+  );
+}
+
+// Modal del Mapa de Sitio — tarjetas pequeñas con acceso directo a TODO lo
+// que hay en la página (los 12 proyectos + FAQ + Sugerencias). Reutiliza
+// BOTONES_PORTADA y MAPA_SITIO_EXTRA (ver arriba, cerca de
+// TODOS_LOS_PROYECTOS) para no duplicar información.
+function ModalMapaSitio({ onCerrar, onAbrirProyecto, onAbrirFAQ, onAbrirSugerencias }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm" onClick={onCerrar}>
+      <div
+        className="bg-[#e8f5e9] text-slate-900 rounded-2xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl flex flex-col max-h-[90vh]"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-[#0f2d1e] font-heading">
+            🗺️ Mapa del Sitio
+          </h3>
+          <button
+            onClick={onCerrar}
+            aria-label="Cerrar"
+            className="shrink-0 h-9 w-9 flex items-center justify-center rounded-full bg-[#0f2d1e] text-white font-black hover:bg-emerald-800 transition-colors"
+          >
+            ×
+          </button>
+        </div>
+        <p className="text-xs sm:text-sm text-[#0f2d1e]/70 font-medium mb-3">
+          Toca cualquier tarjeta para ir directo a esa sección, sin tener que buscarla.
+        </p>
+        <div className="overflow-y-auto pr-1 grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+          {BOTONES_PORTADA.map((btn, idx) => (
+            <button
+              key={idx}
+              type="button"
+              onClick={() => { onCerrar(); onAbrirProyecto(btn.modal); }}
+              className="flex flex-col items-center gap-1.5 rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white shadow-sm transition-colors p-3 text-center font-heading"
+            >
+              {btn.img && (
+                <img
+                  src={btn.img}
+                  alt=""
+                  loading="lazy"
+                  className="max-h-10 w-auto object-contain drop-shadow"
+                  onError={(e) => { e.target.style.display = 'none'; }}
+                />
+              )}
+              <span className="uppercase font-black leading-tight text-[11px] sm:text-xs">{btn.t}</span>
+            </button>
+          ))}
+          {MAPA_SITIO_EXTRA.map((btn, idx) => (
+            <button
+              key={`extra-${idx}`}
+              type="button"
+              onClick={() => {
+                onCerrar();
+                if (btn.accion === "faq") onAbrirFAQ();
+                else if (btn.accion === "sugerencias") onAbrirSugerencias();
+              }}
+              className="flex flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-[#0f2d1e] text-[#0f2d1e] hover:bg-[#0f2d1e] hover:text-white shadow-sm transition-colors p-3 text-center font-heading"
+            >
+              <span className="text-2xl">{btn.emoji}</span>
+              <span className="uppercase font-black leading-tight text-[11px] sm:text-xs">{btn.t}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -2919,7 +3119,13 @@ function ContenidoModalProyecto({ id, onCerrar }) {
             <BotonModal href={proyecto.enlaceDirectoWA}>{proyecto.textoBoton}</BotonModal>
           )}
           {proyecto.segundoBoton && (
-            <BotonModal href={proyecto.segundoBoton.enlace}>{proyecto.segundoBoton.titulo}</BotonModal>
+            proyecto.segundoBoton.claveAcceso ? (
+              <BotonModalProtegido href={proyecto.segundoBoton.enlace} clave={proyecto.segundoBoton.claveAcceso}>
+                {proyecto.segundoBoton.titulo}
+              </BotonModalProtegido>
+            ) : (
+              <BotonModal href={proyecto.segundoBoton.enlace}>{proyecto.segundoBoton.titulo}</BotonModal>
+            )
           )}
         </div>
       )}
@@ -3044,6 +3250,7 @@ function BarraPatrocinadores() {
   const filasEnlaces = useFilasEnlaces();
   const [imagenEnGrande, setImagenEnGrande] = useState(null);
   const [videoEnGrande, setVideoEnGrande] = useState(null);
+  const [pdfEnGrande, setPdfEnGrande] = useState(null);
 
   const items = filasEnlaces
     .map((f) => ({
@@ -3062,6 +3269,8 @@ function BarraPatrocinadores() {
     const video = item.enlace ? detectarVideo(item.enlace) : null;
     if (video) {
       setVideoEnGrande(video);
+    } else if (item.enlace && esPDF(item.enlace)) {
+      setPdfEnGrande(item.enlace);
     } else if (item.enlace && item.enlace.startsWith("http")) {
       window.open(item.enlace, "_blank", "noopener,noreferrer");
     } else {
@@ -3141,6 +3350,35 @@ function BarraPatrocinadores() {
             <div className="rounded-2xl overflow-hidden border-4 border-white/20 shadow-2xl aspect-video bg-black">
               <IframeVideo video={videoEnGrande} className="w-full h-full" />
             </div>
+          </div>
+        </div>
+      )}
+
+      {pdfEnGrande && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 backdrop-blur-sm"
+          onClick={() => setPdfEnGrande(null)}
+        >
+          <div className="relative w-full max-w-3xl h-[85vh]" onClick={(e) => e.stopPropagation()}>
+            <button
+              type="button"
+              onClick={() => setPdfEnGrande(null)}
+              className="absolute -top-10 right-0 text-white text-2xl font-black hover:text-[#e65100] transition-colors"
+              aria-label="Cerrar documento"
+            >
+              ✕
+            </button>
+            <div className="w-full h-full rounded-2xl overflow-hidden border-4 border-white/20 shadow-2xl bg-white">
+              <iframe src={pdfEnGrande} title="Documento PDF" className="w-full h-full" />
+            </div>
+            <a
+              href={pdfEnGrande}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="absolute -bottom-8 left-0 text-white text-xs font-bold underline underline-offset-2 hover:text-[#e65100]"
+            >
+              Abrir en pestaña nueva
+            </a>
           </div>
         </div>
       )}
