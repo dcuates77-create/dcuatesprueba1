@@ -373,19 +373,24 @@ const TODOS_LOS_PROYECTOS = [...INICIATIVAS_PRINCIPALES, ...NUEVOS_PROYECTOS_DAT
 // "ventas-con-causa" / "donaciones") para llenar la ventana emergente.
 // "h" se conserva solo como respaldo por si JavaScript llegara a fallar
 // (accesibilidad).
+// Orden A→L pedido explícitamente (de izquierda a derecha / de arriba hacia
+// abajo en la cuadrícula): Ecatepets, Publicidad, Apoyo Voluntario,
+// Recomienda, Alianzas, Círculo, Asesorías, Bazar, Ventas, Noticias,
+// Bienestar, Libros. Como este arreglo se reutiliza también en el Mapa de
+// Sitio, reordenarlo aquí reordena ambos lugares a la vez.
 const BOTONES_PORTADA = [
-  { t: "PRÉSTAMO GRATUITO DE LIBROS", h: "#libros", modal: "libros", img: "/images/bb.png", puntos: ["GRATUITO", "PÍDELO CON UN SOLO CLIC ;)", "SE ACEPTAN DONACIONES DE LIBROS Y MÁS..."] },
-  { t: "ECATEPETS MASCOTAS", h: "#ecatepets", modal: "ecatepets", img: "/images/Ecatepets.png", puntos: ["DIFUSIÓN DE EXTRAVÍOS", "ADOPCIÓN RESPONSABLE", "CUIDADO Y CONCIENTIZACIÓN"] },
-  { t: "ALIANZAS SOLIDARIAS", h: "#iniciativas", modal: "alianzas-tarjeta", img: "/images/Alianzas.png", puntos: ["COLABORACIÓN MUTUA", "RED DE CONTACTOS", "IMPACTO COMUNITARIO"] },
-  { t: "CÍRCULO DE CONFIANZA", h: "#circulo-confianza", modal: "circulo-confianza", img: "/images/Círculo.png", puntos: ["PERFILES VERIFICADOS POR CONFIANZA", "SINERGIA QUE MULTIPLICA", "RED EXCLUSIVA DE CONTACTOS"] },
-  { t: "RECOMIENDA, EVALÚA Y GANA", h: "#recomienda-evalua-gana", modal: "recomienda-evalua-gana", img: "/images/Recomienda.png", puntos: ["RECOMENDACIONES CON VALOR REAL", "RECONOCIMIENTO POR TU EXPERIENCIA", "MEJORA CONTINUA DE NEGOCIOS"] },
-  { t: "PUBLICIDAD GRATUITA", h: "#publicidad", modal: "publicidad-tarjeta", img: "/images/Publicidad2.png", puntos: ["REGISTRO GRATUITO", "COMPARTE PROMOCIONES E IMÁGENES", "MÁS CLIENTES DE TU ZONA"] },
-  { t: "ASESORÍAS GRATUITAS", h: "#asesorias", modal: "asesorias", img: "/images/Asesorías.png", puntos: ["ASESORÍA GRATUITA", "APORTACIÓN VOLUNTARIA", "IMPULSO DE METAS"] },
-  { t: "BAZAR Y COMERCIO", h: "#bazares", modal: "bazares", img: "/images/Bazar.png", puntos: ["COMERCIO LOCAL SEGURO", "BARRIO DE CONFIANZA", "APOYO A CAUSAS"] },
-  { t: "NOTICIAS DE BARRIO", h: "#noticias", modal: "noticias", img: "/images/Noticias.png", puntos: ["EVENTOS CULTURALES", "CONVOCATORIAS VECINALES", "ACONTECIMIENTOS SOCIALES"] },
-  { t: "BIENESTAR Y RECREACIÓN", h: "#bienestar", modal: "bienestar", img: "/images/Bienestar.png", puntos: ["DESARROLLO PERSONAL Y SOCIAL", "SALUD INTEGRAL", "DISFRUTE PERSONAL Y SOCIAL"] },
-  { t: "VENTAS CON CAUSA", h: "#ventas-con-causa", modal: "ventas-con-causa", img: "/images/VentasConCausa.png", puntos: ["PRODUCTOS Y SERVICIOS LOCALES", "CATÁLOGO SIEMPRE ACTUALIZADO", "CONTACTO DIRECTO POR WHATSAPP"] },
-  { t: "APOYO VOLUNTARIO", h: "#donaciones", modal: "donaciones", img: "/images/ApoyoVoluntario.png", puntos: ["ECONÓMICA, EN ESPECIE O TRUEQUE", "LABOR VOLUNTARIA", "TOTAL TRANSPARENCIA"] }
+  { t: "ECATEPETS MASCOTAS", h: "#ecatepets", modal: "ecatepets", img: "/images/Ecatepets.png" },
+  { t: "PUBLICIDAD GRATUITA", h: "#publicidad", modal: "publicidad-tarjeta", img: "/images/Publicidad2.png" },
+  { t: "APOYO VOLUNTARIO", h: "#donaciones", modal: "donaciones", img: "/images/ApoyoVoluntario.png" },
+  { t: "RECOMIENDA, EVALÚA Y GANA", h: "#recomienda-evalua-gana", modal: "recomienda-evalua-gana", img: "/images/Recomienda.png" },
+  { t: "ALIANZAS SOLIDARIAS", h: "#iniciativas", modal: "alianzas-tarjeta", img: "/images/Alianzas.png" },
+  { t: "CÍRCULO DE CONFIANZA", h: "#circulo-confianza", modal: "circulo-confianza", img: "/images/Círculo.png" },
+  { t: "ASESORÍAS GRATUITAS", h: "#asesorias", modal: "asesorias", img: "/images/Asesorías.png" },
+  { t: "BAZAR Y COMERCIO", h: "#bazares", modal: "bazares", img: "/images/Bazar.png" },
+  { t: "VENTAS CON CAUSA", h: "#ventas-con-causa", modal: "ventas-con-causa", img: "/images/VentasConCausa.png" },
+  { t: "NOTICIAS DE BARRIO", h: "#noticias", modal: "noticias", img: "/images/Noticias.png" },
+  { t: "BIENESTAR Y RECREACIÓN", h: "#bienestar", modal: "bienestar", img: "/images/Bienestar.png" },
+  { t: "PRÉSTAMO GRATUITO DE LIBROS", h: "#libros", modal: "libros", img: "/images/bb.png" }
 ];
 
 // Items extra del Mapa de Sitio que NO abren un modal de proyecto, sino
@@ -842,22 +847,15 @@ export default function App() {
                       {btn.t}
                     </h4>
                   </div>
-                  <div className="flex flex-1 items-center gap-2 px-2 py-2">
-                    <div className="w-2/5 h-full flex items-center justify-center">
-                      {btn.img && (
-                        <img
-                          src={btn.img}
-                          alt=""
-                          loading="lazy"
-                          className="max-h-16 sm:max-h-20 w-auto object-contain drop-shadow"
-                          onError={(e) => { e.target.style.display = 'none'; }}
-                        />
-                      )}
-                    </div>
-                    {btn.puntos.length > 0 && (
-                      <ul className="w-3/5 space-y-1 text-left text-[10px] sm:text-xs font-bold leading-snug">
-                        {btn.puntos.map((p, i) => <li key={i}>* {p}</li>)}
-                      </ul>
+                  <div className="flex flex-1 items-center justify-center px-3 py-4">
+                    {btn.img && (
+                      <img
+                        src={btn.img}
+                        alt=""
+                        loading="lazy"
+                        className="max-h-24 sm:max-h-28 w-auto object-contain drop-shadow"
+                        onError={(e) => { e.target.style.display = 'none'; }}
+                      />
                     )}
                   </div>
                 </button>
@@ -1515,7 +1513,10 @@ export default function App() {
 
         <div className="flex items-center justify-center gap-3">
           <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#0f2d1e] font-black text-white text-lg shrink-0">DC</span>
-          <span className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#0f2d1e]">DCUATES</span>
+          <div className="flex flex-col items-start leading-none">
+            <span className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#0f2d1e]">DCUATES</span>
+            <span className="text-[10px] sm:text-xs font-black uppercase tracking-wide text-[#e65100] -mt-0.5">¡Comparte y Gana!</span>
+          </div>
         </div>
 
         <p className="max-w-xl mx-auto text-sm sm:text-base text-[#0f2d1e]/80 leading-relaxed font-medium">
@@ -1715,7 +1716,10 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSug
               }}
             />
           </span>
-          <span className="text-2xl sm:text-3xl md:text-4xl font-black uppercase tracking-tight text-[#0f2d1e]">DCUATES</span>
+          <div className="flex flex-col leading-none">
+            <span className="text-2xl sm:text-3xl md:text-4xl font-black uppercase tracking-tight text-[#0f2d1e]">DCUATES</span>
+            <span className="text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-wide text-[#e65100] -mt-0.5">¡Comparte y Gana!</span>
+          </div>
         </a>
 
         {/* Íconos de redes: comparten la primera fila con el logo (empujados a la derecha) en móvil; en escritorio, a la derecha del todo. Orden: Avisos y Beneficios, Compartir Más, redes — mismo alto y tamaño de letra. */}
@@ -1847,6 +1851,16 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSug
 function BotonNecesidades({ onAbrirProyecto, onAccionEspecial }) {
   const [abierto, setAbierto] = useState(false);
   const [grupoAbierto, setGrupoAbierto] = useState(null);
+  // Texto libre para la opción "Otro(s)" — al final de la lista de
+  // necesidades, para lo que no encaje en ninguna categoría.
+  const [textoOtro, setTextoOtro] = useState("");
+
+  const enviarOtro = () => {
+    if (!textoOtro.trim()) return;
+    window.open(enlaceWhatsApp(`¡Hola DCUATES! ${textoOtro.trim()}`), "_blank", "noopener,noreferrer");
+    setTextoOtro("");
+    cerrarTodo();
+  };
 
   const cerrarTodo = () => {
     setAbierto(false);
@@ -1863,17 +1877,17 @@ function BotonNecesidades({ onAbrirProyecto, onAccionEspecial }) {
   return (
     <>
       <div className="absolute top-full right-5 sm:right-6 mt-1.5 sm:mt-2 z-50 flex items-center gap-2">
-        <span className="bg-[#e65100] text-white text-[10px] sm:text-xs font-black uppercase tracking-wide px-2.5 py-1.5 rounded-full shadow-lg border border-white/30 whitespace-nowrap animate-pulse">
+        <span className="bg-yellow-400 text-[#0f2d1e] text-[10px] sm:text-xs font-black uppercase tracking-wide px-2.5 py-1.5 rounded-full shadow-lg border border-white/30 whitespace-nowrap animate-pulse">
           ¿Qué necesitas hoy?
         </span>
         <button
           type="button"
           onClick={() => setAbierto((v) => !v)}
-          className="relative flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[#ff9248] to-[#e65100] text-white shadow-[0_10px_20px_rgba(0,0,0,0.35),inset_0_-3px_6px_rgba(0,0,0,0.25),inset_0_3px_4px_rgba(255,255,255,0.4)] transition-all hover:scale-110 active:scale-95 border-2 border-white/40 shrink-0"
+          className="relative flex h-14 w-14 items-center justify-center rounded-full bg-yellow-400 text-[#0f2d1e] shadow-[0_10px_20px_rgba(0,0,0,0.35),inset_0_-3px_6px_rgba(0,0,0,0.25),inset_0_3px_4px_rgba(255,255,255,0.4)] transition-all hover:scale-110 active:scale-95 border-2 border-white/40 shrink-0"
           title="¿Qué necesitas hoy?"
           aria-label="¿Qué necesitas hoy?"
         >
-          <span className="absolute inset-0 rounded-full bg-[#e65100] animate-ping opacity-60"></span>
+          <span className="absolute inset-0 rounded-full bg-yellow-400 animate-ping opacity-60"></span>
           <span className="relative z-10 text-2xl font-black drop-shadow">?</span>
         </button>
       </div>
@@ -1919,6 +1933,24 @@ function BotonNecesidades({ onAbrirProyecto, onAccionEspecial }) {
                 )}
               </div>
             ))}
+            <div className="p-4 space-y-2">
+              <p className="font-black uppercase text-[#0f2d1e] text-xs">Otro(s)</p>
+              <textarea
+                value={textoOtro}
+                onChange={(e) => setTextoOtro(e.target.value)}
+                onClick={(e) => e.stopPropagation()}
+                placeholder="Cuéntanos qué necesitas y te contactamos por WhatsApp..."
+                rows={2}
+                className="w-full rounded-lg border-2 border-emerald-200 px-3 py-2 text-sm font-medium focus:outline-none focus:border-[#0f2d1e]"
+              />
+              <button
+                type="button"
+                onClick={enviarOtro}
+                className="w-full rounded-lg bg-yellow-400 text-[#0f2d1e] font-black uppercase text-xs py-2.5 hover:brightness-95 transition-all"
+              >
+                Enviar por WhatsApp
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -2935,6 +2967,14 @@ function ContenidoModalProyecto({ id, onCerrar }) {
         <p className="text-sm text-slate-600 font-medium leading-relaxed">
           Explora el catálogo, cuéntanos qué te interesa o qué buscas, y te contactamos directo por WhatsApp.
         </p>
+        <ul className="space-y-2">
+          {["Productos y servicios locales", "Catálogo siempre actualizado", "Contacto directo por WhatsApp"].map((punto, i) => (
+            <li key={i} className="flex items-center gap-2 text-sm font-bold text-slate-700 uppercase">
+              <span className="h-2 w-2 rounded-full bg-[#00c853] flex-shrink-0" />
+              {punto}
+            </li>
+          ))}
+        </ul>
         <PasarelaVentasConCausa />
         <p className="text-center text-xs font-bold text-emerald-800">
           <a href={BASEROW_GALLERY_URL} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-900">
@@ -2984,6 +3024,14 @@ function ContenidoModalProyecto({ id, onCerrar }) {
         <p className="text-sm text-slate-600 font-medium leading-relaxed">
           Elige la forma de aportación que prefieras — todas te conectan directo por WhatsApp.
         </p>
+        <ul className="space-y-2">
+          {["Económica, en especie o trueque", "Labor voluntaria", "Total transparencia"].map((punto, i) => (
+            <li key={i} className="flex items-center gap-2 text-sm font-bold text-slate-700 uppercase">
+              <span className="h-2 w-2 rounded-full bg-[#00c853] flex-shrink-0" />
+              {punto}
+            </li>
+          ))}
+        </ul>
         <div className="space-y-2">
           {OPCIONES_APORTACION.map((opc) => (
             <a
