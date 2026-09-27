@@ -25,11 +25,12 @@ const CLAVE_CIRCULO_CONFIANZA = "confianza2026";
 // iframe); no hace falta tocar nada más en el código.
 const MAPA_NEGOCIOS_EMBED_URL = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15034.541076557625!2d-99.00223799999999!3d19.600120500000003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1ee234c038987%3A0x4b578513910d8103!2sJardines%20de%20Morelos%2C%20Ecatepec%20de%20Morelos%2C%20M%C3%A9x.!5e0!3m2!1ses!2smx!4v1790129394750!5m2!1ses!2smx";
 
-// Ventana de Solicitudes — formulario para pedir apoyo/servicio, pensado
-// para recibirse desde un link (ej. la respuesta automática de WhatsApp
-// Business puede decir "regístrala aquí: dcuates.com/#solicitudes" y esta
-// ventana se abre sola, ver el useEffect de "abrirSolicitudesDesdeURL" en
-// el componente principal).
+// Ventana de Solicitudes — formulario visible directo en la página (no es
+// modal), debajo del mapa de negocios (busca id="solicitudes" más abajo en
+// el archivo). Para dirigir tráfico desde WhatsApp Business a esta sección
+// exacta, comparte el link "dcuates.com/#solicitudes" (o el dominio que
+// uses en cada rama/proyecto) — el navegador baja solo hasta ahí, sin
+// necesitar nada de código extra.
 //
 // CÓMO CONFIGURARLO (nada de esto se toca en código, solo en Google):
 // 1) Crea un Google Form con las preguntas que quieras pedir (nombre,
@@ -94,7 +95,7 @@ const NAV_LINKS_MAS = [
   { label: "Alianzas Solidarias", modal: "alianzas-tarjeta" },
   { label: "Apoyo a Causas", href: "#extraviados-registro" },
   { label: "Mapa del Sitio", action: "mapa-sitio" },
-  { label: "Registra tu Solicitud", action: "solicitudes" },
+  { label: "Registra tu Solicitud", href: "#solicitudes" },
   { label: "Preguntas Frecuentes", action: "faq" },
   { label: "Sugerencias y Quejas", action: "sugerencias" },
   { label: "Préstamo Gratuito de Libros", modal: "libros" },
@@ -667,13 +668,6 @@ export default function App() {
   const [showMapaSitio, setShowMapaSitio] = useState(false);
   // Categoría abierta (portada simplificada de 4 botones) — null = cerrada.
   const [categoriaAbierta, setCategoriaAbierta] = useState(null);
-  // Ventana de Solicitudes — se puede abrir desde un botón del sitio O
-  // sola, si alguien llega con dcuates.com/#solicitudes en el link (útil
-  // para la respuesta automática de WhatsApp Business).
-  const [showSolicitudes, setShowSolicitudes] = useState(false);
-  useEffect(() => {
-    if (window.location.hash === "#solicitudes") setShowSolicitudes(true);
-  }, []);
   // Ventana emergente única para los 12 botones naranjas de portada.
   // null = cerrada; si tiene un id (ej. "libros", "ecatepets", "ventas-con-causa",
   // "donaciones") se abre con la información de ese proyecto.
@@ -797,7 +791,6 @@ export default function App() {
           onAbrirSugerencias={() => setModalFormulario("sugerencias")}
           onAbrirComparte={() => setModalFormulario("comparte")}
           onAbrirMapaSitio={() => setShowMapaSitio(true)}
-          onAbrirSolicitudes={() => setShowSolicitudes(true)}
         />
         <TickerFrases />
         <BarraLogros />
@@ -1227,13 +1220,66 @@ export default function App() {
                   referrerPolicy="strict-origin-when-cross-origin"
                   title="Mapa de negocios locales DCUATES"
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowSolicitudes(true)}
-                  className="w-full bg-[#e65100] hover:bg-[#bf360c] text-white font-black uppercase text-xs sm:text-sm tracking-wide py-3 transition-colors"
-                >
-                  📝 ¿Necesitas algo? Registra tu Solicitud
-                </button>
+              </div>
+
+              {/* Ventana de Solicitudes — VISIBLE directo en la página (no
+                  modal), justo debajo del mapa. Para dirigir tráfico desde
+                  WhatsApp Business a esta sección exacta: comparte el link
+                  https://dcuates.com/#solicitudes (o el dominio que uses) —
+                  el navegador baja solo hasta aquí, sin necesitar nada de
+                  código (el id="solicitudes" + scroll-mt de abajo ya hacen
+                  que no quede tapada por el encabezado). */}
+              <div id="solicitudes" className="mt-3 scroll-mt-40 sm:scroll-mt-36 rounded-2xl overflow-hidden border-4 border-[#0f2d1e]/30 shadow-lg bg-white">
+                <div className="bg-[#e65100] px-3 py-2">
+                  <p className="text-white font-black uppercase text-xs sm:text-sm tracking-wide text-center">
+                    📝 Registra tu Solicitud
+                  </p>
+                </div>
+                <div className="p-4 space-y-3">
+                  <p className="text-sm text-slate-600 font-medium leading-relaxed text-center">
+                    Cuéntanos qué necesitas con el siguiente formulario. En cuanto lo revisemos, te contactamos directo por WhatsApp para darle seguimiento.
+                  </p>
+
+                  {/* Accesos rápidos — para quien llega directo desde
+                      WhatsApp sin conocer el resto de la página, un vistazo
+                      rápido de qué más hay antes de llenar el formulario. */}
+                  <div className="flex flex-wrap justify-center gap-2">
+                    <button type="button" onClick={() => setModalProyecto("libros")} className="rounded-full bg-emerald-100 text-[#0f2d1e] text-[11px] font-black uppercase px-3 py-1.5 hover:bg-emerald-200 transition-colors">📚 Libros</button>
+                    <button type="button" onClick={() => setModalProyecto("ecatepets")} className="rounded-full bg-emerald-100 text-[#0f2d1e] text-[11px] font-black uppercase px-3 py-1.5 hover:bg-emerald-200 transition-colors">🐾 Mascotas</button>
+                    <button type="button" onClick={() => setModalProyecto("asesorias")} className="rounded-full bg-emerald-100 text-[#0f2d1e] text-[11px] font-black uppercase px-3 py-1.5 hover:bg-emerald-200 transition-colors">🎓 Asesorías</button>
+                    <button type="button" onClick={() => setModalProyecto("donaciones")} className="rounded-full bg-emerald-100 text-[#0f2d1e] text-[11px] font-black uppercase px-3 py-1.5 hover:bg-emerald-200 transition-colors">💚 Apoyo Voluntario</button>
+                    <button
+                      type="button"
+                      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                      className="rounded-full bg-amber-100 text-[#0f2d1e] text-[11px] font-black uppercase px-3 py-1.5 hover:bg-amber-200 transition-colors"
+                    >
+                      🏆 Ver Logros
+                    </button>
+                  </div>
+
+                  <div className="rounded-xl overflow-hidden border-2 border-emerald-100">
+                    <iframe
+                      src={GOOGLE_FORM_SOLICITUDES_URL}
+                      title="Formulario de solicitud DCUATES"
+                      className="w-full"
+                      style={{ minHeight: 420, border: 0 }}
+                    >
+                      Cargando…
+                    </iframe>
+                  </div>
+
+                  <div className="text-center pt-1">
+                    <p className="text-xs text-slate-500 font-medium mb-2">¿Prefieres contarnos directo?</p>
+                    <a
+                      href={enlaceWhatsApp("¡Hola DCUATES! Quiero registrar una solicitud de apoyo.")}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block rounded-lg bg-[#25d366] hover:bg-[#1da851] text-white font-black uppercase text-xs px-4 py-2.5 transition-colors"
+                    >
+                      💬 Escríbenos por WhatsApp
+                    </a>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -1680,7 +1726,7 @@ export default function App() {
             Mapa del Sitio
           </button>
           <button
-            onClick={() => setShowSolicitudes(true)}
+            onClick={() => irASeccion("solicitudes")}
             className="underline underline-offset-4 hover:text-[#0f2d1e] bg-transparent border-none cursor-pointer font-bold transition-colors"
           >
             Registra tu Solicitud
@@ -1803,9 +1849,6 @@ export default function App() {
         />
       )}
 
-      {/* VENTANA DE SOLICITUDES */}
-      {showSolicitudes && <ModalSolicitudes onCerrar={() => setShowSolicitudes(false)} />}
-
       {/* MODAL DE FORMULARIO REUTILIZABLE — Sugerencias y Quejas / Conocer y
           Compartir Más. Ambos arman un mensaje de WhatsApp, sin backend. */}
       {modalFormulario === "sugerencias" && (
@@ -1834,7 +1877,7 @@ export default function App() {
 // =========================================================================
 // 3. SUBCOMPONENTE: SITE HEADER
 // =========================================================================
-function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSugerencias, onAbrirComparte, onAbrirMapaSitio, onAbrirSolicitudes }) {
+function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSugerencias, onAbrirComparte, onAbrirMapaSitio }) {
   const [menuMasAbierto, setMenuMasAbierto] = useState(false);
   return (
     <header className="border-b border-emerald-800/20 bg-white/95 py-2 px-4 shadow-sm text-slate-900 relative">
@@ -1947,7 +1990,6 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSug
                             if (link.action === "faq") onAbrirFAQ && onAbrirFAQ();
                             else if (link.action === "sugerencias") onAbrirSugerencias && onAbrirSugerencias();
                             else if (link.action === "mapa-sitio") onAbrirMapaSitio && onAbrirMapaSitio();
-                            else if (link.action === "solicitudes") onAbrirSolicitudes && onAbrirSolicitudes();
                             else if (link.modal) onAbrirProyecto && onAbrirProyecto(link.modal);
                           }}
                           className="px-4 py-2.5 text-left uppercase tracking-wide text-[11px] sm:text-xs font-black text-emerald-900 hover:bg-emerald-50 transition-colors"
@@ -3078,58 +3120,6 @@ function ModalCategoria({ categoria, onCerrar, onAbrirProyecto }) {
               <span className="uppercase font-black leading-tight text-[11px] sm:text-xs">{btn.t}</span>
             </button>
           ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Ventana de Solicitudes — formulario para pedir apoyo/servicio (ver
-// GOOGLE_FORM_SOLICITUDES_URL arriba para cómo configurarlo). Incluye
-// también un botón directo a WhatsApp por si alguien prefiere no llenar
-// el formulario.
-function ModalSolicitudes({ onCerrar }) {
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm" onClick={onCerrar}>
-      <div
-        className="bg-white text-slate-900 rounded-2xl max-w-xl w-full p-5 sm:p-6 shadow-2xl flex flex-col max-h-[90vh]"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-start justify-between gap-3 mb-2">
-          <h3 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-[#0f2d1e] font-heading">
-            📝 Registra tu Solicitud
-          </h3>
-          <button
-            onClick={onCerrar}
-            aria-label="Cerrar"
-            className="shrink-0 h-9 w-9 flex items-center justify-center rounded-full bg-[#0f2d1e] text-white font-black hover:bg-emerald-800 transition-colors"
-          >
-            ×
-          </button>
-        </div>
-        <p className="text-sm text-slate-600 font-medium leading-relaxed mb-3">
-          Cuéntanos qué necesitas con el siguiente formulario. En cuanto lo revisemos, te contactamos directo por WhatsApp para darle seguimiento.
-        </p>
-        <div className="flex-1 min-h-[420px] rounded-xl overflow-hidden border-2 border-emerald-100">
-          <iframe
-            src={GOOGLE_FORM_SOLICITUDES_URL}
-            title="Formulario de solicitud DCUATES"
-            className="w-full h-full"
-            style={{ minHeight: 420 }}
-          >
-            Cargando…
-          </iframe>
-        </div>
-        <div className="mt-3 pt-3 border-t border-emerald-100 text-center">
-          <p className="text-xs text-slate-500 font-medium mb-2">¿Prefieres contarnos directo?</p>
-          <a
-            href={enlaceWhatsApp("¡Hola DCUATES! Quiero registrar una solicitud de apoyo.")}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block rounded-lg bg-[#25d366] hover:bg-[#1da851] text-white font-black uppercase text-xs px-4 py-2.5 transition-colors"
-          >
-            💬 Escríbenos por WhatsApp
-          </a>
         </div>
       </div>
     </div>
