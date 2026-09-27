@@ -1227,6 +1227,13 @@ export default function App() {
                   referrerPolicy="strict-origin-when-cross-origin"
                   title="Mapa de negocios locales DCUATES"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowSolicitudes(true)}
+                  className="w-full bg-[#e65100] hover:bg-[#bf360c] text-white font-black uppercase text-xs sm:text-sm tracking-wide py-3 transition-colors"
+                >
+                  📝 ¿Necesitas algo? Registra tu Solicitud
+                </button>
               </div>
             </div>
           </div>
