@@ -25,6 +25,27 @@ const CLAVE_CIRCULO_CONFIANZA = "confianza2026";
 // iframe); no hace falta tocar nada más en el código.
 const MAPA_NEGOCIOS_EMBED_URL = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15034.541076557625!2d-99.00223799999999!3d19.600120500000003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1ee234c038987%3A0x4b578513910d8103!2sJardines%20de%20Morelos%2C%20Ecatepec%20de%20Morelos%2C%20M%C3%A9x.!5e0!3m2!1ses!2smx!4v1790129394750!5m2!1ses!2smx";
 
+// Ventana de Solicitudes — formulario para pedir apoyo/servicio, pensado
+// para recibirse desde un link (ej. la respuesta automática de WhatsApp
+// Business puede decir "regístrala aquí: dcuates.com/#solicitudes" y esta
+// ventana se abre sola, ver el useEffect de "abrirSolicitudesDesdeURL" en
+// el componente principal).
+//
+// CÓMO CONFIGURARLO (nada de esto se toca en código, solo en Google):
+// 1) Crea un Google Form con las preguntas que quieras pedir (nombre,
+//    teléfono, qué necesitas, colonia, etc.).
+// 2) En "Respuestas", pulsa el ícono verde de Sheets para ligarlo a una
+//    Hoja de Cálculo nueva — ahí se guardará cada solicitud SOLA, sin
+//    código.
+// 3) En el engrane ⚙️ de Configuración → Presentación → "Mensaje de
+//    confirmación", pega el texto que quieras que vea la gente justo
+//    después de enviar (dale clic también a "Recibir notificaciones por
+//    correo electrónico para las respuestas nuevas" — así te avisa cada
+//    vez que llega una solicitud nueva, sin instalar nada).
+// 4) Botón "Enviar" del formulario → pestaña "<>" (insertar HTML) → copia
+//    el link que está dentro de src="..." y pégalo aquí abajo.
+const GOOGLE_FORM_SOLICITUDES_URL = "https://docs.google.com/forms/d/e/TU_FORM_ID_AQUI/viewform?embedded=true";
+
 const REDES_SOCIALES = {
   facebook: "https://www.facebook.com/abelzarem/",
   instagram: "https://www.instagram.com/conexionesconcausa/",
@@ -73,6 +94,7 @@ const NAV_LINKS_MAS = [
   { label: "Alianzas Solidarias", modal: "alianzas-tarjeta" },
   { label: "Apoyo a Causas", href: "#extraviados-registro" },
   { label: "Mapa del Sitio", action: "mapa-sitio" },
+  { label: "Registra tu Solicitud", action: "solicitudes" },
   { label: "Preguntas Frecuentes", action: "faq" },
   { label: "Sugerencias y Quejas", action: "sugerencias" },
   { label: "Préstamo Gratuito de Libros", modal: "libros" },
@@ -125,12 +147,15 @@ const TICKER_ETIQUETAS = {
 // con esas 2 columnas llenas, sustituyen automáticamente a estos ejemplos
 // (ver BarraLogros más abajo).
 const LOGROS_ITEMS = [
-  { texto: "🐾 47 mascotas reencontradas con su familia gracias a Ecatepets", enlace: "#ecatepets" },
-  { texto: "📚 180 libros prestados sin costo por la Bibliobici y Amigos", enlace: "#libros" },
-  { texto: "🏪 12 negocios locales impulsados con Publicidad Gratuita este mes", enlace: "#publicidad" },
-  { texto: "💚 $8,400 canalizados a causas sociales, con total transparencia", enlace: "#donaciones" },
-  { texto: "🎓 25 asesorías gratuitas brindadas a emprendedores del barrio", enlace: "#asesorias" },
-  { texto: "🤝 60 familias ya forman parte del Círculo de Confianza", enlace: "#circulo-confianza" }
+  { texto: "🤝 Más de 2,000 recomendaciones y conexiones de apoyo", enlace: "#circulo-confianza" },
+  { texto: "📚 Más de 1,000 libros y materiales educativos prestados", enlace: "#libros" },
+  { texto: "🎓 Más de 300 asesorías y orientación educativa y laboral gratuitas", enlace: "#asesorias" },
+  { texto: "🐾 Más de 200 adopciones y apoyo a rescate de peluditos", enlace: "#ecatepets" },
+  { texto: "💰 Gestión y fondeo de más de un millón de pesos en apoyos para personas y grupos vulnerables", enlace: "#donaciones" },
+  { texto: "🌱 Formación y desarrollo de talento que genera cadena de valor y de valores", enlace: "#asesorias" },
+  { texto: "🌟 Apoyos y sinergia con quienes también se preocupan por apoyar a nuestra comunidad", enlace: "#iniciativas" },
+  { texto: "📖 Más de 100 reuniones de negocios y tertulias literarias y de sana convivencia", enlace: "#bazares" },
+  { texto: "💻 Más de 500 cursos y talleres digitales para nuestro desarrollo personal y social", enlace: "#bienestar" }
 ];
 
 // Ticker SUPERIOR (debajo de la barra fija de menú): frases sobre
@@ -451,7 +476,7 @@ const CATEGORIAS_PROYECTOS = [
   },
   {
     id: "apoya-causas",
-    titulo: "APOYA CAUSAS",
+    titulo: "APOYANDO CAUSAS",
     slogan: "Tu ayuda, su bienestar",
     emoji: "💚",
     img: null,
@@ -642,6 +667,13 @@ export default function App() {
   const [showMapaSitio, setShowMapaSitio] = useState(false);
   // Categoría abierta (portada simplificada de 4 botones) — null = cerrada.
   const [categoriaAbierta, setCategoriaAbierta] = useState(null);
+  // Ventana de Solicitudes — se puede abrir desde un botón del sitio O
+  // sola, si alguien llega con dcuates.com/#solicitudes en el link (útil
+  // para la respuesta automática de WhatsApp Business).
+  const [showSolicitudes, setShowSolicitudes] = useState(false);
+  useEffect(() => {
+    if (window.location.hash === "#solicitudes") setShowSolicitudes(true);
+  }, []);
   // Ventana emergente única para los 12 botones naranjas de portada.
   // null = cerrada; si tiene un id (ej. "libros", "ecatepets", "ventas-con-causa",
   // "donaciones") se abre con la información de ese proyecto.
@@ -765,6 +797,7 @@ export default function App() {
           onAbrirSugerencias={() => setModalFormulario("sugerencias")}
           onAbrirComparte={() => setModalFormulario("comparte")}
           onAbrirMapaSitio={() => setShowMapaSitio(true)}
+          onAbrirSolicitudes={() => setShowSolicitudes(true)}
         />
         <TickerFrases />
         <BarraLogros />
@@ -1640,6 +1673,12 @@ export default function App() {
             Mapa del Sitio
           </button>
           <button
+            onClick={() => setShowSolicitudes(true)}
+            className="underline underline-offset-4 hover:text-[#0f2d1e] bg-transparent border-none cursor-pointer font-bold transition-colors"
+          >
+            Registra tu Solicitud
+          </button>
+          <button
             onClick={() => setShowFAQ(true)}
             className="underline underline-offset-4 hover:text-[#0f2d1e] bg-transparent border-none cursor-pointer font-bold transition-colors"
           >
@@ -1757,6 +1796,9 @@ export default function App() {
         />
       )}
 
+      {/* VENTANA DE SOLICITUDES */}
+      {showSolicitudes && <ModalSolicitudes onCerrar={() => setShowSolicitudes(false)} />}
+
       {/* MODAL DE FORMULARIO REUTILIZABLE — Sugerencias y Quejas / Conocer y
           Compartir Más. Ambos arman un mensaje de WhatsApp, sin backend. */}
       {modalFormulario === "sugerencias" && (
@@ -1785,7 +1827,7 @@ export default function App() {
 // =========================================================================
 // 3. SUBCOMPONENTE: SITE HEADER
 // =========================================================================
-function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSugerencias, onAbrirComparte, onAbrirMapaSitio }) {
+function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSugerencias, onAbrirComparte, onAbrirMapaSitio, onAbrirSolicitudes }) {
   const [menuMasAbierto, setMenuMasAbierto] = useState(false);
   return (
     <header className="border-b border-emerald-800/20 bg-white/95 py-2 px-4 shadow-sm text-slate-900 relative">
@@ -1898,6 +1940,7 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSug
                             if (link.action === "faq") onAbrirFAQ && onAbrirFAQ();
                             else if (link.action === "sugerencias") onAbrirSugerencias && onAbrirSugerencias();
                             else if (link.action === "mapa-sitio") onAbrirMapaSitio && onAbrirMapaSitio();
+                            else if (link.action === "solicitudes") onAbrirSolicitudes && onAbrirSolicitudes();
                             else if (link.modal) onAbrirProyecto && onAbrirProyecto(link.modal);
                           }}
                           className="px-4 py-2.5 text-left uppercase tracking-wide text-[11px] sm:text-xs font-black text-emerald-900 hover:bg-emerald-50 transition-colors"
@@ -3028,6 +3071,58 @@ function ModalCategoria({ categoria, onCerrar, onAbrirProyecto }) {
               <span className="uppercase font-black leading-tight text-[11px] sm:text-xs">{btn.t}</span>
             </button>
           ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Ventana de Solicitudes — formulario para pedir apoyo/servicio (ver
+// GOOGLE_FORM_SOLICITUDES_URL arriba para cómo configurarlo). Incluye
+// también un botón directo a WhatsApp por si alguien prefiere no llenar
+// el formulario.
+function ModalSolicitudes({ onCerrar }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm" onClick={onCerrar}>
+      <div
+        className="bg-white text-slate-900 rounded-2xl max-w-xl w-full p-5 sm:p-6 shadow-2xl flex flex-col max-h-[90vh]"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-start justify-between gap-3 mb-2">
+          <h3 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-[#0f2d1e] font-heading">
+            📝 Registra tu Solicitud
+          </h3>
+          <button
+            onClick={onCerrar}
+            aria-label="Cerrar"
+            className="shrink-0 h-9 w-9 flex items-center justify-center rounded-full bg-[#0f2d1e] text-white font-black hover:bg-emerald-800 transition-colors"
+          >
+            ×
+          </button>
+        </div>
+        <p className="text-sm text-slate-600 font-medium leading-relaxed mb-3">
+          Cuéntanos qué necesitas con el siguiente formulario. En cuanto lo revisemos, te contactamos directo por WhatsApp para darle seguimiento.
+        </p>
+        <div className="flex-1 min-h-[420px] rounded-xl overflow-hidden border-2 border-emerald-100">
+          <iframe
+            src={GOOGLE_FORM_SOLICITUDES_URL}
+            title="Formulario de solicitud DCUATES"
+            className="w-full h-full"
+            style={{ minHeight: 420 }}
+          >
+            Cargando…
+          </iframe>
+        </div>
+        <div className="mt-3 pt-3 border-t border-emerald-100 text-center">
+          <p className="text-xs text-slate-500 font-medium mb-2">¿Prefieres contarnos directo?</p>
+          <a
+            href={enlaceWhatsApp("¡Hola DCUATES! Quiero registrar una solicitud de apoyo.")}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block rounded-lg bg-[#25d366] hover:bg-[#1da851] text-white font-black uppercase text-xs px-4 py-2.5 transition-colors"
+          >
+            💬 Escríbenos por WhatsApp
+          </a>
         </div>
       </div>
     </div>
