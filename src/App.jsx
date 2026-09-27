@@ -118,6 +118,21 @@ const TICKER_ETIQUETAS = {
   frase: { emoji: "💚", label: "DCUATES" }
 };
 
+// Barra de Logros y Resultados — ejemplos FICTICIOS mientras no haya datos
+// reales; reemplázalos o (mejor) aliméntalos desde Baserow sin tocar
+// código: crea en la tabla ENLACES 2 columnas de texto — "NOMBRE LOGROS" y
+// "ENLACE LOGROS" — una fila por logro. En cuanto haya al menos una fila
+// con esas 2 columnas llenas, sustituyen automáticamente a estos ejemplos
+// (ver BarraLogros más abajo).
+const LOGROS_ITEMS = [
+  { texto: "🐾 47 mascotas reencontradas con su familia gracias a Ecatepets", enlace: "#ecatepets" },
+  { texto: "📚 180 libros prestados sin costo por la Bibliobici y Amigos", enlace: "#libros" },
+  { texto: "🏪 12 negocios locales impulsados con Publicidad Gratuita este mes", enlace: "#publicidad" },
+  { texto: "💚 $8,400 canalizados a causas sociales, con total transparencia", enlace: "#donaciones" },
+  { texto: "🎓 25 asesorías gratuitas brindadas a emprendedores del barrio", enlace: "#asesorias" },
+  { texto: "🤝 60 familias ya forman parte del Círculo de Confianza", enlace: "#circulo-confianza" }
+];
+
 // Ticker SUPERIOR (debajo de la barra fija de menú): frases sobre
 // solidaridad y causas afines, más llamados a la acción para sumarse.
 // Edítalas o agrégalas aquí — cada una puede enlazar a cualquier sección
@@ -374,10 +389,12 @@ const TODOS_LOS_PROYECTOS = [...INICIATIVAS_PRINCIPALES, ...NUEVOS_PROYECTOS_DAT
 // "h" se conserva solo como respaldo por si JavaScript llegara a fallar
 // (accesibilidad).
 // Orden A→L pedido explícitamente (de izquierda a derecha / de arriba hacia
-// abajo en la cuadrícula): Ecatepets, Publicidad, Apoyo Voluntario,
-// Recomienda, Alianzas, Círculo, Asesorías, Bazar, Ventas, Noticias,
-// Bienestar, Libros. Como este arreglo se reutiliza también en el Mapa de
-// Sitio, reordenarlo aquí reordena ambos lugares a la vez.
+// abajo): Ecatepets, Publicidad, Apoyo Voluntario, Recomienda, Alianzas,
+// Círculo, Asesorías, Bazar, Ventas, Noticias, Bienestar, Libros.
+// Ya NO se muestra directo en la portada (que ahora usa las 4 categorías
+// de CATEGORIAS_PROYECTOS, más abajo) — este arreglo sigue vivo porque lo
+// usan el Mapa de Sitio (ModalMapaSitio) y las tarjetas de cada categoría
+// (ModalCategoria), así que reordenarlo aquí los reordena a ambos.
 const BOTONES_PORTADA = [
   { t: "ECATEPETS MASCOTAS", h: "#ecatepets", modal: "ecatepets", img: "/images/Ecatepets.png" },
   { t: "PUBLICIDAD GRATUITA", h: "#publicidad", modal: "publicidad-tarjeta", img: "/images/Publicidad2.png" },
@@ -398,6 +415,58 @@ const BOTONES_PORTADA = [
 const MAPA_SITIO_EXTRA = [
   { t: "PREGUNTAS FRECUENTES", accion: "faq", emoji: "❓" },
   { t: "SUGERENCIAS Y QUEJAS", accion: "sugerencias", emoji: "💬" }
+];
+
+// Portada simplificada: en vez de los 12 botones de proyecto, se muestran
+// solo estas 4 categorías (más grandes). Cada una agrupa varios proyectos
+// — al tocarla se abre un modal de presentación con acceso directo a cada
+// proyecto incluido (ver ModalCategoria). Los 12 proyectos originales
+// siguen totalmente accesibles uno por uno desde el Mapa de Sitio (usa
+// BOTONES_PORTADA arriba, sin tocar).
+// "emoji" es el respaldo mientras no exista un logo propio: en cuanto
+// tengas la imagen, solo agrega "img: '/images/NombreDelArchivo.png'" y se
+// usará automáticamente en su lugar (mismo patrón que los botones de
+// proyecto). Slogans son provisionales — cámbialos cuando quieras.
+// Nota: "Bazar y Comercio" no estaba en ninguna de las 4 categorías que
+// diste, así que se agregó a "Alianzas y Negocios" por ser lo más afín
+// (comercio local) — muévelo si lo quieres en otra.
+const CATEGORIAS_PROYECTOS = [
+  {
+    id: "beneficios-comunitarios",
+    titulo: "BENEFICIOS COMUNITARIOS",
+    slogan: "Todo lo que la comunidad te regala",
+    emoji: "🎁",
+    img: null,
+    descripcion: "Recursos pensados para tu bienestar y el de tu familia, sin costo: préstamo de libros, actividades de bienestar, asesorías, apoyo para tus mascotas y una red de confianza vecinal.",
+    proyectos: ["libros", "bienestar", "asesorias", "ecatepets", "circulo-confianza"]
+  },
+  {
+    id: "alianzas-y-negocios",
+    titulo: "ALIANZAS Y NEGOCIOS",
+    slogan: "Creciendo juntos, ganamos más",
+    emoji: "🤝",
+    img: null,
+    descripcion: "Todo lo que impulsa tu negocio o emprendimiento: publicidad gratuita, recomendaciones que valen, alianzas ganar-ganar, asesoría profesional, comercio local y ventas con causa, y una red de confianza para crecer sin miedo.",
+    proyectos: ["publicidad-tarjeta", "recomienda-evalua-gana", "alianzas-tarjeta", "asesorias", "bazares", "ventas-con-causa", "circulo-confianza"]
+  },
+  {
+    id: "apoya-causas",
+    titulo: "APOYA CAUSAS",
+    slogan: "Tu ayuda, su bienestar",
+    emoji: "💚",
+    img: null,
+    descripcion: "Formas de aportar tu tiempo, dinero o talento para causas que transforman: apoyo voluntario, asesoría a quien la necesita, bienestar comunitario, préstamo de libros y apoyo a mascotas.",
+    proyectos: ["donaciones", "asesorias", "bienestar", "libros", "ecatepets"]
+  },
+  {
+    id: "sumando-valores",
+    titulo: "SUMANDO VALORES",
+    slogan: "Valores que se multiplican",
+    emoji: "✨",
+    img: null,
+    descripcion: "Proyectos que fortalecen el tejido comunitario desde distintos frentes: asesoría, alianzas, noticias de barrio, bienestar, mascotas y una red basada en la confianza.",
+    proyectos: ["asesorias", "alianzas-tarjeta", "noticias", "bienestar", "ecatepets", "circulo-confianza"]
+  }
 ];
 
 // Las 4 formas de aportación — se reutilizan aquí y en la sección de Apoyo
@@ -571,6 +640,8 @@ export default function App() {
   // Modal del Mapa de Sitio — tarjetas con acceso directo a todo lo que
   // hay en la página (accesible desde el pie de página y el menú "Más").
   const [showMapaSitio, setShowMapaSitio] = useState(false);
+  // Categoría abierta (portada simplificada de 4 botones) — null = cerrada.
+  const [categoriaAbierta, setCategoriaAbierta] = useState(null);
   // Ventana emergente única para los 12 botones naranjas de portada.
   // null = cerrada; si tiene un id (ej. "libros", "ecatepets", "ventas-con-causa",
   // "donaciones") se abre con la información de ese proyecto.
@@ -696,6 +767,7 @@ export default function App() {
           onAbrirMapaSitio={() => setShowMapaSitio(true)}
         />
         <TickerFrases />
+        <BarraLogros />
 
         {/* Botón de Navegación por Necesidades — pegado justo debajo de la
             barra de frases (mismo espacio que el de WhatsApp guarda con la
@@ -827,43 +899,50 @@ export default function App() {
             </div>
           </div>
 
-          {/* Cuadrícula de los 12 botones — 2 columnas en celular, 3 columnas x 4 filas en escritorio */}
+          {/* Cuadrícula de las 4 categorías (portada simplificada) — 2x2 en
+              celular y en escritorio, botones grandes con logo/emoji al
+              centro. Cada una abre ModalCategoria con la presentación y el
+              acceso a los proyectos que agrupa. */}
           <div className="lg:col-span-6">
             <p className="flex items-center justify-center gap-3 text-center text-3xl sm:text-4xl font-black text-[#0f2d1e] uppercase tracking-tight leading-none mb-4">
               <span>⭐</span> Proyectos Comunitarios DCUATES <span>⭐</span>
             </p>
             {(() => {
-              // BOTONES_PORTADA ahora vive a nivel de archivo (ver arriba,
-              // cerca de TODOS_LOS_PROYECTOS) para poder reutilizarse
-              // también en el Mapa de Sitio.
-              const BotonProyecto = ({ btn }) => (
+              const BotonCategoria = ({ cat }) => (
                 <button
                   type="button"
-                  onClick={() => setModalProyecto(btn.modal)}
-                  className="flex flex-col rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white shadow-md transition-all hover:scale-[1.02] overflow-hidden font-heading text-left w-full"
+                  onClick={() => setCategoriaAbierta(cat.id)}
+                  className="flex flex-col rounded-2xl bg-[#e65100] hover:bg-[#bf360c] text-white shadow-md transition-all hover:scale-[1.02] overflow-hidden font-heading text-center w-full"
                 >
-                  <div className="px-2 pt-3 pb-1 text-center border-b border-white/20">
-                    <h4 className="uppercase font-black leading-tight text-sm sm:text-base lg:text-lg">
-                      {btn.t}
+                  <div className="px-2 pt-4 pb-1">
+                    <h4 className="uppercase font-black leading-tight text-base sm:text-lg lg:text-xl">
+                      {cat.titulo}
                     </h4>
                   </div>
-                  <div className="flex flex-1 items-center justify-center px-3 py-4">
-                    {btn.img && (
+                  <div className="flex flex-1 items-center justify-center py-4">
+                    {cat.img ? (
                       <img
-                        src={btn.img}
+                        src={cat.img}
                         alt=""
                         loading="lazy"
-                        className="max-h-24 sm:max-h-28 w-auto object-contain drop-shadow"
+                        className="max-h-32 sm:max-h-40 w-auto object-contain drop-shadow"
                         onError={(e) => { e.target.style.display = 'none'; }}
                       />
+                    ) : (
+                      <span className="text-6xl sm:text-7xl" aria-hidden="true">{cat.emoji}</span>
                     )}
+                  </div>
+                  <div className="px-3 pb-4 pt-1">
+                    <p className="text-[11px] sm:text-xs font-bold uppercase tracking-wide text-white/90 italic">
+                      {cat.slogan}
+                    </p>
                   </div>
                 </button>
               );
 
               return (
-                <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
-                  {BOTONES_PORTADA.map((btn, idx) => <BotonProyecto key={idx} btn={btn} />)}
+                <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                  {CATEGORIAS_PROYECTOS.map((cat) => <BotonCategoria key={cat.id} cat={cat} />)}
                 </div>
               );
             })()}
@@ -1666,6 +1745,15 @@ export default function App() {
           onAbrirProyecto={(id) => setModalProyecto(id)}
           onAbrirFAQ={() => setShowFAQ(true)}
           onAbrirSugerencias={() => setModalFormulario("sugerencias")}
+        />
+      )}
+
+      {/* MODAL DE CATEGORÍA — portada simplificada de 4 botones */}
+      {categoriaAbierta && (
+        <ModalCategoria
+          categoria={CATEGORIAS_PROYECTOS.find((c) => c.id === categoriaAbierta)}
+          onCerrar={() => setCategoriaAbierta(null)}
+          onAbrirProyecto={(id) => setModalProyecto(id)}
         />
       )}
 
@@ -2892,6 +2980,60 @@ function ModalMapaSitio({ onCerrar, onAbrirProyecto, onAbrirFAQ, onAbrirSugerenc
   );
 }
 
+// Modal de categoría — presentación "ad hoc" de una de las 4 categorías de
+// la portada simplificada (ver CATEGORIAS_PROYECTOS arriba), con acceso
+// directo a cada proyecto que agrupa. Reutiliza los mismos datos (img,
+// título) de BOTONES_PORTADA para no duplicar información.
+function ModalCategoria({ categoria, onCerrar, onAbrirProyecto }) {
+  if (!categoria) return null;
+  const proyectosDeLaCategoria = BOTONES_PORTADA.filter((b) => categoria.proyectos.includes(b.modal));
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm" onClick={onCerrar}>
+      <div
+        className="bg-white text-slate-900 rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl flex flex-col max-h-[90vh]"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-start justify-between gap-3 mb-2">
+          <span className="inline-flex items-center gap-2 rounded-full bg-emerald-200 px-4 py-1.5 text-xs sm:text-sm font-black uppercase tracking-wider text-emerald-800">
+            <span aria-hidden="true">{categoria.emoji}</span> {categoria.titulo}
+          </span>
+          <button
+            onClick={onCerrar}
+            aria-label="Cerrar"
+            className="shrink-0 h-9 w-9 flex items-center justify-center rounded-full bg-[#0f2d1e] text-white font-black hover:bg-emerald-800 transition-colors"
+          >
+            ×
+          </button>
+        </div>
+        <p className="text-xs sm:text-sm italic font-black text-[#e65100] mb-2">{categoria.slogan}</p>
+        <p className="text-sm text-slate-600 font-medium leading-relaxed mb-4">{categoria.descripcion}</p>
+        <div className="overflow-y-auto pr-1 grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+          {proyectosDeLaCategoria.map((btn, idx) => (
+            <button
+              key={idx}
+              type="button"
+              onClick={() => { onCerrar(); onAbrirProyecto(btn.modal); }}
+              className="flex flex-col items-center gap-1.5 rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white shadow-sm transition-colors p-3 text-center font-heading"
+            >
+              {btn.img && (
+                <img
+                  src={btn.img}
+                  alt=""
+                  loading="lazy"
+                  className="max-h-10 w-auto object-contain drop-shadow"
+                  onError={(e) => { e.target.style.display = 'none'; }}
+                />
+              )}
+              <span className="uppercase font-black leading-tight text-[11px] sm:text-xs">{btn.t}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // Botón verde desplegable — usado en la fila de "resumen rápido" junto al
 // video (Nuestra Misión, Cómo Podemos Sumar, Preguntas Frecuentes, Aviso
 // de Privacidad). Al dar clic se expande hacia abajo mostrando su contenido.
@@ -3243,6 +3385,57 @@ function FilaTicker({ items, index, onClose, mostrarCerrar }) {
   );
 }
 
+// Barra de Logros y Resultados — se coloca en el encabezado, debajo de la
+// barra de frases motivacionales (TickerFrases). Casi el doble de alta que
+// un renglón normal de ticker, para que los resultados/impacto de los
+// proyectos (transparencia y utilidad del programa) resalten más. Antes
+// esta información vivía como la "segunda fila" de la barra inferior fija
+// (BarraTicker) — se movió aquí y se le cambió el contenido a logros.
+function BarraLogros() {
+  const [index, setIndex] = useState(0);
+
+  const filasEnlaces = useFilasEnlaces();
+  const logrosBaserow = paresBaserow(filasEnlaces, "NOMBRE LOGROS", "ENLACE LOGROS", 20);
+  const itemsLogros = logrosBaserow.length > 0 ? logrosBaserow : LOGROS_ITEMS;
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setIndex((i) => (i + 1) % itemsLogros.length);
+    }, 5000);
+    return () => clearInterval(id);
+  }, [itemsLogros.length]);
+
+  const item = itemsLogros[index];
+  const esExterno = item.enlace && item.enlace.startsWith("http");
+
+  return (
+    <div className="bg-[#0f2d1e] border-b-2 border-emerald-700/50">
+      <a
+        key={index}
+        href={item.enlace || "#"}
+        target={esExterno ? "_blank" : undefined}
+        rel={esExterno ? "noopener noreferrer" : undefined}
+        className="mx-auto max-w-6xl flex items-center gap-3 sm:gap-4 px-3 sm:px-4 py-3 sm:py-4"
+      >
+        <span className="hidden sm:flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-amber-300 shrink-0 border-r border-emerald-700/50 pr-4">
+          🏆 Logros DCUATES
+        </span>
+        <span className="text-sm sm:text-base font-bold text-white flex-1 min-w-0 truncate">
+          {item.texto || item.nombre}
+        </span>
+        <div className="hidden sm:flex items-center gap-1 shrink-0">
+          {itemsLogros.map((_, i) => (
+            <span
+              key={i}
+              className={`h-1.5 w-1.5 rounded-full transition-colors ${i === index ? "bg-amber-300" : "bg-emerald-700/60"}`}
+            />
+          ))}
+        </div>
+      </a>
+    </div>
+  );
+}
+
 // Ticker SUPERIOR — frases de solidaridad y llamados a sumarse. No es fijo
 // (queda fijo junto con el encabezado, dentro del mismo contenedor "sticky"
 // en el render principal): vive pegado debajo de él, visible siempre.
@@ -3460,14 +3653,9 @@ function BarraTicker() {
 
   if (!visible) return null;
 
-  // La segunda fila va desfasada a la mitad del arreglo para no repetir
-  // exactamente el mismo anuncio que la primera fila al mismo tiempo.
-  const indexFila2 = (index + Math.floor(itemsTicker.length / 2)) % itemsTicker.length;
-
   return (
-    <div className="fixed bottom-0 inset-x-0 z-40 bg-[#17472d] border-t-2 border-emerald-700/50 shadow-[0_-4px_12px_rgba(0,0,0,0.25)] divide-y divide-emerald-800/40">
-      <FilaTicker items={itemsTicker} index={index} mostrarCerrar={false} />
-      <FilaTicker items={itemsTicker} index={indexFila2} onClose={() => setVisible(false)} mostrarCerrar={true} />
+    <div className="fixed bottom-0 inset-x-0 z-40 bg-[#17472d] border-t-2 border-emerald-700/50 shadow-[0_-4px_12px_rgba(0,0,0,0.25)]">
+      <FilaTicker items={itemsTicker} index={index} onClose={() => setVisible(false)} mostrarCerrar={true} />
     </div>
   );
 }
