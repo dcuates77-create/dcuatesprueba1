@@ -828,6 +828,7 @@ export default function App() {
           onAbrirSugerencias={() => setModalFormulario("sugerencias")}
           onAbrirComparte={() => setModalFormulario("comparte")}
           onAbrirMapaSitio={() => setShowMapaSitio(true)}
+          onAbrirCategoria={(id) => setCategoriaAbierta(id)}
         />
         <TickerFrases />
         <BarraLogros />
@@ -1243,7 +1244,7 @@ export default function App() {
                   Para agregar/editar negocios no se toca este código: se
                   edita el mapa en Google Maps/My Maps y se actualiza la
                   constante MAPA_NEGOCIOS_EMBED_URL arriba del archivo. */}
-              <div className="mt-3 rounded-2xl overflow-hidden border-4 border-[#0f2d1e]/30 shadow-lg">
+              <div id="mapa-negocios" className="scroll-mt-48 md:scroll-mt-36 mt-3 rounded-2xl overflow-hidden border-4 border-[#0f2d1e]/30 shadow-lg">
                 <div className="bg-[#0f2d1e] px-3 py-2">
                   <p className="text-white font-black uppercase text-xs sm:text-sm tracking-wide text-center">
                     📍 Mapa de Negocios Locales Aliados
@@ -1295,14 +1296,7 @@ export default function App() {
                   </div>
 
                   <div className="rounded-xl overflow-hidden border-2 border-emerald-100">
-                    <iframe
-                      src={GOOGLE_FORM_SOLICITUDES_URL}
-                      title="Formulario de solicitud DCUATES"
-                      className="w-full"
-                      style={{ minHeight: 640, border: 0 }}
-                    >
-                      Cargando…
-                    </iframe>
+                    <FormularioSolicitud />
                   </div>
 
                   <div className="text-center pt-1">
@@ -1788,7 +1782,7 @@ export default function App() {
           </button>
         </nav>
 
-        <p className="text-xs sm:text-sm text-[#0f2d1e]/60 pt-4 border-t border-[#0f2d1e]/20 max-w-md sm:max-w-lg mx-auto font-medium">
+        <p className="text-sm sm:text-base text-[#0f2d1e] pt-4 border-t border-[#0f2d1e]/30 max-w-md sm:max-w-lg mx-auto font-black">
           © {new Date().getFullYear()} DCUATES, un programa de CONEXIONES CON CAUSA ♥.<br />
           Todos los derechos reservados.
         </p>
@@ -1930,14 +1924,116 @@ export default function App() {
 // =========================================================================
 // 3. SUBCOMPONENTE: SITE HEADER
 // =========================================================================
-function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSugerencias, onAbrirComparte, onAbrirMapaSitio }) {
+// Barra de búsqueda del encabezado (con lupa): busca por palabras en los
+// proyectos, categorías, preguntas frecuentes y secciones de la página, y al
+// elegir un resultado abre su ventana o baja hasta esa sección. Ignora
+// acentos y mayúsculas ("asesoria" encuentra "Asesorías").
+const normalizarBusqueda = (t) => String(t || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
+const SECCIONES_BUSCABLES = [
+  { t: "Registra tu Solicitud (formulario)", kw: "solicitud formulario pedir apoyo ayuda registro necesito whatsapp", id: "solicitudes" },
+  { t: "Mapa de Negocios Locales", kw: "mapa negocios locales aliados ubicacion donde direccion", id: "mapa-negocios" },
+  { t: "Video de Chuy, el Sapo Soñador", kw: "chuy sapo soñador video ejemplo donativos vida", id: "chuy-video" },
+  { t: "Historias y reflexiones DCUATES (videos)", kw: "historias reflexiones videos testimonios inspiracion", id: "historias-reflexiones" },
+  { t: "Publicidad Comunitaria (publica tu negocio)", kw: "publicidad publicar negocio servicio anunciar formulario gratis", id: "publicidad" },
+  { t: "Ventas con Causa (catálogo)", kw: "ventas causa catalogo productos comprar apartar", id: "ventas-con-causa" },
+  { t: "Mascotas, personas y cosas extraviadas", kw: "extraviados extraviado perdido mascota persona cosa registro adopcion", id: "extraviados-registro" }
+];
+
+function BarraBusqueda({ onAbrirProyecto, onAbrirCategoria, onAbrirFAQ }) {
+  const [texto, setTexto] = useState("");
+  const [abierta, setAbierta] = useState(false);
+
+  const indice = React.useMemo(() => {
+    const lista = [];
+    CATEGORIAS_PROYECTOS.forEach((c) => lista.push({
+      t: c.titulo, tipo: "Categoría", emoji: c.emoji,
+      kw: `${c.slogan} ${c.descripcion}`, accion: () => onAbrirCategoria && onAbrirCategoria(c.id)
+    }));
+    BOTONES_PORTADA.forEach((b) => {
+      const p = TODOS_LOS_PROYECTOS.find((x) => x.id === b.modal);
+      lista.push({
+        t: b.t, tipo: "Proyecto", emoji: "📌",
+        kw: p ? `${p.titulo} ${p.descripcion} ${(p.puntos || []).join(" ")}` : "",
+        accion: () => onAbrirProyecto && onAbrirProyecto(b.modal)
+      });
+    });
+    FAQ_ITEMS.forEach((f) => lista.push({
+      t: f.pregunta, tipo: "Pregunta frecuente", emoji: "❓",
+      kw: f.respuesta, accion: () => onAbrirFAQ && onAbrirFAQ()
+    }));
+    SECCIONES_BUSCABLES.forEach((x) => lista.push({
+      t: x.t, tipo: "Sección", emoji: "📍", kw: x.kw,
+      accion: () => setTimeout(() => irASeccion(x.id), 60)
+    }));
+    return lista.map((it) => ({ ...it, _n: normalizarBusqueda(`${it.t} ${it.kw}`) }));
+  }, []);
+
+  const palabras = normalizarBusqueda(texto).split(/\s+/).filter(Boolean);
+  const resultados = palabras.length && normalizarBusqueda(texto).length >= 2
+    ? indice.filter((it) => palabras.every((w) => it._n.includes(w))).slice(0, 8)
+    : [];
+
+  const elegir = (it) => { setTexto(""); setAbierta(false); it.accion(); };
+
+  return (
+    <>
+      <div className="flex-1 min-w-[6.5rem] md:flex-none md:w-64">
+        <div className="flex items-center gap-1.5 rounded-full border-2 border-[#0f2d1e]/30 bg-white px-2.5 py-1.5 focus-within:border-[#e65100]">
+          <svg viewBox="0 0 24 24" className="h-4 w-4 sm:h-5 sm:w-5 shrink-0 fill-none stroke-[#0f2d1e] stroke-[2.5]" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" />
+            <line x1="16.5" y1="16.5" x2="21" y2="21" strokeLinecap="round" />
+          </svg>
+          <input
+            type="search"
+            value={texto}
+            onChange={(e) => { setTexto(e.target.value); setAbierta(true); }}
+            onFocus={() => setAbierta(true)}
+            onKeyDown={(e) => { if (e.key === "Escape") setAbierta(false); if (e.key === "Enter" && resultados[0]) elegir(resultados[0]); }}
+            placeholder="Buscar…"
+            aria-label="Buscar en DCUATES"
+            className="w-full min-w-0 bg-transparent text-xs sm:text-sm font-bold text-[#0f2d1e] placeholder:text-slate-400 focus:outline-none"
+          />
+        </div>
+      </div>
+      {abierta && palabras.length > 0 && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setAbierta(false)} />
+          <div className="absolute left-2 right-2 sm:left-auto sm:right-4 sm:w-96 top-full mt-1 z-50 rounded-2xl bg-white shadow-xl border border-emerald-800/10 py-1 max-h-[60vh] overflow-y-auto">
+            {resultados.length === 0 ? (
+              <p className="px-4 py-3 text-xs font-bold text-slate-500">Sin resultados para “{texto}”. Prueba con otra palabra.</p>
+            ) : (
+              resultados.map((it, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => elegir(it)}
+                  className="w-full text-left px-4 py-2.5 hover:bg-emerald-50 transition-colors flex items-start gap-2"
+                >
+                  <span aria-hidden="true">{it.emoji}</span>
+                  <span className="flex-1 min-w-0">
+                    <span className="block text-xs sm:text-sm font-black text-[#0f2d1e] leading-tight">{it.t}</span>
+                    <span className="block text-[10px] font-bold uppercase tracking-wide text-[#e65100]">{it.tipo}</span>
+                  </span>
+                </button>
+              ))
+            )}
+          </div>
+        </>
+      )}
+    </>
+  );
+}
+
+function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSugerencias, onAbrirComparte, onAbrirMapaSitio, onAbrirCategoria }) {
   const [menuMasAbierto, setMenuMasAbierto] = useState(false);
   return (
     <header className="border-b border-emerald-800/20 bg-white/95 py-2 px-4 shadow-sm text-slate-900 relative">
       <div className="mx-auto flex flex-wrap items-center gap-y-2 max-w-6xl">
 
         {/* Logo + nombre — siempre primero, en la misma fila que las redes en móvil */}
-        <a href="#inicio" className="order-1 flex items-center gap-3 shrink-0">
+        <div className="order-1 flex items-center gap-2 sm:gap-3 min-w-0 flex-1 md:flex-none">
+        <a href="#inicio" className="flex items-center gap-2 sm:gap-3 shrink-0">
           <span className="flex h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 items-center justify-center rounded-full overflow-hidden bg-[#0f2d1e] border-2 border-[#0f2d1e]/20 shadow-sm shrink-0">
             <img
               src="/images/logo-circular.png"
@@ -1950,10 +2046,12 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSug
             />
           </span>
           <div className="flex flex-col leading-none">
-            <span className="text-2xl sm:text-3xl md:text-4xl font-black uppercase tracking-tight text-[#0f2d1e]">DCUATES</span>
-            <span className="text-[10px] sm:text-xs md:text-sm font-black uppercase tracking-wide text-[#e65100] -mt-0.5">¡Comparte y Gana!</span>
+            <span className="text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-tight text-[#0f2d1e]">DCUATES</span>
+            <span className="text-xs sm:text-sm md:text-base font-black uppercase tracking-wide text-[#e65100] -mt-0.5">¡Comparte y Gana!</span>
           </div>
         </a>
+        <BarraBusqueda onAbrirProyecto={onAbrirProyecto} onAbrirCategoria={onAbrirCategoria} onAbrirFAQ={onAbrirFAQ} />
+        </div>
 
         {/* Íconos de redes: comparten la primera fila con el logo (empujados a la derecha) en móvil; en escritorio, a la derecha del todo. Orden: Avisos y Beneficios, Compartir Más, redes — mismo alto y tamaño de letra. */}
         <div className="order-2 md:order-3 ml-auto flex flex-wrap items-center gap-1.5 sm:gap-3">
@@ -1998,22 +2096,22 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSug
 
         {/* Fila única de menú: accesos directos + MÁS (con todo lo demás). */}
         <div className="order-3 w-full flex flex-wrap items-center gap-2 pt-1.5 mt-0.5 border-t border-emerald-800/10">
-          <div className="flex flex-wrap items-center gap-1 sm:gap-2 text-[9px] sm:text-[11px] md:text-xs font-black">
+          <div className="flex w-full md:w-auto items-stretch gap-1.5 sm:gap-2 text-[11px] sm:text-xs md:text-sm font-black">
             {NAV_LINKS_PRINCIPALES.map(link => (
               <a
                 key={link.href}
                 href={link.href}
-                className="rounded-full border-2 border-transparent bg-[#17472d] hover:bg-[#0f2d1e] text-white transition-colors uppercase tracking-wide text-center leading-tight px-2 sm:px-3 py-1.5"
+                className="flex-1 md:flex-none flex items-center justify-center rounded-full border-2 border-transparent bg-[#17472d] hover:bg-[#0f2d1e] text-white transition-colors uppercase tracking-wide text-center leading-tight px-2 sm:px-4 py-2.5 sm:py-2"
               >
                 {link.label}
               </a>
             ))}
 
-            <div className="relative">
+            <div className="relative flex-1 md:flex-none flex">
               <button
                 type="button"
                 onClick={() => setMenuMasAbierto((v) => !v)}
-                className="rounded-full border-2 border-transparent bg-[#17472d] hover:bg-[#0f2d1e] text-white transition-colors uppercase tracking-wide text-center leading-tight px-2 sm:px-3 py-1.5 flex items-center gap-1"
+                className="w-full rounded-full border-2 border-transparent bg-[#17472d] hover:bg-[#0f2d1e] text-white transition-colors uppercase tracking-wide text-center leading-tight px-2 sm:px-4 py-2.5 sm:py-2 flex items-center justify-center gap-1"
               >
                 Más
                 <span className={`transition-transform ${menuMasAbierto ? "rotate-180" : ""}`}>▾</span>
@@ -2930,7 +3028,12 @@ function useCarruselAutomatico(cantidad, intervaloMs = 2500) {
     const contenedor = scrollRef.current;
     const hijo = contenedor && contenedor.children[indiceAuto];
     if (!contenedor || !hijo) return;
-    const objetivo = hijo.offsetLeft - (contenedor.clientWidth - hijo.clientWidth) / 2;
+    // Posición del elemento DENTRO del contenedor (con getBoundingClientRect,
+    // porque offsetLeft se medía contra otro ancestro y en la columna de
+    // Retos daba un número enorme: la pasarela saltaba al final y se
+    // quedaba ahí).
+    const izqHijo = hijo.getBoundingClientRect().left - contenedor.getBoundingClientRect().left + contenedor.scrollLeft;
+    const objetivo = izqHijo - (contenedor.clientWidth - hijo.clientWidth) / 2;
     contenedor.scrollTo({ left: Math.max(0, objetivo), behavior: "smooth" });
   }, [indiceAuto]);
   // Al tocar/deslizar a mano se pausa, pero ya NO para siempre: 6 segundos
@@ -3236,16 +3339,62 @@ function BotonVerdeInfo({ titulo, abierto, onClick, children }) {
 // Decide qué mostrar dentro del modal según el id recibido: los 10 proyectos
 // "normales" (con tarjeta propia), o los 2 casos especiales sin tarjeta
 // (Ventas con Causa y Apoyo Voluntario/donaciones).
+// Formulario de solicitudes (Tally) con altura AUTOMÁTICA: al enviar, la
+// ventana se encoge a la pantalla de agradecimiento (antes quedaba un hueco
+// en blanco) y la página sube para que se vea completa. Si el script de
+// Tally no carga, se usa el iframe normal como respaldo.
+function FormularioSolicitud() {
+  const [respaldo, setRespaldo] = useState(false);
+  const urlDinamica = GOOGLE_FORM_SOLICITUDES_URL + (GOOGLE_FORM_SOLICITUDES_URL.includes("?") ? "&" : "?") + "dynamicHeight=1";
+  useEffect(() => {
+    const cargar = () => window.Tally && window.Tally.loadEmbeds && window.Tally.loadEmbeds();
+    let script = document.querySelector('script[src="https://tally.so/widgets/embed.js"]');
+    if (window.Tally) cargar();
+    else if (script) script.addEventListener("load", cargar);
+    else {
+      script = document.createElement("script");
+      script.src = "https://tally.so/widgets/embed.js";
+      script.onload = cargar;
+      script.onerror = () => setRespaldo(true);
+      document.body.appendChild(script);
+    }
+    const alMensaje = (e) => {
+      if (typeof e.data === "string" && e.data.includes("Tally.FormSubmitted")) {
+        setTimeout(() => irASeccion("solicitudes"), 150);
+      }
+    };
+    window.addEventListener("message", alMensaje);
+    return () => window.removeEventListener("message", alMensaje);
+  }, []);
+  return respaldo ? (
+    <iframe src={GOOGLE_FORM_SOLICITUDES_URL} title="Formulario de solicitud DCUATES" className="w-full" style={{ minHeight: 640, border: 0 }} />
+  ) : (
+    <iframe
+      data-tally-src={urlDinamica}
+      title="Formulario de solicitud DCUATES"
+      className="w-full"
+      style={{ minHeight: 320, border: 0 }}
+      loading="lazy"
+    />
+  );
+}
+
 // Botón naranja alargado que lleva al video de Chuy (ejemplo de cómo un
 // donativo cambia vidas). Se usa en Apoyo Voluntario y en Historias DCUATES.
-function BotonEjemploChuy({ onCerrar }) {
+function BotonEjemploChuy({ onCerrar, color = "naranja" }) {
+  // "verde" = verde oscuro con letras amarillas (resalta junto a los
+  // botones naranja); "naranja" = el naranja de siempre.
+  const estilo = color === "verde"
+    ? "bg-[#0f2d1e] hover:bg-emerald-900 border-yellow-400"
+    : "bg-[#e65100] hover:bg-[#bf360c] border-[#0f2d1e]";
+  const letra = color === "verde" ? "text-yellow-300" : "text-white";
   return (
     <button
       type="button"
       onClick={() => { onCerrar(); setTimeout(() => irASeccion("chuy-video"), 80); }}
-      className="w-full text-left rounded-xl border-2 border-[#0f2d1e] bg-[#e65100] hover:bg-[#bf360c] p-3 shadow-sm transition-colors flex items-center justify-between gap-3"
+      className={`w-full text-left rounded-xl border-2 ${estilo} p-3 shadow-md transition-colors flex items-center justify-between gap-3`}
     >
-      <p className="text-sm sm:text-base font-black text-white uppercase tracking-tight leading-tight">
+      <p className={`text-sm sm:text-base font-black ${letra} uppercase tracking-tight leading-tight`}>
         Donativos y apoyos que cambian vidas: un gran ejemplo
       </p>
       <FlechaBlanca />
@@ -3346,7 +3495,6 @@ function ContenidoModalProyecto({ id, onCerrar }) {
             </li>
           ))}
         </ul>
-        <BotonEjemploChuy onCerrar={onCerrar} />
         <div className="space-y-2">
           {OPCIONES_APORTACION.map((opc) => (
             <a
@@ -3373,6 +3521,7 @@ function ContenidoModalProyecto({ id, onCerrar }) {
             </a>
           ))}
         </div>
+        <BotonEjemploChuy onCerrar={onCerrar} color="verde" />
       </div>
     );
   }
@@ -3399,11 +3548,11 @@ function ContenidoModalProyecto({ id, onCerrar }) {
             </li>
           ))}
         </ul>
-        {id === "historias-dcuates" && <BotonEjemploChuy onCerrar={onCerrar} />}
         <Carrusel
           items={caja.items}
           renderItem={(item) => <TarjetaCarrusel item={item} etiqueta={item.tipo} />}
         />
+        {id === "historias-dcuates" && <BotonEjemploChuy onCerrar={onCerrar} />}
       </div>
     );
   }
