@@ -440,6 +440,13 @@ const BOTONES_PORTADA = [
   { t: "PRÉSTAMO GRATUITO DE LIBROS", h: "#libros", modal: "libros", img: "/images/bb.png" }
 ];
 
+// Logos para las ventanas que no salen de BOTONES_PORTADA (los 3 botones
+// de abajo: Historias, Cupones, Patrocinadores). Ajusta las rutas si tus
+// archivos se llaman distinto.
+const LOGOS_EXTRA_MODAL = {
+  "historias-dcuates": "/images/HistoriasDCUATES.png"
+};
+
 // Items extra del Mapa de Sitio que NO abren un modal de proyecto, sino
 // una acción especial (igual que en NAV_LINKS_MAS): FAQ y Sugerencias.
 const MAPA_SITIO_EXTRA = [
@@ -930,13 +937,13 @@ export default function App() {
                 <p className="text-sm sm:text-base text-emerald-50 leading-relaxed font-medium pt-2">{COMO_SUMAR.ventajas}</p>
                 <p className="text-sm sm:text-base font-bold text-emerald-100 pt-2">{COMO_SUMAR.cierre}</p>
               </div>
-              <div className="mt-3">
+              <div className="mt-4 flex justify-center">
                 <button
                   type="button"
                   onClick={() => setTimeout(() => irASeccion("donaciones"), 50)}
-                  className="rounded-lg bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-2 px-3 uppercase tracking-wide text-[11px] sm:text-xs"
+                  className="rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3.5 px-6 sm:px-8 uppercase tracking-wide text-sm sm:text-lg shadow-lg transition-all hover:scale-105"
                 >
-                  Ir a Apoyo Voluntario
+                  Ir a Apoyo Voluntario 🙏
                 </button>
               </div>
             </div>
@@ -1637,7 +1644,7 @@ export default function App() {
           {/* Bloque 4: flecha + video de Chuy — fila 2 en escritorio (col. derecha), justo después de la transparencia en móvil.
               col-start-6 (en vez de 7) para que la flecha quede pegada al cuadro de transparencia, sin columna vacía de por medio;
               col-span-7 (en vez de 6) le da más ancho al video, y por lo tanto también más alto. */}
-          <div className="order-3 md:order-none md:col-start-6 md:col-span-7 md:row-start-2 flex flex-col md:flex-row items-center gap-2 md:gap-3">
+          <div id="chuy-video" className="scroll-mt-48 md:scroll-mt-36 order-3 md:order-none md:col-start-6 md:col-span-7 md:row-start-2 flex flex-col md:flex-row items-center gap-2 md:gap-3">
             {/* Flecha con relleno naranja: apunta hacia abajo en móvil y hacia la derecha en escritorio */}
             <div className="flex justify-center items-center shrink-0" aria-hidden="true">
               <svg
@@ -1823,6 +1830,22 @@ export default function App() {
               ×
             </button>
             <div className="overflow-y-auto pr-1">
+              {/* Logo del proyecto, grande y visible al abrir su ventana.
+                  Usa la misma imagen del botón (BOTONES_PORTADA); para
+                  Historias, Cupones y Patrocinadores, LOGOS_EXTRA_MODAL. */}
+              {(() => {
+                const logo = (BOTONES_PORTADA.find((b) => b.modal === modalProyecto) || {}).img || LOGOS_EXTRA_MODAL[modalProyecto];
+                return logo ? (
+                  <div className="flex justify-center pb-3">
+                    <img
+                      src={logo}
+                      alt=""
+                      className="max-h-36 sm:max-h-44 w-auto object-contain drop-shadow-md"
+                      onError={(e) => { e.target.style.display = 'none'; }}
+                    />
+                  </div>
+                ) : null;
+              })()}
               <ContenidoModalProyecto id={modalProyecto} onCerrar={() => setModalProyecto(null)} />
             </div>
           </div>
@@ -2894,6 +2917,8 @@ function useCarruselAutomatico(cantidad, intervaloMs = 2500) {
   const scrollRef = useRef(null);
   const [indiceAuto, setIndiceAuto] = useState(0);
   const [pausado, setPausado] = useState(false);
+  const temporizadorReanudar = useRef(null);
+  useEffect(() => () => clearTimeout(temporizadorReanudar.current), []);
   useEffect(() => {
     if (pausado || cantidad <= 1) return;
     const id = setInterval(() => {
@@ -2908,7 +2933,15 @@ function useCarruselAutomatico(cantidad, intervaloMs = 2500) {
     const objetivo = hijo.offsetLeft - (contenedor.clientWidth - hijo.clientWidth) / 2;
     contenedor.scrollTo({ left: Math.max(0, objetivo), behavior: "smooth" });
   }, [indiceAuto]);
-  return { scrollRef, onPointerDown: () => setPausado(true) };
+  // Al tocar/deslizar a mano se pausa, pero ya NO para siempre: 6 segundos
+  // después de la última interacción la pasarela se reanuda sola (antes
+  // se quedaba parada en el último elemento tocado).
+  const alTocar = () => {
+    setPausado(true);
+    clearTimeout(temporizadorReanudar.current);
+    temporizadorReanudar.current = setTimeout(() => setPausado(false), 6000);
+  };
+  return { scrollRef, onPointerDown: alTocar };
 }
 
 function useCatalogoBaserow(tableId, itemsRespaldo) {
@@ -3203,6 +3236,23 @@ function BotonVerdeInfo({ titulo, abierto, onClick, children }) {
 // Decide qué mostrar dentro del modal según el id recibido: los 10 proyectos
 // "normales" (con tarjeta propia), o los 2 casos especiales sin tarjeta
 // (Ventas con Causa y Apoyo Voluntario/donaciones).
+// Botón naranja alargado que lleva al video de Chuy (ejemplo de cómo un
+// donativo cambia vidas). Se usa en Apoyo Voluntario y en Historias DCUATES.
+function BotonEjemploChuy({ onCerrar }) {
+  return (
+    <button
+      type="button"
+      onClick={() => { onCerrar(); setTimeout(() => irASeccion("chuy-video"), 80); }}
+      className="w-full text-left rounded-xl border-2 border-[#0f2d1e] bg-[#e65100] hover:bg-[#bf360c] p-3 shadow-sm transition-colors flex items-center justify-between gap-3"
+    >
+      <p className="text-sm sm:text-base font-black text-white uppercase tracking-tight leading-tight">
+        Donativos y apoyos que cambian vidas: un gran ejemplo
+      </p>
+      <FlechaBlanca />
+    </button>
+  );
+}
+
 function ContenidoModalProyecto({ id, onCerrar }) {
   // Se llama siempre, sin importar el "id", para respetar las reglas de
   // React sobre hooks. Las galerías de Noticias y Bienestar ahora se
@@ -3296,6 +3346,7 @@ function ContenidoModalProyecto({ id, onCerrar }) {
             </li>
           ))}
         </ul>
+        <BotonEjemploChuy onCerrar={onCerrar} />
         <div className="space-y-2">
           {OPCIONES_APORTACION.map((opc) => (
             <a
@@ -3348,6 +3399,7 @@ function ContenidoModalProyecto({ id, onCerrar }) {
             </li>
           ))}
         </ul>
+        {id === "historias-dcuates" && <BotonEjemploChuy onCerrar={onCerrar} />}
         <Carrusel
           items={caja.items}
           renderItem={(item) => <TarjetaCarrusel item={item} etiqueta={item.tipo} />}
