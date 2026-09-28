@@ -90,7 +90,6 @@ const MUSICA_DCUATES_URL = "/audio/musica-dcuates.mp3";
 //   id que en TODOS_LOS_PROYECTOS)
 const NAV_LINKS_PRINCIPALES = [
   { label: "Inicio", href: "#inicio" },
-  { label: "Proyectos", href: "#inicio" },
   { label: "Apoyo Voluntario", href: "#donaciones" }
 ];
 const NAV_LINKS_MAS = [
@@ -100,8 +99,6 @@ const NAV_LINKS_MAS = [
   { label: "Apoyo a Causas", href: "#extraviados-registro" },
   { label: "Mapa del Sitio", action: "mapa-sitio" },
   { label: "Registra tu Solicitud", href: "#solicitudes" },
-  { label: "Preguntas Frecuentes", action: "faq" },
-  { label: "Sugerencias y Quejas", action: "sugerencias" },
   { label: "Préstamo Gratuito de Libros", modal: "libros" },
   { label: "Ecatepets Mascotas", modal: "ecatepets" },
   { label: "Círculo de Confianza", modal: "circulo-confianza" },
@@ -109,7 +106,9 @@ const NAV_LINKS_MAS = [
   { label: "Asesorías Gratuitas", modal: "asesorias" },
   { label: "Bazar y Comercio", modal: "bazares" },
   { label: "Noticias de Barrio", modal: "noticias" },
-  { label: "Bienestar y Recreación", modal: "bienestar" }
+  { label: "Bienestar y Recreación", modal: "bienestar" },
+  { label: "Sugerencias y Quejas", action: "sugerencias" },
+  { label: "Preguntas Frecuentes", action: "faq" }
 ];
 
 // Función helper para armar enlaces directos de WhatsApp de forma consistente
@@ -654,19 +653,96 @@ const RETOS_REGALOS_ITEMS = [
   {
     titulo: "RETOS que nos hacen MEJORES !!!",
     icono: "🎯",
+    intro: "Ejemplos de retos que podríamos lanzar entre vecinos, familias y negocios:",
+    ejemplos: [
+      "🧹 Reto Cuadra Limpia: 30 días dejando tu banqueta y tu cuadra más limpias; sube foto de antes y después.",
+      "📚 Reto Un Libro al Mes: lee un libro (de nuestro préstamo gratuito) y comparte tu reseña en una frase.",
+      "🛍️ Reto Compra Local: una semana comprando en negocios de la colonia y recomendando tu favorito.",
+      "💚 Reto Un Acto de Bondad al Día: ayuda a alguien sin esperar nada y cuéntanos la historia.",
+      "🌱 Reto Cuadra Verde: siembra una planta o adopta un árbol y cuídalo durante 3 meses."
+    ],
+    cta: "💡 Propón tu propio RETO",
     enlace: enlaceWhatsApp("¡Hola DCUATES! Quiero proponer o participar en un Reto que nos haga mejores.")
   },
   {
     titulo: "REGALOS que motivan",
     icono: "🎁",
+    intro: "Ejemplos de regalos que pueden motivar la participación (donados por vecinos y negocios aliados):",
+    ejemplos: [
+      "🎟️ Sorteo mensual de una canasta de productos de negocios aliados entre quienes cumplan los retos.",
+      "📖 Un libro nuevo para quien complete el Reto Un Libro al Mes.",
+      "🏷️ Cupones y descuentos exclusivos en negocios de la comunidad.",
+      "✂️ Un servicio gratis donado por un negocio: corte de cabello, asesoría, clase de prueba, etc.",
+      "🐶 Un kit para mascota (croquetas, collar o placa) para quien adopte o cuide a un peludito en apuros."
+    ],
+    cta: "🎁 Propón tu propio REGALO",
     enlace: enlaceWhatsApp("¡Hola DCUATES! Tengo una propuesta de Regalo que motive a la comunidad.")
   },
   {
     titulo: "RECONOCIMIENTO a quienes nos INSPIRAN",
     icono: "🏅",
+    intro: "Ejemplos de reconocimientos que podríamos entregar y difundir en nuestras redes:",
+    ejemplos: [
+      "🏆 Vecino/a del Mes: por su ayuda constante a la comunidad.",
+      "🏪 Negocio con Causa del Mes: por apoyar a familias y causas sociales.",
+      "🤝 Voluntario/a Constante: por sumar tiempo y talento sin descanso.",
+      "🐾 Héroe/Heroína de Ecatepets: por rescatar, cuidar o dar hogar a una mascota.",
+      "👩‍🏫 Promotor/a de la Lectura: por acercar libros y educación a niñas y niños."
+    ],
+    cta: "🏅 Propón a quien merece un RECONOCIMIENTO",
     enlace: enlaceWhatsApp("¡Hola DCUATES! Quiero proponer a alguien para un Reconocimiento que inspira.")
   }
 ];
+
+// Los 3 botones naranjas de Retos/Regalos/Reconocimiento se despliegan
+// (uno a la vez) mostrando ejemplos y un botón inferior para que el público
+// mande su propia propuesta por WhatsApp. Edita "ejemplos" en el arreglo de arriba.
+function BotonesRetosRegalos() {
+  const [abierto, setAbierto] = useState(null);
+  return (
+    <div className="flex flex-col gap-2">
+      {RETOS_REGALOS_ITEMS.map((item, i) => {
+        const activo = abierto === i;
+        return (
+          <div key={i} className="rounded-xl overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setAbierto(activo ? null : i)}
+              aria-expanded={activo}
+              className="w-full flex items-center justify-between gap-2 bg-[#e65100] hover:bg-[#bf360c] text-white font-black uppercase text-xs sm:text-sm leading-tight px-4 py-3.5 transition-colors text-left"
+            >
+              <span>{item.titulo}</span>
+              <span className="flex items-center gap-2 shrink-0">
+                <span className="text-xl" aria-hidden="true">{item.icono}</span>
+                <span className={`transition-transform ${activo ? "rotate-180" : ""}`} aria-hidden="true">▾</span>
+              </span>
+            </button>
+            {activo && (
+              <div className="bg-[#fff8f1] border-2 border-t-0 border-[#e65100] rounded-b-xl p-3 space-y-2">
+                <p className="text-[#0f2d1e] text-[11px] sm:text-xs font-black leading-snug">{item.intro}</p>
+                <ul className="space-y-1.5">
+                  {item.ejemplos.map((ej, j) => (
+                    <li key={j} className="text-[#0f2d1e] text-[11px] sm:text-xs font-semibold leading-snug bg-white rounded-lg border border-[#e65100]/20 px-2.5 py-1.5">
+                      {ej}
+                    </li>
+                  ))}
+                </ul>
+                <a
+                  href={item.enlace}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full text-center rounded-full bg-[#17472d] hover:bg-[#0f2d1e] text-white font-black uppercase text-[11px] sm:text-xs tracking-wide px-4 py-2.5 transition-colors"
+                >
+                  {item.cta}
+                </a>
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 // =========================================================================
 // 2. COMPONENTE PRINCIPAL (INICIO DEL RENDERIZADO)
@@ -1011,8 +1087,8 @@ export default function App() {
               );
             })()}
 
-            {/* Retos, Regalos y Reconocimientos DCUATES — 3 columnas: botones
-                naranjas | carrusel de fotos (Baserow: RETOSGALERIA) | videos
+            {/* Retos, Regalos y Reconocimientos DCUATES — 3 columnas: carrusel
+                de fotos (Baserow: RETOSGALERIA) | botones naranjas | videos
                 relacionados (Baserow: NOMBRE RETOSVID / RETOSVID). */}
             <div className="mt-3">
               <div className="rounded-2xl overflow-hidden border-4 border-[#0f2d1e]/30 shadow-lg bg-[#0f2d1e] p-3">
@@ -1022,24 +1098,13 @@ export default function App() {
                   <span className="block sm:inline sm:ml-1 normal-case font-bold text-emerald-100">Porque todo lo bueno merece ser compartido y reconocido, envíanos tus propuestas</span>
                 </p>
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-                  {/* Columna 1: los 3 botones naranjas */}
-                  <div className="flex flex-col gap-2">
-                    {RETOS_REGALOS_ITEMS.map((item, i) => (
-                      <a
-                        key={i}
-                        href={item.enlace}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center justify-between gap-2 rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black uppercase text-xs sm:text-sm leading-tight px-4 py-3.5 transition-colors"
-                      >
-                        <span>{item.titulo}</span>
-                        <span className="text-xl shrink-0" aria-hidden="true">{item.icono}</span>
-                      </a>
-                    ))}
+                  {/* Columna central: los 3 botones naranjas (desplegables con ejemplos) */}
+                  <div className="order-1 lg:order-2">
+                    <BotonesRetosRegalos />
                   </div>
 
                   {/* Columna 2: carrusel de fotos (RETOSGALERIA en Baserow) */}
-                  <div className="rounded-xl overflow-hidden bg-white/5 border border-white/10 flex items-center justify-center min-h-[180px]">
+                  <div className="order-2 lg:order-1 rounded-xl overflow-hidden bg-white/5 border border-white/10 flex items-center justify-center min-h-[180px]">
                     {galeriaRetos.length > 0 ? (
                       <Carrusel
                         items={galeriaRetos}
@@ -1060,7 +1125,7 @@ export default function App() {
                   </div>
 
                   {/* Columna 3: videos relacionados (NOMBRE RETOSVID / RETOSVID) — tira horizontal con rotación automática */}
-                  <div className="rounded-xl bg-white/5 border border-white/10 p-2 min-h-[180px] flex items-center">
+                  <div className="order-3 rounded-xl bg-white/5 border border-white/10 p-2 min-h-[180px] flex items-center">
                     {videosRetos.length > 0 ? (
                       <div
                         ref={scrollRetosVideosRef}
@@ -1747,7 +1812,6 @@ export default function App() {
         <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm sm:text-base font-bold text-[#0f2d1e]/80">
           <a href="#quienes-somos" className="hover:text-[#0f2d1e] transition-colors">Quiénes Somos</a>
           <a href="#inicio" className="hover:text-[#0f2d1e] transition-colors">Proyectos</a>
-          <a href="#nuevos-proyectos" className="hover:text-[#0f2d1e] transition-colors">Nuevos Proyectos</a>
           <a href="#publicidad" className="hover:text-[#0f2d1e] transition-colors">Publicidad</a>
           <a href="#donaciones" className="hover:text-[#0f2d1e] transition-colors">Donaciones</a>
           <button
@@ -1977,9 +2041,9 @@ function BarraBusqueda({ onAbrirProyecto, onAbrirCategoria, onAbrirFAQ }) {
   const elegir = (it) => { setTexto(""); setAbierta(false); it.accion(); };
 
   return (
-    <>
-      <div className="flex-1 min-w-[6.5rem] md:flex-none md:w-64">
-        <div className="flex items-center gap-1.5 rounded-full border-2 border-[#0f2d1e]/30 bg-white px-2.5 py-1.5 focus-within:border-[#e65100]">
+    <div className="relative w-full">
+      <div className="w-full">
+        <div className="flex items-center gap-2 rounded-full border-2 border-[#0f2d1e]/30 bg-white px-3.5 py-2 focus-within:border-[#e65100]">
           <svg viewBox="0 0 24 24" className="h-4 w-4 sm:h-5 sm:w-5 shrink-0 fill-none stroke-[#0f2d1e] stroke-[2.5]" aria-hidden="true">
             <circle cx="11" cy="11" r="7" />
             <line x1="16.5" y1="16.5" x2="21" y2="21" strokeLinecap="round" />
@@ -1990,7 +2054,7 @@ function BarraBusqueda({ onAbrirProyecto, onAbrirCategoria, onAbrirFAQ }) {
             onChange={(e) => { setTexto(e.target.value); setAbierta(true); }}
             onFocus={() => setAbierta(true)}
             onKeyDown={(e) => { if (e.key === "Escape") setAbierta(false); if (e.key === "Enter" && resultados[0]) elegir(resultados[0]); }}
-            placeholder="Buscar…"
+            placeholder="Buscar proyectos, apoyos, preguntas…"
             aria-label="Buscar en DCUATES"
             className="w-full min-w-0 bg-transparent text-xs sm:text-sm font-bold text-[#0f2d1e] placeholder:text-slate-400 focus:outline-none"
           />
@@ -1999,7 +2063,7 @@ function BarraBusqueda({ onAbrirProyecto, onAbrirCategoria, onAbrirFAQ }) {
       {abierta && palabras.length > 0 && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setAbierta(false)} />
-          <div className="absolute left-2 right-2 sm:left-auto sm:right-4 sm:w-96 top-full mt-1 z-50 rounded-2xl bg-white shadow-xl border border-emerald-800/10 py-1 max-h-[60vh] overflow-y-auto">
+          <div className="absolute left-0 right-0 top-full mt-1 z-50 rounded-2xl bg-white shadow-xl border border-emerald-800/10 py-1 max-h-[60vh] overflow-y-auto">
             {resultados.length === 0 ? (
               <p className="px-4 py-3 text-xs font-bold text-slate-500">Sin resultados para “{texto}”. Prueba con otra palabra.</p>
             ) : (
@@ -2021,7 +2085,7 @@ function BarraBusqueda({ onAbrirProyecto, onAbrirCategoria, onAbrirFAQ }) {
           </div>
         </>
       )}
-    </>
+    </div>
   );
 }
 
@@ -2050,7 +2114,6 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSug
             <span className="text-xs sm:text-sm md:text-base font-black uppercase tracking-wide text-[#e65100] -mt-0.5">¡Comparte y Gana!</span>
           </div>
         </a>
-        <BarraBusqueda onAbrirProyecto={onAbrirProyecto} onAbrirCategoria={onAbrirCategoria} onAbrirFAQ={onAbrirFAQ} />
         </div>
 
         {/* Íconos de redes: comparten la primera fila con el logo (empujados a la derecha) en móvil; en escritorio, a la derecha del todo. Orden: Avisos y Beneficios, Compartir Más, redes — mismo alto y tamaño de letra. */}
@@ -2095,8 +2158,12 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSug
         </div>
 
         {/* Fila única de menú: accesos directos + MÁS (con todo lo demás). */}
-        <div className="order-3 w-full flex flex-wrap items-center gap-2 pt-1.5 mt-0.5 border-t border-emerald-800/10">
-          <div className="flex w-full md:w-auto items-stretch gap-1.5 sm:gap-2 text-[11px] sm:text-xs md:text-sm font-black">
+        <div className="order-3 w-full flex flex-wrap md:flex-nowrap items-center gap-2 md:gap-3 pt-1.5 mt-0.5 border-t border-emerald-800/10">
+          {/* Búsqueda: en móvil ocupa su propio renglón (arriba de los botones); en escritorio llena todo el espacio libre del renglón, a la derecha de los botones. */}
+          <div className="order-1 md:order-2 w-full md:w-auto md:flex-1 md:min-w-0">
+            <BarraBusqueda onAbrirProyecto={onAbrirProyecto} onAbrirCategoria={onAbrirCategoria} onAbrirFAQ={onAbrirFAQ} />
+          </div>
+          <div className="order-2 md:order-1 flex w-full md:w-auto items-stretch gap-1.5 sm:gap-2 text-[11px] sm:text-xs md:text-sm font-black">
             {NAV_LINKS_PRINCIPALES.map(link => (
               <a
                 key={link.href}
@@ -2121,7 +2188,7 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSug
                 <>
                   {/* Fondo invisible para poder cerrar el menú al tocar fuera */}
                   <div className="fixed inset-0 z-30" onClick={() => setMenuMasAbierto(false)} />
-                  <div className="absolute right-0 top-full mt-2 z-40 w-64 rounded-2xl bg-white shadow-xl border border-emerald-800/10 py-2 flex flex-col max-h-[70vh] overflow-y-auto">
+                  <div className="absolute right-0 md:right-auto md:left-0 top-full mt-2 z-40 w-64 rounded-2xl bg-white shadow-xl border border-emerald-800/10 py-2 flex flex-col max-h-[70vh] overflow-y-auto">
                     {NAV_LINKS_MAS.map((link) =>
                       link.href ? (
                         <a
