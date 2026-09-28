@@ -45,7 +45,11 @@ const MAPA_NEGOCIOS_EMBED_URL = "https://www.google.com/maps/embed?pb=!1m18!1m12
 //    vez que llega una solicitud nueva, sin instalar nada).
 // 4) Botón "Enviar" del formulario → pestaña "<>" (insertar HTML) → copia
 //    el link que está dentro de src="..." y pégalo aquí abajo.
-const GOOGLE_FORM_SOLICITUDES_URL = "https://docs.google.com/forms/d/e/TU_FORM_ID_AQUI/viewform?embedded=true";
+// FORMULARIO DE MUESTRA (Tally): https://tally.so/r/7RGQK6 — ya está
+// publicado y funcionando; para verlo en la página basta con esta liga de
+// "embed". Cuando prefieras uno propio (Google Forms u otro), reemplaza
+// solo esta liga por la de tu formulario.
+const GOOGLE_FORM_SOLICITUDES_URL = "https://tally.so/embed/7RGQK6?hideTitle=1&transparentBackground=1";
 
 const REDES_SOCIALES = {
   facebook: "https://www.facebook.com/abelzarem/",
@@ -1262,7 +1266,7 @@ export default function App() {
                       src={GOOGLE_FORM_SOLICITUDES_URL}
                       title="Formulario de solicitud DCUATES"
                       className="w-full"
-                      style={{ minHeight: 420, border: 0 }}
+                      style={{ minHeight: 640, border: 0 }}
                     >
                       Cargando…
                     </iframe>
