@@ -676,6 +676,32 @@ export default function App() {
   // null = cerrada; si tiene un id (ej. "libros", "ecatepets", "ventas-con-causa",
   // "donaciones") se abre con la información de ese proyecto.
   const [modalProyecto, setModalProyecto] = useState(null);
+
+  // Enlaces con "#algo" (ej. dcuatesmini.vercel.app/#solicitudes): la página
+  // se dibuja con React DESPUÉS de cargar, así que el navegador no encuentra
+  // la sección a tiempo y se queda arriba. Aquí, al entrar, esperamos a que
+  // exista y bajamos hasta ella (reintentando unos segundos, porque el
+  // contenido de Baserow puede mover la altura de la página al cargar).
+  // Si el "#algo" es el id de un proyecto (ej. #ecatepets), abre su ventana.
+  useEffect(() => {
+    const id = decodeURIComponent(window.location.hash.replace("#", ""));
+    if (!id) return;
+    let intentos = 0;
+    const timer = setInterval(() => {
+      intentos += 1;
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+        clearInterval(timer);
+      } else if (TODOS_LOS_PROYECTOS.some((p) => p.id === id)) {
+        setModalProyecto(id);
+        clearInterval(timer);
+      } else if (intentos >= 20) {
+        clearInterval(timer);
+      }
+    }, 250);
+    return () => clearInterval(timer);
+  }, []);
   // Formulario emergente reutilizable: null = cerrado; "sugerencias" abre el
   // de Sugerencias y Quejas (pie de página / menú "MÁS"); "comparte" abre el
   // de Conocer y Compartir Más (desde el botón naranja "Compartir Más" del encabezado).
