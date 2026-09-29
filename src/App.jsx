@@ -759,12 +759,11 @@ export default function App() {
   // null = cerrada; si tiene un id (ej. "libros", "ecatepets", "ventas-con-causa",
   // "donaciones") se abre con la información de ese proyecto.
   const [modalProyecto, setModalProyecto] = useState(null);
+  // Búsqueda: vive aquí (no dentro de SiteHeader) para poder abrirla desde
+  // cualquier parte de la página (ej. el acceso rápido de "Registra tu
+  // Solicitud"), además del botón del encabezado.
+  const [busquedaAbierta, setBusquedaAbierta] = useState(false);
 
-  // Acordeón que agrupa Retos/Regalos/Reconocimientos + Historias/Cupones/
-  // Patrocinadores, para que la portada se vea más corta en celular.
-  const [retosHistoriasAbierto, setRetosHistoriasAbierto] = useState(false);
-  // Mapa de negocios: se ve solo la mitad y se despliega completo al tocar.
-  const [mapaExpandido, setMapaExpandido] = useState(false);
   // Formulario de "Registra tu Solicitud" (junto al mapa): se ve resumido
   // y se despliega completo al querer llenarlo (es un formulario externo
   // -Tally-, así que se expande al tocarlo, no al detectar un campo exacto).
@@ -952,6 +951,8 @@ export default function App() {
           onAbrirComparte={() => setModalFormulario("comparte")}
           onAbrirMapaSitio={() => setShowMapaSitio(true)}
           onAbrirCategoria={(id) => setCategoriaAbierta(id)}
+          busquedaAbierta={busquedaAbierta}
+          setBusquedaAbierta={setBusquedaAbierta}
         />
         <TickerFrases />
         <BarraLogros />
@@ -963,6 +964,7 @@ export default function App() {
         <BotonNecesidades
           onAbrirProyecto={(id) => setModalProyecto(id)}
           onAccionEspecial={(accion) => setModalFormulario(accion)}
+          onAbrirFAQ={() => setShowFAQ(true)}
         />
       </div>
 
@@ -1134,121 +1136,7 @@ export default function App() {
               );
             })()}
 
-              {/* Recomendaciones / Música-Libros-Pelis / Preguntas Frecuentes,
-                  en fila horizontal debajo del video (antes eran una columna
-                  al lado del video). */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-3">
-                <BotonVerdeInfo
-                  titulo="Recomendaciones ⭐⭐⭐⭐⭐"
-                  abierto={infoAbierta === "recomendaciones"}
-                  onClick={() => setInfoAbierta((v) => (v === "recomendaciones" ? null : "recomendaciones"))}
-                >
-                  <p className="font-black uppercase text-emerald-300 text-[11px] tracking-wide">Recomendaciones DCUATES</p>
-                  <ul className="space-y-1">
-                    {recomendacionesDcuates.map((r, i) => (
-                      <li key={i}>
-                        <a href={r.enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-300">
-                          {r.nombre}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                  <p className="font-black uppercase text-emerald-300 text-[11px] tracking-wide pt-2">Recomendaciones de la Comunidad</p>
-                  <ul className="space-y-1">
-                    {recomendacionesComunidad.map((r, i) => (
-                      <li key={i}>
-                        <a href={r.enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-300">
-                          {r.nombre}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                  <p className="pt-2 font-black uppercase text-emerald-300">Si necesitas alguna recomendación en especial, contáctanos !!!</p>
-                </BotonVerdeInfo>
 
-                <BotonVerdeInfo
-                  titulo="Música, Libros, Pelis y Más... 🎵📚🎬"
-                  abierto={infoAbierta === "recursos"}
-                  onClick={() => setInfoAbierta((v) => (v === "recursos" ? null : "recursos"))}
-                >
-                  <p className="font-black uppercase text-emerald-300 text-[11px] tracking-wide">🎵 Música</p>
-                  <ul className="space-y-1">
-                    {musicaLinks.map((enlace, i) => (
-                      <li key={i}>
-                        <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-300">
-                          Música {i + 1}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                  <p className="font-black uppercase text-emerald-300 text-[11px] tracking-wide pt-2">📚 Libros</p>
-                  <ul className="space-y-1">
-                    {librosLinks.map((enlace, i) => (
-                      <li key={i}>
-                        <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-300">
-                          Libro {i + 1}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                  <p className="font-black uppercase text-emerald-300 text-[11px] tracking-wide pt-2">🎬 Películas y Más</p>
-                  <ul className="space-y-1">
-                    {videosLinks.map((enlace, i) => (
-                      <li key={i}>
-                        <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-300">
-                          Recurso {i + 1}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </BotonVerdeInfo>
-
-                <BotonVerdeInfo
-                  titulo="Preguntas Frecuentes ❓💬"
-                  abierto={infoAbierta === "faq"}
-                  onClick={() => setInfoAbierta((v) => (v === "faq" ? null : "faq"))}
-                >
-                  <div className="space-y-2">
-                    {FAQ_ITEMS.map((f, i) => (
-                      <details key={i} className="rounded-lg bg-emerald-900/40 px-3 py-2">
-                        <summary className="cursor-pointer text-xs sm:text-sm font-bold">{f.pregunta}</summary>
-                        <p className="mt-1 text-xs text-emerald-100/90 leading-relaxed">{f.respuesta}</p>
-                      </details>
-                    ))}
-                  </div>
-                </BotonVerdeInfo>
-              </div>
-
-            {/* Acordeón que agrupa Retos, Regalos y Reconocimientos junto con
-                Historias, Cupones/Promos y Patrocinadores/Alianzas — para que
-                la portada se vea más corta en celular. Un solo toque lo abre
-                o lo cierra (ver estado retosHistoriasAbierto). */}
-            <div className="mt-3 rounded-2xl overflow-hidden border-4 border-[#0f2d1e]/30 shadow-lg">
-              <button
-                type="button"
-                onClick={() => setRetosHistoriasAbierto((v) => !v)}
-                aria-expanded={retosHistoriasAbierto}
-                className="w-full text-left bg-[#0f2d1e] hover:bg-[#17472d] transition-colors px-4 py-3.5 flex items-center justify-between gap-3"
-              >
-                <span>
-                  <span className="block text-white font-black uppercase text-xs sm:text-sm tracking-wide">
-                    🎯🎁🏅 Retos, Regalos y Reconocimientos · 📖🏷️🤝 Historias, Cupones y Patrocinadores
-                  </span>
-                  <span className="block text-emerald-100 font-bold normal-case text-[11px] sm:text-xs mt-0.5">
-                    Toca para ver cómo participar y motivarte, reconocer a quien inspira, inspirarte con historias reales, aprovechar cupones y promos, y conocer a quienes hacen esto posible.
-                  </span>
-                </span>
-                <span className={`shrink-0 text-white text-xl transition-transform ${retosHistoriasAbierto ? "rotate-180" : ""}`} aria-hidden="true">▾</span>
-              </button>
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateRows: retosHistoriasAbierto ? "1fr" : "0fr",
-                  transition: "grid-template-rows 350ms ease-in-out"
-                }}
-              >
-                <div style={{ overflow: "hidden" }}>
-                  <div className="bg-[#e8f5e9] p-3">
 
               {/* Retos, Regalos y Reconocimientos DCUATES — 3 columnas: carrusel
                   de fotos (Baserow: RETOSGALERIA) | botones naranjas | videos
@@ -1382,18 +1270,6 @@ export default function App() {
                     </button>
                   ))}
                 </div>
-                    <button
-                      type="button"
-                      onClick={() => setRetosHistoriasAbierto(false)}
-                      className="w-full mt-3 rounded-xl border-2 border-[#0f2d1e] text-[#0f2d1e] hover:bg-white font-black uppercase tracking-wide text-[11px] sm:text-xs py-2.5 transition-colors"
-                    >
-                      ▲ Cerrar
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
 
               {/* Mapa de Negocios Locales — embed de Google Maps/My Maps.
                   Para agregar/editar negocios no se toca este código: se
@@ -1408,36 +1284,14 @@ export default function App() {
                     Toca un punto del mapa para ver el negocio o negocio aliado
                   </p>
                 </div>
-                <div className="relative">
-                  <iframe
-                    src={MAPA_NEGOCIOS_EMBED_URL}
-                    className={`w-full transition-[height] duration-300 ${mapaExpandido ? "h-64 sm:h-80" : "h-32 sm:h-40"}`}
-                    style={{ border: 0 }}
-                    loading="lazy"
-                    referrerPolicy="strict-origin-when-cross-origin"
-                    title="Mapa de negocios locales DCUATES"
-                  />
-                  {!mapaExpandido && (
-                    <div className="absolute inset-x-0 bottom-0 flex items-end justify-center bg-gradient-to-t from-white/95 via-white/60 to-transparent pb-2 pt-6 pointer-events-none">
-                      <button
-                        type="button"
-                        onClick={() => setMapaExpandido(true)}
-                        className="pointer-events-auto rounded-full bg-[#0f2d1e] hover:bg-emerald-800 text-white font-black uppercase text-[10px] sm:text-[11px] tracking-wide px-4 py-1.5 shadow-md transition-colors"
-                      >
-                        🔎 Ver mapa completo
-                      </button>
-                    </div>
-                  )}
-                </div>
-                {mapaExpandido && (
-                  <button
-                    type="button"
-                    onClick={() => setMapaExpandido(false)}
-                    className="w-full bg-white text-[#0f2d1e] hover:bg-emerald-50 font-black uppercase text-[10px] sm:text-[11px] tracking-wide py-2 transition-colors border-t border-emerald-100"
-                  >
-                    ▲ Ver menos
-                  </button>
-                )}
+                <iframe
+                  src={MAPA_NEGOCIOS_EMBED_URL}
+                  className="w-full h-64 sm:h-80"
+                  style={{ border: 0 }}
+                  loading="lazy"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  title="Mapa de negocios locales DCUATES"
+                />
               </div>
 
               {/* Ventana de Solicitudes — VISIBLE directo en la página (no
@@ -1472,6 +1326,20 @@ export default function App() {
                       className="rounded-full bg-amber-100 text-[#0f2d1e] text-[11px] font-black uppercase px-3 py-1.5 hover:bg-amber-200 transition-colors"
                     >
                       🏆 Ver Logros
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowFAQ(true)}
+                      className="rounded-full bg-emerald-100 text-[#0f2d1e] text-[11px] font-black uppercase px-3 py-1.5 hover:bg-emerald-200 transition-colors"
+                    >
+                      ❓ Preguntas Frecuentes
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setBusquedaAbierta(true)}
+                      className="rounded-full bg-emerald-100 text-[#0f2d1e] text-[11px] font-black uppercase px-3 py-1.5 hover:bg-emerald-200 transition-colors"
+                    >
+                      🔍 Buscar
                     </button>
                   </div>
 
@@ -1895,6 +1763,102 @@ export default function App() {
       </section>
 
       <div className="mt-[1.5cm] mb-[0.5cm]">
+      {/* SECCIÓN: Recomendaciones / Música-Libros-Pelis / Preguntas
+          Frecuentes — antes vivía en la portada; se movió aquí, al final,
+          justo antes de la barra de patrocinadores, para que la portada se
+          vea más corta en celular. */}
+      <section className="bg-[#0f2d1e] py-8 px-4 border-b-4 border-[#0f2d1e]">
+        <div className="max-w-5xl mx-auto">
+          <p className="text-white font-black uppercase text-sm sm:text-base tracking-wide text-center mb-3">
+            🔎 Más recursos e información de valor
+          </p>
+            {/* Recomendaciones / Música-Libros-Pelis / Preguntas Frecuentes,
+                en fila horizontal debajo del video (antes eran una columna
+                al lado del video). */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-3">
+              <BotonVerdeInfo
+                titulo="Recomendaciones ⭐⭐⭐⭐⭐"
+                abierto={infoAbierta === "recomendaciones"}
+                onClick={() => setInfoAbierta((v) => (v === "recomendaciones" ? null : "recomendaciones"))}
+              >
+                <p className="font-black uppercase text-emerald-300 text-[11px] tracking-wide">Recomendaciones DCUATES</p>
+                <ul className="space-y-1">
+                  {recomendacionesDcuates.map((r, i) => (
+                    <li key={i}>
+                      <a href={r.enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-300">
+                        {r.nombre}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+                <p className="font-black uppercase text-emerald-300 text-[11px] tracking-wide pt-2">Recomendaciones de la Comunidad</p>
+                <ul className="space-y-1">
+                  {recomendacionesComunidad.map((r, i) => (
+                    <li key={i}>
+                      <a href={r.enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-300">
+                        {r.nombre}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+                <p className="pt-2 font-black uppercase text-emerald-300">Si necesitas alguna recomendación en especial, contáctanos !!!</p>
+              </BotonVerdeInfo>
+
+              <BotonVerdeInfo
+                titulo="Música, Libros, Pelis y Más... 🎵📚🎬"
+                abierto={infoAbierta === "recursos"}
+                onClick={() => setInfoAbierta((v) => (v === "recursos" ? null : "recursos"))}
+              >
+                <p className="font-black uppercase text-emerald-300 text-[11px] tracking-wide">🎵 Música</p>
+                <ul className="space-y-1">
+                  {musicaLinks.map((enlace, i) => (
+                    <li key={i}>
+                      <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-300">
+                        Música {i + 1}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+                <p className="font-black uppercase text-emerald-300 text-[11px] tracking-wide pt-2">📚 Libros</p>
+                <ul className="space-y-1">
+                  {librosLinks.map((enlace, i) => (
+                    <li key={i}>
+                      <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-300">
+                        Libro {i + 1}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+                <p className="font-black uppercase text-emerald-300 text-[11px] tracking-wide pt-2">🎬 Películas y Más</p>
+                <ul className="space-y-1">
+                  {videosLinks.map((enlace, i) => (
+                    <li key={i}>
+                      <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-300">
+                        Recurso {i + 1}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </BotonVerdeInfo>
+
+              <BotonVerdeInfo
+                titulo="Preguntas Frecuentes ❓💬"
+                abierto={infoAbierta === "faq"}
+                onClick={() => setInfoAbierta((v) => (v === "faq" ? null : "faq"))}
+              >
+                <div className="space-y-2">
+                  {FAQ_ITEMS.map((f, i) => (
+                    <details key={i} className="rounded-lg bg-emerald-900/40 px-3 py-2">
+                      <summary className="cursor-pointer text-xs sm:text-sm font-bold">{f.pregunta}</summary>
+                      <p className="mt-1 text-xs text-emerald-100/90 leading-relaxed">{f.respuesta}</p>
+                    </details>
+                  ))}
+                </div>
+              </BotonVerdeInfo>
+            </div>
+        </div>
+      </section>
+
         <BarraPatrocinadores />
       </div>
 
@@ -2144,9 +2108,9 @@ const SECCIONES_BUSCABLES = [
   { t: "Mascotas, personas y cosas extraviadas", kw: "extraviados extraviado perdido mascota persona cosa registro adopcion", id: "extraviados-registro" }
 ];
 
-function BarraBusqueda({ onAbrirProyecto, onAbrirCategoria, onAbrirFAQ }) {
+function BarraBusqueda({ onAbrirProyecto, onAbrirCategoria, onAbrirFAQ, abierta, setAbierta }) {
   const [texto, setTexto] = useState("");
-  const [abierta, setAbierta] = useState(false);
+  const inputRef = React.useRef(null);
 
   const indice = React.useMemo(() => {
     const lista = [];
@@ -2179,31 +2143,61 @@ function BarraBusqueda({ onAbrirProyecto, onAbrirCategoria, onAbrirFAQ }) {
     : [];
 
   const elegir = (it) => { setTexto(""); setAbierta(false); it.accion(); };
+  const abrirBusqueda = () => {
+    setAbierta(true);
+    setTimeout(() => inputRef.current && inputRef.current.focus(), 50);
+  };
+
+  // Botón pequeño (mismo tamaño y estilo que Inicio/Apoyo Voluntario/Más):
+  // solo despliega la ventana de búsqueda al tocarlo, en vez de ocupar su
+  // propio renglón todo el tiempo.
+  if (!abierta) {
+    return (
+      <button
+        type="button"
+        onClick={abrirBusqueda}
+        aria-label="Buscar en DCUATES"
+        title="Buscar"
+        className="flex-1 md:flex-none flex items-center justify-center gap-1.5 rounded-full border-2 border-transparent bg-[#17472d] hover:bg-[#0f2d1e] text-white transition-colors uppercase tracking-wide text-center leading-tight px-2 sm:px-4 py-2.5 sm:py-2"
+      >
+        <svg viewBox="0 0 24 24" className="h-4 w-4 shrink-0 fill-none stroke-current stroke-[2.5]" aria-hidden="true">
+          <circle cx="11" cy="11" r="7" />
+          <line x1="16.5" y1="16.5" x2="21" y2="21" strokeLinecap="round" />
+        </svg>
+        <span className="hidden sm:inline">Buscar</span>
+      </button>
+    );
+  }
 
   return (
-    <div className="relative w-full">
-      <div className="w-full">
-        <div className="flex items-center gap-2 rounded-full border-2 border-[#0f2d1e]/30 bg-white pl-3.5 pr-2.5 py-2 focus-within:border-[#e65100]">
-          <input
-            type="search"
-            value={texto}
-            onChange={(e) => { setTexto(e.target.value); setAbierta(true); }}
-            onFocus={() => setAbierta(true)}
-            onKeyDown={(e) => { if (e.key === "Escape") setAbierta(false); if (e.key === "Enter" && resultados[0]) elegir(resultados[0]); }}
-            placeholder="Buscar proyectos, apoyos, preguntas…"
-            aria-label="Buscar en DCUATES"
-            className="w-full min-w-0 bg-transparent text-xs sm:text-sm font-bold text-[#0f2d1e] placeholder:text-slate-400 focus:outline-none"
-          />
+    <div className="fixed inset-0 z-[65] flex items-start justify-center bg-black/50 p-4 pt-24 sm:pt-28" onClick={() => setAbierta(false)}>
+      <div className="w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center gap-2 rounded-full border-2 border-[#0f2d1e]/30 bg-white pl-3.5 pr-2.5 py-2 shadow-2xl focus-within:border-[#e65100]">
           <svg viewBox="0 0 24 24" className="h-4 w-4 sm:h-5 sm:w-5 shrink-0 fill-none stroke-[#0f2d1e] stroke-[2.5]" aria-hidden="true">
             <circle cx="11" cy="11" r="7" />
             <line x1="16.5" y1="16.5" x2="21" y2="21" strokeLinecap="round" />
           </svg>
+          <input
+            ref={inputRef}
+            type="search"
+            value={texto}
+            onChange={(e) => setTexto(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Escape") setAbierta(false); if (e.key === "Enter" && resultados[0]) elegir(resultados[0]); }}
+            placeholder="Buscar proyectos, apoyos, preguntas…"
+            aria-label="Buscar en DCUATES"
+            className="w-full min-w-0 bg-transparent text-sm font-bold text-[#0f2d1e] placeholder:text-slate-400 focus:outline-none"
+          />
+          <button
+            type="button"
+            onClick={() => setAbierta(false)}
+            aria-label="Cerrar búsqueda"
+            className="shrink-0 h-7 w-7 flex items-center justify-center rounded-full bg-slate-100 text-slate-600 font-black hover:bg-slate-200 transition-colors"
+          >
+            ×
+          </button>
         </div>
-      </div>
-      {abierta && palabras.length > 0 && (
-        <>
-          <div className="fixed inset-0 z-40" onClick={() => setAbierta(false)} />
-          <div className="absolute left-0 right-0 top-full mt-1 z-50 rounded-2xl bg-white shadow-xl border border-emerald-800/10 py-1 max-h-[60vh] overflow-y-auto">
+        {palabras.length > 0 && (
+          <div className="mt-1 rounded-2xl bg-white shadow-xl border border-emerald-800/10 py-1 max-h-[60vh] overflow-y-auto">
             {resultados.length === 0 ? (
               <p className="px-4 py-3 text-xs font-bold text-slate-500">Sin resultados para “{texto}”. Prueba con otra palabra.</p>
             ) : (
@@ -2223,13 +2217,13 @@ function BarraBusqueda({ onAbrirProyecto, onAbrirCategoria, onAbrirFAQ }) {
               ))
             )}
           </div>
-        </>
-      )}
+        )}
+      </div>
     </div>
   );
 }
 
-function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSugerencias, onAbrirComparte, onAbrirMapaSitio, onAbrirCategoria }) {
+function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSugerencias, onAbrirComparte, onAbrirMapaSitio, onAbrirCategoria, busquedaAbierta, setBusquedaAbierta }) {
   const [menuMasAbierto, setMenuMasAbierto] = useState(false);
   return (
     <header className="border-b border-emerald-800/20 bg-white/95 py-2 px-4 shadow-sm text-slate-900 relative">
@@ -2299,11 +2293,7 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSug
 
         {/* Fila única de menú: accesos directos + MÁS (con todo lo demás). */}
         <div className="order-3 w-full flex flex-wrap md:flex-nowrap items-center gap-2 md:gap-3 pt-1.5 mt-0.5 border-t border-emerald-800/10">
-          {/* Búsqueda: en móvil ocupa su propio renglón (arriba de los botones); en escritorio llena todo el espacio libre del renglón, a la derecha de los botones. */}
-          <div className="order-1 md:order-2 w-full md:w-auto md:flex-1 md:min-w-0">
-            <BarraBusqueda onAbrirProyecto={onAbrirProyecto} onAbrirCategoria={onAbrirCategoria} onAbrirFAQ={onAbrirFAQ} />
-          </div>
-          <div className="order-2 md:order-1 flex w-full md:w-auto items-stretch gap-1.5 sm:gap-2 text-[11px] sm:text-xs md:text-sm font-black">
+          <div className="flex w-full md:w-auto items-stretch gap-1.5 sm:gap-2 text-[11px] sm:text-xs md:text-sm font-black">
             {NAV_LINKS_PRINCIPALES.map(link => (
               <a
                 key={link.href}
@@ -2368,6 +2358,10 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSug
                 </>
               )}
             </div>
+
+            {/* Búsqueda: botón pequeño junto a "Más", del mismo tamaño;
+                se despliega en una ventana superpuesta solo al tocarlo. */}
+            <BarraBusqueda onAbrirProyecto={onAbrirProyecto} onAbrirCategoria={onAbrirCategoria} onAbrirFAQ={onAbrirFAQ} abierta={busquedaAbierta} setAbierta={setBusquedaAbierta} />
           </div>
         </div>
       </div>
@@ -2386,7 +2380,7 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSug
 // NECESIDADES_GRUPOS arriba). Se autogestiona su propio estado — solo
 // necesita los 2 callbacks para abrir el modal de proyecto o una acción
 // especial (por ahora, solo "comparte").
-function BotonNecesidades({ onAbrirProyecto, onAccionEspecial }) {
+function BotonNecesidades({ onAbrirProyecto, onAccionEspecial, onAbrirFAQ }) {
   const [abierto, setAbierto] = useState(false);
   const [grupoAbierto, setGrupoAbierto] = useState(null);
   // Texto libre para la opción "Otro(s)" — al final de la lista de
@@ -2471,6 +2465,15 @@ function BotonNecesidades({ onAbrirProyecto, onAccionEspecial }) {
                 )}
               </div>
             ))}
+            <button
+              type="button"
+              onClick={() => { cerrarTodo(); onAbrirFAQ && onAbrirFAQ(); }}
+              className="w-full flex items-center justify-between px-4 py-3 text-left font-black uppercase text-xs text-emerald-900 hover:bg-emerald-50 transition-colors border-b border-emerald-50"
+            >
+              ❓ Preguntas Frecuentes
+              <span aria-hidden="true">›</span>
+            </button>
+
             <div className="p-4 space-y-2">
               <p className="font-black uppercase text-[#0f2d1e] text-xs">Otro(s)</p>
               <textarea
