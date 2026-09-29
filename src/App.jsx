@@ -755,21 +755,39 @@ export default function App() {
   const [showMapaSitio, setShowMapaSitio] = useState(false);
   // Categoría abierta (portada simplificada de 4 botones) — null = cerrada.
   const [categoriaAbierta, setCategoriaAbierta] = useState(null);
-  // Retos/Mapa: accordeones de la portada — cerrados por default para
-  // aligerar la primera vista (punto 1 y 2 de la última tanda de cambios).
-  const [retosAbierto, setRetosAbierto] = useState(false);
-  const [mapaExpandido, setMapaExpandido] = useState(false);
-  // Botón "Subir" — solo aparece después de bajar un poco en la página.
-  const [mostrarSubir, setMostrarSubir] = useState(false);
-  useEffect(() => {
-    const alScrollear = () => setMostrarSubir(window.scrollY > 480);
-    window.addEventListener("scroll", alScrollear, { passive: true });
-    return () => window.removeEventListener("scroll", alScrollear);
-  }, []);
   // Ventana emergente única para los 12 botones naranjas de portada.
   // null = cerrada; si tiene un id (ej. "libros", "ecatepets", "ventas-con-causa",
   // "donaciones") se abre con la información de ese proyecto.
   const [modalProyecto, setModalProyecto] = useState(null);
+
+  // Acordeón que agrupa Retos/Regalos/Reconocimientos + Historias/Cupones/
+  // Patrocinadores, para que la portada se vea más corta en celular.
+  const [retosHistoriasAbierto, setRetosHistoriasAbierto] = useState(false);
+  // Mapa de negocios: se ve solo la mitad y se despliega completo al tocar.
+  const [mapaExpandido, setMapaExpandido] = useState(false);
+  // Formulario de "Registra tu Solicitud" (junto al mapa): se ve resumido
+  // y se despliega completo al querer llenarlo (es un formulario externo
+  // -Tally-, así que se expande al tocarlo, no al detectar un campo exacto).
+  const [solicitudExpandida, setSolicitudExpandida] = useState(false);
+  // Botones naranjas junto a los carruseles de Ventas con Causa y de
+  // Extraviados: agrupados en un solo botón resumen debajo del carrusel.
+  const [ventasResumenAbierto, setVentasResumenAbierto] = useState(false);
+  const [extraviadosResumenAbierto, setExtraviadosResumenAbierto] = useState(false);
+  // Botón flotante "Subir" + barra de progreso de lectura (aparecen solo
+  // después de bajar un poco en la página).
+  const [mostrarSubir, setMostrarSubir] = useState(false);
+  const [progresoLectura, setProgresoLectura] = useState(0);
+  useEffect(() => {
+    const onScroll = () => {
+      const alto = document.documentElement.scrollHeight - window.innerHeight;
+      const pct = alto > 0 ? Math.min(100, Math.max(0, (window.scrollY / alto) * 100)) : 0;
+      setProgresoLectura(pct);
+      setMostrarSubir(window.scrollY > 500);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   // Enlaces con "#algo" (ej. dcuatesmini.vercel.app/#solicitudes): la página
   // se dibuja con React DESPUÉS de cargar, así que el navegador no encuentra
@@ -816,13 +834,6 @@ export default function App() {
   // Cómo Podemos Sumar, Preguntas Frecuentes, Aviso de Privacidad) está
   // abierto junto al video. null = ninguno abierto; solo uno a la vez.
   const [infoAbierta, setInfoAbierta] = useState(null);
-  // Botón desplegable "Registra Aquí Tu Interés" en la sección de Ventas
-  // con Causa (a la derecha del carrusel).
-  const [registroVentasAbierto, setRegistroVentasAbierto] = useState(false);
-  // Acordeones "maestros" que agrupan los botones que antes iban a un lado
-  // de los carruseles de Ventas con Causa y Extraviados.
-  const [ventasAbierto, setVentasAbierto] = useState(false);
-  const [extraviadosAbierto, setExtraviadosAbierto] = useState(false);
 
   // Filas "crudas" de la tabla ENLACES en Baserow — alimentan el video de
   // portada, las recomendaciones y el botón de Música/Libros/Pelis.
@@ -885,8 +896,29 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#17472d] font-sans antialiased text-slate-900 selection:bg-emerald-500/30 relative pb-28 sm:pb-24">
 
+      {/* Barra de progreso de lectura — línea delgada pegada arriba de todo */}
+      <div className="fixed top-0 left-0 right-0 z-[60] h-1 bg-black/10">
+        <div
+          className="h-full bg-[#e65100] transition-[width] duration-150"
+          style={{ width: `${progresoLectura}%` }}
+        />
+      </div>
+
       {/* Barra Ticker Inferior Fija — combina negocios, mascotas, avisos y momentos */}
       <BarraTicker />
+
+      {/* Botón flotante "Subir" — aparece solo después de bajar un poco */}
+      {mostrarSubir && (
+        <button
+          type="button"
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          aria-label="Subir al inicio de la página"
+          title="Subir"
+          className="fixed bottom-20 sm:bottom-24 left-4 z-50 h-11 w-11 sm:h-12 sm:w-12 flex items-center justify-center rounded-full bg-[#0f2d1e] text-white shadow-lg border-2 border-white/30 hover:bg-emerald-800 transition-colors"
+        >
+          <span className="text-xl leading-none" aria-hidden="true">↑</span>
+        </button>
+      )}
 
       {/* Botón Flotante Permanente de WhatsApp — efecto 3D + anillo parpadeante + etiqueta */}
       <div className="fixed bottom-20 sm:bottom-24 right-6 z-50 flex items-center gap-3">
@@ -906,19 +938,6 @@ export default function App() {
           </svg>
         </a>
       </div>
-
-      {/* Botón "Subir" — aparece al bajar, arriba del de WhatsApp. */}
-      {mostrarSubir && (
-        <button
-          type="button"
-          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          title="Subir al inicio de la página"
-          aria-label="Subir al inicio de la página"
-          className="fixed bottom-40 sm:bottom-48 right-6 z-50 h-11 w-11 sm:h-12 sm:w-12 flex items-center justify-center rounded-full bg-[#0f2d1e] hover:bg-emerald-800 text-white shadow-[0_6px_14px_rgba(0,0,0,0.35)] border-2 border-white/40 transition-all hover:scale-110"
-        >
-          <span className="text-xl sm:text-2xl leading-none">↑</span>
-        </button>
-      )}
 
       {/* Encabezado + ticker de frases, pegados juntos como una sola barra fija.
           "relative" para poder anclar el botón de Necesidades justo debajo
@@ -1115,109 +1134,6 @@ export default function App() {
               );
             })()}
 
-            {/* Retos, Regalos y Reconocimientos DCUATES — ahora en acordeón
-                (cerrado por default) para aligerar la primera vista; adentro
-                van también Historias, Cupones y Patrocinadores. */}
-            <div className="mt-3 rounded-2xl overflow-hidden border-4 border-[#0f2d1e]/30 shadow-lg">
-              <button
-                type="button"
-                onClick={() => setRetosAbierto((v) => !v)}
-                title={retosAbierto ? "Ocultar esta sección" : "Ver Retos, Regalos y Reconocimientos"}
-                className="w-full text-left bg-[#0f2d1e] hover:bg-emerald-900 transition-colors px-3 py-3 flex items-center justify-between gap-3"
-              >
-                <p className="text-white font-black uppercase text-xs sm:text-sm tracking-wide">
-                  🔎 Retos, Regalos y Reconocimientos DCUATES
-                  <br className="sm:hidden" />
-                  <span className="block sm:inline sm:ml-1 normal-case font-bold text-emerald-100">Historias, cupones, patrocinadores y todo lo bueno que merece compartirse — toca para ver</span>
-                </p>
-                <span className={`shrink-0 text-white text-xl transition-transform ${retosAbierto ? "rotate-180" : ""}`} aria-hidden="true">⌄</span>
-              </button>
-              {retosAbierto && (
-              <div className="p-3 bg-[#0f2d1e]">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-                  {/* Columna central: los 3 botones naranjas (desplegables con ejemplos) */}
-                  <div className="order-1 lg:order-2">
-                    <BotonesRetosRegalos />
-                  </div>
-
-                  {/* Columna 2: carrusel de fotos (RETOSGALERIA en Baserow) */}
-                  <div className="order-2 lg:order-1 rounded-xl overflow-hidden bg-white/5 border border-white/10 flex items-center justify-center min-h-[180px]">
-                    {galeriaRetos.length > 0 ? (
-                      <Carrusel
-                        items={galeriaRetos}
-                        renderItem={(item) => (
-                          <img
-                            src={resolverSrcImagen(item.img)}
-                            alt={item.nombre}
-                            loading="lazy"
-                            className="w-full aspect-square object-cover"
-                          />
-                        )}
-                      />
-                    ) : (
-                      <p className="text-emerald-200/70 text-[10px] font-bold uppercase tracking-wide text-center px-4">
-                        Sube fotos a la columna "RETOSGALERIA" en Baserow para verlas aquí
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Columna 3: videos relacionados (NOMBRE RETOSVID / RETOSVID) — tira horizontal con rotación automática */}
-                  <div className="order-3 rounded-xl bg-white/5 border border-white/10 p-2 min-h-[180px] flex items-center">
-                    {videosRetos.length > 0 ? (
-                      <div
-                        ref={scrollRetosVideosRef}
-                        onPointerDown={onPointerDownRetosVideos}
-                        className="flex gap-2 overflow-x-auto pb-1 w-full"
-                      >
-                        {videosRetos.map((v, i) => (
-                          <button
-                            key={i}
-                            type="button"
-                            onClick={() => setVideoEnGrande(v.video)}
-                            className="group relative rounded-lg overflow-hidden border-2 border-white/10 hover:border-[#e65100] transition-colors bg-black/30 text-left shrink-0 w-32"
-                          >
-                            <div className="aspect-video w-full overflow-hidden">
-                              <MiniaturaVideo video={v.video} nombre={v.nombre} />
-                            </div>
-                            <span className="absolute inset-0 flex items-center justify-center">
-                              <span className="w-8 h-8 rounded-full bg-[#e65100]/90 flex items-center justify-center text-white text-sm shadow-md group-hover:bg-[#e65100]">▶</span>
-                            </span>
-                            <p className="px-2 py-1 text-[10px] font-black text-white uppercase tracking-tight leading-tight">
-                              {v.nombre}
-                            </p>
-                          </button>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-emerald-200/70 text-[10px] font-bold uppercase tracking-wide text-center px-2 py-6 w-full">
-                        Sube videos con las columnas "NOMBRE RETOSVID" y "RETOSVID" en Baserow para verlos aquí
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {videoEnGrande && (
-                <div
-                  className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 backdrop-blur-sm"
-                  onClick={() => setVideoEnGrande(null)}
-                >
-                  <div className="relative w-full max-w-3xl" onClick={(e) => e.stopPropagation()}>
-                    <button
-                      type="button"
-                      onClick={() => setVideoEnGrande(null)}
-                      className="absolute -top-10 right-0 text-white text-2xl font-black hover:text-[#e65100] transition-colors"
-                      aria-label="Cerrar video"
-                    >
-                      ✕
-                    </button>
-                    <div className="rounded-2xl overflow-hidden border-4 border-white/20 shadow-2xl aspect-video bg-black">
-                      <IframeVideo video={videoEnGrande} className="w-full h-full" />
-                    </div>
-                  </div>
-                </div>
-              )}
-
               {/* Recomendaciones / Música-Libros-Pelis / Preguntas Frecuentes,
                   en fila horizontal debajo del video (antes eran una columna
                   al lado del video). */}
@@ -1303,47 +1219,181 @@ export default function App() {
                 </BotonVerdeInfo>
               </div>
 
-              {/* 3 botones naranjas nuevos — mismo estilo que los de arriba,
-                  cada uno abre su propio modal con el carrusel adentro (el
-                  logo de cada uno se agrega después en /public/images/,
-                  con el mismo nombre de archivo que aquí abajo). */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
-                {[
-                  { t: "HISTORIAS DCUATES", modal: "historias-dcuates", img: "/images/HistoriasDCUATES.png", puntos: ["TESTIMONIOS REALES", "HISTORIAS CON CAUSA", "INSPIRACIÓN COMUNITARIA"] },
-                  { t: "CUPONES, PROMOS Y MÁS", modal: "cupones-promos", img: "/images/CuponesPromos.png", puntos: ["DESCUENTOS EXCLUSIVOS", "PROMOCIONES LOCALES", "SE ACTUALIZA CADA MES"] },
-                  { t: "PATROCINADORES Y ALIANZAS DCUATES", modal: "patrocinadores-alianzas", img: "/images/PatrocinadoresAlianzas.png", puntos: ["NEGOCIOS ALIADOS", "ORGANIZACIONES QUE APOYAN", "¡GRACIAS POR SUMAR!"] }
-                ].map((btn, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => setModalProyecto(btn.modal)}
-                    className="flex flex-col rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white shadow-md transition-all hover:scale-[1.02] overflow-hidden font-heading text-left w-full"
-                  >
-                    <div className="px-2 pt-3 pb-1 text-center border-b border-white/20">
-                      <h4 className="uppercase font-black leading-tight text-sm sm:text-base lg:text-lg">
-                        {btn.t}
-                      </h4>
+            {/* Acordeón que agrupa Retos, Regalos y Reconocimientos junto con
+                Historias, Cupones/Promos y Patrocinadores/Alianzas — para que
+                la portada se vea más corta en celular. Un solo toque lo abre
+                o lo cierra (ver estado retosHistoriasAbierto). */}
+            <div className="mt-3 rounded-2xl overflow-hidden border-4 border-[#0f2d1e]/30 shadow-lg">
+              <button
+                type="button"
+                onClick={() => setRetosHistoriasAbierto((v) => !v)}
+                aria-expanded={retosHistoriasAbierto}
+                className="w-full text-left bg-[#0f2d1e] hover:bg-[#17472d] transition-colors px-4 py-3.5 flex items-center justify-between gap-3"
+              >
+                <span>
+                  <span className="block text-white font-black uppercase text-xs sm:text-sm tracking-wide">
+                    🎯🎁🏅 Retos, Regalos y Reconocimientos · 📖🏷️🤝 Historias, Cupones y Patrocinadores
+                  </span>
+                  <span className="block text-emerald-100 font-bold normal-case text-[11px] sm:text-xs mt-0.5">
+                    Toca para ver cómo participar y motivarte, reconocer a quien inspira, inspirarte con historias reales, aprovechar cupones y promos, y conocer a quienes hacen esto posible.
+                  </span>
+                </span>
+                <span className={`shrink-0 text-white text-xl transition-transform ${retosHistoriasAbierto ? "rotate-180" : ""}`} aria-hidden="true">▾</span>
+              </button>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateRows: retosHistoriasAbierto ? "1fr" : "0fr",
+                  transition: "grid-template-rows 350ms ease-in-out"
+                }}
+              >
+                <div style={{ overflow: "hidden" }}>
+                  <div className="bg-[#e8f5e9] p-3">
+
+              {/* Retos, Regalos y Reconocimientos DCUATES — 3 columnas: carrusel
+                  de fotos (Baserow: RETOSGALERIA) | botones naranjas | videos
+                  relacionados (Baserow: NOMBRE RETOSVID / RETOSVID). */}
+              <div className="mt-3">
+                <div className="rounded-2xl overflow-hidden border-4 border-[#0f2d1e]/30 shadow-lg bg-[#0f2d1e] p-3">
+                  <p className="text-white font-black uppercase text-xs sm:text-sm tracking-wide mb-2 px-1 text-center">
+                    🔎 Retos, Regalos y Reconocimientos DCUATES
+                    <br className="sm:hidden" />
+                    <span className="block sm:inline sm:ml-1 normal-case font-bold text-emerald-100">Porque todo lo bueno merece ser compartido y reconocido, envíanos tus propuestas</span>
+                  </p>
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+                    {/* Columna central: los 3 botones naranjas (desplegables con ejemplos) */}
+                    <div className="order-1 lg:order-2">
+                      <BotonesRetosRegalos />
                     </div>
-                    <div className="flex flex-1 items-center gap-2 px-2 py-2">
-                      <div className="w-2/5 h-full flex items-center justify-center">
-                        <img
-                          src={btn.img}
-                          alt=""
-                          loading="lazy"
-                          className="max-h-16 sm:max-h-20 w-auto object-contain drop-shadow"
-                          onError={(e) => { e.target.style.display = 'none'; }}
+
+                    {/* Columna 2: carrusel de fotos (RETOSGALERIA en Baserow) */}
+                    <div className="order-2 lg:order-1 rounded-xl overflow-hidden bg-white/5 border border-white/10 flex items-center justify-center min-h-[180px]">
+                      {galeriaRetos.length > 0 ? (
+                        <Carrusel
+                          items={galeriaRetos}
+                          renderItem={(item) => (
+                            <img
+                              src={resolverSrcImagen(item.img)}
+                              alt={item.nombre}
+                              loading="lazy"
+                              className="w-full aspect-square object-cover"
+                            />
+                          )}
                         />
-                      </div>
-                      <ul className="w-3/5 space-y-1 text-left text-[10px] sm:text-xs font-bold leading-snug">
-                        {btn.puntos.map((p, i) => <li key={i}>* {p}</li>)}
-                      </ul>
+                      ) : (
+                        <p className="text-emerald-200/70 text-[10px] font-bold uppercase tracking-wide text-center px-4">
+                          Sube fotos a la columna "RETOSGALERIA" en Baserow para verlas aquí
+                        </p>
+                      )}
                     </div>
-                  </button>
-                ))}
+
+                    {/* Columna 3: videos relacionados (NOMBRE RETOSVID / RETOSVID) — tira horizontal con rotación automática */}
+                    <div className="order-3 rounded-xl bg-white/5 border border-white/10 p-2 min-h-[180px] flex items-center">
+                      {videosRetos.length > 0 ? (
+                        <div
+                          ref={scrollRetosVideosRef}
+                          onPointerDown={onPointerDownRetosVideos}
+                          className="flex gap-2 overflow-x-auto pb-1 w-full"
+                        >
+                          {videosRetos.map((v, i) => (
+                            <button
+                              key={i}
+                              type="button"
+                              onClick={() => setVideoEnGrande(v.video)}
+                              className="group relative rounded-lg overflow-hidden border-2 border-white/10 hover:border-[#e65100] transition-colors bg-black/30 text-left shrink-0 w-32"
+                            >
+                              <div className="aspect-video w-full overflow-hidden">
+                                <MiniaturaVideo video={v.video} nombre={v.nombre} />
+                              </div>
+                              <span className="absolute inset-0 flex items-center justify-center">
+                                <span className="w-8 h-8 rounded-full bg-[#e65100]/90 flex items-center justify-center text-white text-sm shadow-md group-hover:bg-[#e65100]">▶</span>
+                              </span>
+                              <p className="px-2 py-1 text-[10px] font-black text-white uppercase tracking-tight leading-tight">
+                                {v.nombre}
+                              </p>
+                            </button>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-emerald-200/70 text-[10px] font-bold uppercase tracking-wide text-center px-2 py-6 w-full">
+                          Sube videos con las columnas "NOMBRE RETOSVID" y "RETOSVID" en Baserow para verlos aquí
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {videoEnGrande && (
+                  <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 backdrop-blur-sm"
+                    onClick={() => setVideoEnGrande(null)}
+                  >
+                    <div className="relative w-full max-w-3xl" onClick={(e) => e.stopPropagation()}>
+                      <button
+                        type="button"
+                        onClick={() => setVideoEnGrande(null)}
+                        className="absolute -top-10 right-0 text-white text-2xl font-black hover:text-[#e65100] transition-colors"
+                        aria-label="Cerrar video"
+                      >
+                        ✕
+                      </button>
+                      <div className="rounded-2xl overflow-hidden border-4 border-white/20 shadow-2xl aspect-video bg-black">
+                        <IframeVideo video={videoEnGrande} className="w-full h-full" />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* 3 botones naranjas nuevos — mismo estilo que los de arriba,
+                    cada uno abre su propio modal con el carrusel adentro (el
+                    logo de cada uno se agrega después en /public/images/,
+                    con el mismo nombre de archivo que aquí abajo). */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
+                  {[
+                    { t: "HISTORIAS DCUATES", modal: "historias-dcuates", img: "/images/HistoriasDCUATES.png", puntos: ["TESTIMONIOS REALES", "HISTORIAS CON CAUSA", "INSPIRACIÓN COMUNITARIA"] },
+                    { t: "CUPONES, PROMOS Y MÁS", modal: "cupones-promos", img: "/images/CuponesPromos.png", puntos: ["DESCUENTOS EXCLUSIVOS", "PROMOCIONES LOCALES", "SE ACTUALIZA CADA MES"] },
+                    { t: "PATROCINADORES Y ALIANZAS DCUATES", modal: "patrocinadores-alianzas", img: "/images/PatrocinadoresAlianzas.png", puntos: ["NEGOCIOS ALIADOS", "ORGANIZACIONES QUE APOYAN", "¡GRACIAS POR SUMAR!"] }
+                  ].map((btn, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => setModalProyecto(btn.modal)}
+                      className="flex flex-col rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white shadow-md transition-all hover:scale-[1.02] overflow-hidden font-heading text-left w-full"
+                    >
+                      <div className="px-2 pt-3 pb-1 text-center border-b border-white/20">
+                        <h4 className="uppercase font-black leading-tight text-sm sm:text-base lg:text-lg">
+                          {btn.t}
+                        </h4>
+                      </div>
+                      <div className="flex flex-1 items-center gap-2 px-2 py-2">
+                        <div className="w-2/5 h-full flex items-center justify-center">
+                          <img
+                            src={btn.img}
+                            alt=""
+                            loading="lazy"
+                            className="max-h-16 sm:max-h-20 w-auto object-contain drop-shadow"
+                            onError={(e) => { e.target.style.display = 'none'; }}
+                          />
+                        </div>
+                        <ul className="w-3/5 space-y-1 text-left text-[10px] sm:text-xs font-bold leading-snug">
+                          {btn.puntos.map((p, i) => <li key={i}>* {p}</li>)}
+                        </ul>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+                    <button
+                      type="button"
+                      onClick={() => setRetosHistoriasAbierto(false)}
+                      className="w-full mt-3 rounded-xl border-2 border-[#0f2d1e] text-[#0f2d1e] hover:bg-white font-black uppercase tracking-wide text-[11px] sm:text-xs py-2.5 transition-colors"
+                    >
+                      ▲ Cerrar
+                    </button>
+                  </div>
+                </div>
               </div>
-              </div>
-              )}
             </div>
+
 
               {/* Mapa de Negocios Locales — embed de Google Maps/My Maps.
                   Para agregar/editar negocios no se toca este código: se
@@ -1354,27 +1404,40 @@ export default function App() {
                   <p className="text-white font-black uppercase text-xs sm:text-sm tracking-wide text-center">
                     📍 Mapa de Negocios Locales Aliados
                   </p>
+                  <p className="text-emerald-100 font-bold normal-case text-[10px] sm:text-[11px] text-center mt-0.5">
+                    Toca un punto del mapa para ver el negocio o negocio aliado
+                  </p>
                 </div>
-                {/* Se muestra solo la mitad del mapa por default (h-32); al
-                    tocar "Ver mapa completo" se expande a su alto normal. */}
-                <div className={mapaExpandido ? "w-full h-64 sm:h-80" : "w-full h-32 sm:h-40 overflow-hidden"}>
+                <div className="relative">
                   <iframe
                     src={MAPA_NEGOCIOS_EMBED_URL}
-                    className="w-full h-64 sm:h-80"
+                    className={`w-full transition-[height] duration-300 ${mapaExpandido ? "h-64 sm:h-80" : "h-32 sm:h-40"}`}
                     style={{ border: 0 }}
                     loading="lazy"
                     referrerPolicy="strict-origin-when-cross-origin"
                     title="Mapa de negocios locales DCUATES"
                   />
+                  {!mapaExpandido && (
+                    <div className="absolute inset-x-0 bottom-0 flex items-end justify-center bg-gradient-to-t from-white/95 via-white/60 to-transparent pb-2 pt-6 pointer-events-none">
+                      <button
+                        type="button"
+                        onClick={() => setMapaExpandido(true)}
+                        className="pointer-events-auto rounded-full bg-[#0f2d1e] hover:bg-emerald-800 text-white font-black uppercase text-[10px] sm:text-[11px] tracking-wide px-4 py-1.5 shadow-md transition-colors"
+                      >
+                        🔎 Ver mapa completo
+                      </button>
+                    </div>
+                  )}
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setMapaExpandido((v) => !v)}
-                  title={mapaExpandido ? "Ver menos del mapa" : "Ver el mapa completo, con zoom"}
-                  className="w-full bg-emerald-100 hover:bg-emerald-200 text-[#0f2d1e] font-black uppercase text-[11px] sm:text-xs tracking-wide py-2 transition-colors"
-                >
-                  {mapaExpandido ? "Ver menos ⌃" : "Ver mapa completo ⌄"}
-                </button>
+                {mapaExpandido && (
+                  <button
+                    type="button"
+                    onClick={() => setMapaExpandido(false)}
+                    className="w-full bg-white text-[#0f2d1e] hover:bg-emerald-50 font-black uppercase text-[10px] sm:text-[11px] tracking-wide py-2 transition-colors border-t border-emerald-100"
+                  >
+                    ▲ Ver menos
+                  </button>
+                )}
               </div>
 
               {/* Ventana de Solicitudes — VISIBLE directo en la página (no
@@ -1412,9 +1475,36 @@ export default function App() {
                     </button>
                   </div>
 
-                  <div className="rounded-xl overflow-hidden border-2 border-emerald-100">
-                    <FormularioSolicitud />
+                  <div className="relative rounded-xl overflow-hidden border-2 border-emerald-100">
+                    <div
+                      className="overflow-hidden transition-[max-height] duration-300"
+                      style={{ maxHeight: solicitudExpandida ? 2000 : 210 }}
+                      onClick={() => { if (!solicitudExpandida) setSolicitudExpandida(true); }}
+                      onFocus={() => setSolicitudExpandida(true)}
+                    >
+                      <FormularioSolicitud />
+                    </div>
+                    {!solicitudExpandida && (
+                      <div className="absolute inset-x-0 bottom-0 flex items-end justify-center bg-gradient-to-t from-white/95 via-white/70 to-transparent pb-2 pt-8">
+                        <button
+                          type="button"
+                          onClick={() => setSolicitudExpandida(true)}
+                          className="rounded-full bg-[#e65100] hover:bg-[#bf360c] text-white font-black uppercase text-[10px] sm:text-[11px] tracking-wide px-4 py-1.5 shadow-md transition-colors"
+                        >
+                          ✍️ Toca para completar tu registro
+                        </button>
+                      </div>
+                    )}
                   </div>
+                  {solicitudExpandida && (
+                    <button
+                      type="button"
+                      onClick={() => setSolicitudExpandida(false)}
+                      className="w-full rounded-lg border-2 border-emerald-200 text-emerald-800 hover:bg-emerald-50 font-black uppercase tracking-wide text-[11px] py-2 transition-colors"
+                    >
+                      ▲ Ver menos
+                    </button>
+                  )}
 
                   <div className="text-center pt-1">
                     <p className="text-xs text-slate-500 font-medium mb-2">¿Prefieres contarnos directo?</p>
@@ -1488,24 +1578,24 @@ export default function App() {
             </p>
           </div>
 
-          {/* Pasarela de Ventas con Causa — carrusel a todo lo ancho, y
-              abajo UN solo botón que agrupa registro, catálogo y las 3
-              recomendaciones (antes eran 5 botones a un lado). */}
-          <div className="max-w-5xl mx-auto mb-14 space-y-3">
+          {/* Pasarela de Ventas con Causa — a la izquierda el carrusel, a la
+              derecha el registro (como botón desplegable) y el acceso al
+              catálogo/canal de WhatsApp. */}
+          <div className="max-w-3xl mx-auto mb-4">
             <PasarelaVentasConCausa />
+          </div>
+          <div className="max-w-3xl mx-auto mb-14">
             <BotonNaranjaDesplegable
-              titulo="💰 Compra, Vende y Descubre Más Opciones"
-              abierto={ventasAbierto}
-              onClick={() => setVentasAbierto((v) => !v)}
+              titulo="🛍️ Regístrate, ve el catálogo completo y descubre recomendaciones de Compra y Venta"
+              abierto={ventasResumenAbierto}
+              onClick={() => setVentasResumenAbierto((v) => !v)}
             >
-              <div className="space-y-3">
-                <BotonNaranjaDesplegable
-                  titulo="Si algo te gustó y deseas apartarlo o comprarlo, regístralo aquí"
-                  abierto={registroVentasAbierto}
-                  onClick={() => setRegistroVentasAbierto((v) => !v)}
-                >
+              <div className="space-y-4">
+                <div>
+                  <p className="font-black uppercase text-[#0f2d1e] text-[11px] tracking-wide mb-2">Si algo te gustó y deseas apartarlo o comprarlo, regístralo aquí</p>
                   <FormularioVentasConCausa />
-                </BotonNaranjaDesplegable>
+                </div>
+
                 <a
                   href="https://whatsapp.com/channel/0029Vb8gAjd1dAvyGu9Jmv1i"
                   target="_blank"
@@ -1519,15 +1609,11 @@ export default function App() {
                 </a>
 
                 {/* Recomendaciones de Compra/Venta/Compra-Venta DCUATES —
-                    igual que el botón verde de Recomendaciones del inicio:
                     muestran el nombre de cada liga (columna "NOMBRE ...");
                     si esa columna no existe o está vacía en una fila, se
                     numeran solas como "Recomendación 1, 2...". */}
-                <BotonNaranjaDesplegable
-                  titulo="Recomendaciones de Compra"
-                  abierto={infoAbierta === "recomendaciones-compra"}
-                  onClick={() => setInfoAbierta((v) => (v === "recomendaciones-compra" ? null : "recomendaciones-compra"))}
-                >
+                <div>
+                  <p className="font-black uppercase text-[#0f2d1e] text-[11px] tracking-wide mb-1">Recomendaciones de Compra</p>
                   {recomendacionesCompra.length === 0 && <p>Muy pronto encontrarás aquí recomendaciones de compra.</p>}
                   <ul className="space-y-1.5">
                     {recomendacionesCompra.map((r, i) => (
@@ -1538,13 +1624,10 @@ export default function App() {
                       </li>
                     ))}
                   </ul>
-                </BotonNaranjaDesplegable>
+                </div>
 
-                <BotonNaranjaDesplegable
-                  titulo="Recomendaciones de Venta"
-                  abierto={infoAbierta === "recomendaciones-venta"}
-                  onClick={() => setInfoAbierta((v) => (v === "recomendaciones-venta" ? null : "recomendaciones-venta"))}
-                >
+                <div>
+                  <p className="font-black uppercase text-[#0f2d1e] text-[11px] tracking-wide mb-1">Recomendaciones de Venta</p>
                   {recomendacionesVenta.length === 0 && <p>Muy pronto encontrarás aquí recomendaciones de venta.</p>}
                   <ul className="space-y-1.5">
                     {recomendacionesVenta.map((r, i) => (
@@ -1555,13 +1638,10 @@ export default function App() {
                       </li>
                     ))}
                   </ul>
-                </BotonNaranjaDesplegable>
+                </div>
 
-                <BotonNaranjaDesplegable
-                  titulo="Compra-Venta DCUATES"
-                  abierto={infoAbierta === "compra-venta-dcuates"}
-                  onClick={() => setInfoAbierta((v) => (v === "compra-venta-dcuates" ? null : "compra-venta-dcuates"))}
-                >
+                <div>
+                  <p className="font-black uppercase text-[#0f2d1e] text-[11px] tracking-wide mb-1">Compra-Venta DCUATES</p>
                   {compraVentaDcuates.length === 0 && <p>Muy pronto encontrarás aquí más opciones de compra-venta DCUATES.</p>}
                   <ul className="space-y-1.5">
                     {compraVentaDcuates.map((r, i) => (
@@ -1572,7 +1652,7 @@ export default function App() {
                       </li>
                     ))}
                   </ul>
-                </BotonNaranjaDesplegable>
+                </div>
               </div>
             </BotonNaranjaDesplegable>
           </div>
@@ -1588,14 +1668,19 @@ export default function App() {
               </p>
             </div>
 
-            <div className="space-y-3">
+            <div className="max-w-3xl mx-auto">
               <PasarelaExtraviados />
+            </div>
+            <div className="max-w-3xl mx-auto mt-4">
               <BotonNaranjaDesplegable
-                titulo="🔎 Reporta, Ayuda y Encuentra Apoyo"
-                abierto={extraviadosAbierto}
-                onClick={() => setExtraviadosAbierto((v) => !v)}
+                titulo="🔎 Reporta un caso, ve más casos y consulta apoyos para mascotas, personas y objetos"
+                abierto={extraviadosResumenAbierto}
+                onClick={() => setExtraviadosResumenAbierto((v) => !v)}
               >
-                <div className="space-y-3">
+                <div className="space-y-4">
+                  <p className="text-[11px] text-slate-500 font-medium italic">
+                    💡 Antes de reportar, revisa el carrusel de arriba — si tu caso ya aparece, evitamos duplicados y llegamos más rápido a quien lo necesita.
+                  </p>
                   <a
                     href="https://whatsapp.com/channel/0029Vb6OjCQGk1FkkmvSzP3S"
                     target="_blank"
@@ -1619,15 +1704,10 @@ export default function App() {
                     <FlechaBlanca />
                   </a>
 
-                  {/* Apoyo a Causa Animal / Personas Extraviadas / Cosas y
-                      Casos. */}
-                  <BotonNaranjaDesplegable
-                    titulo="Apoyo a Causa Animal"
-                    abierto={infoAbierta === "apoyo-causa-animal"}
-                    onClick={() => setInfoAbierta((v) => (v === "apoyo-causa-animal" ? null : "apoyo-causa-animal"))}
-                  >
-                    <p className="font-black uppercase text-[#0f2d1e] text-[11px] tracking-wide">La prevención es la mejor ayuda</p>
-                    <ul className="list-disc pl-4 space-y-1">
+                  {/* Apoyo a Causa Animal / Personas Extraviadas / Cosas y Casos. */}
+                  <div>
+                    <p className="font-black uppercase text-[#0f2d1e] text-[11px] tracking-wide">🐾 Apoyo a Causa Animal — la prevención es la mejor ayuda</p>
+                    <ul className="list-disc pl-4 space-y-1 mt-1">
                       <li>Esteriliza a tu mascota: es la forma más efectiva de evitar camadas no deseadas y abandono.</li>
                       <li>Coloca collar con placa o microchip, por si se extravía.</li>
                       <li>Vacunas y desparasitación al día — previenen enfermedades que también afectan a otros animales.</li>
@@ -1645,13 +1725,10 @@ export default function App() {
                         </li>
                       ))}
                     </ul>
-                  </BotonNaranjaDesplegable>
+                  </div>
 
-                  <BotonNaranjaDesplegable
-                    titulo="Apoyo a Personas Extraviadas"
-                    abierto={infoAbierta === "apoyo-personas-extraviadas"}
-                    onClick={() => setInfoAbierta((v) => (v === "apoyo-personas-extraviadas" ? null : "apoyo-personas-extraviadas"))}
-                  >
+                  <div>
+                    <p className="font-black uppercase text-[#0f2d1e] text-[11px] tracking-wide">🧑‍🤝‍🧑 Apoyo a Personas Extraviadas</p>
                     <p>Recursos, protocolos y contactos de apoyo para casos de personas extraviadas.</p>
                     {apoyoPersonasExtraviadasLinks.length === 0 && <p>Muy pronto encontrarás aquí más recursos de apoyo.</p>}
                     <ul className="space-y-1.5">
@@ -1663,13 +1740,10 @@ export default function App() {
                         </li>
                       ))}
                     </ul>
-                  </BotonNaranjaDesplegable>
+                  </div>
 
-                  <BotonNaranjaDesplegable
-                    titulo="Apoyo Cosas y Casos"
-                    abierto={infoAbierta === "apoyo-cosas-casos"}
-                    onClick={() => setInfoAbierta((v) => (v === "apoyo-cosas-casos" ? null : "apoyo-cosas-casos"))}
-                  >
+                  <div>
+                    <p className="font-black uppercase text-[#0f2d1e] text-[11px] tracking-wide">📦 Apoyo Cosas y Casos</p>
                     <p>Recursos de apoyo para objetos extraviados y otros casos de la comunidad.</p>
                     {apoyoCosasCasosLinks.length === 0 && <p>Muy pronto encontrarás aquí más recursos de apoyo.</p>}
                     <ul className="space-y-1.5">
@@ -1681,7 +1755,7 @@ export default function App() {
                         </li>
                       ))}
                     </ul>
-                  </BotonNaranjaDesplegable>
+                  </div>
                 </div>
               </BotonNaranjaDesplegable>
             </div>
@@ -1930,7 +2004,7 @@ export default function App() {
       {/* MODAL ÚNICO DE PROYECTO — se abre al dar clic en cualquiera de los
           12 botones naranjas de portada. Su contenido lo arma ContenidoModalProyecto. */}
       {modalProyecto && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm" onClick={() => setModalProyecto(null)}>
+        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm" onClick={() => setModalProyecto(null)}>
           <div
             className="bg-[#e8f5e9] text-slate-900 rounded-2xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl flex flex-col max-h-[90vh]"
             onClick={(e) => e.stopPropagation()}
@@ -1940,16 +2014,14 @@ export default function App() {
                 <button
                   type="button"
                   onClick={() => setModalProyecto(null)}
-                  title="Volver a la categoría"
-                  className="text-xs sm:text-sm font-black uppercase text-[#0f2d1e] hover:text-[#e65100] transition-colors flex items-center gap-1"
+                  className="text-[11px] sm:text-xs font-black uppercase tracking-wide text-emerald-800 hover:text-[#0f2d1e] transition-colors flex items-center gap-1"
                 >
-                  ← Volver a {(CATEGORIAS_PROYECTOS.find((c) => c.id === categoriaAbierta) || {}).titulo}
+                  <span aria-hidden="true">←</span> Volver a {(CATEGORIAS_PROYECTOS.find((c) => c.id === categoriaAbierta) || {}).titulo}
                 </button>
               ) : <span />}
               <button
                 onClick={() => setModalProyecto(null)}
                 aria-label="Cerrar"
-                title="Cerrar esta ventana"
                 className="shrink-0 h-9 w-9 flex items-center justify-center rounded-full bg-[#0f2d1e] text-white font-black hover:bg-emerald-800 transition-colors"
               >
                 ×
@@ -2111,7 +2183,7 @@ function BarraBusqueda({ onAbrirProyecto, onAbrirCategoria, onAbrirFAQ }) {
   return (
     <div className="relative w-full">
       <div className="w-full">
-        <div className="flex items-center gap-2 rounded-full border-2 border-[#0f2d1e]/30 bg-white px-3.5 py-2 focus-within:border-[#e65100]">
+        <div className="flex items-center gap-2 rounded-full border-2 border-[#0f2d1e]/30 bg-white pl-3.5 pr-2.5 py-2 focus-within:border-[#e65100]">
           <input
             type="search"
             value={texto}
@@ -2369,7 +2441,7 @@ function BotonNecesidades({ onAbrirProyecto, onAccionEspecial }) {
           >
             <div className="p-4 border-b border-emerald-100 flex items-center justify-between gap-3">
               <p className="font-black uppercase text-[#0f2d1e] text-sm">¿Qué necesitas hoy?</p>
-              <button type="button" onClick={cerrarTodo} aria-label="Cerrar" title="Cerrar" className="h-7 w-7 flex items-center justify-center rounded-full bg-[#0f2d1e] text-white font-black hover:bg-emerald-800 transition-colors shrink-0">×</button>
+              <button type="button" onClick={cerrarTodo} aria-label="Cerrar" className="h-7 w-7 flex items-center justify-center rounded-full bg-[#0f2d1e] text-white font-black hover:bg-emerald-800 transition-colors shrink-0">×</button>
             </div>
             {NECESIDADES_GRUPOS.map((grupo) => (
               <div key={grupo.id} className="border-b border-emerald-50 last:border-0">
@@ -2463,7 +2535,17 @@ function BotonRecibeBeneficios() {
             className="bg-white text-slate-900 rounded-2xl max-w-sm w-full p-6 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <p className="text-sm font-black uppercase text-[#0f2d1e] mb-3">¿Qué te interesa recibir?</p>
+            <div className="flex items-start justify-between gap-3 mb-3">
+              <p className="text-sm font-black uppercase text-[#0f2d1e]">¿Qué te interesa recibir?</p>
+              <button
+                type="button"
+                onClick={() => setAbierto(false)}
+                aria-label="Cerrar"
+                className="shrink-0 h-7 w-7 flex items-center justify-center rounded-full bg-slate-100 text-slate-600 font-black hover:bg-slate-200 transition-colors"
+              >
+                ×
+              </button>
+            </div>
             <div className="space-y-2.5">
               {INTERESES_BENEFICIOS.map((interes) => (
                 <label key={interes} className="flex items-start gap-2 text-sm font-bold text-slate-800 cursor-pointer">
@@ -2511,9 +2593,19 @@ function ModalFormularioWhatsApp({ titulo, descripcion, opciones, placeholder, o
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm" onClick={onCerrar}>
       <div className="bg-white text-slate-900 rounded-2xl max-w-md w-full p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
-        <h3 className="text-xl font-bold uppercase tracking-tight border-b pb-3 mb-4 text-emerald-800 font-heading">
-          {titulo}
-        </h3>
+        <div className="flex items-start justify-between gap-3 border-b pb-3 mb-4">
+          <h3 className="text-xl font-bold uppercase tracking-tight text-emerald-800 font-heading">
+            {titulo}
+          </h3>
+          <button
+            type="button"
+            onClick={onCerrar}
+            aria-label="Cerrar"
+            className="shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-600 font-black hover:bg-slate-200 transition-colors"
+          >
+            ×
+          </button>
+        </div>
         <p className="text-sm text-slate-600 leading-relaxed font-medium mb-3">{descripcion}</p>
         <select
           value={opcion}
@@ -2546,6 +2638,7 @@ function ModalFormularioWhatsApp({ titulo, descripcion, opciones, placeholder, o
 // 4. SUBCOMPONENTE: FORMULARIO DE PUBLICIDAD
 // =========================================================================
 function FormularioPublicidad() {
+  const [expandido, setExpandido] = useState(false);
   const [nombre, setNombre] = useState("");
   const [categoria, setCategoria] = useState("");
   const [contacto, setContacto] = useState("");
@@ -2553,10 +2646,6 @@ function FormularioPublicidad() {
   const [canal1, setCanal1] = useState("");
   const [canal2, setCanal2] = useState("");
   const [canal3, setCanal3] = useState("");
-  // Se muestra "a medias" (solo hasta "Nombre de contacto") y se expande
-  // solo al tocar/enfocar cualquier campo — es un formulario propio (no un
-  // iframe), así que aquí sí sabemos con exactitud dónde recortar.
-  const [expandido, setExpandido] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -2596,53 +2685,71 @@ function FormularioPublicidad() {
   };
 
   return (
-    <div className="relative">
-      <form
-        onSubmit={handleSubmit}
-        onFocus={() => setExpandido(true)}
-        className="bg-white text-slate-800 border-4 border-[#0f2d1e] p-6 rounded-3xl space-y-4 shadow-xl"
-        style={{ maxHeight: expandido ? "none" : 150, overflow: expandido ? "visible" : "hidden" }}
-      >
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div>
-          <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-slate-700 mb-1">Nombre de contacto</label>
-          <input type="text" value={contacto} onChange={e => setContacto(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="Ej. Juan Pérez" />
-        </div>
-        <div>
-          <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-slate-700 mb-1">Teléfono</label>
-          <input type="text" value={telefono} onChange={e => setTelefono(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="Ej. 5512345678" />
-        </div>
-        <div>
-          <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-slate-700 mb-1">Nombre del negocio</label>
-          <input type="text" value={nombre} onChange={e => setNombre(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="Ej. Taquería El Sol" />
-        </div>
-        <div>
-          <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-slate-700 mb-1">Giro / Categoría</label>
-          <input type="text" value={categoria} onChange={e => setCategoria(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="Ej. Restaurante, Salón, Tienda" />
-        </div>
+    <form onSubmit={handleSubmit} className="bg-white text-slate-800 border-4 border-[#0f2d1e] p-6 rounded-3xl space-y-4 shadow-xl">
+      {/* Se ve solo el nombre de contacto; el resto se despliega en cuanto
+          se toca este campo o cualquier parte del formulario. */}
+      <div>
+        <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-slate-700 mb-1">Nombre de contacto</label>
+        <input
+          type="text"
+          value={contacto}
+          onChange={e => setContacto(e.target.value)}
+          onFocus={() => setExpandido(true)}
+          className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium"
+          placeholder="Ej. Juan Pérez"
+        />
       </div>
-      <div className="space-y-2 pt-2">
-        <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-emerald-800">ENLACES Y REDES DIGITALES</label>
-        <input type="text" value={canal1} onChange={e => setCanal1(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="1. Página principal o Correo Electrónico" />
-        <input type="text" value={canal2} onChange={e => setCanal2(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="2. Perfil o Página de Facebook (Opcional)" />
-        <input type="text" value={canal3} onChange={e => setCanal3(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="3. Cualquier otra Red Social (Opcional)" />
-      </div>
-      <button type="submit" className="w-full rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3.5 uppercase tracking-wider text-xs transition-all mt-2 shadow-md font-heading">
-        Enviar registro
-      </button>
-      </form>
+
       {!expandido && (
-        <div
-          className="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-[#17472d] via-[#17472d]/85 to-transparent flex items-end justify-center pb-1 cursor-pointer rounded-b-3xl"
+        <button
+          type="button"
           onClick={() => setExpandido(true)}
-          title="Toca para completar el resto del registro"
+          className="w-full rounded-xl border-2 border-dashed border-[#e65100] text-[#e65100] hover:bg-orange-50 font-black uppercase tracking-wide text-[11px] sm:text-xs py-3 transition-colors"
         >
-          <span className="text-xs font-black uppercase text-yellow-300 underline underline-offset-2">
-            Sigue llenando aquí ▾
-          </span>
-        </div>
+          ✍️ Toca para continuar con tu registro
+        </button>
       )}
-    </div>
+
+      <div
+        className="overflow-hidden transition-[max-height] duration-300 space-y-4"
+        style={{ maxHeight: expandido ? 2000 : 0 }}
+      >
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-slate-700 mb-1">Teléfono</label>
+            <input type="text" value={telefono} onChange={e => setTelefono(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="Ej. 5512345678" />
+          </div>
+          <div>
+            <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-slate-700 mb-1">Nombre del negocio</label>
+            <input type="text" value={nombre} onChange={e => setNombre(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="Ej. Taquería El Sol" />
+          </div>
+          <div>
+            <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-slate-700 mb-1">Giro / Categoría</label>
+            <input type="text" value={categoria} onChange={e => setCategoria(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="Ej. Restaurante, Salón, Tienda" />
+          </div>
+        </div>
+        <div className="space-y-2 pt-2">
+          <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-emerald-800">ENLACES Y REDES DIGITALES</label>
+          {/* Ayuda contextual: por qué pedimos esto y qué pasa si no se tiene. */}
+          <p className="text-[11px] text-slate-500 font-medium italic">
+            💡 No es necesario tener los tres — con uno solo (o ninguno) también puedes registrarte; solo ayuda a que te encuentren más rápido.
+          </p>
+          <input type="text" value={canal1} onChange={e => setCanal1(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="1. Página principal o Correo Electrónico" />
+          <input type="text" value={canal2} onChange={e => setCanal2(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="2. Perfil o Página de Facebook (Opcional)" />
+          <input type="text" value={canal3} onChange={e => setCanal3(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="3. Cualquier otra Red Social (Opcional)" />
+        </div>
+        <button type="submit" className="w-full rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3.5 uppercase tracking-wider text-xs transition-all mt-2 shadow-md font-heading">
+          Enviar registro
+        </button>
+        <button
+          type="button"
+          onClick={() => setExpandido(false)}
+          className="w-full rounded-lg border-2 border-slate-200 text-slate-500 hover:bg-slate-50 font-black uppercase tracking-wide text-[11px] py-2 transition-colors"
+        >
+          ▲ Ver menos
+        </button>
+      </div>
+    </form>
   );
 }
 
@@ -2755,7 +2862,6 @@ function BotonNaranjaDesplegable({ titulo, abierto, onClick, children }) {
       <button
         type="button"
         onClick={onClick}
-        title={abierto ? "Toca para ocultar" : "Toca para ver más"}
         className="w-full text-left bg-[#e65100] hover:bg-[#bf360c] p-3 transition-colors flex items-center justify-between gap-3"
       >
         <p className="text-sm sm:text-base font-black text-white uppercase tracking-tight leading-tight">{titulo}</p>
@@ -3347,7 +3453,6 @@ function ModalMapaSitio({ onCerrar, onAbrirProyecto, onAbrirFAQ, onAbrirSugerenc
           <button
             onClick={onCerrar}
             aria-label="Cerrar"
-            title="Cerrar el Mapa del Sitio"
             className="shrink-0 h-9 w-9 flex items-center justify-center rounded-full bg-[#0f2d1e] text-white font-black hover:bg-emerald-800 transition-colors"
           >
             ×
@@ -3418,7 +3523,6 @@ function ModalCategoria({ categoria, onCerrar, onAbrirProyecto }) {
           <button
             onClick={onCerrar}
             aria-label="Cerrar"
-            title="Cerrar esta categoría"
             className="shrink-0 h-9 w-9 flex items-center justify-center rounded-full bg-[#0f2d1e] text-white font-black hover:bg-emerald-800 transition-colors"
           >
             ×
@@ -3505,15 +3609,6 @@ function BotonVerdeInfo({ titulo, abierto, onClick, children }) {
 // Tally no carga, se usa el iframe normal como respaldo.
 function FormularioSolicitud() {
   const [respaldo, setRespaldo] = useState(false);
-  // Se muestra "a medias" (solo hasta el primer campo, Nombre) y se expande
-  // solo cuando la persona empieza a llenarlo. Como el formulario vive en
-  // un iframe de otro sitio (Tally), no podemos "ver" en qué campo va —
-  // solo podemos saber que EL FOCO entró al iframe (con el truco de
-  // comparar document.activeElement al perder el foco la ventana
-  // principal). Por eso la altura recortada (190px) es un cálculo
-  // aproximado de dónde termina el campo "Nombre", no algo exacto.
-  const [expandido, setExpandido] = useState(false);
-  const contenedorRef = useRef(null);
   const urlDinamica = GOOGLE_FORM_SOLICITUDES_URL + (GOOGLE_FORM_SOLICITUDES_URL.includes("?") ? "&" : "?") + "dynamicHeight=1";
   useEffect(() => {
     const cargar = () => window.Tally && window.Tally.loadEmbeds && window.Tally.loadEmbeds();
@@ -3532,44 +3627,19 @@ function FormularioSolicitud() {
         setTimeout(() => irASeccion("solicitudes"), 150);
       }
     };
-    const alPerderFoco = () => {
-      const iframe = contenedorRef.current && contenedorRef.current.querySelector("iframe");
-      if (iframe && document.activeElement === iframe) setExpandido(true);
-    };
     window.addEventListener("message", alMensaje);
-    window.addEventListener("blur", alPerderFoco);
-    return () => {
-      window.removeEventListener("message", alMensaje);
-      window.removeEventListener("blur", alPerderFoco);
-    };
+    return () => window.removeEventListener("message", alMensaje);
   }, []);
-  return (
-    <div ref={contenedorRef} className="relative">
-      <div className={expandido ? "" : "overflow-hidden"} style={{ height: expandido ? "auto" : 190 }}>
-        {respaldo ? (
-          <iframe src={GOOGLE_FORM_SOLICITUDES_URL} title="Formulario de solicitud DCUATES" className="w-full" style={{ minHeight: 640, border: 0 }} />
-        ) : (
-          <iframe
-            data-tally-src={urlDinamica}
-            title="Formulario de solicitud DCUATES"
-            className="w-full"
-            style={{ minHeight: expandido ? 640 : 810, border: 0 }}
-            loading="lazy"
-          />
-        )}
-      </div>
-      {!expandido && (
-        <div
-          className="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-white via-white/90 to-transparent flex items-end justify-center pb-1 cursor-pointer"
-          onClick={() => setExpandido(true)}
-          title="Toca para ver el formulario completo"
-        >
-          <span className="text-xs font-black uppercase text-[#e65100] underline underline-offset-2">
-            Completa tus datos aquí ▾
-          </span>
-        </div>
-      )}
-    </div>
+  return respaldo ? (
+    <iframe src={GOOGLE_FORM_SOLICITUDES_URL} title="Formulario de solicitud DCUATES" className="w-full" style={{ minHeight: 640, border: 0 }} />
+  ) : (
+    <iframe
+      data-tally-src={urlDinamica}
+      title="Formulario de solicitud DCUATES"
+      className="w-full"
+      style={{ minHeight: 320, border: 0 }}
+      loading="lazy"
+    />
   );
 }
 
