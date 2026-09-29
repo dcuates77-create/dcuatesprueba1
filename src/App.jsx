@@ -755,6 +755,17 @@ export default function App() {
   const [showMapaSitio, setShowMapaSitio] = useState(false);
   // Categoría abierta (portada simplificada de 4 botones) — null = cerrada.
   const [categoriaAbierta, setCategoriaAbierta] = useState(null);
+  // Retos/Mapa: accordeones de la portada — cerrados por default para
+  // aligerar la primera vista (punto 1 y 2 de la última tanda de cambios).
+  const [retosAbierto, setRetosAbierto] = useState(false);
+  const [mapaExpandido, setMapaExpandido] = useState(false);
+  // Botón "Subir" — solo aparece después de bajar un poco en la página.
+  const [mostrarSubir, setMostrarSubir] = useState(false);
+  useEffect(() => {
+    const alScrollear = () => setMostrarSubir(window.scrollY > 480);
+    window.addEventListener("scroll", alScrollear, { passive: true });
+    return () => window.removeEventListener("scroll", alScrollear);
+  }, []);
   // Ventana emergente única para los 12 botones naranjas de portada.
   // null = cerrada; si tiene un id (ej. "libros", "ecatepets", "ventas-con-causa",
   // "donaciones") se abre con la información de ese proyecto.
@@ -808,6 +819,10 @@ export default function App() {
   // Botón desplegable "Registra Aquí Tu Interés" en la sección de Ventas
   // con Causa (a la derecha del carrusel).
   const [registroVentasAbierto, setRegistroVentasAbierto] = useState(false);
+  // Acordeones "maestros" que agrupan los botones que antes iban a un lado
+  // de los carruseles de Ventas con Causa y Extraviados.
+  const [ventasAbierto, setVentasAbierto] = useState(false);
+  const [extraviadosAbierto, setExtraviadosAbierto] = useState(false);
 
   // Filas "crudas" de la tabla ENLACES en Baserow — alimentan el video de
   // portada, las recomendaciones y el botón de Música/Libros/Pelis.
@@ -891,6 +906,19 @@ export default function App() {
           </svg>
         </a>
       </div>
+
+      {/* Botón "Subir" — aparece al bajar, arriba del de WhatsApp. */}
+      {mostrarSubir && (
+        <button
+          type="button"
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          title="Subir al inicio de la página"
+          aria-label="Subir al inicio de la página"
+          className="fixed bottom-40 sm:bottom-48 right-6 z-50 h-11 w-11 sm:h-12 sm:w-12 flex items-center justify-center rounded-full bg-[#0f2d1e] hover:bg-emerald-800 text-white shadow-[0_6px_14px_rgba(0,0,0,0.35)] border-2 border-white/40 transition-all hover:scale-110"
+        >
+          <span className="text-xl sm:text-2xl leading-none">↑</span>
+        </button>
+      )}
 
       {/* Encabezado + ticker de frases, pegados juntos como una sola barra fija.
           "relative" para poder anclar el botón de Necesidades justo debajo
@@ -1087,16 +1115,25 @@ export default function App() {
               );
             })()}
 
-            {/* Retos, Regalos y Reconocimientos DCUATES — 3 columnas: carrusel
-                de fotos (Baserow: RETOSGALERIA) | botones naranjas | videos
-                relacionados (Baserow: NOMBRE RETOSVID / RETOSVID). */}
-            <div className="mt-3">
-              <div className="rounded-2xl overflow-hidden border-4 border-[#0f2d1e]/30 shadow-lg bg-[#0f2d1e] p-3">
-                <p className="text-white font-black uppercase text-xs sm:text-sm tracking-wide mb-2 px-1 text-center">
+            {/* Retos, Regalos y Reconocimientos DCUATES — ahora en acordeón
+                (cerrado por default) para aligerar la primera vista; adentro
+                van también Historias, Cupones y Patrocinadores. */}
+            <div className="mt-3 rounded-2xl overflow-hidden border-4 border-[#0f2d1e]/30 shadow-lg">
+              <button
+                type="button"
+                onClick={() => setRetosAbierto((v) => !v)}
+                title={retosAbierto ? "Ocultar esta sección" : "Ver Retos, Regalos y Reconocimientos"}
+                className="w-full text-left bg-[#0f2d1e] hover:bg-emerald-900 transition-colors px-3 py-3 flex items-center justify-between gap-3"
+              >
+                <p className="text-white font-black uppercase text-xs sm:text-sm tracking-wide">
                   🔎 Retos, Regalos y Reconocimientos DCUATES
                   <br className="sm:hidden" />
-                  <span className="block sm:inline sm:ml-1 normal-case font-bold text-emerald-100">Porque todo lo bueno merece ser compartido y reconocido, envíanos tus propuestas</span>
+                  <span className="block sm:inline sm:ml-1 normal-case font-bold text-emerald-100">Historias, cupones, patrocinadores y todo lo bueno que merece compartirse — toca para ver</span>
                 </p>
+                <span className={`shrink-0 text-white text-xl transition-transform ${retosAbierto ? "rotate-180" : ""}`} aria-hidden="true">⌄</span>
+              </button>
+              {retosAbierto && (
+              <div className="p-3 bg-[#0f2d1e]">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
                   {/* Columna central: los 3 botones naranjas (desplegables con ejemplos) */}
                   <div className="order-1 lg:order-2">
@@ -1304,6 +1341,9 @@ export default function App() {
                   </button>
                 ))}
               </div>
+              </div>
+              )}
+            </div>
 
               {/* Mapa de Negocios Locales — embed de Google Maps/My Maps.
                   Para agregar/editar negocios no se toca este código: se
@@ -1315,14 +1355,26 @@ export default function App() {
                     📍 Mapa de Negocios Locales Aliados
                   </p>
                 </div>
-                <iframe
-                  src={MAPA_NEGOCIOS_EMBED_URL}
-                  className="w-full h-64 sm:h-80"
-                  style={{ border: 0 }}
-                  loading="lazy"
-                  referrerPolicy="strict-origin-when-cross-origin"
-                  title="Mapa de negocios locales DCUATES"
-                />
+                {/* Se muestra solo la mitad del mapa por default (h-32); al
+                    tocar "Ver mapa completo" se expande a su alto normal. */}
+                <div className={mapaExpandido ? "w-full h-64 sm:h-80" : "w-full h-32 sm:h-40 overflow-hidden"}>
+                  <iframe
+                    src={MAPA_NEGOCIOS_EMBED_URL}
+                    className="w-full h-64 sm:h-80"
+                    style={{ border: 0 }}
+                    loading="lazy"
+                    referrerPolicy="strict-origin-when-cross-origin"
+                    title="Mapa de negocios locales DCUATES"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setMapaExpandido((v) => !v)}
+                  title={mapaExpandido ? "Ver menos del mapa" : "Ver el mapa completo, con zoom"}
+                  className="w-full bg-emerald-100 hover:bg-emerald-200 text-[#0f2d1e] font-black uppercase text-[11px] sm:text-xs tracking-wide py-2 transition-colors"
+                >
+                  {mapaExpandido ? "Ver menos ⌃" : "Ver mapa completo ⌄"}
+                </button>
               </div>
 
               {/* Ventana de Solicitudes — VISIBLE directo en la página (no
@@ -1436,94 +1488,93 @@ export default function App() {
             </p>
           </div>
 
-          {/* Pasarela de Ventas con Causa — a la izquierda el carrusel, a la
-              derecha el registro (como botón desplegable) y el acceso al
-              catálogo/canal de WhatsApp. */}
-          <div className="grid gap-6 md:grid-cols-12 items-start max-w-5xl mx-auto mb-14">
-            <div className="md:col-span-7">
-              <PasarelaVentasConCausa />
-            </div>
-            <div className="md:col-span-5 space-y-3">
-              <BotonNaranjaDesplegable
-                titulo="Si algo te gustó y deseas apartarlo o comprarlo, regístralo aquí"
-                abierto={registroVentasAbierto}
-                onClick={() => setRegistroVentasAbierto((v) => !v)}
-              >
-                <FormularioVentasConCausa />
-              </BotonNaranjaDesplegable>
-              <a
-                href="https://whatsapp.com/channel/0029Vb8gAjd1dAvyGu9Jmv1i"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full text-left rounded-xl border-2 border-[#0f2d1e] bg-[#e65100] hover:bg-[#bf360c] p-3 shadow-sm transition-colors flex items-center justify-between gap-3"
-              >
-                <p className="text-sm sm:text-base font-black text-white uppercase tracking-tight leading-tight">
-                  Si quieres ver más productos y catálogos, da clic aquí !!!
-                </p>
-                <FlechaBlanca />
-              </a>
+          {/* Pasarela de Ventas con Causa — carrusel a todo lo ancho, y
+              abajo UN solo botón que agrupa registro, catálogo y las 3
+              recomendaciones (antes eran 5 botones a un lado). */}
+          <div className="max-w-5xl mx-auto mb-14 space-y-3">
+            <PasarelaVentasConCausa />
+            <BotonNaranjaDesplegable
+              titulo="💰 Compra, Vende y Descubre Más Opciones"
+              abierto={ventasAbierto}
+              onClick={() => setVentasAbierto((v) => !v)}
+            >
+              <div className="space-y-3">
+                <BotonNaranjaDesplegable
+                  titulo="Si algo te gustó y deseas apartarlo o comprarlo, regístralo aquí"
+                  abierto={registroVentasAbierto}
+                  onClick={() => setRegistroVentasAbierto((v) => !v)}
+                >
+                  <FormularioVentasConCausa />
+                </BotonNaranjaDesplegable>
+                <a
+                  href="https://whatsapp.com/channel/0029Vb8gAjd1dAvyGu9Jmv1i"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full text-left rounded-xl border-2 border-[#0f2d1e] bg-[#e65100] hover:bg-[#bf360c] p-3 shadow-sm transition-colors flex items-center justify-between gap-3"
+                >
+                  <p className="text-sm sm:text-base font-black text-white uppercase tracking-tight leading-tight">
+                    Si quieres ver más productos y catálogos, da clic aquí !!!
+                  </p>
+                  <FlechaBlanca />
+                </a>
 
-              {/* Recomendaciones de Compra/Venta/Compra-Venta DCUATES —
-                  igual que el botón verde de Recomendaciones del inicio:
-                  muestran el nombre de cada liga (columna "NOMBRE ...");
-                  si esa columna no existe o está vacía en una fila, se
-                  numeran solas como "Recomendación 1, 2...". */}
-              {/* Recomendaciones de Compra/Venta/Compra-Venta DCUATES —
-                  igual que el botón verde de Recomendaciones del inicio:
-                  muestran el nombre de cada liga (columna "NOMBRE ...");
-                  si esa columna no existe o está vacía en una fila, se
-                  numeran solas como "Recomendación 1, 2...". */}
-              <BotonNaranjaDesplegable
-                titulo="Recomendaciones de Compra"
-                abierto={infoAbierta === "recomendaciones-compra"}
-                onClick={() => setInfoAbierta((v) => (v === "recomendaciones-compra" ? null : "recomendaciones-compra"))}
-              >
-                {recomendacionesCompra.length === 0 && <p>Muy pronto encontrarás aquí recomendaciones de compra.</p>}
-                <ul className="space-y-1.5">
-                  {recomendacionesCompra.map((r, i) => (
-                    <li key={i}>
-                      <a href={r.enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100]">
-                        {r.nombre}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </BotonNaranjaDesplegable>
+                {/* Recomendaciones de Compra/Venta/Compra-Venta DCUATES —
+                    igual que el botón verde de Recomendaciones del inicio:
+                    muestran el nombre de cada liga (columna "NOMBRE ...");
+                    si esa columna no existe o está vacía en una fila, se
+                    numeran solas como "Recomendación 1, 2...". */}
+                <BotonNaranjaDesplegable
+                  titulo="Recomendaciones de Compra"
+                  abierto={infoAbierta === "recomendaciones-compra"}
+                  onClick={() => setInfoAbierta((v) => (v === "recomendaciones-compra" ? null : "recomendaciones-compra"))}
+                >
+                  {recomendacionesCompra.length === 0 && <p>Muy pronto encontrarás aquí recomendaciones de compra.</p>}
+                  <ul className="space-y-1.5">
+                    {recomendacionesCompra.map((r, i) => (
+                      <li key={i}>
+                        <a href={r.enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100]">
+                          {r.nombre}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </BotonNaranjaDesplegable>
 
-              <BotonNaranjaDesplegable
-                titulo="Recomendaciones de Venta"
-                abierto={infoAbierta === "recomendaciones-venta"}
-                onClick={() => setInfoAbierta((v) => (v === "recomendaciones-venta" ? null : "recomendaciones-venta"))}
-              >
-                {recomendacionesVenta.length === 0 && <p>Muy pronto encontrarás aquí recomendaciones de venta.</p>}
-                <ul className="space-y-1.5">
-                  {recomendacionesVenta.map((r, i) => (
-                    <li key={i}>
-                      <a href={r.enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100]">
-                        {r.nombre}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </BotonNaranjaDesplegable>
+                <BotonNaranjaDesplegable
+                  titulo="Recomendaciones de Venta"
+                  abierto={infoAbierta === "recomendaciones-venta"}
+                  onClick={() => setInfoAbierta((v) => (v === "recomendaciones-venta" ? null : "recomendaciones-venta"))}
+                >
+                  {recomendacionesVenta.length === 0 && <p>Muy pronto encontrarás aquí recomendaciones de venta.</p>}
+                  <ul className="space-y-1.5">
+                    {recomendacionesVenta.map((r, i) => (
+                      <li key={i}>
+                        <a href={r.enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100]">
+                          {r.nombre}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </BotonNaranjaDesplegable>
 
-              <BotonNaranjaDesplegable
-                titulo="Compra-Venta DCUATES"
-                abierto={infoAbierta === "compra-venta-dcuates"}
-                onClick={() => setInfoAbierta((v) => (v === "compra-venta-dcuates" ? null : "compra-venta-dcuates"))}
-              >
-                {compraVentaDcuates.length === 0 && <p>Muy pronto encontrarás aquí más opciones de compra-venta DCUATES.</p>}
-                <ul className="space-y-1.5">
-                  {compraVentaDcuates.map((r, i) => (
-                    <li key={i}>
-                      <a href={r.enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100]">
-                        {r.nombre}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </BotonNaranjaDesplegable>
-            </div>
+                <BotonNaranjaDesplegable
+                  titulo="Compra-Venta DCUATES"
+                  abierto={infoAbierta === "compra-venta-dcuates"}
+                  onClick={() => setInfoAbierta((v) => (v === "compra-venta-dcuates" ? null : "compra-venta-dcuates"))}
+                >
+                  {compraVentaDcuates.length === 0 && <p>Muy pronto encontrarás aquí más opciones de compra-venta DCUATES.</p>}
+                  <ul className="space-y-1.5">
+                    {compraVentaDcuates.map((r, i) => (
+                      <li key={i}>
+                        <a href={r.enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100]">
+                          {r.nombre}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </BotonNaranjaDesplegable>
+              </div>
+            </BotonNaranjaDesplegable>
           </div>
 
           {/* Pasarela de mascotas, personas y cosas extraviadas */}
@@ -1537,98 +1588,102 @@ export default function App() {
               </p>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-12 items-start">
-              <div className="md:col-span-7">
-                <PasarelaExtraviados />
-              </div>
-              <div className="md:col-span-5 space-y-3">
-                <a
-                  href="https://whatsapp.com/channel/0029Vb6OjCQGk1FkkmvSzP3S"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full text-left rounded-xl border-2 border-[#0f2d1e] bg-[#e65100] hover:bg-[#bf360c] p-3 shadow-sm transition-colors flex items-center justify-between gap-3"
-                >
-                  <p className="text-sm sm:text-base font-black text-white uppercase tracking-tight leading-tight">
-                    Ver Más Casos e Información de Valor
-                  </p>
-                  <FlechaBlanca />
-                </a>
-                <a
-                  href={enlaceWhatsApp("¡Hola DCUATES! Quiero reportar un caso de mascota, persona o cosa extraviada.")}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full text-left rounded-xl border-2 border-[#0f2d1e] bg-[#e65100] hover:bg-[#bf360c] p-3 shadow-sm transition-colors flex items-center justify-between gap-3"
-                >
-                  <p className="text-sm sm:text-base font-black text-white uppercase tracking-tight leading-tight">
-                    Reportar un Caso por WhatsApp
-                  </p>
-                  <FlechaBlanca />
-                </a>
+            <div className="space-y-3">
+              <PasarelaExtraviados />
+              <BotonNaranjaDesplegable
+                titulo="🔎 Reporta, Ayuda y Encuentra Apoyo"
+                abierto={extraviadosAbierto}
+                onClick={() => setExtraviadosAbierto((v) => !v)}
+              >
+                <div className="space-y-3">
+                  <a
+                    href="https://whatsapp.com/channel/0029Vb6OjCQGk1FkkmvSzP3S"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full text-left rounded-xl border-2 border-[#0f2d1e] bg-[#e65100] hover:bg-[#bf360c] p-3 shadow-sm transition-colors flex items-center justify-between gap-3"
+                  >
+                    <p className="text-sm sm:text-base font-black text-white uppercase tracking-tight leading-tight">
+                      Ver Más Casos e Información de Valor
+                    </p>
+                    <FlechaBlanca />
+                  </a>
+                  <a
+                    href={enlaceWhatsApp("¡Hola DCUATES! Quiero reportar un caso de mascota, persona o cosa extraviada.")}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full text-left rounded-xl border-2 border-[#0f2d1e] bg-[#e65100] hover:bg-[#bf360c] p-3 shadow-sm transition-colors flex items-center justify-between gap-3"
+                  >
+                    <p className="text-sm sm:text-base font-black text-white uppercase tracking-tight leading-tight">
+                      Reportar un Caso por WhatsApp
+                    </p>
+                    <FlechaBlanca />
+                  </a>
 
-                {/* Apoyo a Causa Animal / Personas Extraviadas / Cosas y
-                    Casos. */}
-                <BotonNaranjaDesplegable
-                  titulo="Apoyo a Causa Animal"
-                  abierto={infoAbierta === "apoyo-causa-animal"}
-                  onClick={() => setInfoAbierta((v) => (v === "apoyo-causa-animal" ? null : "apoyo-causa-animal"))}
-                >
-                  <p className="font-black uppercase text-[#0f2d1e] text-[11px] tracking-wide">La prevención es la mejor ayuda</p>
-                  <ul className="list-disc pl-4 space-y-1">
-                    <li>Esteriliza a tu mascota: es la forma más efectiva de evitar camadas no deseadas y abandono.</li>
-                    <li>Coloca collar con placa o microchip, por si se extravía.</li>
-                    <li>Vacunas y desparasitación al día — previenen enfermedades que también afectan a otros animales.</li>
-                    <li>Si ves un animal en la calle, no lo alimentes con lo que comemos nosotros; ofrece agua y contacta a un refugio o veterinario cercano.</li>
-                    <li>Adoptar, en vez de comprar, ayuda a que menos animales terminen en situación de calle.</li>
-                  </ul>
-                  <p className="pt-2 font-black uppercase text-[#0f2d1e] text-[11px] tracking-wide">Más Información de Apoyo</p>
-                  {apoyoCausaAnimalLinks.length === 0 && <p>Muy pronto encontrarás aquí más recursos de apoyo a causa animal.</p>}
-                  <ul className="space-y-1.5">
-                    {apoyoCausaAnimalLinks.map((enlace, i) => (
-                      <li key={i}>
-                        <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100] break-words">
-                          Apoyo {i + 1}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </BotonNaranjaDesplegable>
+                  {/* Apoyo a Causa Animal / Personas Extraviadas / Cosas y
+                      Casos. */}
+                  <BotonNaranjaDesplegable
+                    titulo="Apoyo a Causa Animal"
+                    abierto={infoAbierta === "apoyo-causa-animal"}
+                    onClick={() => setInfoAbierta((v) => (v === "apoyo-causa-animal" ? null : "apoyo-causa-animal"))}
+                  >
+                    <p className="font-black uppercase text-[#0f2d1e] text-[11px] tracking-wide">La prevención es la mejor ayuda</p>
+                    <ul className="list-disc pl-4 space-y-1">
+                      <li>Esteriliza a tu mascota: es la forma más efectiva de evitar camadas no deseadas y abandono.</li>
+                      <li>Coloca collar con placa o microchip, por si se extravía.</li>
+                      <li>Vacunas y desparasitación al día — previenen enfermedades que también afectan a otros animales.</li>
+                      <li>Si ves un animal en la calle, no lo alimentes con lo que comemos nosotros; ofrece agua y contacta a un refugio o veterinario cercano.</li>
+                      <li>Adoptar, en vez de comprar, ayuda a que menos animales terminen en situación de calle.</li>
+                    </ul>
+                    <p className="pt-2 font-black uppercase text-[#0f2d1e] text-[11px] tracking-wide">Más Información de Apoyo</p>
+                    {apoyoCausaAnimalLinks.length === 0 && <p>Muy pronto encontrarás aquí más recursos de apoyo a causa animal.</p>}
+                    <ul className="space-y-1.5">
+                      {apoyoCausaAnimalLinks.map((enlace, i) => (
+                        <li key={i}>
+                          <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100] break-words">
+                            Apoyo {i + 1}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </BotonNaranjaDesplegable>
 
-                <BotonNaranjaDesplegable
-                  titulo="Apoyo a Personas Extraviadas"
-                  abierto={infoAbierta === "apoyo-personas-extraviadas"}
-                  onClick={() => setInfoAbierta((v) => (v === "apoyo-personas-extraviadas" ? null : "apoyo-personas-extraviadas"))}
-                >
-                  <p>Recursos, protocolos y contactos de apoyo para casos de personas extraviadas.</p>
-                  {apoyoPersonasExtraviadasLinks.length === 0 && <p>Muy pronto encontrarás aquí más recursos de apoyo.</p>}
-                  <ul className="space-y-1.5">
-                    {apoyoPersonasExtraviadasLinks.map((enlace, i) => (
-                      <li key={i}>
-                        <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100] break-words">
-                          Apoyo {i + 1}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </BotonNaranjaDesplegable>
+                  <BotonNaranjaDesplegable
+                    titulo="Apoyo a Personas Extraviadas"
+                    abierto={infoAbierta === "apoyo-personas-extraviadas"}
+                    onClick={() => setInfoAbierta((v) => (v === "apoyo-personas-extraviadas" ? null : "apoyo-personas-extraviadas"))}
+                  >
+                    <p>Recursos, protocolos y contactos de apoyo para casos de personas extraviadas.</p>
+                    {apoyoPersonasExtraviadasLinks.length === 0 && <p>Muy pronto encontrarás aquí más recursos de apoyo.</p>}
+                    <ul className="space-y-1.5">
+                      {apoyoPersonasExtraviadasLinks.map((enlace, i) => (
+                        <li key={i}>
+                          <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100] break-words">
+                            Apoyo {i + 1}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </BotonNaranjaDesplegable>
 
-                <BotonNaranjaDesplegable
-                  titulo="Apoyo Cosas y Casos"
-                  abierto={infoAbierta === "apoyo-cosas-casos"}
-                  onClick={() => setInfoAbierta((v) => (v === "apoyo-cosas-casos" ? null : "apoyo-cosas-casos"))}
-                >
-                  <p>Recursos de apoyo para objetos extraviados y otros casos de la comunidad.</p>
-                  {apoyoCosasCasosLinks.length === 0 && <p>Muy pronto encontrarás aquí más recursos de apoyo.</p>}
-                  <ul className="space-y-1.5">
-                    {apoyoCosasCasosLinks.map((enlace, i) => (
-                      <li key={i}>
-                        <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100] break-words">
-                          Apoyo {i + 1}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </BotonNaranjaDesplegable>
-              </div>
+                  <BotonNaranjaDesplegable
+                    titulo="Apoyo Cosas y Casos"
+                    abierto={infoAbierta === "apoyo-cosas-casos"}
+                    onClick={() => setInfoAbierta((v) => (v === "apoyo-cosas-casos" ? null : "apoyo-cosas-casos"))}
+                  >
+                    <p>Recursos de apoyo para objetos extraviados y otros casos de la comunidad.</p>
+                    {apoyoCosasCasosLinks.length === 0 && <p>Muy pronto encontrarás aquí más recursos de apoyo.</p>}
+                    <ul className="space-y-1.5">
+                      {apoyoCosasCasosLinks.map((enlace, i) => (
+                        <li key={i}>
+                          <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100] break-words">
+                            Apoyo {i + 1}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </BotonNaranjaDesplegable>
+                </div>
+              </BotonNaranjaDesplegable>
             </div>
           </div>
         </div>
@@ -1847,8 +1902,8 @@ export default function App() {
         </nav>
 
         <p className="text-sm sm:text-base text-[#0f2d1e] pt-4 border-t border-[#0f2d1e]/30 max-w-md sm:max-w-lg mx-auto font-black">
-          © {new Date().getFullYear()} DCUATES, un programa de CONEXIONES CON CAUSA ♥.<br />
-          Todos los derechos reservados.
+          © {new Date().getFullYear()} DCUATES, un programa de CONEXIONES CON CAUSA ♥<br />
+          Todos los derechos reservados
         </p>
       </footer>
 
@@ -1880,13 +1935,26 @@ export default function App() {
             className="bg-[#e8f5e9] text-slate-900 rounded-2xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl flex flex-col max-h-[90vh]"
             onClick={(e) => e.stopPropagation()}
           >
-            <button
-              onClick={() => setModalProyecto(null)}
-              aria-label="Cerrar"
-              className="self-end shrink-0 h-9 w-9 flex items-center justify-center rounded-full bg-[#0f2d1e] text-white font-black hover:bg-emerald-800 transition-colors mb-2"
-            >
-              ×
-            </button>
+            <div className="flex items-center justify-between gap-2 mb-2">
+              {categoriaAbierta ? (
+                <button
+                  type="button"
+                  onClick={() => setModalProyecto(null)}
+                  title="Volver a la categoría"
+                  className="text-xs sm:text-sm font-black uppercase text-[#0f2d1e] hover:text-[#e65100] transition-colors flex items-center gap-1"
+                >
+                  ← Volver a {(CATEGORIAS_PROYECTOS.find((c) => c.id === categoriaAbierta) || {}).titulo}
+                </button>
+              ) : <span />}
+              <button
+                onClick={() => setModalProyecto(null)}
+                aria-label="Cerrar"
+                title="Cerrar esta ventana"
+                className="shrink-0 h-9 w-9 flex items-center justify-center rounded-full bg-[#0f2d1e] text-white font-black hover:bg-emerald-800 transition-colors"
+              >
+                ×
+              </button>
+            </div>
             <div className="overflow-y-auto pr-1">
               {/* Logo del proyecto, grande y visible al abrir su ventana.
                   Usa la misma imagen del botón (BOTONES_PORTADA); para
@@ -2044,10 +2112,6 @@ function BarraBusqueda({ onAbrirProyecto, onAbrirCategoria, onAbrirFAQ }) {
     <div className="relative w-full">
       <div className="w-full">
         <div className="flex items-center gap-2 rounded-full border-2 border-[#0f2d1e]/30 bg-white px-3.5 py-2 focus-within:border-[#e65100]">
-          <svg viewBox="0 0 24 24" className="h-4 w-4 sm:h-5 sm:w-5 shrink-0 fill-none stroke-[#0f2d1e] stroke-[2.5]" aria-hidden="true">
-            <circle cx="11" cy="11" r="7" />
-            <line x1="16.5" y1="16.5" x2="21" y2="21" strokeLinecap="round" />
-          </svg>
           <input
             type="search"
             value={texto}
@@ -2058,6 +2122,10 @@ function BarraBusqueda({ onAbrirProyecto, onAbrirCategoria, onAbrirFAQ }) {
             aria-label="Buscar en DCUATES"
             className="w-full min-w-0 bg-transparent text-xs sm:text-sm font-bold text-[#0f2d1e] placeholder:text-slate-400 focus:outline-none"
           />
+          <svg viewBox="0 0 24 24" className="h-4 w-4 sm:h-5 sm:w-5 shrink-0 fill-none stroke-[#0f2d1e] stroke-[2.5]" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" />
+            <line x1="16.5" y1="16.5" x2="21" y2="21" strokeLinecap="round" />
+          </svg>
         </div>
       </div>
       {abierta && palabras.length > 0 && (
@@ -2301,7 +2369,7 @@ function BotonNecesidades({ onAbrirProyecto, onAccionEspecial }) {
           >
             <div className="p-4 border-b border-emerald-100 flex items-center justify-between gap-3">
               <p className="font-black uppercase text-[#0f2d1e] text-sm">¿Qué necesitas hoy?</p>
-              <button type="button" onClick={cerrarTodo} aria-label="Cerrar" className="h-7 w-7 flex items-center justify-center rounded-full bg-[#0f2d1e] text-white font-black hover:bg-emerald-800 transition-colors shrink-0">×</button>
+              <button type="button" onClick={cerrarTodo} aria-label="Cerrar" title="Cerrar" className="h-7 w-7 flex items-center justify-center rounded-full bg-[#0f2d1e] text-white font-black hover:bg-emerald-800 transition-colors shrink-0">×</button>
             </div>
             {NECESIDADES_GRUPOS.map((grupo) => (
               <div key={grupo.id} className="border-b border-emerald-50 last:border-0">
@@ -2485,6 +2553,10 @@ function FormularioPublicidad() {
   const [canal1, setCanal1] = useState("");
   const [canal2, setCanal2] = useState("");
   const [canal3, setCanal3] = useState("");
+  // Se muestra "a medias" (solo hasta "Nombre de contacto") y se expande
+  // solo al tocar/enfocar cualquier campo — es un formulario propio (no un
+  // iframe), así que aquí sí sabemos con exactitud dónde recortar.
+  const [expandido, setExpandido] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -2524,7 +2596,13 @@ function FormularioPublicidad() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white text-slate-800 border-4 border-[#0f2d1e] p-6 rounded-3xl space-y-4 shadow-xl">
+    <div className="relative">
+      <form
+        onSubmit={handleSubmit}
+        onFocus={() => setExpandido(true)}
+        className="bg-white text-slate-800 border-4 border-[#0f2d1e] p-6 rounded-3xl space-y-4 shadow-xl"
+        style={{ maxHeight: expandido ? "none" : 150, overflow: expandido ? "visible" : "hidden" }}
+      >
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-slate-700 mb-1">Nombre de contacto</label>
@@ -2552,7 +2630,19 @@ function FormularioPublicidad() {
       <button type="submit" className="w-full rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3.5 uppercase tracking-wider text-xs transition-all mt-2 shadow-md font-heading">
         Enviar registro
       </button>
-    </form>
+      </form>
+      {!expandido && (
+        <div
+          className="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-[#17472d] via-[#17472d]/85 to-transparent flex items-end justify-center pb-1 cursor-pointer rounded-b-3xl"
+          onClick={() => setExpandido(true)}
+          title="Toca para completar el resto del registro"
+        >
+          <span className="text-xs font-black uppercase text-yellow-300 underline underline-offset-2">
+            Sigue llenando aquí ▾
+          </span>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -2665,6 +2755,7 @@ function BotonNaranjaDesplegable({ titulo, abierto, onClick, children }) {
       <button
         type="button"
         onClick={onClick}
+        title={abierto ? "Toca para ocultar" : "Toca para ver más"}
         className="w-full text-left bg-[#e65100] hover:bg-[#bf360c] p-3 transition-colors flex items-center justify-between gap-3"
       >
         <p className="text-sm sm:text-base font-black text-white uppercase tracking-tight leading-tight">{titulo}</p>
@@ -3256,6 +3347,7 @@ function ModalMapaSitio({ onCerrar, onAbrirProyecto, onAbrirFAQ, onAbrirSugerenc
           <button
             onClick={onCerrar}
             aria-label="Cerrar"
+            title="Cerrar el Mapa del Sitio"
             className="shrink-0 h-9 w-9 flex items-center justify-center rounded-full bg-[#0f2d1e] text-white font-black hover:bg-emerald-800 transition-colors"
           >
             ×
@@ -3326,6 +3418,7 @@ function ModalCategoria({ categoria, onCerrar, onAbrirProyecto }) {
           <button
             onClick={onCerrar}
             aria-label="Cerrar"
+            title="Cerrar esta categoría"
             className="shrink-0 h-9 w-9 flex items-center justify-center rounded-full bg-[#0f2d1e] text-white font-black hover:bg-emerald-800 transition-colors"
           >
             ×
@@ -3338,7 +3431,7 @@ function ModalCategoria({ categoria, onCerrar, onAbrirProyecto }) {
             <button
               key={idx}
               type="button"
-              onClick={() => { onCerrar(); onAbrirProyecto(btn.modal); }}
+              onClick={() => onAbrirProyecto(btn.modal)}
               className="flex flex-col items-center gap-1.5 rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white shadow-sm transition-colors p-3 text-center font-heading"
             >
               {btn.img && (
@@ -3412,6 +3505,15 @@ function BotonVerdeInfo({ titulo, abierto, onClick, children }) {
 // Tally no carga, se usa el iframe normal como respaldo.
 function FormularioSolicitud() {
   const [respaldo, setRespaldo] = useState(false);
+  // Se muestra "a medias" (solo hasta el primer campo, Nombre) y se expande
+  // solo cuando la persona empieza a llenarlo. Como el formulario vive en
+  // un iframe de otro sitio (Tally), no podemos "ver" en qué campo va —
+  // solo podemos saber que EL FOCO entró al iframe (con el truco de
+  // comparar document.activeElement al perder el foco la ventana
+  // principal). Por eso la altura recortada (190px) es un cálculo
+  // aproximado de dónde termina el campo "Nombre", no algo exacto.
+  const [expandido, setExpandido] = useState(false);
+  const contenedorRef = useRef(null);
   const urlDinamica = GOOGLE_FORM_SOLICITUDES_URL + (GOOGLE_FORM_SOLICITUDES_URL.includes("?") ? "&" : "?") + "dynamicHeight=1";
   useEffect(() => {
     const cargar = () => window.Tally && window.Tally.loadEmbeds && window.Tally.loadEmbeds();
@@ -3430,19 +3532,44 @@ function FormularioSolicitud() {
         setTimeout(() => irASeccion("solicitudes"), 150);
       }
     };
+    const alPerderFoco = () => {
+      const iframe = contenedorRef.current && contenedorRef.current.querySelector("iframe");
+      if (iframe && document.activeElement === iframe) setExpandido(true);
+    };
     window.addEventListener("message", alMensaje);
-    return () => window.removeEventListener("message", alMensaje);
+    window.addEventListener("blur", alPerderFoco);
+    return () => {
+      window.removeEventListener("message", alMensaje);
+      window.removeEventListener("blur", alPerderFoco);
+    };
   }, []);
-  return respaldo ? (
-    <iframe src={GOOGLE_FORM_SOLICITUDES_URL} title="Formulario de solicitud DCUATES" className="w-full" style={{ minHeight: 640, border: 0 }} />
-  ) : (
-    <iframe
-      data-tally-src={urlDinamica}
-      title="Formulario de solicitud DCUATES"
-      className="w-full"
-      style={{ minHeight: 320, border: 0 }}
-      loading="lazy"
-    />
+  return (
+    <div ref={contenedorRef} className="relative">
+      <div className={expandido ? "" : "overflow-hidden"} style={{ height: expandido ? "auto" : 190 }}>
+        {respaldo ? (
+          <iframe src={GOOGLE_FORM_SOLICITUDES_URL} title="Formulario de solicitud DCUATES" className="w-full" style={{ minHeight: 640, border: 0 }} />
+        ) : (
+          <iframe
+            data-tally-src={urlDinamica}
+            title="Formulario de solicitud DCUATES"
+            className="w-full"
+            style={{ minHeight: expandido ? 640 : 810, border: 0 }}
+            loading="lazy"
+          />
+        )}
+      </div>
+      {!expandido && (
+        <div
+          className="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-white via-white/90 to-transparent flex items-end justify-center pb-1 cursor-pointer"
+          onClick={() => setExpandido(true)}
+          title="Toca para ver el formulario completo"
+        >
+          <span className="text-xs font-black uppercase text-[#e65100] underline underline-offset-2">
+            Completa tus datos aquí ▾
+          </span>
+        </div>
+      )}
+    </div>
   );
 }
 
