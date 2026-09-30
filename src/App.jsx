@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import BloqueCentral from "./BloqueCentral";
+import BannerAvisos from "./BannerAvisos";
 
 // =========================================================================
 // 1. CONFIGURACIÓN CENTRALIZADA DE VARIABLES, REDES Y HOJA DE CÁLCULO y BORRADO DE TODOS LOS ANTERIORES JSX CAMBIOS VIDEOS
@@ -25,6 +26,15 @@ const CLAVE_CIRCULO_CONFIANZA = "confianza2026";
 // Maps/My Maps y pega aquí el nuevo link de "Insertar un mapa" (src del
 // iframe); no hace falta tocar nada más en el código.
 const MAPA_NEGOCIOS_EMBED_URL = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15034.541076557625!2d-99.00223799999999!3d19.600120500000003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1ee234c038987%3A0x4b578513910d8103!2sJardines%20de%20Morelos%2C%20Ecatepec%20de%20Morelos%2C%20M%C3%A9x.!5e0!3m2!1ses!2smx!4v1790129394750!5m2!1ses!2smx";
+
+// Banner de avisos (arriba de las pestañas). Estos son avisos MANUALES,
+// editables aquí mismo; además el banner suma solo los videos de Historias
+// y las fotos de Retos que ya vienen de Baserow. tipo: "imagen" | "pdf" |
+// "texto" (un "pdf" lleva url en vez de img). Ejemplo de uso:
+//   { id: "pdf-1", tipo: "pdf", titulo: "Convocatoria", url: "/docs/convocatoria.pdf" }
+const AVISOS_MANUALES = [
+  { id: "aviso-bibliobici", tipo: "imagen", titulo: "Bibliobici Móvil DCUATES", subtitulo: "Préstamo gratuito de libros para la comunidad", img: "/images/bibliobici-movil.png" }
+];
 
 // Ventana de Solicitudes — formulario visible directo en la página (no es
 // modal), debajo del mapa de negocios (busca id="solicitudes" más abajo en
@@ -121,7 +131,16 @@ function enlaceWhatsApp(mensaje) {
 // misma página (usada por los botones que en vez de abrir WhatsApp llevan
 // directo a un formulario, ej. "Publicar mi negocio" o "Extraviados y Adopciones").
 function irASeccion(id) {
-  document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  const el = document.getElementById(id);
+  if (el) {
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+    return;
+  }
+  // La sección vive dentro de una pestaña que está cerrada (ej. Apoyo
+  // Voluntario en Causas): se le pide al bloque de pestañas que la abra y
+  // después se baja hasta ella.
+  window.dispatchEvent(new CustomEvent("dcuates:abrir-seccion", { detail: id }));
+  setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" }), 300);
 }
 
 // Datos de EJEMPLO para la barra ticker inferior — reemplázalos por contenido real
@@ -864,6 +883,28 @@ export default function App() {
   // Historias y Patrocinadores).
   const { scrollRef: scrollRetosVideosRef, onPointerDown: onPointerDownRetosVideos } = useCarruselAutomatico(videosRetos.length);
 
+  // Banner de avisos superior: avisos manuales + videos de Historias +
+  // fotos de Retos (ambos ya vienen de Baserow). Al tocar un video se abre
+  // en grande con el mismo visor de siempre.
+  const avisosBanner = [
+    ...AVISOS_MANUALES,
+    ...videosPortada.slice(0, 5).map((v, i) => ({
+      id: `aviso-video-${i}`,
+      tipo: "video",
+      titulo: v.nombre,
+      subtitulo: "Historias DCUATES",
+      media: <MiniaturaVideo video={v.video} nombre={v.nombre} />,
+      onClick: () => setVideoEnGrande(v.video)
+    })),
+    ...galeriaRetos.slice(0, 5).map((g, i) => ({
+      id: `aviso-reto-${i}`,
+      tipo: "imagen",
+      titulo: "Retos, regalos y reconocimientos",
+      subtitulo: "Comparte y gana con DCUATES",
+      img: resolverSrcImagen(g.img)
+    }))
+  ];
+
   const recomendacionesDcuates = (() => {
     const desdeBaserow = paresBaserow(filasEnlaces, "Nombre Recocasa", "RECASA", 5);
     return desdeBaserow.length > 0 ? desdeBaserow : RECOMENDACIONES_ESTRELLA.dcuates;
@@ -970,13 +1011,28 @@ export default function App() {
       </div>
 
       {/* SECCIÓN PORTADA / HERO — izquierda: título+texto+Quiénes Somos+Bibliobici a toda altura; derecha: cuadrícula de 12 botones (2 columnas en celular, 3 en escritorio = 3x4) */}
-      <section id="inicio" className="scroll-mt-48 md:scroll-mt-36 bg-[#e8f5e9] text-[#0f2d1e] py-8 px-4 sm:py-12 md:py-16 border-b-4 border-[#0f2d1e]">
-        <div className="mx-auto max-w-7xl grid gap-8 lg:grid-cols-12 lg:items-stretch">
+      <section id="inicio" className="scroll-mt-48 md:scroll-mt-36 bg-[#e8f5e9] text-[#0f2d1e] py-4 px-4 sm:py-6 border-b-4 border-[#0f2d1e]">
+        <div className="mx-auto max-w-2xl flex flex-col gap-4">
 
-          {/* Columna izquierda: título, texto, Quiénes Somos y la Bibliobici, todo a la misma altura que la cuadrícula de botones */}
-          <div className="lg:col-span-6 flex flex-col gap-4 min-w-0 lg:h-full">
+          {/* Banner de avisos + bloque central de 7 pestañas (BloqueCentral).
+              Nosotros y Causas reciben aquí su contenido; lo que sigue
+              debajo (Retos, Historias, Solicitudes, etc.) se migrará a
+              su pestaña en la fase 2. */}
+          <div className="min-w-0">
+            <div className="mb-3">
+              <BannerAvisos items={avisosBanner} />
+            </div>
+            <BloqueCentral
+              categorias={CATEGORIAS_PROYECTOS}
+              proyectos={BOTONES_PORTADA}
+              mapaUrl={MAPA_NEGOCIOS_EMBED_URL}
+              whatsappNumero={WHATSAPP_NUMERO}
+              onAbrirCategoria={(id) => setCategoriaAbierta(id)}
+              onAbrirProyecto={(id) => setModalProyecto(id)}
+              nosotros={(
+                <div className="flex flex-col gap-4 min-w-0">
             <div>
-              <h1 className="text-3xl sm:text-4xl font-black uppercase tracking-tight text-[#0f2d1e] leading-tight">
+              <h1 className="sr-only">
                 Juntos hacemos una mejor comunidad ⭐ 😊
               </h1>
               <p className={`text-sm sm:text-base text-slate-800 leading-relaxed text-justify font-medium overflow-hidden mt-3 ${heroExpandido ? "max-h-none" : "max-h-[4.9em]"}`}>
@@ -1075,32 +1131,118 @@ export default function App() {
               </div>
             </div>
 
-            {/* Bibliobici — cubre el espacio restante hasta la altura de la última fila de botones */}
-            <div className="rounded-2xl overflow-hidden border-4 border-[#0f2d1e]/30 shadow-lg h-56 sm:h-72 lg:h-auto lg:flex-1 bg-[#0f2d1e]/5">
-              <img
-                src="/images/bibliobici-movil.png"
-                alt="Bibliobici Móvil DCUATES en la comunidad"
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.target.style.display = 'none';
-                  e.target.parentElement.innerHTML = '<div class="p-12 text-center text-[#0f2d1e]/70 font-bold uppercase text-xs tracking-wider bg-emerald-50 h-full flex items-center justify-center">📷 [Espacio para Foto de la Bibliobici]</div>';
-                }}
-              />
+                </div>
+              )}
+              causas={(
+              <div id="donaciones" className="scroll-mt-48 md:scroll-mt-36 flex flex-col gap-y-6 text-[#0f2d1e]">
+          {/* Bloque 1: intro + CTA — fila 1 en escritorio (col. izquierda) */}
+          <div className="space-y-6">
+            <span className="inline-block rounded-full bg-emerald-200 px-5 py-2 text-lg sm:text-2xl font-black uppercase tracking-wider text-emerald-800 shadow-sm">
+              🟢 Apoyo Voluntario
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-tight leading-none text-[#0f2d1e] font-heading">
+              TU APORTACIÓN IMPULSA A LA COMUNIDAD
+            </h2>
+            <p className="text-base sm:text-lg text-slate-700 leading-relaxed text-justify font-bold">
+              Cada donativo, del formato que decidas, nos ayuda a sostener y hacer crecer los proyectos que benefician a los negocios y familias latinas en conjunto con DCUATES Y CONEXIONES CON CAUSA ♥
+            </p>
+            <p className="text-lg sm:text-xl font-black uppercase text-center text-white bg-[#e65100] border-4 border-[#0f2d1e] rounded-2xl py-4 px-5 shadow-md leading-snug">
+              ¡Tu apoyo hoy es el cambio que nuestra comunidad necesita — súmate ahora! ♥
+            </p>
+          </div>
+
+          {/* Bloque 3: transparencia — fila 2 en escritorio (col. izquierda), justo antes del video en móvil */}
+          <div>
+            <div className="h-full rounded-2xl bg-emerald-200 border-2 border-emerald-500/40 p-5 sm:p-6 text-base sm:text-lg font-black text-emerald-900 leading-relaxed flex items-start gap-3 shadow-sm">
+              <span className="text-2xl">💡</span>
+              <p className="text-justify uppercase tracking-wide">
+                Rendimos cuentas de cómo se usa cada aportación con total transparencia. Parte de la utilidad de nuestros proyectos y de lo que los amigos y la comunidad suman se destina al apoyo de causas sociales como esta gran causa y ejemplo de vida y de lo que se puede lograr con la suma de voluntades, talentos y corazones solidarios ♥
+              </p>
             </div>
           </div>
 
-          {/* Cuadrícula de las 4 categorías (portada simplificada) — 2x2 en
-              celular y en escritorio, botones grandes con logo/emoji al
-              centro. Cada una abre ModalCategoria con la presentación y el
-              acceso a los proyectos que agrupa. */}
-          <div className="lg:col-span-6">
-            <BloqueCentral
-              categorias={CATEGORIAS_PROYECTOS}
-              proyectos={BOTONES_PORTADA}
-              mapaUrl={MAPA_NEGOCIOS_EMBED_URL}
-              whatsappNumero={WHATSAPP_NUMERO}
-              onAbrirCategoria={(id) => setCategoriaAbierta(id)}
-              onAbrirProyecto={(id) => setModalProyecto(id)}
+          {/* Bloque 4: flecha + video de Chuy — fila 2 en escritorio (col. derecha), justo después de la transparencia en móvil.
+              col-start-6 (en vez de 7) para que la flecha quede pegada al cuadro de transparencia, sin columna vacía de por medio;
+              col-span-7 (en vez de 6) le da más ancho al video, y por lo tanto también más alto. */}
+          <div id="chuy-video" className="scroll-mt-48 flex flex-col  items-center gap-2 ">
+            {/* Flecha con relleno naranja: apunta hacia abajo en móvil y hacia la derecha en escritorio */}
+            <div className="flex justify-center items-center shrink-0" aria-hidden="true">
+              <svg
+                viewBox="0 0 100 60"
+                preserveAspectRatio="none"
+                className="w-14 h-24 sm:w-16 sm:h-28 rotate-90  drop-shadow-md"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M4 22 H58 V4 L96 30 L58 56 V38 H4 Z"
+                  fill="#e65100"
+                  stroke="#0f2d1e"
+                  strokeWidth="5"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+
+            <div className="w-full">
+              <div className="rounded-2xl overflow-hidden border-4 border-[#0f2d1e] shadow-lg bg-black aspect-[4/3] sm:aspect-[16/10]">
+                <iframe
+                  className="w-full h-full"
+                  src={`https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID}`}
+                  title="Video de Chuy — DCUATES"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                ></iframe>
+              </div>
+              <a
+                href="https://chuytrujillo.blogspot.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 block cursor-pointer rounded-2xl border-4 border-[#0f2d1e] bg-[#e65100] hover:bg-[#bf360c] text-white font-black uppercase text-sm sm:text-base px-4 py-3.5 shadow-md transition-all hover:scale-[1.01] text-justify leading-snug"
+              >
+                Conoce la vida y obra de nuestro amigo y maestro de vida, Chuy, el Sapo Soñador aquí: https://chuytrujillo.blogspot.com/
+              </a>
+            </div>
+          </div>
+
+          {/* Bloque 2: selecciona tu tipo de aportación + botones — fila 1 en escritorio (col. derecha) */}
+          <div className="space-y-3">
+            <p className="text-xl sm:text-2xl font-black uppercase tracking-wide text-[#0f2d1e] mb-4 block leading-tight">
+              Selecciona el tipo de aportación que te agrade más:
+            </p>
+            {[
+              { t: "Aportación Económica", d: "Solicita los datos bancarios de manera directa y segura.", m: "¡Hola DCUATES! Deseo realizar una Aportación Económica. ¿Me podrías proporcionar los datos seguros?" },
+              { t: "Aportación en Especie", d: "Apoya donando herramientas, materiales o insumos útiles.", m: "¡Hola DCUATES! Quiero realizar una Aportación en Especie. ¿Qué tipo de herramientas o insumos se requieren actualmente?" },
+              { t: "Trueque Solidario", d: "Intercambia productos o servicios de valor equivalente.", m: "¡Hola DCUATES! Me interesa el Trueque Solidario. Tengo productos/servicios para intercambiar a favor de la causa." },
+              { t: "Labor Voluntaria", d: "Dona tu valioso tiempo y conocimientos para crecer juntos.", m: "¡Hola DCUATES! Quiero sumarme con Labor Voluntaria aportando mi tiempo y conocimientos comunitarios." }
+            ].map((opc) => (
+              <a
+                key={opc.t}
+                href={enlaceWhatsApp(opc.m)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full text-left rounded-2xl border-4 border-[#0f2d1e] bg-[#e65100] hover:bg-[#bf360c] p-4 sm:p-5 shadow-md transition-all hover:scale-[1.01] group duration-200 block"
+              >
+                <div className="flex justify-between items-center gap-3">
+                  <div>
+                    <p className="text-xl sm:text-2xl font-black text-white uppercase tracking-tight leading-tight">{opc.t}</p>
+                    <p className="text-sm sm:text-base font-bold text-[#0f2d1e] uppercase tracking-wide leading-snug pt-1">{opc.d}</p>
+                  </div>
+                  <svg
+                    viewBox="0 0 100 60"
+                    preserveAspectRatio="none"
+                    className="w-8 h-8 sm:w-10 sm:h-10 shrink-0 opacity-90 group-hover:opacity-100 transition-all drop-shadow"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path d="M4 22 H58 V4 L96 30 L58 56 V38 H4 Z" fill="#ffffff" stroke="#0f2d1e" strokeWidth="6" strokeLinejoin="round" />
+                  </svg>
+                </div>
+              </a>
+            ))}
+          </div>
+
+              </div>
+              )}
             />
 
 
@@ -1108,7 +1250,7 @@ export default function App() {
               {/* Retos, Regalos y Reconocimientos DCUATES — 3 columnas: carrusel
                   de fotos (Baserow: RETOSGALERIA) | botones naranjas | videos
                   relacionados (Baserow: NOMBRE RETOSVID / RETOSVID). */}
-              <div className="mt-3">
+              <div id="retos-regalos" className="mt-3 scroll-mt-48 md:scroll-mt-36">
                 <div className="rounded-2xl overflow-hidden border-4 border-[#0f2d1e]/30 shadow-lg bg-[#0f2d1e] p-3">
                   <p className="text-white font-black uppercase text-xs sm:text-sm tracking-wide mb-2 px-1 text-center">
                     🔎 Retos, Regalos y Reconocimientos DCUATES
@@ -1572,119 +1714,6 @@ export default function App() {
               </BotonNaranjaDesplegable>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* SECCIÓN: APORTE VOLUNTARIO */}
-      <section id="donaciones" className="scroll-mt-48 md:scroll-mt-36 bg-[#e8f5e9] text-[#0f2d1e] py-12 sm:py-20 px-4 border-b-4 border-[#0f2d1e]">
-        <div className="mx-auto max-w-6xl flex flex-col md:grid md:grid-cols-12 gap-y-8 md:gap-x-10 md:gap-y-10">
-
-          {/* Bloque 1: intro + CTA — fila 1 en escritorio (col. izquierda) */}
-          <div className="order-1 md:order-none md:col-start-1 md:col-span-5 md:row-start-1 space-y-6">
-            <span className="inline-block rounded-full bg-emerald-200 px-5 py-2 text-lg sm:text-2xl font-black uppercase tracking-wider text-emerald-800 shadow-sm">
-              🟢 Apoyo Voluntario
-            </span>
-            <h2 className="text-4xl sm:text-5xl font-black uppercase tracking-tight leading-none text-[#0f2d1e] font-heading">
-              TU APORTACIÓN IMPULSA A LA COMUNIDAD
-            </h2>
-            <p className="text-base sm:text-lg text-slate-700 leading-relaxed text-justify font-bold">
-              Cada donativo, del formato que decidas, nos ayuda a sostener y hacer crecer los proyectos que benefician a los negocios y familias latinas en conjunto con DCUATES Y CONEXIONES CON CAUSA ♥
-            </p>
-            <p className="text-lg sm:text-xl font-black uppercase text-center text-white bg-[#e65100] border-4 border-[#0f2d1e] rounded-2xl py-4 px-5 shadow-md leading-snug">
-              ¡Tu apoyo hoy es el cambio que nuestra comunidad necesita — súmate ahora! ♥
-            </p>
-          </div>
-
-          {/* Bloque 2: selecciona tu tipo de aportación + botones — fila 1 en escritorio (col. derecha) */}
-          <div className="order-4 md:order-none md:col-start-6 md:col-span-7 md:row-start-1 space-y-3">
-            <p className="text-xl sm:text-3xl font-black uppercase tracking-wide text-[#0f2d1e] mb-4 block leading-tight">
-              Selecciona el tipo de aportación que te agrade más:
-            </p>
-            {[
-              { t: "Aportación Económica", d: "Solicita los datos bancarios de manera directa y segura.", m: "¡Hola DCUATES! Deseo realizar una Aportación Económica. ¿Me podrías proporcionar los datos seguros?" },
-              { t: "Aportación en Especie", d: "Apoya donando herramientas, materiales o insumos útiles.", m: "¡Hola DCUATES! Quiero realizar una Aportación en Especie. ¿Qué tipo de herramientas o insumos se requieren actualmente?" },
-              { t: "Trueque Solidario", d: "Intercambia productos o servicios de valor equivalente.", m: "¡Hola DCUATES! Me interesa el Trueque Solidario. Tengo productos/servicios para intercambiar a favor de la causa." },
-              { t: "Labor Voluntaria", d: "Dona tu valioso tiempo y conocimientos para crecer juntos.", m: "¡Hola DCUATES! Quiero sumarme con Labor Voluntaria aportando mi tiempo y conocimientos comunitarios." }
-            ].map((opc) => (
-              <a
-                key={opc.t}
-                href={enlaceWhatsApp(opc.m)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full text-left rounded-2xl border-4 border-[#0f2d1e] bg-[#e65100] hover:bg-[#bf360c] p-4 sm:p-5 shadow-md transition-all hover:scale-[1.01] group duration-200 block"
-              >
-                <div className="flex justify-between items-center gap-3">
-                  <div>
-                    <p className="text-xl sm:text-2xl font-black text-white uppercase tracking-tight leading-tight">{opc.t}</p>
-                    <p className="text-sm sm:text-base font-bold text-[#0f2d1e] uppercase tracking-wide leading-snug pt-1">{opc.d}</p>
-                  </div>
-                  <svg
-                    viewBox="0 0 100 60"
-                    preserveAspectRatio="none"
-                    className="w-8 h-8 sm:w-10 sm:h-10 shrink-0 opacity-90 group-hover:opacity-100 transition-all drop-shadow"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path d="M4 22 H58 V4 L96 30 L58 56 V38 H4 Z" fill="#ffffff" stroke="#0f2d1e" strokeWidth="6" strokeLinejoin="round" />
-                  </svg>
-                </div>
-              </a>
-            ))}
-          </div>
-
-          {/* Bloque 3: transparencia — fila 2 en escritorio (col. izquierda), justo antes del video en móvil */}
-          <div className="order-2 md:order-none md:col-start-1 md:col-span-5 md:row-start-2">
-            <div className="h-full rounded-2xl bg-emerald-200 border-2 border-emerald-500/40 p-5 sm:p-6 text-base sm:text-lg font-black text-emerald-900 leading-relaxed flex items-start gap-3 shadow-sm">
-              <span className="text-2xl">💡</span>
-              <p className="text-justify uppercase tracking-wide">
-                Rendimos cuentas de cómo se usa cada aportación con total transparencia. Parte de la utilidad de nuestros proyectos y de lo que los amigos y la comunidad suman se destina al apoyo de causas sociales como esta gran causa y ejemplo de vida y de lo que se puede lograr con la suma de voluntades, talentos y corazones solidarios ♥
-              </p>
-            </div>
-          </div>
-
-          {/* Bloque 4: flecha + video de Chuy — fila 2 en escritorio (col. derecha), justo después de la transparencia en móvil.
-              col-start-6 (en vez de 7) para que la flecha quede pegada al cuadro de transparencia, sin columna vacía de por medio;
-              col-span-7 (en vez de 6) le da más ancho al video, y por lo tanto también más alto. */}
-          <div id="chuy-video" className="scroll-mt-48 md:scroll-mt-36 order-3 md:order-none md:col-start-6 md:col-span-7 md:row-start-2 flex flex-col md:flex-row items-center gap-2 md:gap-3">
-            {/* Flecha con relleno naranja: apunta hacia abajo en móvil y hacia la derecha en escritorio */}
-            <div className="flex justify-center items-center shrink-0" aria-hidden="true">
-              <svg
-                viewBox="0 0 100 60"
-                preserveAspectRatio="none"
-                className="w-14 h-24 sm:w-16 sm:h-28 md:w-20 md:h-36 rotate-90 md:rotate-0 drop-shadow-md"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M4 22 H58 V4 L96 30 L58 56 V38 H4 Z"
-                  fill="#e65100"
-                  stroke="#0f2d1e"
-                  strokeWidth="5"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </div>
-
-            <div className="w-full">
-              <div className="rounded-2xl overflow-hidden border-4 border-[#0f2d1e] shadow-lg bg-black aspect-[4/3] sm:aspect-[16/10]">
-                <iframe
-                  className="w-full h-full"
-                  src={`https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID}`}
-                  title="Video de Chuy — DCUATES"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                ></iframe>
-              </div>
-              <a
-                href="https://chuytrujillo.blogspot.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-3 block cursor-pointer rounded-2xl border-4 border-[#0f2d1e] bg-[#e65100] hover:bg-[#bf360c] text-white font-black uppercase text-sm sm:text-base px-4 py-3.5 shadow-md transition-all hover:scale-[1.01] text-justify leading-snug"
-              >
-                Conoce la vida y obra de nuestro amigo y maestro de vida, Chuy, el Sapo Soñador aquí: https://chuytrujillo.blogspot.com/
-              </a>
-            </div>
-          </div>
-
         </div>
       </section>
 
