@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import BloqueCentral from "./BloqueCentral";
-import BannerAvisos from "./BannerAvisos";
+import CarruselVideos from "./CarruselVideos";
 
 // =========================================================================
 // 1. CONFIGURACIÓN CENTRALIZADA DE VARIABLES, REDES Y HOJA DE CÁLCULO y BORRADO DE TODOS LOS ANTERIORES JSX CAMBIOS VIDEOS
@@ -26,15 +26,6 @@ const CLAVE_CIRCULO_CONFIANZA = "confianza2026";
 // Maps/My Maps y pega aquí el nuevo link de "Insertar un mapa" (src del
 // iframe); no hace falta tocar nada más en el código.
 const MAPA_NEGOCIOS_EMBED_URL = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15034.541076557625!2d-99.00223799999999!3d19.600120500000003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1ee234c038987%3A0x4b578513910d8103!2sJardines%20de%20Morelos%2C%20Ecatepec%20de%20Morelos%2C%20M%C3%A9x.!5e0!3m2!1ses!2smx!4v1790129394750!5m2!1ses!2smx";
-
-// Banner de avisos (arriba de las pestañas). Estos son avisos MANUALES,
-// editables aquí mismo; además el banner suma solo los videos de Historias
-// y las fotos de Retos que ya vienen de Baserow. tipo: "imagen" | "pdf" |
-// "texto" (un "pdf" lleva url en vez de img). Ejemplo de uso:
-//   { id: "pdf-1", tipo: "pdf", titulo: "Convocatoria", url: "/docs/convocatoria.pdf" }
-const AVISOS_MANUALES = [
-  { id: "aviso-bibliobici", tipo: "imagen", titulo: "Bibliobici Móvil DCUATES", subtitulo: "Préstamo gratuito de libros para la comunidad", img: "/images/bibliobici-movil.png" }
-];
 
 // Ventana de Solicitudes — formulario visible directo en la página (no es
 // modal), debajo del mapa de negocios (busca id="solicitudes" más abajo en
@@ -717,11 +708,55 @@ const RETOS_REGALOS_ITEMS = [
 // Los 3 botones naranjas de Retos/Regalos/Reconocimiento se despliegan
 // (uno a la vez) mostrando ejemplos y un botón inferior para que el público
 // mande su propia propuesta por WhatsApp. Edita "ejemplos" en el arreglo de arriba.
-function BotonesRetosRegalos() {
+// Botones naranjas de portada (Historias, Cupones, Patrocinadores): cada
+// uno vive ahora dentro de su pestaña. "modales" elige cuáles mostrar.
+function BotonesNaranjasSeccion({ modales, onAbrir }) {
+  const todos = [
+                    { t: "HISTORIAS DCUATES", modal: "historias-dcuates", img: "/images/HistoriasDCUATES.png", puntos: ["TESTIMONIOS REALES", "HISTORIAS CON CAUSA", "INSPIRACIÓN COMUNITARIA"] },
+                    { t: "CUPONES, PROMOS Y MÁS", modal: "cupones-promos", img: "/images/CuponesPromos.png", puntos: ["DESCUENTOS EXCLUSIVOS", "PROMOCIONES LOCALES", "SE ACTUALIZA CADA MES"] },
+                    { t: "PATROCINADORES Y ALIANZAS DCUATES", modal: "patrocinadores-alianzas", img: "/images/PatrocinadoresAlianzas.png", puntos: ["NEGOCIOS ALIADOS", "ORGANIZACIONES QUE APOYAN", "¡GRACIAS POR SUMAR!"] }
+  ];
+  const lista = todos.filter((b) => modales.includes(b.modal));
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      {lista.map((btn, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => onAbrir(btn.modal)}
+                      className="flex flex-col rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white shadow-md transition-all hover:scale-[1.02] overflow-hidden font-heading text-left w-full"
+                    >
+                      <div className="px-2 pt-3 pb-1 text-center border-b border-white/20">
+                        <h4 className="uppercase font-black leading-tight text-sm sm:text-base lg:text-lg">
+                          {btn.t}
+                        </h4>
+                      </div>
+                      <div className="flex flex-1 items-center gap-2 px-2 py-2">
+                        <div className="w-2/5 h-full flex items-center justify-center">
+                          <img
+                            src={btn.img}
+                            alt=""
+                            loading="lazy"
+                            className="max-h-16 sm:max-h-20 w-auto object-contain drop-shadow"
+                            onError={(e) => { e.target.style.display = 'none'; }}
+                          />
+                        </div>
+                        <ul className="w-3/5 space-y-1 text-left text-[10px] sm:text-xs font-bold leading-snug">
+                          {btn.puntos.map((p, i) => <li key={i}>* {p}</li>)}
+                        </ul>
+                      </div>
+                    </button>
+      ))}
+    </div>
+  );
+}
+
+function BotonesRetosRegalos({ indices }) {
   const [abierto, setAbierto] = useState(null);
   return (
     <div className="flex flex-col gap-2">
       {RETOS_REGALOS_ITEMS.map((item, i) => {
+        if (indices && !indices.includes(i)) return null;
         const activo = abierto === i;
         return (
           <div key={i} className="rounded-xl overflow-hidden">
@@ -879,31 +914,16 @@ export default function App() {
   const videosRetos = paresBaserow(filasEnlaces, "NOMBRE RETOSVID", "RETOSVID", 8)
     .map((v) => ({ video: detectarVideo(v.enlace), nombre: v.nombre }))
     .filter((v) => v.video);
-  // Rotación automática de la tira de videos de Retos (misma lógica que
-  // Historias y Patrocinadores).
-  const { scrollRef: scrollRetosVideosRef, onPointerDown: onPointerDownRetosVideos } = useCarruselAutomatico(videosRetos.length);
 
-  // Banner de avisos superior: avisos manuales + videos de Historias +
-  // fotos de Retos (ambos ya vienen de Baserow). Al tocar un video se abre
-  // en grande con el mismo visor de siempre.
-  const avisosBanner = [
-    ...AVISOS_MANUALES,
-    ...videosPortada.slice(0, 5).map((v, i) => ({
-      id: `aviso-video-${i}`,
-      tipo: "video",
-      titulo: v.nombre,
-      subtitulo: "Historias DCUATES",
-      media: <MiniaturaVideo video={v.video} nombre={v.nombre} />,
-      onClick: () => setVideoEnGrande(v.video)
-    })),
-    ...galeriaRetos.slice(0, 5).map((g, i) => ({
-      id: `aviso-reto-${i}`,
-      tipo: "imagen",
-      titulo: "Retos, regalos y reconocimientos",
-      subtitulo: "Comparte y gana con DCUATES",
-      img: resolverSrcImagen(g.img)
-    }))
-  ];
+  // Carrusel superior: los videos de "NOMBRE RETOSVID / RETOSVID" (Baserow).
+  // Al tocar uno se abre en grande con el visor de siempre.
+  const carruselSuperior = videosRetos.map((v, i) => ({
+    id: `retos-${i}`,
+    tipo: "video",
+    nombre: v.nombre,
+    media: <MiniaturaVideo video={v.video} nombre={v.nombre} />,
+    onClick: () => setVideoEnGrande(v.video)
+  }));
 
   const recomendacionesDcuates = (() => {
     const desdeBaserow = paresBaserow(filasEnlaces, "Nombre Recocasa", "RECASA", 5);
@@ -1012,7 +1032,7 @@ export default function App() {
 
       {/* SECCIÓN PORTADA / HERO — izquierda: título+texto+Quiénes Somos+Bibliobici a toda altura; derecha: cuadrícula de 12 botones (2 columnas en celular, 3 en escritorio = 3x4) */}
       <section id="inicio" className="scroll-mt-48 md:scroll-mt-36 bg-[#e8f5e9] text-[#0f2d1e] py-4 px-4 sm:py-6 border-b-4 border-[#0f2d1e]">
-        <div className="mx-auto max-w-2xl flex flex-col gap-4">
+        <div className="mx-auto max-w-2xl md:max-w-4xl xl:max-w-6xl flex flex-col gap-4">
 
           {/* Banner de avisos + bloque central de 7 pestañas (BloqueCentral).
               Nosotros y Causas reciben aquí su contenido; lo que sigue
@@ -1020,7 +1040,7 @@ export default function App() {
               su pestaña en la fase 2. */}
           <div className="min-w-0">
             <div className="mb-3">
-              <BannerAvisos items={avisosBanner} />
+              <CarruselVideos items={carruselSuperior} />
             </div>
             <BloqueCentral
               categorias={CATEGORIAS_PROYECTOS}
@@ -1029,8 +1049,340 @@ export default function App() {
               whatsappNumero={WHATSAPP_NUMERO}
               onAbrirCategoria={(id) => setCategoriaAbierta(id)}
               onAbrirProyecto={(id) => setModalProyecto(id)}
-              nosotros={(
+              beneficios={(
                 <div className="flex flex-col gap-4 min-w-0">
+                  <BotonesNaranjasSeccion modales={["cupones-promos"]} onAbrir={(id) => setModalProyecto(id)} />
+<div id="solicitudes" className="mt-3 scroll-mt-40 sm:scroll-mt-36 rounded-2xl overflow-hidden border-4 border-[#0f2d1e]/30 shadow-lg bg-white">
+                <div className="bg-[#e65100] px-3 py-2">
+                  <p className="text-white font-black uppercase text-xs sm:text-sm tracking-wide text-center">
+                    📝 Registra tu Solicitud
+                  </p>
+                </div>
+                <div className="p-4 space-y-3">
+                  <p className="text-sm text-slate-600 font-medium leading-relaxed text-center">
+                    Cuéntanos qué necesitas con el siguiente formulario. En cuanto lo revisemos, te contactamos directo por WhatsApp para darle seguimiento.
+                  </p>
+
+                  {/* Accesos rápidos — para quien llega directo desde
+                      WhatsApp sin conocer el resto de la página, un vistazo
+                      rápido de qué más hay antes de llenar el formulario. */}
+                  <div className="flex flex-wrap justify-center gap-2">
+                    <button type="button" onClick={() => setModalProyecto("libros")} className="rounded-full bg-emerald-100 text-[#0f2d1e] text-[11px] font-black uppercase px-3 py-1.5 hover:bg-emerald-200 transition-colors">📚 Libros</button>
+                    <button type="button" onClick={() => setModalProyecto("ecatepets")} className="rounded-full bg-emerald-100 text-[#0f2d1e] text-[11px] font-black uppercase px-3 py-1.5 hover:bg-emerald-200 transition-colors">🐾 Mascotas</button>
+                    <button type="button" onClick={() => setModalProyecto("asesorias")} className="rounded-full bg-emerald-100 text-[#0f2d1e] text-[11px] font-black uppercase px-3 py-1.5 hover:bg-emerald-200 transition-colors">🎓 Asesorías</button>
+                    <button type="button" onClick={() => setModalProyecto("donaciones")} className="rounded-full bg-emerald-100 text-[#0f2d1e] text-[11px] font-black uppercase px-3 py-1.5 hover:bg-emerald-200 transition-colors">💚 Apoyo Voluntario</button>
+                    <button
+                      type="button"
+                      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                      className="rounded-full bg-amber-100 text-[#0f2d1e] text-[11px] font-black uppercase px-3 py-1.5 hover:bg-amber-200 transition-colors"
+                    >
+                      🏆 Ver Logros
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowFAQ(true)}
+                      className="rounded-full bg-emerald-100 text-[#0f2d1e] text-[11px] font-black uppercase px-3 py-1.5 hover:bg-emerald-200 transition-colors"
+                    >
+                      ❓ Preguntas Frecuentes
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setBusquedaAbierta(true)}
+                      className="rounded-full bg-emerald-100 text-[#0f2d1e] text-[11px] font-black uppercase px-3 py-1.5 hover:bg-emerald-200 transition-colors"
+                    >
+                      🔍 Buscar
+                    </button>
+                  </div>
+
+                  <div className="relative rounded-xl overflow-hidden border-2 border-emerald-100">
+                    <div
+                      className="overflow-hidden transition-[max-height] duration-300"
+                      style={{ maxHeight: solicitudExpandida ? 2000 : 210 }}
+                      onClick={() => { if (!solicitudExpandida) setSolicitudExpandida(true); }}
+                      onFocus={() => setSolicitudExpandida(true)}
+                    >
+                      <FormularioSolicitud />
+                    </div>
+                    {!solicitudExpandida && (
+                      <div className="absolute inset-x-0 bottom-0 flex items-end justify-center bg-gradient-to-t from-white/95 via-white/70 to-transparent pb-2 pt-8">
+                        <button
+                          type="button"
+                          onClick={() => setSolicitudExpandida(true)}
+                          className="rounded-full bg-[#e65100] hover:bg-[#bf360c] text-white font-black uppercase text-[10px] sm:text-[11px] tracking-wide px-4 py-1.5 shadow-md transition-colors"
+                        >
+                          ✍️ Toca para completar tu registro
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  {solicitudExpandida && (
+                    <button
+                      type="button"
+                      onClick={() => setSolicitudExpandida(false)}
+                      className="w-full rounded-lg border-2 border-emerald-200 text-emerald-800 hover:bg-emerald-50 font-black uppercase tracking-wide text-[11px] py-2 transition-colors"
+                    >
+                      ▲ Ver menos
+                    </button>
+                  )}
+
+                  <div className="text-center pt-1">
+                    <p className="text-xs text-slate-500 font-medium mb-2">¿Prefieres contarnos directo?</p>
+                    <a
+                      href={enlaceWhatsApp("¡Hola DCUATES! Quiero registrar una solicitud de apoyo.")}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block rounded-lg bg-[#25d366] hover:bg-[#1da851] text-white font-black uppercase text-xs px-4 py-2.5 transition-colors"
+                    >
+                      💬 Escríbenos por WhatsApp
+                    </a>
+                  </div>
+                </div>
+              </div>
+                </div>
+              )}
+              valores={(
+                <div className="flex flex-col gap-4 min-w-0">
+                  <BotonesNaranjasSeccion modales={["historias-dcuates"]} onAbrir={(id) => setModalProyecto(id)} />
+                  <div id="recursos" className="scroll-mt-48 md:scroll-mt-36 rounded-2xl bg-[#0f2d1e] p-4">
+          <p className="text-white font-black uppercase text-sm sm:text-base tracking-wide text-center mb-3">
+            🔎 Más recursos e información de valor
+          </p>
+            {/* Recomendaciones / Música-Libros-Pelis / Preguntas Frecuentes,
+                en fila horizontal debajo del video (antes eran una columna
+                al lado del video). */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-3">
+              <BotonVerdeInfo
+                titulo="Recomendaciones ⭐⭐⭐⭐⭐"
+                abierto={infoAbierta === "recomendaciones"}
+                onClick={() => setInfoAbierta((v) => (v === "recomendaciones" ? null : "recomendaciones"))}
+              >
+                <p className="font-black uppercase text-emerald-300 text-[11px] tracking-wide">Recomendaciones DCUATES</p>
+                <ul className="space-y-1">
+                  {recomendacionesDcuates.map((r, i) => (
+                    <li key={i}>
+                      <a href={r.enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-300">
+                        {r.nombre}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+                <p className="font-black uppercase text-emerald-300 text-[11px] tracking-wide pt-2">Recomendaciones de la Comunidad</p>
+                <ul className="space-y-1">
+                  {recomendacionesComunidad.map((r, i) => (
+                    <li key={i}>
+                      <a href={r.enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-300">
+                        {r.nombre}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+                <p className="pt-2 font-black uppercase text-emerald-300">Si necesitas alguna recomendación en especial, contáctanos !!!</p>
+              </BotonVerdeInfo>
+
+              <BotonVerdeInfo
+                titulo="Música, Libros, Pelis y Más... 🎵📚🎬"
+                abierto={infoAbierta === "recursos"}
+                onClick={() => setInfoAbierta((v) => (v === "recursos" ? null : "recursos"))}
+              >
+                <p className="font-black uppercase text-emerald-300 text-[11px] tracking-wide">🎵 Música</p>
+                <ul className="space-y-1">
+                  {musicaLinks.map((enlace, i) => (
+                    <li key={i}>
+                      <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-300">
+                        Música {i + 1}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+                <p className="font-black uppercase text-emerald-300 text-[11px] tracking-wide pt-2">📚 Libros</p>
+                <ul className="space-y-1">
+                  {librosLinks.map((enlace, i) => (
+                    <li key={i}>
+                      <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-300">
+                        Libro {i + 1}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+                <p className="font-black uppercase text-emerald-300 text-[11px] tracking-wide pt-2">🎬 Películas y Más</p>
+                <ul className="space-y-1">
+                  {videosLinks.map((enlace, i) => (
+                    <li key={i}>
+                      <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-300">
+                        Recurso {i + 1}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </BotonVerdeInfo>
+
+              <BotonVerdeInfo
+                titulo="Preguntas Frecuentes ❓💬"
+                abierto={infoAbierta === "faq"}
+                onClick={() => setInfoAbierta((v) => (v === "faq" ? null : "faq"))}
+              >
+                <div className="space-y-2">
+                  {FAQ_ITEMS.map((f, i) => (
+                    <details key={i} className="rounded-lg bg-emerald-900/40 px-3 py-2">
+                      <summary className="cursor-pointer text-xs sm:text-sm font-bold">{f.pregunta}</summary>
+                      <p className="mt-1 text-xs text-emerald-100/90 leading-relaxed">{f.respuesta}</p>
+                    </details>
+                  ))}
+                </div>
+              </BotonVerdeInfo>
+            </div>
+        
+                  </div>
+                </div>
+              )}
+              negocios={(
+                <div className="flex flex-col gap-6 min-w-0 text-[#0f2d1e]">
+                  <div id="ventas-con-causa" className="scroll-mt-48 md:scroll-mt-36">
+          <div className="text-center max-w-2xl mx-auto mb-6 space-y-3">
+            <span className="inline-block rounded-full bg-emerald-200 px-5 py-2 text-lg sm:text-2xl font-black uppercase tracking-wider text-emerald-800 shadow-sm">
+              🛍️ Ventas con Causa
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-tight leading-none text-[#0f2d1e] font-heading">
+              Productos y servicios que también apoyan la comunidad
+            </h2>
+            <p className="text-sm sm:text-base text-slate-700 font-bold">
+              Artículos y servicios de vecinos y negocios locales. Explora, cuéntanos qué te interesa o qué estás buscando, y te contactamos directo por WhatsApp.
+            </p>
+          </div>
+
+          {/* Pasarela de Ventas con Causa — a la izquierda el carrusel, a la
+              derecha el registro (como botón desplegable) y el acceso al
+              catálogo/canal de WhatsApp. */}
+          <div className="max-w-3xl mx-auto mb-4">
+            <PasarelaVentasConCausa />
+          </div>
+          <div className="max-w-3xl mx-auto mb-8">
+            <BotonNaranjaDesplegable
+              titulo="🛍️ Regístrate, ve el catálogo completo y descubre recomendaciones de Compra y Venta"
+              abierto={ventasResumenAbierto}
+              onClick={() => setVentasResumenAbierto((v) => !v)}
+            >
+              <div className="space-y-4">
+                <div>
+                  <p className="font-black uppercase text-[#0f2d1e] text-[11px] tracking-wide mb-2">Si algo te gustó y deseas apartarlo o comprarlo, regístralo aquí</p>
+                  <FormularioVentasConCausa />
+                </div>
+
+                <a
+                  href="https://whatsapp.com/channel/0029Vb8gAjd1dAvyGu9Jmv1i"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full text-left rounded-xl border-2 border-[#0f2d1e] bg-[#e65100] hover:bg-[#bf360c] p-3 shadow-sm transition-colors flex items-center justify-between gap-3"
+                >
+                  <p className="text-sm sm:text-base font-black text-white uppercase tracking-tight leading-tight">
+                    Si quieres ver más productos y catálogos, da clic aquí !!!
+                  </p>
+                  <FlechaBlanca />
+                </a>
+
+                {/* Recomendaciones de Compra/Venta/Compra-Venta DCUATES —
+                    muestran el nombre de cada liga (columna "NOMBRE ...");
+                    si esa columna no existe o está vacía en una fila, se
+                    numeran solas como "Recomendación 1, 2...". */}
+                <div>
+                  <p className="font-black uppercase text-[#0f2d1e] text-[11px] tracking-wide mb-1">Recomendaciones de Compra</p>
+                  {recomendacionesCompra.length === 0 && <p>Muy pronto encontrarás aquí recomendaciones de compra.</p>}
+                  <ul className="space-y-1.5">
+                    {recomendacionesCompra.map((r, i) => (
+                      <li key={i}>
+                        <a href={r.enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100]">
+                          {r.nombre}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div>
+                  <p className="font-black uppercase text-[#0f2d1e] text-[11px] tracking-wide mb-1">Recomendaciones de Venta</p>
+                  {recomendacionesVenta.length === 0 && <p>Muy pronto encontrarás aquí recomendaciones de venta.</p>}
+                  <ul className="space-y-1.5">
+                    {recomendacionesVenta.map((r, i) => (
+                      <li key={i}>
+                        <a href={r.enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100]">
+                          {r.nombre}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div>
+                  <p className="font-black uppercase text-[#0f2d1e] text-[11px] tracking-wide mb-1">Compra-Venta DCUATES</p>
+                  {compraVentaDcuates.length === 0 && <p>Muy pronto encontrarás aquí más opciones de compra-venta DCUATES.</p>}
+                  <ul className="space-y-1.5">
+                    {compraVentaDcuates.map((r, i) => (
+                      <li key={i}>
+                        <a href={r.enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100]">
+                          {r.nombre}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </BotonNaranjaDesplegable>
+          </div>
+
+
+                  </div>
+                  <div id="publicidad" className="scroll-mt-48 md:scroll-mt-36 rounded-2xl bg-[#17472d] text-white p-4 sm:p-6">
+          <div className="text-center space-y-2 mb-8">
+            <span className="inline-block rounded-full bg-emerald-900/60 px-5 py-2 text-lg sm:text-2xl font-black uppercase tracking-wider text-emerald-400">
+              📢 Publicidad Comunitaria
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-black text-center uppercase tracking-tight text-emerald-300">
+              Publica tu negocio gratis
+            </h2>
+            <p className="text-xs font-bold text-emerald-100/70 uppercase max-w-md mx-auto leading-relaxed">
+              Comparte la información de tu negocio, sube imágenes de tus promociones y publicidad, y agrega tu página o redes sociales. Tu aportación voluntaria es bienvenida.
+            </p>
+          </div>
+          <FormularioPublicidad />
+        
+                  </div>
+                </div>
+              )}
+              regalos={(
+                <div id="retos-regalos" className="scroll-mt-48 md:scroll-mt-36 rounded-2xl bg-[#0f2d1e] p-3 sm:p-4">
+                  <p className="text-white font-black uppercase text-xs sm:text-sm tracking-wide mb-3 px-1 text-center">
+                    🔎 Retos, Regalos y Reconocimientos DCUATES
+                    <span className="block normal-case font-bold text-emerald-100">Porque todo lo bueno merece ser compartido y reconocido, envíanos tus propuestas.</span>
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <BotonesRetosRegalos indices={[0, 1]} />
+                    <div className="rounded-xl overflow-hidden bg-white/5 border border-white/10 flex items-center justify-center min-h-[180px]">
+                      {galeriaRetos.length > 0 ? (
+                        <Carrusel
+                          items={galeriaRetos}
+                          renderItem={(item) => (
+                            <img src={resolverSrcImagen(item.img)} alt={item.nombre} loading="lazy" className="w-full aspect-square object-cover" />
+                          )}
+                        />
+                      ) : (
+                        <p className="text-emerald-200/70 text-[10px] font-bold uppercase tracking-wide text-center px-4">
+                          Sube fotos a la columna "RETOSGALERIA" en Baserow para verlas aquí
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+              gratitud={(
+                <div className="flex flex-col gap-4 min-w-0">
+                  <div className="rounded-2xl bg-[#0f2d1e] p-3 sm:p-4">
+                    <BotonesRetosRegalos indices={[2]} />
+                  </div>
+                  <BotonesNaranjasSeccion modales={["patrocinadores-alianzas"]} onAbrir={(id) => setModalProyecto(id)} />
+                </div>
+              )}
+              nosotros={(
+                <div className="flex flex-col gap-4 min-w-0 lg:grid lg:grid-cols-2 lg:items-start">
             <div>
               <h1 className="sr-only">
                 Juntos hacemos una mejor comunidad ⭐ 😊
@@ -1134,8 +1486,10 @@ export default function App() {
                 </div>
               )}
               causas={(
-              <div id="donaciones" className="scroll-mt-48 md:scroll-mt-36 flex flex-col gap-y-6 text-[#0f2d1e]">
-          {/* Bloque 1: intro + CTA — fila 1 en escritorio (col. izquierda) */}
+              <>
+              <div id="donaciones" className="scroll-mt-48 md:scroll-mt-36 flex flex-col gap-y-6 lg:grid lg:grid-cols-2 lg:gap-x-8 lg:gap-y-6 lg:items-start text-[#0f2d1e]">
+                <div className="lg:order-1 min-w-0">
+{/* Bloque 1: intro + CTA — fila 1 en escritorio (col. izquierda) */}
           <div className="space-y-6">
             <span className="inline-block rounded-full bg-emerald-200 px-5 py-2 text-lg sm:text-2xl font-black uppercase tracking-wider text-emerald-800 shadow-sm">
               🟢 Apoyo Voluntario
@@ -1151,7 +1505,9 @@ export default function App() {
             </p>
           </div>
 
-          {/* Bloque 3: transparencia — fila 2 en escritorio (col. izquierda), justo antes del video en móvil */}
+                          </div>
+                <div className="lg:order-3 min-w-0">
+{/* Bloque 3: transparencia — fila 2 en escritorio (col. izquierda), justo antes del video en móvil */}
           <div>
             <div className="h-full rounded-2xl bg-emerald-200 border-2 border-emerald-500/40 p-5 sm:p-6 text-base sm:text-lg font-black text-emerald-900 leading-relaxed flex items-start gap-3 shadow-sm">
               <span className="text-2xl">💡</span>
@@ -1161,7 +1517,9 @@ export default function App() {
             </div>
           </div>
 
-          {/* Bloque 4: flecha + video de Chuy — fila 2 en escritorio (col. derecha), justo después de la transparencia en móvil.
+                          </div>
+                <div className="lg:order-4 min-w-0">
+{/* Bloque 4: flecha + video de Chuy — fila 2 en escritorio (col. derecha), justo después de la transparencia en móvil.
               col-start-6 (en vez de 7) para que la flecha quede pegada al cuadro de transparencia, sin columna vacía de por medio;
               col-span-7 (en vez de 6) le da más ancho al video, y por lo tanto también más alto. */}
           <div id="chuy-video" className="scroll-mt-48 flex flex-col  items-center gap-2 ">
@@ -1205,7 +1563,9 @@ export default function App() {
             </div>
           </div>
 
-          {/* Bloque 2: selecciona tu tipo de aportación + botones — fila 1 en escritorio (col. derecha) */}
+                          </div>
+                <div className="lg:order-2 min-w-0">
+{/* Bloque 2: selecciona tu tipo de aportación + botones — fila 1 en escritorio (col. derecha) */}
           <div className="space-y-3">
             <p className="text-xl sm:text-2xl font-black uppercase tracking-wide text-[#0f2d1e] mb-4 block leading-tight">
               Selecciona el tipo de aportación que te agrade más:
@@ -1241,378 +1601,11 @@ export default function App() {
             ))}
           </div>
 
-              </div>
-              )}
-            />
-
-
-
-              {/* Retos, Regalos y Reconocimientos DCUATES — 3 columnas: carrusel
-                  de fotos (Baserow: RETOSGALERIA) | botones naranjas | videos
-                  relacionados (Baserow: NOMBRE RETOSVID / RETOSVID). */}
-              <div id="retos-regalos" className="mt-3 scroll-mt-48 md:scroll-mt-36">
-                <div className="rounded-2xl overflow-hidden border-4 border-[#0f2d1e]/30 shadow-lg bg-[#0f2d1e] p-3">
-                  <p className="text-white font-black uppercase text-xs sm:text-sm tracking-wide mb-2 px-1 text-center">
-                    🔎 Retos, Regalos y Reconocimientos DCUATES
-                    <br className="sm:hidden" />
-                    <span className="block sm:inline sm:ml-1 normal-case font-bold text-emerald-100">Porque todo lo bueno merece ser compartido y reconocido, envíanos tus propuestas</span>
-                  </p>
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-                    {/* Columna central: los 3 botones naranjas (desplegables con ejemplos) */}
-                    <div className="order-1 lg:order-2">
-                      <BotonesRetosRegalos />
-                    </div>
-
-                    {/* Columna 2: carrusel de fotos (RETOSGALERIA en Baserow) */}
-                    <div className="order-2 lg:order-1 rounded-xl overflow-hidden bg-white/5 border border-white/10 flex items-center justify-center min-h-[180px]">
-                      {galeriaRetos.length > 0 ? (
-                        <Carrusel
-                          items={galeriaRetos}
-                          renderItem={(item) => (
-                            <img
-                              src={resolverSrcImagen(item.img)}
-                              alt={item.nombre}
-                              loading="lazy"
-                              className="w-full aspect-square object-cover"
-                            />
-                          )}
-                        />
-                      ) : (
-                        <p className="text-emerald-200/70 text-[10px] font-bold uppercase tracking-wide text-center px-4">
-                          Sube fotos a la columna "RETOSGALERIA" en Baserow para verlas aquí
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Columna 3: videos relacionados (NOMBRE RETOSVID / RETOSVID) — tira horizontal con rotación automática */}
-                    <div className="order-3 rounded-xl bg-white/5 border border-white/10 p-2 min-h-[180px] flex items-center">
-                      {videosRetos.length > 0 ? (
-                        <div
-                          ref={scrollRetosVideosRef}
-                          onPointerDown={onPointerDownRetosVideos}
-                          className="flex gap-2 overflow-x-auto pb-1 w-full"
-                        >
-                          {videosRetos.map((v, i) => (
-                            <button
-                              key={i}
-                              type="button"
-                              onClick={() => setVideoEnGrande(v.video)}
-                              className="group relative rounded-lg overflow-hidden border-2 border-white/10 hover:border-[#e65100] transition-colors bg-black/30 text-left shrink-0 w-32"
-                            >
-                              <div className="aspect-video w-full overflow-hidden">
-                                <MiniaturaVideo video={v.video} nombre={v.nombre} />
-                              </div>
-                              <span className="absolute inset-0 flex items-center justify-center">
-                                <span className="w-8 h-8 rounded-full bg-[#e65100]/90 flex items-center justify-center text-white text-sm shadow-md group-hover:bg-[#e65100]">▶</span>
-                              </span>
-                              <p className="px-2 py-1 text-[10px] font-black text-white uppercase tracking-tight leading-tight">
-                                {v.nombre}
-                              </p>
-                            </button>
-                          ))}
-                        </div>
-                      ) : (
-                        <p className="text-emerald-200/70 text-[10px] font-bold uppercase tracking-wide text-center px-2 py-6 w-full">
-                          Sube videos con las columnas "NOMBRE RETOSVID" y "RETOSVID" en Baserow para verlos aquí
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {videoEnGrande && (
-                  <div
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 backdrop-blur-sm"
-                    onClick={() => setVideoEnGrande(null)}
-                  >
-                    <div className="relative w-full max-w-3xl" onClick={(e) => e.stopPropagation()}>
-                      <button
-                        type="button"
-                        onClick={() => setVideoEnGrande(null)}
-                        className="absolute -top-10 right-0 text-white text-2xl font-black hover:text-[#e65100] transition-colors"
-                        aria-label="Cerrar video"
-                      >
-                        ✕
-                      </button>
-                      <div className="rounded-2xl overflow-hidden border-4 border-white/20 shadow-2xl aspect-video bg-black">
-                        <IframeVideo video={videoEnGrande} className="w-full h-full" />
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* 3 botones naranjas nuevos — mismo estilo que los de arriba,
-                    cada uno abre su propio modal con el carrusel adentro (el
-                    logo de cada uno se agrega después en /public/images/,
-                    con el mismo nombre de archivo que aquí abajo). */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
-                  {[
-                    { t: "HISTORIAS DCUATES", modal: "historias-dcuates", img: "/images/HistoriasDCUATES.png", puntos: ["TESTIMONIOS REALES", "HISTORIAS CON CAUSA", "INSPIRACIÓN COMUNITARIA"] },
-                    { t: "CUPONES, PROMOS Y MÁS", modal: "cupones-promos", img: "/images/CuponesPromos.png", puntos: ["DESCUENTOS EXCLUSIVOS", "PROMOCIONES LOCALES", "SE ACTUALIZA CADA MES"] },
-                    { t: "PATROCINADORES Y ALIANZAS DCUATES", modal: "patrocinadores-alianzas", img: "/images/PatrocinadoresAlianzas.png", puntos: ["NEGOCIOS ALIADOS", "ORGANIZACIONES QUE APOYAN", "¡GRACIAS POR SUMAR!"] }
-                  ].map((btn, idx) => (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => setModalProyecto(btn.modal)}
-                      className="flex flex-col rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white shadow-md transition-all hover:scale-[1.02] overflow-hidden font-heading text-left w-full"
-                    >
-                      <div className="px-2 pt-3 pb-1 text-center border-b border-white/20">
-                        <h4 className="uppercase font-black leading-tight text-sm sm:text-base lg:text-lg">
-                          {btn.t}
-                        </h4>
-                      </div>
-                      <div className="flex flex-1 items-center gap-2 px-2 py-2">
-                        <div className="w-2/5 h-full flex items-center justify-center">
-                          <img
-                            src={btn.img}
-                            alt=""
-                            loading="lazy"
-                            className="max-h-16 sm:max-h-20 w-auto object-contain drop-shadow"
-                            onError={(e) => { e.target.style.display = 'none'; }}
-                          />
-                        </div>
-                        <ul className="w-3/5 space-y-1 text-left text-[10px] sm:text-xs font-bold leading-snug">
-                          {btn.puntos.map((p, i) => <li key={i}>* {p}</li>)}
-                        </ul>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-
-              {/* Ventana de Solicitudes — VISIBLE directo en la página (no
-                  modal), justo debajo del mapa. Para dirigir tráfico desde
-                  WhatsApp Business a esta sección exacta: comparte el link
-                  https://dcuates.com/#solicitudes (o el dominio que uses) —
-                  el navegador baja solo hasta aquí, sin necesitar nada de
-                  código (el id="solicitudes" + scroll-mt de abajo ya hacen
-                  que no quede tapada por el encabezado). */}
-              <div id="solicitudes" className="mt-3 scroll-mt-40 sm:scroll-mt-36 rounded-2xl overflow-hidden border-4 border-[#0f2d1e]/30 shadow-lg bg-white">
-                <div className="bg-[#e65100] px-3 py-2">
-                  <p className="text-white font-black uppercase text-xs sm:text-sm tracking-wide text-center">
-                    📝 Registra tu Solicitud
-                  </p>
-                </div>
-                <div className="p-4 space-y-3">
-                  <p className="text-sm text-slate-600 font-medium leading-relaxed text-center">
-                    Cuéntanos qué necesitas con el siguiente formulario. En cuanto lo revisemos, te contactamos directo por WhatsApp para darle seguimiento.
-                  </p>
-
-                  {/* Accesos rápidos — para quien llega directo desde
-                      WhatsApp sin conocer el resto de la página, un vistazo
-                      rápido de qué más hay antes de llenar el formulario. */}
-                  <div className="flex flex-wrap justify-center gap-2">
-                    <button type="button" onClick={() => setModalProyecto("libros")} className="rounded-full bg-emerald-100 text-[#0f2d1e] text-[11px] font-black uppercase px-3 py-1.5 hover:bg-emerald-200 transition-colors">📚 Libros</button>
-                    <button type="button" onClick={() => setModalProyecto("ecatepets")} className="rounded-full bg-emerald-100 text-[#0f2d1e] text-[11px] font-black uppercase px-3 py-1.5 hover:bg-emerald-200 transition-colors">🐾 Mascotas</button>
-                    <button type="button" onClick={() => setModalProyecto("asesorias")} className="rounded-full bg-emerald-100 text-[#0f2d1e] text-[11px] font-black uppercase px-3 py-1.5 hover:bg-emerald-200 transition-colors">🎓 Asesorías</button>
-                    <button type="button" onClick={() => setModalProyecto("donaciones")} className="rounded-full bg-emerald-100 text-[#0f2d1e] text-[11px] font-black uppercase px-3 py-1.5 hover:bg-emerald-200 transition-colors">💚 Apoyo Voluntario</button>
-                    <button
-                      type="button"
-                      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-                      className="rounded-full bg-amber-100 text-[#0f2d1e] text-[11px] font-black uppercase px-3 py-1.5 hover:bg-amber-200 transition-colors"
-                    >
-                      🏆 Ver Logros
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setShowFAQ(true)}
-                      className="rounded-full bg-emerald-100 text-[#0f2d1e] text-[11px] font-black uppercase px-3 py-1.5 hover:bg-emerald-200 transition-colors"
-                    >
-                      ❓ Preguntas Frecuentes
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setBusquedaAbierta(true)}
-                      className="rounded-full bg-emerald-100 text-[#0f2d1e] text-[11px] font-black uppercase px-3 py-1.5 hover:bg-emerald-200 transition-colors"
-                    >
-                      🔍 Buscar
-                    </button>
-                  </div>
-
-                  <div className="relative rounded-xl overflow-hidden border-2 border-emerald-100">
-                    <div
-                      className="overflow-hidden transition-[max-height] duration-300"
-                      style={{ maxHeight: solicitudExpandida ? 2000 : 210 }}
-                      onClick={() => { if (!solicitudExpandida) setSolicitudExpandida(true); }}
-                      onFocus={() => setSolicitudExpandida(true)}
-                    >
-                      <FormularioSolicitud />
-                    </div>
-                    {!solicitudExpandida && (
-                      <div className="absolute inset-x-0 bottom-0 flex items-end justify-center bg-gradient-to-t from-white/95 via-white/70 to-transparent pb-2 pt-8">
-                        <button
-                          type="button"
-                          onClick={() => setSolicitudExpandida(true)}
-                          className="rounded-full bg-[#e65100] hover:bg-[#bf360c] text-white font-black uppercase text-[10px] sm:text-[11px] tracking-wide px-4 py-1.5 shadow-md transition-colors"
-                        >
-                          ✍️ Toca para completar tu registro
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                  {solicitudExpandida && (
-                    <button
-                      type="button"
-                      onClick={() => setSolicitudExpandida(false)}
-                      className="w-full rounded-lg border-2 border-emerald-200 text-emerald-800 hover:bg-emerald-50 font-black uppercase tracking-wide text-[11px] py-2 transition-colors"
-                    >
-                      ▲ Ver menos
-                    </button>
-                  )}
-
-                  <div className="text-center pt-1">
-                    <p className="text-xs text-slate-500 font-medium mb-2">¿Prefieres contarnos directo?</p>
-                    <a
-                      href={enlaceWhatsApp("¡Hola DCUATES! Quiero registrar una solicitud de apoyo.")}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-block rounded-lg bg-[#25d366] hover:bg-[#1da851] text-white font-black uppercase text-xs px-4 py-2.5 transition-colors"
-                    >
-                      💬 Escríbenos por WhatsApp
-                    </a>
-                  </div>
                 </div>
               </div>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      {/* HISTORIAS Y REFLEXIONES DCUATES — movida aquí (antes vivía dentro
-          del hero); ahora como barra horizontal de 1-2 videos de alto, con
-          scroll lateral para ver más. Sigue tomando sus videos de las
-          columnas "NOMBRE VIDPORT" / "VIDPORT" en Baserow. */}
-      <section id="historias-reflexiones" className="scroll-mt-48 md:scroll-mt-36 bg-[#0f2d1e] py-6 px-4 border-b-4 border-[#0f2d1e]">
-        <div className="mx-auto max-w-6xl">
-          <p className="text-white font-black uppercase text-xs sm:text-sm tracking-wide mb-2 px-1 text-center">
-            Historias y reflexiones DCUATES que INSPIRAN 💡
-            <br className="sm:hidden" />
-            <span className="block sm:inline sm:ml-1">Dales clic para ampliarlos y disfrutarlos 🎥 🍿 😊</span>
-          </p>
-          <div
-            ref={carruselHistorias.scrollRef}
-            onPointerDown={carruselHistorias.onPointerDown}
-            className="flex gap-2 sm:gap-3 overflow-x-auto pb-1"
-          >
-            {videosPortadaFinal.map((v, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => setVideoEnGrande(v.video)}
-                className="group relative rounded-xl overflow-hidden border-2 border-white/10 hover:border-[#e65100] transition-colors bg-black/30 text-left w-40 sm:w-56 shrink-0"
-              >
-                <div className="aspect-video w-full overflow-hidden">
-                  <MiniaturaVideo video={v.video} nombre={v.nombre} />
-                </div>
-                <span className="absolute inset-0 flex items-center justify-center">
-                  <span className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-[#e65100]/90 flex items-center justify-center text-white text-base sm:text-lg shadow-md group-hover:bg-[#e65100]">▶</span>
-                </span>
-                <p className="px-2 py-1.5 text-[10px] sm:text-xs font-black text-white uppercase tracking-tight leading-tight">
-                  {v.nombre}
-                </p>
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* SECCIÓN: VENTAS CON CAUSA */}
-      <section id="ventas-con-causa" className="scroll-mt-48 md:scroll-mt-36 bg-[#e8f5e9] text-[#0f2d1e] py-10 sm:py-16 px-4 border-b-4 border-[#0f2d1e]">
-        <div className="mx-auto max-w-6xl">
-          <div className="text-center max-w-2xl mx-auto mb-10 space-y-3">
-            <span className="inline-block rounded-full bg-emerald-200 px-5 py-2 text-lg sm:text-2xl font-black uppercase tracking-wider text-emerald-800 shadow-sm">
-              🛍️ Ventas con Causa
-            </span>
-            <h2 className="text-4xl sm:text-5xl font-black uppercase tracking-tight leading-none text-[#0f2d1e] font-heading">
-              Productos y servicios que también apoyan la comunidad
-            </h2>
-            <p className="text-sm sm:text-base text-slate-700 font-bold">
-              Artículos y servicios de vecinos y negocios locales. Explora, cuéntanos qué te interesa o qué estás buscando, y te contactamos directo por WhatsApp.
-            </p>
-          </div>
-
-          {/* Pasarela de Ventas con Causa — a la izquierda el carrusel, a la
-              derecha el registro (como botón desplegable) y el acceso al
-              catálogo/canal de WhatsApp. */}
-          <div className="max-w-3xl mx-auto mb-4">
-            <PasarelaVentasConCausa />
-          </div>
-          <div className="max-w-3xl mx-auto mb-14">
-            <BotonNaranjaDesplegable
-              titulo="🛍️ Regístrate, ve el catálogo completo y descubre recomendaciones de Compra y Venta"
-              abierto={ventasResumenAbierto}
-              onClick={() => setVentasResumenAbierto((v) => !v)}
-            >
-              <div className="space-y-4">
-                <div>
-                  <p className="font-black uppercase text-[#0f2d1e] text-[11px] tracking-wide mb-2">Si algo te gustó y deseas apartarlo o comprarlo, regístralo aquí</p>
-                  <FormularioVentasConCausa />
-                </div>
-
-                <a
-                  href="https://whatsapp.com/channel/0029Vb8gAjd1dAvyGu9Jmv1i"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full text-left rounded-xl border-2 border-[#0f2d1e] bg-[#e65100] hover:bg-[#bf360c] p-3 shadow-sm transition-colors flex items-center justify-between gap-3"
-                >
-                  <p className="text-sm sm:text-base font-black text-white uppercase tracking-tight leading-tight">
-                    Si quieres ver más productos y catálogos, da clic aquí !!!
-                  </p>
-                  <FlechaBlanca />
-                </a>
-
-                {/* Recomendaciones de Compra/Venta/Compra-Venta DCUATES —
-                    muestran el nombre de cada liga (columna "NOMBRE ...");
-                    si esa columna no existe o está vacía en una fila, se
-                    numeran solas como "Recomendación 1, 2...". */}
-                <div>
-                  <p className="font-black uppercase text-[#0f2d1e] text-[11px] tracking-wide mb-1">Recomendaciones de Compra</p>
-                  {recomendacionesCompra.length === 0 && <p>Muy pronto encontrarás aquí recomendaciones de compra.</p>}
-                  <ul className="space-y-1.5">
-                    {recomendacionesCompra.map((r, i) => (
-                      <li key={i}>
-                        <a href={r.enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100]">
-                          {r.nombre}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div>
-                  <p className="font-black uppercase text-[#0f2d1e] text-[11px] tracking-wide mb-1">Recomendaciones de Venta</p>
-                  {recomendacionesVenta.length === 0 && <p>Muy pronto encontrarás aquí recomendaciones de venta.</p>}
-                  <ul className="space-y-1.5">
-                    {recomendacionesVenta.map((r, i) => (
-                      <li key={i}>
-                        <a href={r.enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100]">
-                          {r.nombre}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div>
-                  <p className="font-black uppercase text-[#0f2d1e] text-[11px] tracking-wide mb-1">Compra-Venta DCUATES</p>
-                  {compraVentaDcuates.length === 0 && <p>Muy pronto encontrarás aquí más opciones de compra-venta DCUATES.</p>}
-                  <ul className="space-y-1.5">
-                    {compraVentaDcuates.map((r, i) => (
-                      <li key={i}>
-                        <a href={r.enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100]">
-                          {r.nombre}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            </BotonNaranjaDesplegable>
-          </div>
-
+              <div className="mt-8 text-[#0f2d1e]">
           {/* Pasarela de mascotas, personas y cosas extraviadas */}
-          <div id="extraviados-registro" className="scroll-mt-48 md:scroll-mt-36 mt-14 max-w-5xl mx-auto">
+          <div id="extraviados-registro" className="scroll-mt-48 md:scroll-mt-36 mt-8 max-w-5xl mx-auto">
             <div className="text-center mb-6 space-y-2">
               <span className="inline-block rounded-full bg-emerald-200 px-5 py-2 text-base sm:text-xl font-black uppercase tracking-wider text-emerald-800 shadow-sm">
                 🔎 Mascotas, Personas y Cosas Extraviadas
@@ -1714,123 +1707,55 @@ export default function App() {
               </BotonNaranjaDesplegable>
             </div>
           </div>
+        
+              </div>
+              </>
+              )}
+            />
+          </div>
         </div>
       </section>
 
-      {/* SECCIÓN 4: FORMULARIO DE PUBLICIDAD */}
-      <section id="publicidad" className="scroll-mt-48 md:scroll-mt-36 bg-[#17472d] text-white py-10 sm:py-16 px-4">
-        <div className="mx-auto max-w-2xl">
-          <div className="text-center space-y-2 mb-8">
-            <span className="inline-block rounded-full bg-emerald-900/60 px-5 py-2 text-lg sm:text-2xl font-black uppercase tracking-wider text-emerald-400">
-              📢 Publicidad Comunitaria
-            </span>
-            <h2 className="text-4xl sm:text-5xl font-black text-center uppercase tracking-tight text-emerald-300">
-              Publica tu negocio gratis
-            </h2>
-            <p className="text-xs font-bold text-emerald-100/70 uppercase max-w-md mx-auto leading-relaxed">
-              Comparte la información de tu negocio, sube imágenes de tus promociones y publicidad, y agrega tu página o redes sociales. Tu aportación voluntaria es bienvenida.
-            </p>
+
+      {/* HISTORIAS Y REFLEXIONES DCUATES — movida aquí (antes vivía dentro
+          del hero); ahora como barra horizontal de 1-2 videos de alto, con
+          scroll lateral para ver más. Sigue tomando sus videos de las
+          columnas "NOMBRE VIDPORT" / "VIDPORT" en Baserow. */}
+      <section id="historias-reflexiones" className="scroll-mt-48 md:scroll-mt-36 bg-[#0f2d1e] py-6 px-4 border-b-4 border-[#0f2d1e]">
+        <div className="mx-auto max-w-6xl">
+          <p className="text-white font-black uppercase text-xs sm:text-sm tracking-wide mb-2 px-1 text-center">
+            Historias y reflexiones DCUATES que INSPIRAN 💡
+            <br className="sm:hidden" />
+            <span className="block sm:inline sm:ml-1">Dales clic para ampliarlos y disfrutarlos 🎥 🍿 😊</span>
+          </p>
+          <div
+            ref={carruselHistorias.scrollRef}
+            onPointerDown={carruselHistorias.onPointerDown}
+            className="flex gap-2 sm:gap-3 overflow-x-auto pb-1"
+          >
+            {videosPortadaFinal.map((v, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => setVideoEnGrande(v.video)}
+                className="group relative rounded-xl overflow-hidden border-2 border-white/10 hover:border-[#e65100] transition-colors bg-black/30 text-left w-40 sm:w-56 shrink-0"
+              >
+                <div className="aspect-video w-full overflow-hidden">
+                  <MiniaturaVideo video={v.video} nombre={v.nombre} />
+                </div>
+                <span className="absolute inset-0 flex items-center justify-center">
+                  <span className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-[#e65100]/90 flex items-center justify-center text-white text-base sm:text-lg shadow-md group-hover:bg-[#e65100]">▶</span>
+                </span>
+                <p className="px-2 py-1.5 text-[10px] sm:text-xs font-black text-white uppercase tracking-tight leading-tight">
+                  {v.nombre}
+                </p>
+              </button>
+            ))}
           </div>
-          <FormularioPublicidad />
         </div>
       </section>
 
       <div className="mt-[1.5cm] mb-[0.5cm]">
-      {/* SECCIÓN: Recomendaciones / Música-Libros-Pelis / Preguntas
-          Frecuentes — antes vivía en la portada; se movió aquí, al final,
-          justo antes de la barra de patrocinadores, para que la portada se
-          vea más corta en celular. */}
-      <section className="bg-[#0f2d1e] py-8 px-4 border-b-4 border-[#0f2d1e]">
-        <div className="max-w-5xl mx-auto">
-          <p className="text-white font-black uppercase text-sm sm:text-base tracking-wide text-center mb-3">
-            🔎 Más recursos e información de valor
-          </p>
-            {/* Recomendaciones / Música-Libros-Pelis / Preguntas Frecuentes,
-                en fila horizontal debajo del video (antes eran una columna
-                al lado del video). */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-3">
-              <BotonVerdeInfo
-                titulo="Recomendaciones ⭐⭐⭐⭐⭐"
-                abierto={infoAbierta === "recomendaciones"}
-                onClick={() => setInfoAbierta((v) => (v === "recomendaciones" ? null : "recomendaciones"))}
-              >
-                <p className="font-black uppercase text-emerald-300 text-[11px] tracking-wide">Recomendaciones DCUATES</p>
-                <ul className="space-y-1">
-                  {recomendacionesDcuates.map((r, i) => (
-                    <li key={i}>
-                      <a href={r.enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-300">
-                        {r.nombre}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-                <p className="font-black uppercase text-emerald-300 text-[11px] tracking-wide pt-2">Recomendaciones de la Comunidad</p>
-                <ul className="space-y-1">
-                  {recomendacionesComunidad.map((r, i) => (
-                    <li key={i}>
-                      <a href={r.enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-300">
-                        {r.nombre}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-                <p className="pt-2 font-black uppercase text-emerald-300">Si necesitas alguna recomendación en especial, contáctanos !!!</p>
-              </BotonVerdeInfo>
-
-              <BotonVerdeInfo
-                titulo="Música, Libros, Pelis y Más... 🎵📚🎬"
-                abierto={infoAbierta === "recursos"}
-                onClick={() => setInfoAbierta((v) => (v === "recursos" ? null : "recursos"))}
-              >
-                <p className="font-black uppercase text-emerald-300 text-[11px] tracking-wide">🎵 Música</p>
-                <ul className="space-y-1">
-                  {musicaLinks.map((enlace, i) => (
-                    <li key={i}>
-                      <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-300">
-                        Música {i + 1}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-                <p className="font-black uppercase text-emerald-300 text-[11px] tracking-wide pt-2">📚 Libros</p>
-                <ul className="space-y-1">
-                  {librosLinks.map((enlace, i) => (
-                    <li key={i}>
-                      <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-300">
-                        Libro {i + 1}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-                <p className="font-black uppercase text-emerald-300 text-[11px] tracking-wide pt-2">🎬 Películas y Más</p>
-                <ul className="space-y-1">
-                  {videosLinks.map((enlace, i) => (
-                    <li key={i}>
-                      <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-300">
-                        Recurso {i + 1}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </BotonVerdeInfo>
-
-              <BotonVerdeInfo
-                titulo="Preguntas Frecuentes ❓💬"
-                abierto={infoAbierta === "faq"}
-                onClick={() => setInfoAbierta((v) => (v === "faq" ? null : "faq"))}
-              >
-                <div className="space-y-2">
-                  {FAQ_ITEMS.map((f, i) => (
-                    <details key={i} className="rounded-lg bg-emerald-900/40 px-3 py-2">
-                      <summary className="cursor-pointer text-xs sm:text-sm font-bold">{f.pregunta}</summary>
-                      <p className="mt-1 text-xs text-emerald-100/90 leading-relaxed">{f.respuesta}</p>
-                    </details>
-                  ))}
-                </div>
-              </BotonVerdeInfo>
-            </div>
-        </div>
-      </section>
 
         <BarraPatrocinadores />
       </div>
@@ -1917,6 +1842,29 @@ export default function App() {
           Todos los derechos reservados
         </p>
       </footer>
+
+      {/* VISOR DE VIDEO EN GRANDE — global: lo usan el carrusel superior y el de Historias */}
+      {videoEnGrande && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 backdrop-blur-sm"
+          onClick={() => setVideoEnGrande(null)}
+        >
+          <div className="relative w-full max-w-3xl" onClick={(e) => e.stopPropagation()}>
+            <button
+              type="button"
+              onClick={() => setVideoEnGrande(null)}
+              className="absolute -top-10 right-0 text-white text-2xl font-black hover:text-[#e65100] transition-colors"
+              aria-label="Cerrar video"
+            >
+              ✕
+            </button>
+            <div className="rounded-2xl overflow-hidden border-4 border-white/20 shadow-2xl aspect-video bg-black">
+              <IframeVideo video={videoEnGrande} className="w-full h-full" />
+            </div>
+          </div>
+        </div>
+      )}
+
 
       {/* MODAL DEL AVISO DE PRIVACIDAD */}
       {showPrivacy && (

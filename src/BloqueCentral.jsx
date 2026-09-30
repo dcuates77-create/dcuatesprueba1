@@ -1,15 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 
 // =========================================================================
-// BLOQUE CENTRAL INTERACTIVO — DCUATES (CLON8) · FASE 1
-// Estructura única de 7 pestañas. En esta fase:
-//   - NOSOTROS y CAUSAS reciben su contenido REAL desde App.jsx (props
-//     "nosotros" y "causas": es el mismo JSX de siempre, con sus estados).
-//   - BENEFICIOS, VALORES, NEGOCIOS, REGALOS y GRATITUD muestran la tarjeta
-//     básica (portada, texto, proyectos, botones); su contenido definitivo
-//     se migra en la fase 2. Mientras tanto, Retos/Regalos, Historias,
-//     Ventas con Causa, Solicitudes, Publicidad y el cierre siguen debajo,
-//     sin cambios.
+// BLOQUE CENTRAL INTERACTIVO — DCUATES (CLON8) · FASE 2
+// Estructura única de 7 pestañas. Cada pestaña recibe desde App.jsx, en su
+// prop (nosotros, beneficios, causas, valores, negocios, regalos, gratitud),
+// el mismo JSX de siempre con sus estados. Orden dentro de cada pestaña:
+// portada o mapa -> texto -> fichas -> proyectos -> contenido -> botones.
+// Responsivo: celular primero; en tableta y PC el bloque se ensancha, las
+// pestañas caben todas sin deslizar y los carruseles pasan a rejillas.
 // Sin Tailwind: el CSS propio va al final (clases "bc-").
 // =========================================================================
 
@@ -20,7 +18,7 @@ const TABS = [
   },
   {
     id: "beneficios", label: "Beneficios", emoji: "🎁", color: "#F07A1A", pastel: "#FFF1E1",
-    cat: "beneficios-comunitarios", cover: {}, ver: true,
+    cat: "beneficios-comunitarios", cover: {}, ver: true, slot: "beneficios",
     texto: "Libros prestados, asesorías, bienestar y apoyo para tus mascotas. Todo gratis y cerca de ti.",
     wa: "¡Hola DCUATES! Quiero conocer los beneficios comunitarios disponibles."
   },
@@ -30,27 +28,25 @@ const TABS = [
   },
   {
     id: "valores", label: "Valores", emoji: "✨", color: "#7A5AD8", pastel: "#EFEAFE",
-    cat: "sumando-valores", cover: {}, ver: true,
+    cat: "sumando-valores", cover: {}, ver: true, slot: "valores",
     texto: "Confianza, alianzas y buenas noticias del barrio: así se fortalece nuestra comunidad.",
     wa: "¡Hola DCUATES! Quiero saber más sobre sus valores y alianzas."
   },
   {
     id: "negocios", label: "Negocios", emoji: "🗺️", color: "#2E9E5B", pastel: "#E4F6EB",
-    cat: "alianzas-y-negocios", mapa: true, fichas: true, ver: true,
+    cat: "alianzas-y-negocios", mapa: true, fichas: true, ver: true, slot: "negocios",
     texto: "Encuentra comercios aliados en Jardines de Morelos o registra el tuyo gratis.",
     wa: "¡Hola DCUATES! Quiero registrar mi negocio."
   },
   {
     id: "regalos", label: "Regalos", emoji: "🎉", color: "#D6336C", pastel: "#FDE8F1",
-    cover: { slogan: "Retos, regalos y reconocimientos" }, irA: { id: "retos-regalos", label: "Ver Retos y Regalos ↓" },
-    texto: "Porque todo lo bueno merece ser compartido. Envíanos tus propuestas de retos y regalos.",
-    wa: "¡Hola DCUATES! Quiero proponer un reto o un regalo para la comunidad."
+    cover: { slogan: "Retos y regalos que nos motivan" }, slot: "regalos",
+    texto: "Porque todo lo bueno merece ser compartido. Envíanos tus propuestas de retos y regalos."
   },
   {
     id: "gratitud", label: "Gratitud", emoji: "🙏", color: "#B7791F", pastel: "#FFF4D6",
-    cover: { slogan: "Gracias por hacer el bien" },
-    texto: "Reconocemos a quienes hacen el bien en nuestra comunidad. Cuéntanos a quién quieres agradecer.",
-    wa: "¡Hola DCUATES! Quiero proponer un reconocimiento para alguien de la comunidad."
+    cover: { slogan: "Gracias por hacer el bien" }, slot: "gratitud",
+    texto: "Reconocemos a quienes hacen el bien en nuestra comunidad. Cuéntanos a quién quieres agradecer."
   }
 ];
 
@@ -59,8 +55,14 @@ const TABS = [
 const ID_A_TAB = {
   donaciones: "causas",
   "chuy-video": "causas",
+  "extraviados-registro": "causas",
   "quienes-somos": "nosotros",
-  "mapa-negocios": "negocios"
+  solicitudes: "beneficios",
+  recursos: "valores",
+  "mapa-negocios": "negocios",
+  "ventas-con-causa": "negocios",
+  publicidad: "negocios",
+  "retos-regalos": "regalos"
 };
 
 // Fichas de EJEMPLO — reemplázalas con tus negocios reales (o usa la prop
@@ -140,8 +142,8 @@ export default function BloqueCentral({
   whatsappNumero,           // WHATSAPP_NUMERO
   negocios = NEGOCIOS_EJEMPLO,
   portadas = {},
-  nosotros = null,          // JSX de la pestaña Nosotros (viene de App.jsx)
-  causas = null,            // JSX de la pestaña Causas (viene de App.jsx)
+  nosotros = null, beneficios = null, causas = null, valores = null,
+  negocios: negociosSlot = null, regalos = null, gratitud = null,   // JSX de cada pestaña (viene de App.jsx)
   onAbrirCategoria = () => {},
   onAbrirProyecto = () => {}
 }) {
@@ -152,7 +154,7 @@ export default function BloqueCentral({
   const cat = categorias.find((c) => c.id === tab.cat) || {};
   const pct = Math.round(((idx + 1) / TABS.length) * 100);
   const wa = (m) => `https://wa.me/${whatsappNumero}?text=${encodeURIComponent(m)}`;
-  const slots = { nosotros, causas };
+  const slots = { nosotros, beneficios, causas, valores, negocios: negociosSlot, regalos, gratitud };
   const imgs = { ...PORTADAS_BASE, ...portadas };
 
   // Fuente redondeada (Nunito), una sola vez.
@@ -257,7 +259,7 @@ export default function BloqueCentral({
           {tab.texto && <p className="bc-text">{tab.texto}</p>}
 
           {tab.fichas && (
-            <div className="bc-snap" aria-label="Comercios aliados">
+            <div className="bc-snap bc-fichas" aria-label="Comercios aliados">
               {negocios.map((n) => (
                 <article className="bc-ficha" key={n.nombre}>
                   <span className="bc-ficha-ico" style={{ background: n.color }} aria-hidden="true">{n.emoji}</span>
@@ -327,19 +329,21 @@ export default function BloqueCentral({
 }
 
 const CSS = `
-.bc-root{--ink:#1f2a37;font-family:"Nunito","Varela Round",ui-rounded,system-ui,sans-serif;color:var(--ink);width:100%;max-width:640px;margin:0 auto;box-sizing:border-box;scroll-margin-top:192px}
+.bc-root{--ink:#1f2a37;--pad:16px;font-family:"Nunito","Varela Round",ui-rounded,system-ui,sans-serif;color:var(--ink);width:100%;margin:0 auto;box-sizing:border-box;scroll-margin-top:192px}
+.bc-root *{font-family:inherit}
 @media (min-width:768px){.bc-root{scroll-margin-top:144px}}
 .bc-shell{background:#fff;border-radius:16px;box-shadow:0 6px 20px rgba(31,42,55,.10);overflow:hidden}
 .bc-tabs{display:flex;gap:6px;padding:8px;overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:none;overscroll-behavior-x:contain}
 .bc-tabs::-webkit-scrollbar{display:none}
 .bc-tab{flex:0 0 84px;scroll-snap-align:center;display:flex;flex-direction:column;align-items:center;gap:4px;min-height:64px;padding:8px 4px;border:0;border-radius:14px;background:#f4f6f8;color:var(--ink);font-family:inherit;font-weight:800;font-size:13px;cursor:pointer;transition:background .2s,color .2s}
+.bc-tab:hover{background:#e9edf1}
 .bc-ico{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:17px;line-height:1;transition:background .2s}
 .bc-prog{padding:2px 14px 8px}
 .bc-track{height:6px;border-radius:99px;background:#e8ecef;overflow:hidden}
 .bc-fill{height:100%;border-radius:99px;transition:width .45s ease,background .3s}
 .bc-prog-txt{display:flex;justify-content:space-between;font-size:12px;font-weight:800;margin-top:4px;color:#5b6675}
 .bc-prog-txt b{color:var(--ink)}
-.bc-panel{padding:16px;animation:bc-in .25s ease}
+.bc-panel{padding:var(--pad);animation:bc-in .25s ease}
 @keyframes bc-in{from{opacity:.4}to{opacity:1}}
 .bc-cover{position:relative;border-radius:16px;overflow:hidden;aspect-ratio:16/9;display:grid;place-items:center;box-shadow:0 6px 16px rgba(31,42,55,.12);margin-bottom:14px}
 .bc-cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
@@ -352,10 +356,11 @@ const CSS = `
 .bc-text{margin:0 2px 4px;font-size:16px;line-height:1.5;font-weight:600;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .bc-sub{margin:10px 2px 6px;font-size:15px;font-weight:900}
 .bc-slot{margin-top:14px;min-width:0}
-.bc-snap{display:flex;gap:12px;margin:8px -16px 0;padding:4px 16px 12px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:16px;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;scrollbar-width:none}
+.bc-snap{display:flex;gap:12px;margin:8px calc(var(--pad) * -1) 0;padding:4px var(--pad) 12px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:var(--pad);-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;scrollbar-width:none}
 .bc-snap::-webkit-scrollbar{display:none}
 .bc-sub + .bc-snap{margin-top:0}
-.bc-chip{flex:0 0 132px;scroll-snap-align:start;display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 8px;border:0;border-radius:16px;background:#fff;box-shadow:0 4px 12px rgba(31,42,55,.08);font-family:inherit;font-weight:800;font-size:13px;line-height:1.2;text-align:center;color:var(--ink);cursor:pointer}
+.bc-chip{flex:0 0 132px;scroll-snap-align:start;display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 8px;border:0;border-radius:16px;background:#fff;box-shadow:0 4px 12px rgba(31,42,55,.08);font-family:inherit;font-weight:800;font-size:13px;line-height:1.2;text-align:center;color:var(--ink);cursor:pointer;transition:transform .15s}
+.bc-chip:hover{transform:translateY(-2px)}
 .bc-chip img{width:56px;height:56px;object-fit:contain}
 .bc-chip-emoji{width:56px;height:56px;display:grid;place-items:center;font-size:34px}
 .bc-ficha{flex:0 0 min(78%,250px);scroll-snap-align:start;background:#fff;border-radius:16px;padding:14px;box-shadow:0 4px 12px rgba(31,42,55,.08);border:2px solid transparent;display:flex;flex-direction:column;gap:4px}
@@ -366,17 +371,43 @@ const CSS = `
 .bc-ficha-btns{display:flex;gap:6px;margin-top:auto;padding-top:10px}
 .bc-ficha-btns a,.bc-ficha-btns button{flex:1;min-height:40px;display:grid;place-items:center;border:0;border-radius:12px;color:#fff;font-family:inherit;font-weight:900;font-size:13px;text-decoration:none;cursor:pointer}
 .bc-ficha-cta{border-style:dashed}
-.bc-map{position:relative;margin:-16px -16px 14px;height:280px;background:#dfe7e2}
+.bc-map{position:relative;margin:calc(var(--pad) * -1) calc(var(--pad) * -1) 14px;height:280px;background:#dfe7e2}
 .bc-map iframe{width:100%;height:100%;border:0;display:block}
 .bc-map-lock{position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:center;padding:12px;touch-action:pan-x pan-y;background:rgba(255,255,255,.04)}
 .bc-pill{min-height:40px;padding:8px 14px;border:0;border-radius:99px;background:rgba(31,42,55,.85);color:#fff;font-family:inherit;font-weight:800;font-size:13px;cursor:pointer}
 .bc-pill-on{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);white-space:nowrap}
-.bc-actions{display:grid;gap:10px;margin-top:6px}
+.bc-actions{display:grid;gap:10px;margin-top:10px}
 .bc-btn{display:grid;place-items:center;min-height:48px;padding:10px 16px;border:0;border-radius:14px;color:#fff;font-family:inherit;font-weight:900;font-size:15px;text-decoration:none;cursor:pointer}
 .bc-btn-wa{background:#25d366}
 .bc-nav{display:flex;justify-content:space-between;gap:10px;margin-top:14px}
 .bc-nav button{flex:1;min-height:44px;border:2px solid rgba(31,42,55,.12);border-radius:14px;background:rgba(255,255,255,.7);color:var(--ink);font-family:inherit;font-weight:800;font-size:14px;cursor:pointer}
 .bc-nav button:disabled{opacity:.35;cursor:default}
 .bc-root button:focus-visible,.bc-root a:focus-visible{outline:3px solid #1f2a37;outline-offset:2px}
-@media (prefers-reduced-motion:reduce){.bc-panel{animation:none}.bc-fill,.bc-tab{transition:none}}
+
+/* ---- TABLETA (>= 768 px): las 7 pestañas caben sin deslizar ---- */
+@media (min-width:768px){
+  .bc-root{--pad:24px}
+  .bc-tabs{overflow:visible;padding:12px 12px 8px;gap:8px}
+  .bc-tab{flex:1 1 0;min-height:76px;font-size:15px;gap:6px}
+  .bc-ico{width:36px;height:36px;font-size:20px}
+  .bc-prog{padding:2px 20px 10px}
+  .bc-cover{aspect-ratio:21/9}
+  .bc-cover-txt{font-size:22px;padding:30px 20px 14px}
+  .bc-text{font-size:18px;-webkit-line-clamp:4}
+  .bc-sub{font-size:17px}
+  .bc-map{height:380px}
+  .bc-snap{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));overflow:visible;margin:8px 0 0;padding:4px 0 12px}
+  .bc-snap.bc-fichas{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+  .bc-chip,.bc-ficha{flex:none}
+  .bc-actions{grid-template-columns:1fr 1fr}
+  .bc-btn{font-size:16px}
+}
+/* ---- PC (>= 1100 px) ---- */
+@media (min-width:1100px){
+  .bc-root{--pad:32px}
+  .bc-cover{aspect-ratio:3/1}
+  .bc-map{height:460px}
+  .bc-text{font-size:19px}
+}
+@media (prefers-reduced-motion:reduce){.bc-panel{animation:none}.bc-fill,.bc-tab,.bc-chip{transition:none}}
 `;
