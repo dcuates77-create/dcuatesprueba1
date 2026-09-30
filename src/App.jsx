@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import BloqueCentral from "./BloqueCentral";
 
 // =========================================================================
 // 1. CONFIGURACIÓN CENTRALIZADA DE VARIABLES, REDES Y HOJA DE CÁLCULO y BORRADO DE TODOS LOS ANTERIORES JSX CAMBIOS VIDEOS
@@ -1093,48 +1094,14 @@ export default function App() {
               centro. Cada una abre ModalCategoria con la presentación y el
               acceso a los proyectos que agrupa. */}
           <div className="lg:col-span-6">
-            <p className="flex items-center justify-center gap-3 text-center text-3xl sm:text-4xl font-black text-[#0f2d1e] uppercase tracking-tight leading-none mb-4">
-              <span>⭐</span> Proyectos Comunitarios DCUATES <span>⭐</span>
-            </p>
-            {(() => {
-              const BotonCategoria = ({ cat }) => (
-                <button
-                  type="button"
-                  onClick={() => setCategoriaAbierta(cat.id)}
-                  className="flex flex-col rounded-2xl bg-[#e65100] hover:bg-[#bf360c] text-white shadow-md transition-all hover:scale-[1.02] overflow-hidden font-heading text-center w-full"
-                >
-                  <div className="px-2 pt-4 pb-1">
-                    <h4 className="uppercase font-black leading-tight text-base sm:text-lg lg:text-xl">
-                      {cat.titulo}
-                    </h4>
-                  </div>
-                  <div className="flex flex-1 items-center justify-center py-4">
-                    {cat.img ? (
-                      <img
-                        src={cat.img}
-                        alt=""
-                        loading="lazy"
-                        className="max-h-32 sm:max-h-40 w-auto object-contain drop-shadow"
-                        onError={(e) => { e.target.style.display = 'none'; }}
-                      />
-                    ) : (
-                      <span className="text-6xl sm:text-7xl" aria-hidden="true">{cat.emoji}</span>
-                    )}
-                  </div>
-                  <div className="px-3 pb-4 pt-1">
-                    <p className="text-[11px] sm:text-xs font-bold uppercase tracking-wide text-white/90 italic">
-                      {cat.slogan}
-                    </p>
-                  </div>
-                </button>
-              );
-
-              return (
-                <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                  {CATEGORIAS_PROYECTOS.map((cat) => <BotonCategoria key={cat.id} cat={cat} />)}
-                </div>
-              );
-            })()}
+            <BloqueCentral
+              categorias={CATEGORIAS_PROYECTOS}
+              proyectos={BOTONES_PORTADA}
+              mapaUrl={MAPA_NEGOCIOS_EMBED_URL}
+              whatsappNumero={WHATSAPP_NUMERO}
+              onAbrirCategoria={(id) => setCategoriaAbierta(id)}
+              onAbrirProyecto={(id) => setModalProyecto(id)}
+            />
 
 
 
@@ -1270,29 +1237,6 @@ export default function App() {
                     </button>
                   ))}
                 </div>
-
-              {/* Mapa de Negocios Locales — embed de Google Maps/My Maps.
-                  Para agregar/editar negocios no se toca este código: se
-                  edita el mapa en Google Maps/My Maps y se actualiza la
-                  constante MAPA_NEGOCIOS_EMBED_URL arriba del archivo. */}
-              <div id="mapa-negocios" className="scroll-mt-48 md:scroll-mt-36 mt-3 rounded-2xl overflow-hidden border-4 border-[#0f2d1e]/30 shadow-lg">
-                <div className="bg-[#0f2d1e] px-3 py-2">
-                  <p className="text-white font-black uppercase text-xs sm:text-sm tracking-wide text-center">
-                    📍 Mapa de Negocios Locales Aliados
-                  </p>
-                  <p className="text-emerald-100 font-bold normal-case text-[10px] sm:text-[11px] text-center mt-0.5">
-                    Toca un punto del mapa para ver el negocio o negocio aliado
-                  </p>
-                </div>
-                <iframe
-                  src={MAPA_NEGOCIOS_EMBED_URL}
-                  className="w-full h-64 sm:h-80"
-                  style={{ border: 0 }}
-                  loading="lazy"
-                  referrerPolicy="strict-origin-when-cross-origin"
-                  title="Mapa de negocios locales DCUATES"
-                />
-              </div>
 
               {/* Ventana de Solicitudes — VISIBLE directo en la página (no
                   modal), justo debajo del mapa. Para dirigir tráfico desde
