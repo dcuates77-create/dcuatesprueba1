@@ -1,13 +1,17 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
+import CarruselPortada from "./CarruselPortada";
 
 // =========================================================================
-// BLOQUE CENTRAL INTERACTIVO — DCUATES (CLON8) · FASE 2
+// BLOQUE CENTRAL INTERACTIVO — DCUATES (CLON8) · FASE 3
 // Estructura única de 7 pestañas. Cada pestaña recibe desde App.jsx, en su
 // prop (nosotros, beneficios, causas, valores, negocios, regalos, gratitud),
 // el mismo JSX de siempre con sus estados. Orden dentro de cada pestaña:
 // portada o mapa -> texto -> fichas -> proyectos -> contenido -> botones.
 // Responsivo: celular primero; en tableta y PC el bloque se ensancha, las
 // pestañas caben todas sin deslizar y los carruseles pasan a rejillas.
+// Pestañas y barra de avance FIJAS (sticky) pegadas bajo las barras de anuncios
+// mientras se baja por el contenido; al quedar fijas se compactan (solo el
+// ícono, y la pestaña activa con su nombre).
 // Sin Tailwind: el CSS propio va al final (clases "bc-").
 // =========================================================================
 
@@ -101,18 +105,6 @@ function Logo({ src, emoji }) {
   );
 }
 
-function Portada({ src, tab, slogan }) {
-  const [fallo, setFallo] = useState(!src);
-  useEffect(() => { setFallo(!src); }, [src]);
-  return (
-    <div className="bc-cover" style={{ background: `linear-gradient(135deg, ${tab.color}, ${tab.color}99)` }}>
-      {!fallo && <img src={src} alt="" loading="lazy" onError={() => setFallo(true)} />}
-      {fallo && <span className="bc-cover-emoji" aria-hidden="true">{tab.emoji}</span>}
-      <div className="bc-cover-txt">{slogan}</div>
-    </div>
-  );
-}
-
 // Mapa con bloqueo: en celular una capa transparente deja pasar el scroll
 // de la página con un dedo; con DOS dedos (o tocando el aviso) se activa.
 // Se vuelve a bloquear solo al hacer scroll en la página o a los 8 s.
@@ -151,7 +143,8 @@ export default function BloqueCentral({
   mapaUrl,                  // MAPA_NEGOCIOS_EMBED_URL
   whatsappNumero,           // WHATSAPP_NUMERO
   negocios = NEGOCIOS_EJEMPLO,
-  portadas = {},
+  portadas = {},            // respaldo local por pestaña
+  portadasItems = {},       // { idPestaña: [cuadros] } imágenes, videos y PDFs
   nosotros = null, beneficios = null, causas = null, valores = null,
   negociosSeccion = null, regalos = null, gratitud = null,   // JSX de cada pestaña (viene de App.jsx)
   onAbrirCategoria = () => {},
@@ -160,6 +153,10 @@ export default function BloqueCentral({
   const [idx, setIdx] = useState(0);
   const rootRef = useRef(null);
   const barraRef = useRef(null);
+  const fijaRef = useRef(null);
+  const altoNormal = useRef(0);
+  const [pegado, setPegado] = useState(false);
+  const [compensa, setCompensa] = useState(0);
   const tab = TABS[idx];
   const cat = categorias.find((c) => c.id === tab.cat) || {};
   const pct = Math.round(((idx + 1) / TABS.length) * 100);
@@ -218,11 +215,68 @@ export default function BloqueCentral({
       ?.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" });
   }, [idx]);
 
+  // Mide el encabezado fijo (y las pestañas fijas) y publica sus alturas como
+  // variables CSS: sirven para pegar las pestañas justo debajo de las barras
+  // de anuncios y para que los enlaces internos no queden tapados.
+  useEffect(() => {
+    const raiz = document.documentElement;
+    const encabezado = document.getElementById("encabezado-fijo");
+    const medir = () => {
+      const h = encabezado ? Math.round(encabezado.getBoundingClientRect().height) : 0;
+      const t = fijaRef.current ? Math.round(fijaRef.current.getBoundingClientRect().height) : 0;
+      raiz.style.setProperty("--alto-header", `${h}px`);
+      raiz.style.setProperty("--alto-fijo", `${h + t}px`);
+    };
+    medir();
+    let ro;
+    if (typeof ResizeObserver !== "undefined") {
+      ro = new ResizeObserver(medir);
+      if (encabezado) ro.observe(encabezado);
+      if (fijaRef.current) ro.observe(fijaRef.current);
+    }
+    window.addEventListener("resize", medir);
+    return () => { ro?.disconnect(); window.removeEventListener("resize", medir); };
+  }, []);
+
+  // ¿Las pestañas ya quedaron pegadas arriba? Entonces se compactan.
+  useEffect(() => {
+    let pendiente = false;
+    const revisar = () => {
+      pendiente = false;
+      const fija = fijaRef.current;
+      const raiz = rootRef.current;
+      if (!fija || !raiz) return;
+      const h = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--alto-header")) || 0;
+      const topFija = fija.getBoundingClientRect().top;
+      const finBloque = raiz.getBoundingClientRect().bottom;
+      setPegado(topFija <= h + 1 && finBloque > h + 120);
+    };
+    const alScroll = () => { if (!pendiente) { pendiente = true; requestAnimationFrame(revisar); } };
+    revisar();
+    window.addEventListener("scroll", alScroll, { passive: true });
+    window.addEventListener("resize", alScroll);
+    return () => { window.removeEventListener("scroll", alScroll); window.removeEventListener("resize", alScroll); };
+  }, []);
+
+  // Al compactarse la barra, el contenido de abajo no debe dar un salto: se
+  // reserva el espacio que ocupaba la barra normal.
+  useLayoutEffect(() => {
+    const fija = fijaRef.current;
+    if (!fija) return;
+    if (!pegado) {
+      altoNormal.current = fija.offsetHeight;
+      setCompensa(0);
+    } else {
+      setCompensa(Math.max(0, altoNormal.current - fija.offsetHeight));
+    }
+  }, [pegado, idx]);
+
   const cambiar = (i) => {
     setIdx(i);
     // Si el usuario ya bajó por el contenido, regresa al inicio del bloque.
+    const h = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--alto-header")) || 0;
     const top = rootRef.current?.getBoundingClientRect().top ?? 0;
-    if (top < 0) rootRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (top < h) rootRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   const chips = (cat.proyectos || [])
@@ -235,30 +289,36 @@ export default function BloqueCentral({
     <section id="mapa-negocios" ref={rootRef} className="bc-root" aria-label="Explora DCUATES">
       <style>{CSS}</style>
       <div className="bc-shell">
-        <div className="bc-tabs" role="tablist" ref={barraRef}>
-          {TABS.map((t, i) => (
-            <button
-              key={t.id} type="button" role="tab" id={`bc-tab-${t.id}`}
-              aria-selected={i === idx} aria-controls="bc-panel"
-              className="bc-tab" onClick={() => cambiar(i)}
-              style={i === idx ? { background: t.color, color: "#fff" } : undefined}
-            >
-              <span className="bc-ico" style={{ background: i === idx ? "#fff" : t.color }} aria-hidden="true">{t.emoji}</span>
-              <span>{t.label}</span>
-            </button>
-          ))}
-        </div>
+        <div
+          className={`bc-fija${pegado ? " bc-pegado" : ""}`}
+          ref={fijaRef}
+          style={compensa ? { marginBottom: compensa } : undefined}
+        >
+          <div className="bc-tabs" role="tablist" ref={barraRef}>
+            {TABS.map((t, i) => (
+              <button
+                key={t.id} type="button" role="tab" id={`bc-tab-${t.id}`}
+                aria-selected={i === idx} aria-controls="bc-panel" aria-label={t.label}
+                className="bc-tab" onClick={() => cambiar(i)}
+                style={i === idx ? { background: t.color, color: "#fff" } : undefined}
+              >
+                <span className="bc-ico" style={{ background: i === idx ? "#fff" : t.color }} aria-hidden="true">{t.emoji}</span>
+                <span className="bc-tab-t">{t.label}</span>
+              </button>
+            ))}
+          </div>
 
-        <div className="bc-prog" role="progressbar" aria-valuemin={1} aria-valuemax={TABS.length} aria-valuenow={idx + 1} aria-label="Sección actual">
-          <div className="bc-track"><div className="bc-fill" style={{ width: `${pct}%`, background: tab.color }} /></div>
-          <div className="bc-prog-txt"><span>{pct}%</span><b>{idx + 1} / {TABS.length}</b></div>
+          <div className="bc-prog" role="progressbar" aria-valuemin={1} aria-valuemax={TABS.length} aria-valuenow={idx + 1} aria-label="Sección actual">
+            <div className="bc-track"><div className="bc-fill" style={{ width: `${pct}%`, background: tab.color }} /></div>
+            <div className="bc-prog-txt"><span>{pct}%</span><b>{idx + 1} / {TABS.length}</b></div>
+          </div>
         </div>
 
         <div className="bc-panel" id="bc-panel" role="tabpanel" aria-labelledby={`bc-tab-${tab.id}`} key={tab.id} style={{ background: tab.pastel }}>
           {tab.mapa ? (
             <MapaLocal url={mapaUrl} color={tab.color} />
           ) : tab.cover ? (
-            <Portada src={imgs[tab.id]} tab={tab} slogan={textoPortada} />
+            <CarruselPortada items={portadasItems[tab.id] || []} tab={tab} slogan={textoPortada} fallback={imgs[tab.id]} />
           ) : tab.encabezado ? (
             <div className="bc-head" style={{ color: tab.color }}>
               <span aria-hidden="true">{tab.emoji}</span>
@@ -342,7 +402,19 @@ const CSS = `
 .bc-root{--ink:#1f2a37;--pad:16px;font-family:"Nunito","Varela Round",ui-rounded,system-ui,sans-serif;color:var(--ink);width:100%;margin:0 auto;box-sizing:border-box;scroll-margin-top:192px}
 .bc-root *{font-family:inherit}
 @media (min-width:768px){.bc-root{scroll-margin-top:144px}}
-.bc-shell{background:#fff;border-radius:16px;box-shadow:0 6px 20px rgba(31,42,55,.10);overflow:hidden}
+.bc-root{scroll-margin-top:calc(var(--alto-header,160px) + 8px)}
+/* Los enlaces internos (#donaciones, #solicitudes…) no deben quedar tapados por el encabezado y las pestañas fijas. */
+[class*="scroll-mt-"]{scroll-margin-top:calc(var(--alto-fijo,200px) + 8px) !important}
+.bc-shell{background:#fff;border-radius:16px;box-shadow:0 6px 20px rgba(31,42,55,.10)}
+.bc-fija{position:sticky;top:var(--alto-header,0px);z-index:30;background:#fff;border-radius:16px 16px 0 0;transition:box-shadow .2s}
+.bc-fija.bc-pegado{border-radius:0;box-shadow:0 6px 12px rgba(15,45,30,.22)}
+.bc-pegado .bc-tabs{padding:4px 6px 2px;gap:4px;justify-content:center}
+.bc-pegado .bc-tab{flex:0 0 auto;flex-direction:row;justify-content:center;gap:6px;min-height:44px;padding:4px 8px;font-size:12px}
+.bc-pegado .bc-tab[aria-selected="false"] .bc-tab-t{display:none}
+.bc-pegado .bc-ico{width:26px;height:26px;font-size:15px}
+.bc-pegado .bc-prog{padding:0 12px 5px}
+.bc-pegado .bc-track{height:4px}
+.bc-pegado .bc-prog-txt{display:none}
 .bc-tabs{display:flex;gap:6px;padding:8px;overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:none;overscroll-behavior-x:contain}
 .bc-tabs::-webkit-scrollbar{display:none}
 .bc-tab{flex:0 0 84px;scroll-snap-align:center;display:flex;flex-direction:column;align-items:center;gap:4px;min-height:64px;padding:8px 4px;border:0;border-radius:14px;background:#f4f6f8;color:var(--ink);font-family:inherit;font-weight:800;font-size:13px;cursor:pointer;transition:background .2s,color .2s}
@@ -353,12 +425,8 @@ const CSS = `
 .bc-fill{height:100%;border-radius:99px;transition:width .45s ease,background .3s}
 .bc-prog-txt{display:flex;justify-content:space-between;font-size:12px;font-weight:800;margin-top:4px;color:#5b6675}
 .bc-prog-txt b{color:var(--ink)}
-.bc-panel{padding:var(--pad);animation:bc-in .25s ease}
+.bc-panel{padding:var(--pad);border-radius:0 0 16px 16px;overflow:hidden;animation:bc-in .25s ease}
 @keyframes bc-in{from{opacity:.4}to{opacity:1}}
-.bc-cover{position:relative;border-radius:16px;overflow:hidden;aspect-ratio:16/9;display:grid;place-items:center;box-shadow:0 6px 16px rgba(31,42,55,.12);margin-bottom:14px}
-.bc-cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.bc-cover-emoji{font-size:64px;filter:drop-shadow(0 4px 6px rgba(0,0,0,.2))}
-.bc-cover-txt{position:absolute;left:0;right:0;bottom:0;padding:22px 14px 10px;color:#fff;font-weight:900;font-size:17px;line-height:1.2;background:linear-gradient(transparent,rgba(0,0,0,.6))}
 .bc-head{display:flex;align-items:center;gap:10px;margin:0 2px 4px;font-size:30px}
 .bc-head div{display:flex;flex-direction:column;line-height:1.1}
 .bc-head b{font-size:20px;font-weight:900}
@@ -399,11 +467,11 @@ const CSS = `
   .bc-root{--pad:24px}
   .bc-tabs{overflow:visible;padding:12px 12px 8px;gap:8px}
   .bc-tab{flex:1 1 0;min-height:76px;font-size:15px;gap:6px}
+  .bc-pegado .bc-tab{flex:1 1 0;min-height:48px;font-size:14px}
+  .bc-pegado .bc-tab[aria-selected="false"] .bc-tab-t{display:inline}
   .bc-ico{width:36px;height:36px;font-size:20px}
   .bc-prog{padding:2px 20px 10px}
-  .bc-cover{aspect-ratio:21/9}
-  .bc-cover-txt{font-size:22px;padding:30px 20px 14px}
-  .bc-text{font-size:18px;-webkit-line-clamp:4}
+      .bc-text{font-size:18px;-webkit-line-clamp:4}
   .bc-sub{font-size:17px}
   .bc-map{height:380px}
   .bc-snap{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));overflow:visible;margin:8px 0 0;padding:4px 0 12px}
@@ -415,8 +483,7 @@ const CSS = `
 /* ---- PC (>= 1100 px) ---- */
 @media (min-width:1100px){
   .bc-root{--pad:32px}
-  .bc-cover{aspect-ratio:3/1}
-  .bc-map{height:460px}
+    .bc-map{height:460px}
   .bc-text{font-size:19px}
 }
 @media (prefers-reduced-motion:reduce){.bc-panel{animation:none}.bc-fill,.bc-tab,.bc-chip{transition:none}}

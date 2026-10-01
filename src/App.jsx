@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import BloqueCentral from "./BloqueCentral";
-import CarruselVideos from "./CarruselVideos";
 
 // =========================================================================
 // 1. CONFIGURACIÓN CENTRALIZADA DE VARIABLES, REDES Y HOJA DE CÁLCULO y BORRADO DE TODOS LOS ANTERIORES JSX CAMBIOS VIDEOS
@@ -90,27 +89,23 @@ const MUSICA_DCUATES_URL = "/audio/musica-dcuates.mp3";
 // - { label, action: "faq" } -> abre la ventana de Preguntas Frecuentes
 // - { label, modal }  -> abre la ventana emergente de ese proyecto (mismo
 //   id que en TODOS_LOS_PROYECTOS)
-const NAV_LINKS_PRINCIPALES = [
-  { label: "Inicio", href: "#inicio" },
-  { label: "Apoyo Voluntario", href: "#donaciones" }
-];
 const NAV_LINKS_MAS = [
-  { label: "Publicidad Gratuita", href: "#publicidad" },
-  { label: "Ventas con Causa", href: "#ventas-con-causa" },
-  { label: "Alianzas Solidarias", modal: "alianzas-tarjeta" },
-  { label: "Apoyo a Causas", href: "#extraviados-registro" },
-  { label: "Mapa del Sitio", action: "mapa-sitio" },
-  { label: "Registra tu Solicitud", href: "#solicitudes" },
-  { label: "Préstamo Gratuito de Libros", modal: "libros" },
-  { label: "Ecatepets Mascotas", modal: "ecatepets" },
-  { label: "Círculo de Confianza", modal: "circulo-confianza" },
-  { label: "Recomienda, Evalúa y Gana", modal: "recomienda-evalua-gana" },
-  { label: "Asesorías Gratuitas", modal: "asesorias" },
-  { label: "Bazar y Comercio", modal: "bazares" },
-  { label: "Noticias de Barrio", modal: "noticias" },
-  { label: "Bienestar y Recreación", modal: "bienestar" },
-  { label: "Sugerencias y Quejas", action: "sugerencias" },
-  { label: "Preguntas Frecuentes", action: "faq" }
+  { label: "Publicidad Gratuita", emoji: "📣", href: "#publicidad" },
+  { label: "Ventas con Causa", emoji: "🛍️", href: "#ventas-con-causa" },
+  { label: "Alianzas Solidarias", emoji: "🤝", modal: "alianzas-tarjeta" },
+  { label: "Apoyo a Causas", emoji: "❤️", href: "#extraviados-registro" },
+  { label: "Mapa del Sitio", emoji: "🗺️", action: "mapa-sitio" },
+  { label: "Registra tu Solicitud", emoji: "📝", href: "#solicitudes" },
+  { label: "Préstamo Gratuito de Libros", emoji: "📚", modal: "libros" },
+  { label: "Ecatepets Mascotas", emoji: "🐾", modal: "ecatepets" },
+  { label: "Círculo de Confianza", emoji: "👥", modal: "circulo-confianza" },
+  { label: "Recomienda, Evalúa y Gana", emoji: "⭐", modal: "recomienda-evalua-gana" },
+  { label: "Asesorías Gratuitas", emoji: "🎓", modal: "asesorias" },
+  { label: "Bazar y Comercio", emoji: "🏪", modal: "bazares" },
+  { label: "Noticias de Barrio", emoji: "📰", modal: "noticias" },
+  { label: "Bienestar y Recreación", emoji: "🧘", modal: "bienestar" },
+  { label: "Sugerencias y Quejas", emoji: "💬", action: "sugerencias" },
+  { label: "Preguntas Frecuentes", emoji: "❓", action: "faq" }
 ];
 
 // Función helper para armar enlaces directos de WhatsApp de forma consistente
@@ -908,28 +903,56 @@ export default function App() {
   // Mientras no subas nada a esas columnas, estas listas simplemente salen
   // vacías y la sección lo indica.
   const galeriaRetos = galeriaDesdeColumna(filasEnlaces, "RETOSGALERIA", 10, "Retos");
-  // Portada de cada pestaña: columnas tipo Archivo "PORTADA NOSOTROS",
-  // "PORTADA BENEFICIOS", "PORTADA CAUSAS", "PORTADA VALORES",
-  // "PORTADA REGALOS" y "PORTADA GRATITUD" en la tabla ENLACES (se usa la
-  // primera imagen que tenga cada columna).
-  const portadasTabs = {};
-  ["nosotros", "beneficios", "causas", "valores", "regalos", "gratitud"].forEach((id) => {
-    const g = galeriaDesdeColumna(filasEnlaces, `PORTADA ${id.toUpperCase()}`, 1, id);
-    if (g[0]) portadasTabs[id] = resolverSrcImagen(g[0].img);
-  });
   const videosRetos = paresBaserow(filasEnlaces, "NOMBRE RETOSVID", "RETOSVID", 8)
     .map((v) => ({ video: detectarVideo(v.enlace), nombre: v.nombre }))
     .filter((v) => v.video);
 
-  // Carrusel superior: los videos de "NOMBRE RETOSVID / RETOSVID" (Baserow).
-  // Al tocar uno se abre en grande con el visor de siempre.
-  const carruselSuperior = videosRetos.map((v, i) => ({
-    id: `retos-${i}`,
-    tipo: "video",
-    nombre: v.nombre,
-    media: <MiniaturaVideo video={v.video} nombre={v.nombre} />,
-    onClick: () => setVideoEnGrande(v.video)
-  }));
+  // Carrusel de portada de cada pestaña (un cuadro cada 3 segundos). Para cada
+  // pestaña (NOSOTROS, BENEFICIOS, CAUSAS, VALORES, REGALOS, GRATITUD), en la
+  // tabla ENLACES de Baserow:
+  //  - "PORTADA <PESTAÑA>"  (columna Archivo): una imagen o un PDF por fila.
+  //    Opcional: "NOMBRE PORTADA <PESTAÑA>" como texto al pie del cuadro.
+  //  - "NOMBRE VIDEOS <PESTAÑA>" + "VIDEOS <PESTAÑA>": un enlace de video por fila.
+  // En CAUSAS se suman además los videos de RETOSVID (el carrusel que antes
+  // estaba arriba de todo). Si una pestaña no tiene nada, muestra su imagen de
+  // respaldo (ver PORTADAS_BASE en BloqueCentral.jsx).
+  const portadasItems = {};
+  ["nosotros", "beneficios", "causas", "valores", "regalos", "gratitud"].forEach((id) => {
+    const K = id.toUpperCase();
+    const archivos = filasEnlaces
+      .map((f, i) => {
+        if (!f) return null;
+        const url = urlDesdeCeldaBaserow(f[`PORTADA ${K}`]);
+        if (!url) return null;
+        const nombre = (f[`NOMBRE PORTADA ${K}`] && String(f[`NOMBRE PORTADA ${K}`]).trim()) || "";
+        return esPDF(url)
+          ? { id: `${id}-arch-${i}`, tipo: "pdf", url, nombre: nombre || "Documento PDF" }
+          : { id: `${id}-arch-${i}`, tipo: "imagen", img: resolverSrcImagen(url), nombre };
+      })
+      .filter(Boolean)
+      .slice(0, 10);
+    const videos = paresBaserow(filasEnlaces, `NOMBRE VIDEOS ${K}`, `VIDEOS ${K}`, 10)
+      .map((v) => ({ video: detectarVideo(v.enlace), nombre: v.nombre }))
+      .filter((v) => v.video)
+      .map((v, i) => ({
+        id: `${id}-vid-${i}`,
+        tipo: "video",
+        nombre: v.nombre,
+        media: <MiniaturaVideo video={v.video} nombre={v.nombre} />,
+        onClick: () => setVideoEnGrande(v.video)
+      }));
+    portadasItems[id] = [...archivos, ...videos];
+  });
+  portadasItems.causas = [
+    ...portadasItems.causas,
+    ...videosRetos.map((v, i) => ({
+      id: `causas-retos-${i}`,
+      tipo: "video",
+      nombre: v.nombre,
+      media: <MiniaturaVideo video={v.video} nombre={v.nombre} />,
+      onClick: () => setVideoEnGrande(v.video)
+    }))
+  ];
 
   const recomendacionesDcuates = (() => {
     const desdeBaserow = paresBaserow(filasEnlaces, "Nombre Recocasa", "RECASA", 5);
@@ -981,14 +1004,21 @@ export default function App() {
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           aria-label="Subir al inicio de la página"
           title="Subir"
-          className="fixed bottom-20 sm:bottom-24 left-4 z-50 h-11 w-11 sm:h-12 sm:w-12 flex items-center justify-center rounded-full bg-[#0f2d1e] text-white shadow-lg border-2 border-white/30 hover:bg-emerald-800 transition-colors"
+          className="fixed bottom-[3.75rem] sm:bottom-16 left-4 z-50 h-11 w-11 sm:h-12 sm:w-12 flex items-center justify-center rounded-full bg-[#0f2d1e] text-white shadow-lg border-2 border-white/30 hover:bg-emerald-800 transition-colors"
         >
           <span className="text-xl leading-none" aria-hidden="true">↑</span>
         </button>
       )}
 
       {/* Botón Flotante Permanente de WhatsApp — efecto 3D + anillo parpadeante + etiqueta */}
-      <div className="fixed bottom-20 sm:bottom-24 right-6 z-50 flex items-center gap-3">
+      <div className="fixed bottom-[3.75rem] sm:bottom-16 right-4 sm:right-6 z-50 flex flex-col items-end gap-3">
+        {/* ¿Qué necesitas hoy? — arriba del botón de WhatsApp */}
+        <BotonNecesidades
+          onAbrirProyecto={(id) => setModalProyecto(id)}
+          onAccionEspecial={(accion) => setModalFormulario(accion)}
+          onAbrirFAQ={() => setShowFAQ(true)}
+        />
+        <div className="flex items-center gap-3">
         <span className="bg-[#25d366] text-white text-[11px] sm:text-sm font-black uppercase tracking-wide px-3 py-2 rounded-full shadow-lg border border-white/30 whitespace-nowrap animate-pulse">
           Dudas y Atención
         </span>
@@ -1004,19 +1034,19 @@ export default function App() {
             <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.503-5.729-1.458L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.965C16.428 1.978 13.96 1.951 12.01 1.951c-5.438 0-9.863 4.374-9.867 9.802 0 1.685.459 3.324 1.333 4.766L2.483 20.3l3.966-.995zM17.15 14.34c-.283-.141-1.674-.824-1.933-.917-.26-.093-.448-.14-.637.142-.188.282-.729.917-.894 1.105-.165.188-.33.212-.613.07a9.23 9.23 0 0 1-2.28-1.401 10.15 10.15 0 0 1-1.579-1.954c-.165-.282-.018-.434.124-.574.127-.127.283-.329.424-.494.141-.165.188-.282.283-.47.094-.188.047-.353-.024-.494-.071-.141-.637-1.53-.873-2.102-.229-.554-.46-.478-.637-.487-.164-.008-.353-.01-.542-.01-.189 0-.495.07-.755.353-.26.282-.99 1.011-.99 2.467 0 1.457 1.06 2.867 1.201 3.056.142.188 2.086 3.178 5.053 4.462.705.305 1.256.488 1.684.624.708.226 1.353.194 1.863.118.568-.085 1.674-.682 1.909-1.34.236-.658.236-1.223.165-1.34-.07-.117-.26-.188-.542-.329z"/>
           </svg>
         </a>
+              </div>
       </div>
 
       {/* Encabezado + ticker de frases, pegados juntos como una sola barra fija.
           "relative" para poder anclar el botón de Necesidades justo debajo
           (top-full), pegado al borde inferior, y que se mueva junto con todo
           el bloque al hacer scroll (igual que el header, que es sticky). */}
-      <div className="sticky top-0 z-40 relative">
+      <div id="encabezado-fijo" className="sticky top-0 z-40 relative">
         <SiteHeader
           onAbrirFAQ={() => setShowFAQ(true)}
           onAbrirPrivacidad={() => setShowPrivacy(true)}
           onAbrirProyecto={(id) => setModalProyecto(id)}
           onAbrirSugerencias={() => setModalFormulario("sugerencias")}
-          onAbrirComparte={() => setModalFormulario("comparte")}
           onAbrirMapaSitio={() => setShowMapaSitio(true)}
           onAbrirCategoria={(id) => setCategoriaAbierta(id)}
           busquedaAbierta={busquedaAbierta}
@@ -1025,19 +1055,10 @@ export default function App() {
         <TickerFrases />
         <BarraLogros />
 
-        {/* Botón de Navegación por Necesidades — pegado justo debajo de la
-            barra de frases (mismo espacio que el de WhatsApp guarda con la
-            barra inferior). Al ser "absolute" dentro de este contenedor
-            "sticky", se mueve junto con el encabezado al hacer scroll. */}
-        <BotonNecesidades
-          onAbrirProyecto={(id) => setModalProyecto(id)}
-          onAccionEspecial={(accion) => setModalFormulario(accion)}
-          onAbrirFAQ={() => setShowFAQ(true)}
-        />
       </div>
 
       {/* SECCIÓN PORTADA / HERO — izquierda: título+texto+Quiénes Somos+Bibliobici a toda altura; derecha: cuadrícula de 12 botones (2 columnas en celular, 3 en escritorio = 3x4) */}
-      <section id="inicio" className="scroll-mt-48 md:scroll-mt-36 bg-[#e8f5e9] text-[#0f2d1e] py-4 px-4 sm:py-6 border-b-4 border-[#0f2d1e]">
+      <section id="inicio" className="scroll-mt-48 md:scroll-mt-36 bg-[#e8f5e9] text-[#0f2d1e] py-4 px-4 sm:py-6">
         <div className="mx-auto max-w-2xl md:max-w-4xl xl:max-w-6xl flex flex-col gap-4">
 
           {/* Banner de avisos + bloque central de 7 pestañas (BloqueCentral).
@@ -1045,15 +1066,12 @@ export default function App() {
               debajo (Retos, Historias, Solicitudes, etc.) se migrará a
               su pestaña en la fase 2. */}
           <div className="min-w-0">
-            <div className="mb-3">
-              <CarruselVideos items={carruselSuperior} />
-            </div>
             <BloqueCentral
               categorias={CATEGORIAS_PROYECTOS}
               proyectos={BOTONES_PORTADA}
               mapaUrl={MAPA_NEGOCIOS_EMBED_URL}
               whatsappNumero={WHATSAPP_NUMERO}
-              portadas={portadasTabs}
+              portadasItems={portadasItems}
               onAbrirCategoria={(id) => setCategoriaAbierta(id)}
               onAbrirProyecto={(id) => setModalProyecto(id)}
               beneficios={(
@@ -1694,6 +1712,9 @@ export default function App() {
       </section>
 
 
+      {/* Accesos rápidos: Avisos y Beneficios · Compartir Más · Inicio */}
+      <BarraAccionesFinal onAbrirComparte={() => setModalFormulario("comparte")} />
+
       {/* HISTORIAS Y REFLEXIONES DCUATES — movida aquí (antes vivía dentro
           del hero); ahora como barra horizontal de 1-2 videos de alto, con
           scroll lateral para ver más. Sigue tomando sus videos de las
@@ -2056,13 +2077,12 @@ function BarraBusqueda({ onAbrirProyecto, onAbrirCategoria, onAbrirFAQ, abierta,
         onClick={abrirBusqueda}
         aria-label="Buscar en DCUATES"
         title="Buscar"
-        className="flex-1 md:flex-none flex items-center justify-center gap-1.5 rounded-full border-2 border-transparent bg-[#17472d] hover:bg-[#0f2d1e] text-white transition-colors uppercase tracking-wide text-center leading-tight px-2 sm:px-4 py-2.5 sm:py-2"
+        className="flex h-7 w-7 sm:h-9 sm:w-9 md:h-10 md:w-10 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-[#0f2d1e] transition-colors hover:bg-emerald-50"
       >
-        <svg viewBox="0 0 24 24" className="h-4 w-4 shrink-0 fill-none stroke-current stroke-[2.5]" aria-hidden="true">
+        <svg viewBox="0 0 24 24" className="h-4 w-4 sm:h-5 sm:w-5 shrink-0 fill-none stroke-current stroke-[2.5]" aria-hidden="true">
           <circle cx="11" cy="11" r="7" />
           <line x1="16.5" y1="16.5" x2="21" y2="21" strokeLinecap="round" />
         </svg>
-        <span className="hidden sm:inline">Buscar</span>
       </button>
     );
   }
@@ -2121,11 +2141,17 @@ function BarraBusqueda({ onAbrirProyecto, onAbrirCategoria, onAbrirFAQ, abierta,
   );
 }
 
-function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSugerencias, onAbrirComparte, onAbrirMapaSitio, onAbrirCategoria, busquedaAbierta, setBusquedaAbierta }) {
-  const [menuMasAbierto, setMenuMasAbierto] = useState(false);
+function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSugerencias, onAbrirMapaSitio, onAbrirCategoria, busquedaAbierta, setBusquedaAbierta }) {
+  const [menuAbierto, setMenuAbierto] = useState(false);
+  // Colores alternados del menú (combinan con el verde, el naranja y el azul
+  // turquesa que ya usa la página).
+  const COLORES_MENU = ["#17472d", "#bf360c", "#1B6F8A"];
+  const cerrar = () => setMenuAbierto(false);
+  const claseFila = "w-full flex items-center gap-3 px-4 py-2.5 text-left uppercase tracking-wide text-[11px] sm:text-xs font-black hover:bg-emerald-50 transition-colors";
+  const claseIcono = "flex h-7 w-7 sm:h-9 sm:w-9 md:h-10 md:w-10 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-[#0f2d1e] transition-colors hover:bg-emerald-50";
   return (
     <header className="border-b border-emerald-800/20 bg-white/95 py-2 px-4 shadow-sm text-slate-900 relative">
-      <div className="mx-auto flex flex-wrap items-center gap-y-2 max-w-6xl">
+      <div className="mx-auto flex items-center gap-3 max-w-6xl">
 
         {/* Logo + nombre — siempre primero, en la misma fila que las redes en móvil */}
         <div className="order-1 flex items-center gap-2 sm:gap-3 min-w-0 flex-1 md:flex-none">
@@ -2148,23 +2174,10 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSug
         </a>
         </div>
 
-        {/* Íconos de redes: comparten la primera fila con el logo (empujados a la derecha) en móvil; en escritorio, a la derecha del todo. Orden: Avisos y Beneficios, Compartir Más, redes — mismo alto y tamaño de letra. */}
-        <div className="order-2 md:order-3 ml-auto flex flex-wrap items-center gap-1.5 sm:gap-3">
-
-          {/* Avisos y Beneficios — suscripción por WhatsApp con intereses. */}
-          <BotonRecibeBeneficios />
-
-          {/* Compartir Más — abre el formulario de Conocer y Compartir Más. */}
-          <button
-            type="button"
-            onClick={() => onAbrirComparte && onAbrirComparte()}
-            className="rounded-full bg-[#e65100] hover:bg-[#bf360c] text-white shadow-sm px-2.5 py-1.5 text-[10px] sm:text-[11px] font-black uppercase tracking-wide transition-colors flex items-center gap-1 min-h-[30px] sm:min-h-[34px]"
-          >
-            <span className="hidden sm:inline">Compartir Más</span>
-            <span className="sm:hidden">Compartir</span>
-            <span aria-hidden="true">🌟</span>
-          </button>
-
+        {/* Íconos a la derecha, en dos filas: arriba las redes; abajo la lupa
+            (bajo YouTube) y el menú de tres rayas (bajo TikTok). */}
+        <div className="ml-auto flex flex-col items-end gap-1.5 sm:gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-3">
           <a href={REDES_SOCIALES.facebook} target="_blank" rel="noreferrer" className="flex h-7 w-7 sm:h-9 sm:w-9 md:h-10 md:w-10 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="Facebook">
             <svg className="h-4 w-4 sm:h-5 sm:w-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" />
@@ -2187,79 +2200,74 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSug
               <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.02 1.59 4.23.94 1.13 2.29 1.89 3.73 2.18l-.02 3.88c-1.63-.03-3.2-.55-4.51-1.52A7.83 7.83 0 0 1 16.43 7.5v8.32a7.83 7.83 0 0 1-3.32 6.42 7.91 7.91 0 0 1-8.73-.24 7.85 7.85 0 0 1-3.23-7.58 7.84 7.84 0 0 1 5.37-6.84V11.5a3.94 3.94 0 0 0-1.5 3.32 3.93 3.93 0 0 0 3.2 3.88 3.93 3.93 0 0 0 4.61-3.2c.04-.33.05-.66.05-.99V.02z" />
             </svg>
           </a>
-        </div>
+          </div>
 
-        {/* Fila única de menú: accesos directos + MÁS (con todo lo demás). */}
-        <div className="order-3 w-full flex flex-wrap md:flex-nowrap items-center gap-2 md:gap-3 pt-1.5 mt-0.5 border-t border-emerald-800/10">
-          <div className="flex w-full md:w-auto items-stretch gap-1.5 sm:gap-2 text-[11px] sm:text-xs md:text-sm font-black">
-            {NAV_LINKS_PRINCIPALES.map(link => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="flex-1 md:flex-none flex items-center justify-center rounded-full border-2 border-transparent bg-[#17472d] hover:bg-[#0f2d1e] text-white transition-colors uppercase tracking-wide text-center leading-tight px-2 sm:px-4 py-2.5 sm:py-2"
-              >
-                {link.label}
-              </a>
-            ))}
+          <div className="flex items-center gap-1.5 sm:gap-3">
+            {/* Búsqueda: ícono de lupa; abre una ventana de búsqueda al tocarlo. */}
+            <BarraBusqueda onAbrirProyecto={onAbrirProyecto} onAbrirCategoria={onAbrirCategoria} onAbrirFAQ={onAbrirFAQ} abierta={busquedaAbierta} setAbierta={setBusquedaAbierta} />
 
-            <div className="relative flex-1 md:flex-none flex">
+            {/* Menú de tres rayas — antes botón "Más". */}
+            <div className="relative">
               <button
                 type="button"
-                onClick={() => setMenuMasAbierto((v) => !v)}
-                className="w-full rounded-full border-2 border-transparent bg-[#17472d] hover:bg-[#0f2d1e] text-white transition-colors uppercase tracking-wide text-center leading-tight px-2 sm:px-4 py-2.5 sm:py-2 flex items-center justify-center gap-1"
+                onClick={() => setMenuAbierto((v) => !v)}
+                aria-label="Abrir menú"
+                aria-expanded={menuAbierto}
+                title="Menú"
+                className={claseIcono}
               >
-                Más
-                <span className={`transition-transform ${menuMasAbierto ? "rotate-180" : ""}`}>▾</span>
+                <svg viewBox="0 0 24 24" className="h-4 w-4 sm:h-5 sm:w-5 fill-none stroke-current stroke-[2.5]" aria-hidden="true">
+                  <line x1="4" y1="6" x2="20" y2="6" strokeLinecap="round" />
+                  <line x1="4" y1="12" x2="20" y2="12" strokeLinecap="round" />
+                  <line x1="4" y1="18" x2="20" y2="18" strokeLinecap="round" />
+                </svg>
               </button>
 
-              {menuMasAbierto && (
+              {menuAbierto && (
                 <>
-                  {/* Fondo invisible para poder cerrar el menú al tocar fuera */}
-                  <div className="fixed inset-0 z-30" onClick={() => setMenuMasAbierto(false)} />
-                  <div className="absolute right-0 md:right-auto md:left-0 top-full mt-2 z-40 w-64 rounded-2xl bg-white shadow-xl border border-emerald-800/10 py-2 flex flex-col max-h-[70vh] overflow-y-auto">
-                    {NAV_LINKS_MAS.map((link) =>
-                      link.href ? (
-                        <a
-                          key={link.label}
-                          href={link.href}
-                          onClick={() => setMenuMasAbierto(false)}
-                          className="px-4 py-2.5 text-left uppercase tracking-wide text-[11px] sm:text-xs font-black text-emerald-900 hover:bg-emerald-50 transition-colors"
-                        >
-                          {link.label}
-                        </a>
+                  {/* Fondo invisible para cerrar el menú al tocar fuera */}
+                  <div className="fixed inset-0 z-30" onClick={cerrar} />
+                  <div className="absolute right-0 top-full mt-2 z-40 w-72 max-w-[calc(100vw-2rem)] rounded-2xl bg-white shadow-2xl border border-emerald-800/10 py-2 flex flex-col max-h-[70vh] overflow-y-auto">
+                    {NAV_LINKS_MAS.map((link, i) => {
+                      const color = COLORES_MENU[i % COLORES_MENU.length];
+                      const contenido = (
+                        <>
+                          <span className="text-lg leading-none w-6 text-center shrink-0" aria-hidden="true">{link.emoji}</span>
+                          <span style={{ color }}>{link.label}</span>
+                        </>
+                      );
+                      return link.href ? (
+                        <a key={link.label} href={link.href} onClick={cerrar} className={claseFila}>{contenido}</a>
                       ) : (
                         <button
                           type="button"
                           key={link.label}
                           onClick={() => {
-                            setMenuMasAbierto(false);
+                            cerrar();
                             if (link.action === "faq") onAbrirFAQ && onAbrirFAQ();
                             else if (link.action === "sugerencias") onAbrirSugerencias && onAbrirSugerencias();
                             else if (link.action === "mapa-sitio") onAbrirMapaSitio && onAbrirMapaSitio();
                             else if (link.modal) onAbrirProyecto && onAbrirProyecto(link.modal);
                           }}
-                          className="px-4 py-2.5 text-left uppercase tracking-wide text-[11px] sm:text-xs font-black text-emerald-900 hover:bg-emerald-50 transition-colors"
+                          className={claseFila}
                         >
-                          {link.label}
+                          {contenido}
                         </button>
-                      )
-                    )}
+                      );
+                    })}
                     <div className="border-t border-emerald-800/10 my-1" />
                     <button
                       type="button"
-                      onClick={() => { setMenuMasAbierto(false); onAbrirPrivacidad && onAbrirPrivacidad(); }}
-                      className="px-4 py-2.5 text-left uppercase tracking-wide text-[11px] sm:text-xs font-black text-emerald-900 hover:bg-emerald-50 transition-colors"
+                      onClick={() => { cerrar(); onAbrirPrivacidad && onAbrirPrivacidad(); }}
+                      className={claseFila}
                     >
-                      Aviso de Privacidad
+                      <span className="text-lg leading-none w-6 text-center shrink-0" aria-hidden="true">🔒</span>
+                      <span style={{ color: COLORES_MENU[NAV_LINKS_MAS.length % COLORES_MENU.length] }}>Aviso de Privacidad</span>
                     </button>
                   </div>
                 </>
               )}
             </div>
-
-            {/* Búsqueda: botón pequeño junto a "Más", del mismo tamaño;
-                se despliega en una ventana superpuesta solo al tocarlo. */}
-            <BarraBusqueda onAbrirProyecto={onAbrirProyecto} onAbrirCategoria={onAbrirCategoria} onAbrirFAQ={onAbrirFAQ} abierta={busquedaAbierta} setAbierta={setBusquedaAbierta} />
           </div>
         </div>
       </div>
@@ -2306,7 +2314,7 @@ function BotonNecesidades({ onAbrirProyecto, onAccionEspecial, onAbrirFAQ }) {
 
   return (
     <>
-      <div className="absolute top-full right-5 sm:right-6 mt-1.5 sm:mt-2 z-50 flex items-center gap-2">
+      <div className="flex items-center gap-2">
         <span className="bg-yellow-400 text-[#0f2d1e] text-[10px] sm:text-xs font-black uppercase tracking-wide px-2.5 py-1.5 rounded-full shadow-lg border border-white/30 whitespace-nowrap animate-pulse">
           ¿Qué necesitas hoy?
         </span>
@@ -2324,11 +2332,11 @@ function BotonNecesidades({ onAbrirProyecto, onAccionEspecial, onAbrirFAQ }) {
 
       {abierto && (
         <div
-          className="fixed inset-0 z-50 flex items-start justify-end bg-black/50 p-4 pt-40 sm:pt-44"
+          className="fixed inset-0 z-[55] flex items-end justify-end bg-black/50 p-4 pb-36 sm:pb-40"
           onClick={cerrarTodo}
         >
           <div
-            className="bg-white text-slate-900 rounded-2xl shadow-2xl max-w-sm w-full max-h-[70vh] overflow-y-auto"
+            className="bg-white text-slate-900 rounded-2xl shadow-2xl max-w-sm w-full max-h-[calc(100dvh-12rem)] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-4 border-b border-emerald-100 flex items-center justify-between gap-3">
@@ -2400,7 +2408,35 @@ function BotonNecesidades({ onAbrirProyecto, onAccionEspecial, onAbrirFAQ }) {
 // Botón "Recibe Beneficios" del encabezado — abre un mini formulario de
 // intereses (ver INTERESES_BENEFICIOS arriba) y arma el mensaje de WhatsApp
 // con lo que la persona seleccionó.
-function BotonRecibeBeneficios() {
+// Accesos rápidos al final de la página (arriba de la barra de videos):
+// Avisos y Beneficios, Compartir Más e Inicio — antes vivían en el menú superior.
+function BarraAccionesFinal({ onAbrirComparte }) {
+  return (
+    <section aria-label="Accesos rápidos" className="bg-[#e8f5e9] px-4 py-5 sm:py-6 border-b-4 border-[#0f2d1e]">
+      <div className="mx-auto max-w-2xl md:max-w-4xl xl:max-w-6xl grid grid-cols-3 gap-2 sm:gap-4 items-stretch">
+        <BotonRecibeBeneficios grande />
+        <button
+          type="button"
+          onClick={() => onAbrirComparte && onAbrirComparte()}
+          className="w-full min-h-[56px] rounded-2xl bg-[#e65100] hover:bg-[#bf360c] text-white shadow-md px-2 py-3 text-[11px] sm:text-sm font-black uppercase tracking-wide transition-colors flex flex-col sm:flex-row items-center justify-center gap-1 text-center leading-tight"
+        >
+          <span>Compartir Más</span>
+          <span aria-hidden="true">🌟</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          className="w-full min-h-[56px] rounded-2xl bg-[#17472d] hover:bg-[#0f2d1e] text-white shadow-md px-2 py-3 text-[11px] sm:text-sm font-black uppercase tracking-wide transition-colors flex flex-col sm:flex-row items-center justify-center gap-1 text-center leading-tight"
+        >
+          <span>Inicio</span>
+          <span aria-hidden="true">🏠</span>
+        </button>
+      </div>
+    </section>
+  );
+}
+
+function BotonRecibeBeneficios({ grande = false }) {
   const [abierto, setAbierto] = useState(false);
   const [seleccion, setSeleccion] = useState([]);
 
@@ -2416,14 +2452,16 @@ function BotonRecibeBeneficios() {
   };
 
   return (
-    <div className="relative">
+    <div className={grande ? "relative h-full" : "relative"}>
       <button
         type="button"
         onClick={() => setAbierto((v) => !v)}
-        className="rounded-full bg-[#e65100] hover:bg-[#bf360c] text-white shadow-sm px-2.5 py-1.5 text-[10px] sm:text-[11px] font-black uppercase tracking-wide transition-colors flex items-center gap-1 min-h-[30px] sm:min-h-[34px]"
+        className={grande
+          ? "w-full h-full min-h-[56px] rounded-2xl bg-[#e65100] hover:bg-[#bf360c] text-white shadow-md px-2 py-3 text-[11px] sm:text-sm font-black uppercase tracking-wide transition-colors flex flex-col sm:flex-row items-center justify-center gap-1 text-center leading-tight"
+          : "rounded-full bg-[#e65100] hover:bg-[#bf360c] text-white shadow-sm px-2.5 py-1.5 text-[10px] sm:text-[11px] font-black uppercase tracking-wide transition-colors flex items-center gap-1 min-h-[30px] sm:min-h-[34px]"}
       >
-        <span className="hidden sm:inline">Avisos y Beneficios</span>
-        <span className="sm:hidden">Avisos</span>
+        <span className={grande ? "" : "hidden sm:inline"}>Avisos y Beneficios</span>
+        {!grande && <span className="sm:hidden">Avisos</span>}
         <span aria-hidden="true">💌</span>
       </button>
 
