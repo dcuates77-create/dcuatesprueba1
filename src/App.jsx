@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import BloqueCentral from "./BloqueCentral";
 
 // =========================================================================
 // 1. CONFIGURACIÓN CENTRALIZADA DE VARIABLES, REDES Y HOJA DE CÁLCULO y BORRADO DE TODOS LOS ANTERIORES JSX CAMBIOS VIDEOS
@@ -88,27 +89,23 @@ const MUSICA_DCUATES_URL = "/audio/musica-dcuates.mp3";
 // - { label, action: "faq" } -> abre la ventana de Preguntas Frecuentes
 // - { label, modal }  -> abre la ventana emergente de ese proyecto (mismo
 //   id que en TODOS_LOS_PROYECTOS)
-const NAV_LINKS_PRINCIPALES = [
-  { label: "Inicio", href: "#inicio" },
-  { label: "Apoyo Voluntario", href: "#donaciones" }
-];
 const NAV_LINKS_MAS = [
-  { label: "Publicidad Gratuita", href: "#publicidad" },
-  { label: "Ventas con Causa", href: "#ventas-con-causa" },
-  { label: "Alianzas Solidarias", modal: "alianzas-tarjeta" },
-  { label: "Apoyo a Causas", href: "#extraviados-registro" },
-  { label: "Mapa del Sitio", action: "mapa-sitio" },
-  { label: "Registra tu Solicitud", href: "#solicitudes" },
-  { label: "Préstamo Gratuito de Libros", modal: "libros" },
-  { label: "Ecatepets Mascotas", modal: "ecatepets" },
-  { label: "Círculo de Confianza", modal: "circulo-confianza" },
-  { label: "Recomienda, Evalúa y Gana", modal: "recomienda-evalua-gana" },
-  { label: "Asesorías Gratuitas", modal: "asesorias" },
-  { label: "Bazar y Comercio", modal: "bazares" },
-  { label: "Noticias de Barrio", modal: "noticias" },
-  { label: "Bienestar y Recreación", modal: "bienestar" },
-  { label: "Sugerencias y Quejas", action: "sugerencias" },
-  { label: "Preguntas Frecuentes", action: "faq" }
+  { label: "Publicidad Gratuita", emoji: "📣", href: "#publicidad" },
+  { label: "Ventas con Causa", emoji: "🛍️", href: "#ventas-con-causa" },
+  { label: "Alianzas Solidarias", emoji: "🤝", modal: "alianzas-tarjeta" },
+  { label: "Apoyo a Causas", emoji: "❤️", href: "#extraviados-registro" },
+  { label: "Mapa del Sitio", emoji: "🗺️", action: "mapa-sitio" },
+  { label: "Registra tu Solicitud", emoji: "📝", href: "#solicitudes" },
+  { label: "Préstamo Gratuito de Libros", emoji: "📚", modal: "libros" },
+  { label: "Ecatepets Mascotas", emoji: "🐾", modal: "ecatepets" },
+  { label: "Círculo de Confianza", emoji: "👥", modal: "circulo-confianza" },
+  { label: "Recomienda, Evalúa y Gana", emoji: "⭐", modal: "recomienda-evalua-gana" },
+  { label: "Asesorías Gratuitas", emoji: "🎓", modal: "asesorias" },
+  { label: "Bazar y Comercio", emoji: "🏪", modal: "bazares" },
+  { label: "Noticias de Barrio", emoji: "📰", modal: "noticias" },
+  { label: "Bienestar y Recreación", emoji: "🧘", modal: "bienestar" },
+  { label: "Sugerencias y Quejas", emoji: "💬", action: "sugerencias" },
+  { label: "Preguntas Frecuentes", emoji: "❓", action: "faq" }
 ];
 
 // Función helper para armar enlaces directos de WhatsApp de forma consistente
@@ -120,7 +117,16 @@ function enlaceWhatsApp(mensaje) {
 // misma página (usada por los botones que en vez de abrir WhatsApp llevan
 // directo a un formulario, ej. "Publicar mi negocio" o "Extraviados y Adopciones").
 function irASeccion(id) {
-  document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  const el = document.getElementById(id);
+  if (el) {
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+    return;
+  }
+  // La sección vive dentro de una pestaña que está cerrada (ej. Apoyo
+  // Voluntario en Causas): se le pide al bloque de pestañas que la abra y
+  // después se baja hasta ella.
+  window.dispatchEvent(new CustomEvent("dcuates:abrir-seccion", { detail: id }));
+  setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" }), 300);
 }
 
 // Datos de EJEMPLO para la barra ticker inferior — reemplázalos por contenido real
@@ -697,26 +703,67 @@ const RETOS_REGALOS_ITEMS = [
 // Los 3 botones naranjas de Retos/Regalos/Reconocimiento se despliegan
 // (uno a la vez) mostrando ejemplos y un botón inferior para que el público
 // mande su propia propuesta por WhatsApp. Edita "ejemplos" en el arreglo de arriba.
-function BotonesRetosRegalos() {
+// Botones naranjas de portada (Historias, Cupones, Patrocinadores): cada
+// uno vive ahora dentro de su pestaña. "modales" elige cuáles mostrar.
+function BotonesNaranjasSeccion({ modales, onAbrir }) {
+  const todos = [
+                    { t: "HISTORIAS DCUATES", modal: "historias-dcuates", img: "/images/HistoriasDCUATES.png", puntos: ["TESTIMONIOS REALES", "HISTORIAS CON CAUSA", "INSPIRACIÓN COMUNITARIA"] },
+                    { t: "CUPONES, PROMOS Y MÁS", modal: "cupones-promos", img: "/images/CuponesPromos.png", puntos: ["DESCUENTOS EXCLUSIVOS", "PROMOCIONES LOCALES", "SE ACTUALIZA CADA MES"] },
+                    { t: "PATROCINADORES Y ALIANZAS DCUATES", modal: "patrocinadores-alianzas", img: "/images/PatrocinadoresAlianzas.png", puntos: ["NEGOCIOS ALIADOS", "ORGANIZACIONES QUE APOYAN", "¡GRACIAS POR SUMAR!"] }
+  ];
+  const lista = todos.filter((b) => modales.includes(b.modal));
+  return (
+    <div className={lista.length === 1 ? "flex justify-center" : "grid grid-cols-1 md:grid-cols-2 gap-3"}>
+      {lista.map((btn, idx) => (
+        <div key={idx} className={lista.length === 1 ? "w-full max-w-md" : "w-full"}>
+                    <button
+                      type="button"
+                      onClick={() => onAbrir(btn.modal)}
+                      className="flex flex-col rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white shadow-md transition-all hover:scale-[1.02] overflow-hidden font-heading text-left w-full"
+                    >
+                      <div className="px-2 pt-3 pb-1 text-center border-b border-white/20">
+                        <h4 className="uppercase font-black leading-tight text-sm sm:text-base lg:text-lg">
+                          {btn.t}
+                        </h4>
+                      </div>
+                      <div className="flex flex-1 items-center gap-2 px-2 py-2">
+                        <div className="w-2/5 h-full flex items-center justify-center">
+                          <img
+                            src={btn.img}
+                            alt=""
+                            loading="lazy"
+                            className="max-h-16 sm:max-h-20 w-auto object-contain drop-shadow"
+                            onError={(e) => { e.target.style.display = 'none'; }}
+                          />
+                        </div>
+                        <ul className="w-3/5 space-y-1 text-left text-[10px] sm:text-xs font-bold leading-snug">
+                          {btn.puntos.map((p, i) => <li key={i}>* {p}</li>)}
+                        </ul>
+                      </div>
+                    </button>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function BotonesRetosRegalos({ indices }) {
   const [abierto, setAbierto] = useState(null);
   return (
     <div className="flex flex-col gap-2">
       {RETOS_REGALOS_ITEMS.map((item, i) => {
-        const activo = abierto === i;
+        if (indices && !indices.includes(i)) return null;
+        const activo = true;
         return (
           <div key={i} className="rounded-xl overflow-hidden">
-            <button
-              type="button"
-              onClick={() => setAbierto(activo ? null : i)}
-              aria-expanded={activo}
-              className="w-full flex items-center justify-between gap-2 bg-[#e65100] hover:bg-[#bf360c] text-white font-black uppercase text-xs sm:text-sm leading-tight px-4 py-3.5 transition-colors text-left"
+            <div
+              className="w-full flex items-center justify-between gap-2 bg-[#e65100] text-white font-black uppercase text-xs sm:text-sm leading-tight px-4 py-3.5 transition-colors text-left"
             >
               <span>{item.titulo}</span>
               <span className="flex items-center gap-2 shrink-0">
                 <span className="text-xl" aria-hidden="true">{item.icono}</span>
-                <span className={`transition-transform ${activo ? "rotate-180" : ""}`} aria-hidden="true">▾</span>
               </span>
-            </button>
+            </div>
             {activo && (
               <div className="bg-[#fff8f1] border-2 border-t-0 border-[#e65100] rounded-b-xl p-3 space-y-2">
                 <p className="text-[#0f2d1e] text-[11px] sm:text-xs font-black leading-snug">{item.intro}</p>
@@ -767,7 +814,7 @@ export default function App() {
   // Formulario de "Registra tu Solicitud" (junto al mapa): se ve resumido
   // y se despliega completo al querer llenarlo (es un formulario externo
   // -Tally-, así que se expande al tocarlo, no al detectar un campo exacto).
-  const [solicitudExpandida, setSolicitudExpandida] = useState(false);
+  const [solicitudExpandida, setSolicitudExpandida] = useState(true);
   // Botones naranjas junto a los carruseles de Ventas con Causa y de
   // Extraviados: agrupados en un solo botón resumen debajo del carrusel.
   const [ventasResumenAbierto, setVentasResumenAbierto] = useState(false);
@@ -859,9 +906,53 @@ export default function App() {
   const videosRetos = paresBaserow(filasEnlaces, "NOMBRE RETOSVID", "RETOSVID", 8)
     .map((v) => ({ video: detectarVideo(v.enlace), nombre: v.nombre }))
     .filter((v) => v.video);
-  // Rotación automática de la tira de videos de Retos (misma lógica que
-  // Historias y Patrocinadores).
-  const { scrollRef: scrollRetosVideosRef, onPointerDown: onPointerDownRetosVideos } = useCarruselAutomatico(videosRetos.length);
+
+  // Carrusel de portada de cada pestaña (un cuadro cada 3 segundos). Para cada
+  // pestaña (NOSOTROS, BENEFICIOS, CAUSAS, VALORES, REGALOS, GRATITUD), en la
+  // tabla ENLACES de Baserow:
+  //  - "PORTADA <PESTAÑA>"  (columna Archivo): una imagen o un PDF por fila.
+  //    Opcional: "NOMBRE PORTADA <PESTAÑA>" como texto al pie del cuadro.
+  //  - "NOMBRE VIDEOS <PESTAÑA>" + "VIDEOS <PESTAÑA>": un enlace de video por fila.
+  // En CAUSAS se suman además los videos de RETOSVID (el carrusel que antes
+  // estaba arriba de todo). Si una pestaña no tiene nada, muestra su imagen de
+  // respaldo (ver PORTADAS_BASE en BloqueCentral.jsx).
+  const portadasItems = {};
+  ["nosotros", "beneficios", "causas", "valores", "regalos", "gratitud"].forEach((id) => {
+    const K = id.toUpperCase();
+    const archivos = filasEnlaces
+      .map((f, i) => {
+        if (!f) return null;
+        const url = urlDesdeCeldaBaserow(f[`PORTADA ${K}`]);
+        if (!url) return null;
+        const nombre = (f[`NOMBRE PORTADA ${K}`] && String(f[`NOMBRE PORTADA ${K}`]).trim()) || "";
+        return esPDF(url)
+          ? { id: `${id}-arch-${i}`, tipo: "pdf", url, nombre: nombre || "Documento PDF" }
+          : { id: `${id}-arch-${i}`, tipo: "imagen", img: resolverSrcImagen(url), nombre };
+      })
+      .filter(Boolean)
+      .slice(0, 10);
+    const videos = paresBaserow(filasEnlaces, `NOMBRE VIDEOS ${K}`, `VIDEOS ${K}`, 10)
+      .map((v) => ({ video: detectarVideo(v.enlace), nombre: v.nombre }))
+      .filter((v) => v.video)
+      .map((v, i) => ({
+        id: `${id}-vid-${i}`,
+        tipo: "video",
+        nombre: v.nombre,
+        media: <MiniaturaVideo video={v.video} nombre={v.nombre} />,
+        onClick: () => setVideoEnGrande(v.video)
+      }));
+    portadasItems[id] = [...archivos, ...videos];
+  });
+  portadasItems.causas = [
+    ...portadasItems.causas,
+    ...videosRetos.map((v, i) => ({
+      id: `causas-retos-${i}`,
+      tipo: "video",
+      nombre: v.nombre,
+      media: <MiniaturaVideo video={v.video} nombre={v.nombre} />,
+      onClick: () => setVideoEnGrande(v.video)
+    }))
+  ];
 
   const recomendacionesDcuates = (() => {
     const desdeBaserow = paresBaserow(filasEnlaces, "Nombre Recocasa", "RECASA", 5);
@@ -913,14 +1004,21 @@ export default function App() {
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           aria-label="Subir al inicio de la página"
           title="Subir"
-          className="fixed bottom-20 sm:bottom-24 left-4 z-50 h-11 w-11 sm:h-12 sm:w-12 flex items-center justify-center rounded-full bg-[#0f2d1e] text-white shadow-lg border-2 border-white/30 hover:bg-emerald-800 transition-colors"
+          className="fixed bottom-[3.75rem] sm:bottom-16 left-4 z-50 h-11 w-11 sm:h-12 sm:w-12 flex items-center justify-center rounded-full bg-[#0f2d1e] text-white shadow-lg border-2 border-white/30 hover:bg-emerald-800 transition-colors"
         >
           <span className="text-xl leading-none" aria-hidden="true">↑</span>
         </button>
       )}
 
       {/* Botón Flotante Permanente de WhatsApp — efecto 3D + anillo parpadeante + etiqueta */}
-      <div className="fixed bottom-20 sm:bottom-24 right-6 z-50 flex items-center gap-3">
+      <div className="fixed bottom-[3.75rem] sm:bottom-16 right-4 sm:right-6 z-50 flex flex-col items-end gap-3">
+        {/* ¿Qué necesitas hoy? — arriba del botón de WhatsApp */}
+        <BotonNecesidades
+          onAbrirProyecto={(id) => setModalProyecto(id)}
+          onAccionEspecial={(accion) => setModalFormulario(accion)}
+          onAbrirFAQ={() => setShowFAQ(true)}
+        />
+        <div className="flex items-center gap-3">
         <span className="bg-[#25d366] text-white text-[11px] sm:text-sm font-black uppercase tracking-wide px-3 py-2 rounded-full shadow-lg border border-white/30 whitespace-nowrap animate-pulse">
           Dudas y Atención
         </span>
@@ -936,19 +1034,19 @@ export default function App() {
             <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.503-5.729-1.458L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.965C16.428 1.978 13.96 1.951 12.01 1.951c-5.438 0-9.863 4.374-9.867 9.802 0 1.685.459 3.324 1.333 4.766L2.483 20.3l3.966-.995zM17.15 14.34c-.283-.141-1.674-.824-1.933-.917-.26-.093-.448-.14-.637.142-.188.282-.729.917-.894 1.105-.165.188-.33.212-.613.07a9.23 9.23 0 0 1-2.28-1.401 10.15 10.15 0 0 1-1.579-1.954c-.165-.282-.018-.434.124-.574.127-.127.283-.329.424-.494.141-.165.188-.282.283-.47.094-.188.047-.353-.024-.494-.071-.141-.637-1.53-.873-2.102-.229-.554-.46-.478-.637-.487-.164-.008-.353-.01-.542-.01-.189 0-.495.07-.755.353-.26.282-.99 1.011-.99 2.467 0 1.457 1.06 2.867 1.201 3.056.142.188 2.086 3.178 5.053 4.462.705.305 1.256.488 1.684.624.708.226 1.353.194 1.863.118.568-.085 1.674-.682 1.909-1.34.236-.658.236-1.223.165-1.34-.07-.117-.26-.188-.542-.329z"/>
           </svg>
         </a>
+              </div>
       </div>
 
       {/* Encabezado + ticker de frases, pegados juntos como una sola barra fija.
           "relative" para poder anclar el botón de Necesidades justo debajo
           (top-full), pegado al borde inferior, y que se mueva junto con todo
           el bloque al hacer scroll (igual que el header, que es sticky). */}
-      <div className="sticky top-0 z-40 relative">
+      <div id="encabezado-fijo" className="sticky top-0 z-40 relative">
         <SiteHeader
           onAbrirFAQ={() => setShowFAQ(true)}
           onAbrirPrivacidad={() => setShowPrivacy(true)}
           onAbrirProyecto={(id) => setModalProyecto(id)}
           onAbrirSugerencias={() => setModalFormulario("sugerencias")}
-          onAbrirComparte={() => setModalFormulario("comparte")}
           onAbrirMapaSitio={() => setShowMapaSitio(true)}
           onAbrirCategoria={(id) => setCategoriaAbierta(id)}
           busquedaAbierta={busquedaAbierta}
@@ -957,351 +1055,29 @@ export default function App() {
         <TickerFrases />
         <BarraLogros />
 
-        {/* Botón de Navegación por Necesidades — pegado justo debajo de la
-            barra de frases (mismo espacio que el de WhatsApp guarda con la
-            barra inferior). Al ser "absolute" dentro de este contenedor
-            "sticky", se mueve junto con el encabezado al hacer scroll. */}
-        <BotonNecesidades
-          onAbrirProyecto={(id) => setModalProyecto(id)}
-          onAccionEspecial={(accion) => setModalFormulario(accion)}
-          onAbrirFAQ={() => setShowFAQ(true)}
-        />
       </div>
 
       {/* SECCIÓN PORTADA / HERO — izquierda: título+texto+Quiénes Somos+Bibliobici a toda altura; derecha: cuadrícula de 12 botones (2 columnas en celular, 3 en escritorio = 3x4) */}
-      <section id="inicio" className="scroll-mt-48 md:scroll-mt-36 bg-[#e8f5e9] text-[#0f2d1e] py-8 px-4 sm:py-12 md:py-16 border-b-4 border-[#0f2d1e]">
-        <div className="mx-auto max-w-7xl grid gap-8 lg:grid-cols-12 lg:items-stretch">
+      <section id="inicio" className="scroll-mt-48 md:scroll-mt-36 bg-[#e8f5e9] text-[#0f2d1e] py-4 px-4 sm:py-6">
+        <div className="mx-auto max-w-2xl md:max-w-4xl xl:max-w-6xl flex flex-col gap-4">
 
-          {/* Columna izquierda: título, texto, Quiénes Somos y la Bibliobici, todo a la misma altura que la cuadrícula de botones */}
-          <div className="lg:col-span-6 flex flex-col gap-4 min-w-0 lg:h-full">
-            <div>
-              <h1 className="text-3xl sm:text-4xl font-black uppercase tracking-tight text-[#0f2d1e] leading-tight">
-                Juntos hacemos una mejor comunidad ⭐ 😊
-              </h1>
-              <p className={`text-sm sm:text-base text-slate-800 leading-relaxed text-justify font-medium overflow-hidden mt-3 ${heroExpandido ? "max-h-none" : "max-h-[4.9em]"}`}>
-                <strong>DCUATES</strong> impulsa proyectos, <strong>PERSONAS, ORGANIZACIONES Y EMPRENDIMIENTOS</strong> que <strong>BENEFICIAN a las FAMILIAS</strong>: <strong>PUBLICIDAD GRATUITA</strong> para tu negocio, préstamo de <strong>LIBROS</strong> y materiales <strong>EDUCATIVOS</strong>, apoyo a <strong>MASCOTAS Y GRUPOS VULNERABLES</strong>, y <strong>ALIANZAS GANAR-GANAR</strong> que generan apoyos y beneficios mutuos y comunitarios. Suma con tu valiosa colaboración o con tu invaluable <strong>APOYO VOLUNTARIO</strong> para lograr nuestros objetivos de forma más efectiva, y forjar <strong>LA CADENA DE VALOR Y DE VALORES</strong> que nos liberará de nuestras limitaciones para ser mejores, Y ASÍ MEJORAR NUESTRO ENTORNO Y NUESTRO MUNDO !!!
-              </p>
-              <button
-                type="button"
-                onClick={() => setHeroExpandido((v) => !v)}
-                className="text-xs font-black uppercase text-emerald-800 underline underline-offset-2 mt-1"
-              >
-                {heroExpandido ? "Leer menos" : "Leer más"}
-              </button>
-            </div>
-
-            {/* QUIÉNES SOMOS — justo debajo de JUNTOS, resumido con "Mostrar más" */}
-            <div id="quienes-somos" className="scroll-mt-48 md:scroll-mt-36 rounded-2xl bg-[#17472d] text-white p-4 sm:p-5">
-              <span className="flex items-center gap-2 text-xl sm:text-2xl font-black uppercase tracking-wider text-emerald-400 mb-2">
-                <span className="text-3xl sm:text-4xl">✅</span> Quiénes Somos
-              </span>
-              <div className={`overflow-hidden ${quienesExpandido ? "max-h-none" : "max-h-[5.6em]"}`}>
-                <p className="text-sm sm:text-base text-emerald-50 leading-relaxed font-medium">
-                  {QUIENES_SOMOS.idea}
-                </p>
-                <div className="grid gap-2 text-left pt-3">
-                  {QUIENES_SOMOS.objetivos.map((obj, i) => (
-                    <div key={i} className="flex items-start gap-2 bg-emerald-900/40 rounded-xl px-3 py-2">
-                      <span className="h-2 w-2 mt-1.5 rounded-full bg-[#00c853] flex-shrink-0" />
-                      <p className="text-xs sm:text-sm font-bold text-emerald-100 uppercase leading-snug">{obj}</p>
-                    </div>
-                  ))}
-                </div>
-                <p className="text-xs sm:text-sm text-emerald-200/80 italic leading-relaxed pt-3">
-                  {QUIENES_SOMOS.filosofia}
-                </p>
-                <p className="text-sm sm:text-base font-black uppercase text-white bg-[#0f2d1e]/60 border-2 border-emerald-500/40 rounded-2xl py-4 px-4 mt-3 leading-snug">
-                  {QUIENES_SOMOS.colofon}
-                  <span className="block mt-2 text-emerald-300 tracking-wide">{QUIENES_SOMOS.firma}</span>
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setQuienesExpandido((v) => !v)}
-                className="text-xs font-black uppercase text-emerald-300 underline underline-offset-2 mt-2"
-              >
-                {quienesExpandido ? "Mostrar menos" : "Mostrar más"}
-              </button>
-            </div>
-
-            {/* NUESTRA MISIÓN — mismo formato que Quiénes Somos, justo debajo */}
-            <div className="rounded-2xl bg-[#17472d] text-white p-4 sm:p-5">
-              <span className="flex items-center gap-2 text-xl sm:text-2xl font-black uppercase tracking-wider text-emerald-400 mb-2">
-                <span className="text-3xl sm:text-4xl">🎯</span> Nuestra Misión
-              </span>
-              <div className={`overflow-hidden ${misionExpandida ? "max-h-none" : "max-h-[5.6em]"}`}>
-                <p className="text-sm sm:text-base text-emerald-50 leading-relaxed font-medium">
-                  <strong>Misión:</strong> {MISION_VISION.mision}
-                </p>
-                <p className="text-sm sm:text-base text-emerald-50 leading-relaxed font-medium pt-2">
-                  <strong>Visión:</strong> {MISION_VISION.vision}
-                </p>
-                <p className="text-xs sm:text-sm text-emerald-200/80 italic leading-relaxed pt-3">
-                  <strong className="not-italic">Filosofía:</strong> {MISION_VISION.filosofia}
-                </p>
-                <p className="text-sm sm:text-base font-black uppercase text-white bg-[#0f2d1e]/60 border-2 border-emerald-500/40 rounded-2xl py-4 px-4 mt-3 leading-snug">
-                  Mucha gente pequeña, en lugares pequeños, haciendo cosas pequeñas, puede cambiar el mundo (Eduardo Galeano)
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setMisionExpandida((v) => !v)}
-                className="text-xs font-black uppercase text-emerald-300 underline underline-offset-2 mt-2"
-              >
-                {misionExpandida ? "Mostrar menos" : "Mostrar más"}
-              </button>
-            </div>
-
-            {/* CÓMO PODEMOS SUMAR — mismo formato, justo debajo de Misión.
-                Sin truncar: el texto se ve siempre completo. */}
-            <div className="rounded-2xl bg-[#17472d] text-white p-4 sm:p-5">
-              <span className="flex items-center gap-2 text-xl sm:text-2xl font-black uppercase tracking-wider text-emerald-400 mb-2">
-                <span className="text-3xl sm:text-4xl">🤝</span> Cómo Podemos Sumar
-              </span>
-              <div>
-                <p className="text-sm sm:text-base text-emerald-50 leading-relaxed font-medium">{COMO_SUMAR.intro}</p>
-                <p className="text-sm sm:text-base text-emerald-50 leading-relaxed font-medium pt-2">{COMO_SUMAR.ventajas}</p>
-                <p className="text-sm sm:text-base font-bold text-emerald-100 pt-2">{COMO_SUMAR.cierre}</p>
-              </div>
-              <div className="mt-4 flex justify-center">
-                <button
-                  type="button"
-                  onClick={() => setTimeout(() => irASeccion("donaciones"), 50)}
-                  className="rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3.5 px-6 sm:px-8 uppercase tracking-wide text-sm sm:text-lg shadow-lg transition-all hover:scale-105"
-                >
-                  Ir a Apoyo Voluntario 🙏
-                </button>
-              </div>
-            </div>
-
-            {/* Bibliobici — cubre el espacio restante hasta la altura de la última fila de botones */}
-            <div className="rounded-2xl overflow-hidden border-4 border-[#0f2d1e]/30 shadow-lg h-56 sm:h-72 lg:h-auto lg:flex-1 bg-[#0f2d1e]/5">
-              <img
-                src="/images/bibliobici-movil.png"
-                alt="Bibliobici Móvil DCUATES en la comunidad"
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.target.style.display = 'none';
-                  e.target.parentElement.innerHTML = '<div class="p-12 text-center text-[#0f2d1e]/70 font-bold uppercase text-xs tracking-wider bg-emerald-50 h-full flex items-center justify-center">📷 [Espacio para Foto de la Bibliobici]</div>';
-                }}
-              />
-            </div>
-          </div>
-
-          {/* Cuadrícula de las 4 categorías (portada simplificada) — 2x2 en
-              celular y en escritorio, botones grandes con logo/emoji al
-              centro. Cada una abre ModalCategoria con la presentación y el
-              acceso a los proyectos que agrupa. */}
-          <div className="lg:col-span-6">
-            <p className="flex items-center justify-center gap-3 text-center text-3xl sm:text-4xl font-black text-[#0f2d1e] uppercase tracking-tight leading-none mb-4">
-              <span>⭐</span> Proyectos Comunitarios DCUATES <span>⭐</span>
-            </p>
-            {(() => {
-              const BotonCategoria = ({ cat }) => (
-                <button
-                  type="button"
-                  onClick={() => setCategoriaAbierta(cat.id)}
-                  className="flex flex-col rounded-2xl bg-[#e65100] hover:bg-[#bf360c] text-white shadow-md transition-all hover:scale-[1.02] overflow-hidden font-heading text-center w-full"
-                >
-                  <div className="px-2 pt-4 pb-1">
-                    <h4 className="uppercase font-black leading-tight text-base sm:text-lg lg:text-xl">
-                      {cat.titulo}
-                    </h4>
-                  </div>
-                  <div className="flex flex-1 items-center justify-center py-4">
-                    {cat.img ? (
-                      <img
-                        src={cat.img}
-                        alt=""
-                        loading="lazy"
-                        className="max-h-32 sm:max-h-40 w-auto object-contain drop-shadow"
-                        onError={(e) => { e.target.style.display = 'none'; }}
-                      />
-                    ) : (
-                      <span className="text-6xl sm:text-7xl" aria-hidden="true">{cat.emoji}</span>
-                    )}
-                  </div>
-                  <div className="px-3 pb-4 pt-1">
-                    <p className="text-[11px] sm:text-xs font-bold uppercase tracking-wide text-white/90 italic">
-                      {cat.slogan}
-                    </p>
-                  </div>
-                </button>
-              );
-
-              return (
-                <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                  {CATEGORIAS_PROYECTOS.map((cat) => <BotonCategoria key={cat.id} cat={cat} />)}
-                </div>
-              );
-            })()}
-
-
-
-              {/* Retos, Regalos y Reconocimientos DCUATES — 3 columnas: carrusel
-                  de fotos (Baserow: RETOSGALERIA) | botones naranjas | videos
-                  relacionados (Baserow: NOMBRE RETOSVID / RETOSVID). */}
-              <div className="mt-3">
-                <div className="rounded-2xl overflow-hidden border-4 border-[#0f2d1e]/30 shadow-lg bg-[#0f2d1e] p-3">
-                  <p className="text-white font-black uppercase text-xs sm:text-sm tracking-wide mb-2 px-1 text-center">
-                    🔎 Retos, Regalos y Reconocimientos DCUATES
-                    <br className="sm:hidden" />
-                    <span className="block sm:inline sm:ml-1 normal-case font-bold text-emerald-100">Porque todo lo bueno merece ser compartido y reconocido, envíanos tus propuestas</span>
-                  </p>
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-                    {/* Columna central: los 3 botones naranjas (desplegables con ejemplos) */}
-                    <div className="order-1 lg:order-2">
-                      <BotonesRetosRegalos />
-                    </div>
-
-                    {/* Columna 2: carrusel de fotos (RETOSGALERIA en Baserow) */}
-                    <div className="order-2 lg:order-1 rounded-xl overflow-hidden bg-white/5 border border-white/10 flex items-center justify-center min-h-[180px]">
-                      {galeriaRetos.length > 0 ? (
-                        <Carrusel
-                          items={galeriaRetos}
-                          renderItem={(item) => (
-                            <img
-                              src={resolverSrcImagen(item.img)}
-                              alt={item.nombre}
-                              loading="lazy"
-                              className="w-full aspect-square object-cover"
-                            />
-                          )}
-                        />
-                      ) : (
-                        <p className="text-emerald-200/70 text-[10px] font-bold uppercase tracking-wide text-center px-4">
-                          Sube fotos a la columna "RETOSGALERIA" en Baserow para verlas aquí
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Columna 3: videos relacionados (NOMBRE RETOSVID / RETOSVID) — tira horizontal con rotación automática */}
-                    <div className="order-3 rounded-xl bg-white/5 border border-white/10 p-2 min-h-[180px] flex items-center">
-                      {videosRetos.length > 0 ? (
-                        <div
-                          ref={scrollRetosVideosRef}
-                          onPointerDown={onPointerDownRetosVideos}
-                          className="flex gap-2 overflow-x-auto pb-1 w-full"
-                        >
-                          {videosRetos.map((v, i) => (
-                            <button
-                              key={i}
-                              type="button"
-                              onClick={() => setVideoEnGrande(v.video)}
-                              className="group relative rounded-lg overflow-hidden border-2 border-white/10 hover:border-[#e65100] transition-colors bg-black/30 text-left shrink-0 w-32"
-                            >
-                              <div className="aspect-video w-full overflow-hidden">
-                                <MiniaturaVideo video={v.video} nombre={v.nombre} />
-                              </div>
-                              <span className="absolute inset-0 flex items-center justify-center">
-                                <span className="w-8 h-8 rounded-full bg-[#e65100]/90 flex items-center justify-center text-white text-sm shadow-md group-hover:bg-[#e65100]">▶</span>
-                              </span>
-                              <p className="px-2 py-1 text-[10px] font-black text-white uppercase tracking-tight leading-tight">
-                                {v.nombre}
-                              </p>
-                            </button>
-                          ))}
-                        </div>
-                      ) : (
-                        <p className="text-emerald-200/70 text-[10px] font-bold uppercase tracking-wide text-center px-2 py-6 w-full">
-                          Sube videos con las columnas "NOMBRE RETOSVID" y "RETOSVID" en Baserow para verlos aquí
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {videoEnGrande && (
-                  <div
-                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 backdrop-blur-sm"
-                    onClick={() => setVideoEnGrande(null)}
-                  >
-                    <div className="relative w-full max-w-3xl" onClick={(e) => e.stopPropagation()}>
-                      <button
-                        type="button"
-                        onClick={() => setVideoEnGrande(null)}
-                        className="absolute -top-10 right-0 text-white text-2xl font-black hover:text-[#e65100] transition-colors"
-                        aria-label="Cerrar video"
-                      >
-                        ✕
-                      </button>
-                      <div className="rounded-2xl overflow-hidden border-4 border-white/20 shadow-2xl aspect-video bg-black">
-                        <IframeVideo video={videoEnGrande} className="w-full h-full" />
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* 3 botones naranjas nuevos — mismo estilo que los de arriba,
-                    cada uno abre su propio modal con el carrusel adentro (el
-                    logo de cada uno se agrega después en /public/images/,
-                    con el mismo nombre de archivo que aquí abajo). */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
-                  {[
-                    { t: "HISTORIAS DCUATES", modal: "historias-dcuates", img: "/images/HistoriasDCUATES.png", puntos: ["TESTIMONIOS REALES", "HISTORIAS CON CAUSA", "INSPIRACIÓN COMUNITARIA"] },
-                    { t: "CUPONES, PROMOS Y MÁS", modal: "cupones-promos", img: "/images/CuponesPromos.png", puntos: ["DESCUENTOS EXCLUSIVOS", "PROMOCIONES LOCALES", "SE ACTUALIZA CADA MES"] },
-                    { t: "PATROCINADORES Y ALIANZAS DCUATES", modal: "patrocinadores-alianzas", img: "/images/PatrocinadoresAlianzas.png", puntos: ["NEGOCIOS ALIADOS", "ORGANIZACIONES QUE APOYAN", "¡GRACIAS POR SUMAR!"] }
-                  ].map((btn, idx) => (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => setModalProyecto(btn.modal)}
-                      className="flex flex-col rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white shadow-md transition-all hover:scale-[1.02] overflow-hidden font-heading text-left w-full"
-                    >
-                      <div className="px-2 pt-3 pb-1 text-center border-b border-white/20">
-                        <h4 className="uppercase font-black leading-tight text-sm sm:text-base lg:text-lg">
-                          {btn.t}
-                        </h4>
-                      </div>
-                      <div className="flex flex-1 items-center gap-2 px-2 py-2">
-                        <div className="w-2/5 h-full flex items-center justify-center">
-                          <img
-                            src={btn.img}
-                            alt=""
-                            loading="lazy"
-                            className="max-h-16 sm:max-h-20 w-auto object-contain drop-shadow"
-                            onError={(e) => { e.target.style.display = 'none'; }}
-                          />
-                        </div>
-                        <ul className="w-3/5 space-y-1 text-left text-[10px] sm:text-xs font-bold leading-snug">
-                          {btn.puntos.map((p, i) => <li key={i}>* {p}</li>)}
-                        </ul>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-
-              {/* Mapa de Negocios Locales — embed de Google Maps/My Maps.
-                  Para agregar/editar negocios no se toca este código: se
-                  edita el mapa en Google Maps/My Maps y se actualiza la
-                  constante MAPA_NEGOCIOS_EMBED_URL arriba del archivo. */}
-              <div id="mapa-negocios" className="scroll-mt-48 md:scroll-mt-36 mt-3 rounded-2xl overflow-hidden border-4 border-[#0f2d1e]/30 shadow-lg">
-                <div className="bg-[#0f2d1e] px-3 py-2">
-                  <p className="text-white font-black uppercase text-xs sm:text-sm tracking-wide text-center">
-                    📍 Mapa de Negocios Locales Aliados
-                  </p>
-                  <p className="text-emerald-100 font-bold normal-case text-[10px] sm:text-[11px] text-center mt-0.5">
-                    Toca un punto del mapa para ver el negocio o negocio aliado
-                  </p>
-                </div>
-                <iframe
-                  src={MAPA_NEGOCIOS_EMBED_URL}
-                  className="w-full h-64 sm:h-80"
-                  style={{ border: 0 }}
-                  loading="lazy"
-                  referrerPolicy="strict-origin-when-cross-origin"
-                  title="Mapa de negocios locales DCUATES"
-                />
-              </div>
-
-              {/* Ventana de Solicitudes — VISIBLE directo en la página (no
-                  modal), justo debajo del mapa. Para dirigir tráfico desde
-                  WhatsApp Business a esta sección exacta: comparte el link
-                  https://dcuates.com/#solicitudes (o el dominio que uses) —
-                  el navegador baja solo hasta aquí, sin necesitar nada de
-                  código (el id="solicitudes" + scroll-mt de abajo ya hacen
-                  que no quede tapada por el encabezado). */}
-              <div id="solicitudes" className="mt-3 scroll-mt-40 sm:scroll-mt-36 rounded-2xl overflow-hidden border-4 border-[#0f2d1e]/30 shadow-lg bg-white">
+          {/* Banner de avisos + bloque central de 7 pestañas (BloqueCentral).
+              Nosotros y Causas reciben aquí su contenido; lo que sigue
+              debajo (Retos, Historias, Solicitudes, etc.) se migrará a
+              su pestaña en la fase 2. */}
+          <div className="min-w-0">
+            <BloqueCentral
+              categorias={CATEGORIAS_PROYECTOS}
+              proyectos={BOTONES_PORTADA}
+              mapaUrl={MAPA_NEGOCIOS_EMBED_URL}
+              whatsappNumero={WHATSAPP_NUMERO}
+              portadasItems={portadasItems}
+              onAbrirCategoria={(id) => setCategoriaAbierta(id)}
+              onAbrirProyecto={(id) => setModalProyecto(id)}
+              beneficios={(
+                <div className="flex flex-col gap-4 min-w-0">
+                  <BotonesNaranjasSeccion modales={["cupones-promos"]} onAbrir={(id) => setModalProyecto(id)} />
+<div id="solicitudes" className="mt-3 scroll-mt-40 sm:scroll-mt-36 rounded-2xl overflow-hidden border-4 border-[#0f2d1e]/30 shadow-lg bg-white">
                 <div className="bg-[#e65100] px-3 py-2">
                   <p className="text-white font-black uppercase text-xs sm:text-sm tracking-wide text-center">
                     📝 Registra tu Solicitud
@@ -1364,15 +1140,6 @@ export default function App() {
                       </div>
                     )}
                   </div>
-                  {solicitudExpandida && (
-                    <button
-                      type="button"
-                      onClick={() => setSolicitudExpandida(false)}
-                      className="w-full rounded-lg border-2 border-emerald-200 text-emerald-800 hover:bg-emerald-50 font-black uppercase tracking-wide text-[11px] py-2 transition-colors"
-                    >
-                      ▲ Ver menos
-                    </button>
-                  )}
 
                   <div className="text-center pt-1">
                     <p className="text-xs text-slate-500 font-medium mb-2">¿Prefieres contarnos directo?</p>
@@ -1387,58 +1154,111 @@ export default function App() {
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      {/* HISTORIAS Y REFLEXIONES DCUATES — movida aquí (antes vivía dentro
-          del hero); ahora como barra horizontal de 1-2 videos de alto, con
-          scroll lateral para ver más. Sigue tomando sus videos de las
-          columnas "NOMBRE VIDPORT" / "VIDPORT" en Baserow. */}
-      <section id="historias-reflexiones" className="scroll-mt-48 md:scroll-mt-36 bg-[#0f2d1e] py-6 px-4 border-b-4 border-[#0f2d1e]">
-        <div className="mx-auto max-w-6xl">
-          <p className="text-white font-black uppercase text-xs sm:text-sm tracking-wide mb-2 px-1 text-center">
-            Historias y reflexiones DCUATES que INSPIRAN 💡
-            <br className="sm:hidden" />
-            <span className="block sm:inline sm:ml-1">Dales clic para ampliarlos y disfrutarlos 🎥 🍿 😊</span>
-          </p>
-          <div
-            ref={carruselHistorias.scrollRef}
-            onPointerDown={carruselHistorias.onPointerDown}
-            className="flex gap-2 sm:gap-3 overflow-x-auto pb-1"
-          >
-            {videosPortadaFinal.map((v, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => setVideoEnGrande(v.video)}
-                className="group relative rounded-xl overflow-hidden border-2 border-white/10 hover:border-[#e65100] transition-colors bg-black/30 text-left w-40 sm:w-56 shrink-0"
-              >
-                <div className="aspect-video w-full overflow-hidden">
-                  <MiniaturaVideo video={v.video} nombre={v.nombre} />
                 </div>
-                <span className="absolute inset-0 flex items-center justify-center">
-                  <span className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-[#e65100]/90 flex items-center justify-center text-white text-base sm:text-lg shadow-md group-hover:bg-[#e65100]">▶</span>
-                </span>
-                <p className="px-2 py-1.5 text-[10px] sm:text-xs font-black text-white uppercase tracking-tight leading-tight">
-                  {v.nombre}
-                </p>
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
+              )}
+              valores={(
+                <div className="flex flex-col gap-4 min-w-0">
+                  <BotonesNaranjasSeccion modales={["historias-dcuates"]} onAbrir={(id) => setModalProyecto(id)} />
+                  <div id="recursos" className="scroll-mt-48 md:scroll-mt-36 rounded-2xl bg-[#0f2d1e] p-4">
+          <p className="text-white font-black uppercase text-sm sm:text-base tracking-wide text-center mb-3">
+            🔎 Más recursos e información de valor
+          </p>
+            {/* Recomendaciones / Música-Libros-Pelis / Preguntas Frecuentes,
+                en fila horizontal debajo del video (antes eran una columna
+                al lado del video). */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-3">
+              <BotonVerdeInfo
+                titulo="Recomendaciones ⭐⭐⭐⭐⭐"
+                abierto={infoAbierta === "recomendaciones"}
+                onClick={() => setInfoAbierta((v) => (v === "recomendaciones" ? null : "recomendaciones"))}
+              >
+                <p className="font-black uppercase text-emerald-300 text-[11px] tracking-wide">Recomendaciones DCUATES</p>
+                <ul className="space-y-1">
+                  {recomendacionesDcuates.map((r, i) => (
+                    <li key={i}>
+                      <a href={r.enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-300">
+                        {r.nombre}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+                <p className="font-black uppercase text-emerald-300 text-[11px] tracking-wide pt-2">Recomendaciones de la Comunidad</p>
+                <ul className="space-y-1">
+                  {recomendacionesComunidad.map((r, i) => (
+                    <li key={i}>
+                      <a href={r.enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-300">
+                        {r.nombre}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+                <p className="pt-2 font-black uppercase text-emerald-300">Si necesitas alguna recomendación en especial, contáctanos !!!</p>
+              </BotonVerdeInfo>
 
-      {/* SECCIÓN: VENTAS CON CAUSA */}
-      <section id="ventas-con-causa" className="scroll-mt-48 md:scroll-mt-36 bg-[#e8f5e9] text-[#0f2d1e] py-10 sm:py-16 px-4 border-b-4 border-[#0f2d1e]">
-        <div className="mx-auto max-w-6xl">
-          <div className="text-center max-w-2xl mx-auto mb-10 space-y-3">
+              <BotonVerdeInfo
+                titulo="Música, Libros, Pelis y Más... 🎵📚🎬"
+                abierto={infoAbierta === "recursos"}
+                onClick={() => setInfoAbierta((v) => (v === "recursos" ? null : "recursos"))}
+              >
+                <p className="font-black uppercase text-emerald-300 text-[11px] tracking-wide">🎵 Música</p>
+                <ul className="space-y-1">
+                  {musicaLinks.map((enlace, i) => (
+                    <li key={i}>
+                      <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-300">
+                        Música {i + 1}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+                <p className="font-black uppercase text-emerald-300 text-[11px] tracking-wide pt-2">📚 Libros</p>
+                <ul className="space-y-1">
+                  {librosLinks.map((enlace, i) => (
+                    <li key={i}>
+                      <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-300">
+                        Libro {i + 1}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+                <p className="font-black uppercase text-emerald-300 text-[11px] tracking-wide pt-2">🎬 Películas y Más</p>
+                <ul className="space-y-1">
+                  {videosLinks.map((enlace, i) => (
+                    <li key={i}>
+                      <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-300">
+                        Recurso {i + 1}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </BotonVerdeInfo>
+
+              <BotonVerdeInfo
+                titulo="Preguntas Frecuentes ❓💬"
+                abierto={infoAbierta === "faq"}
+                onClick={() => setInfoAbierta((v) => (v === "faq" ? null : "faq"))}
+              >
+                <div className="space-y-2">
+                  {FAQ_ITEMS.map((f, i) => (
+                    <details open key={i} className="rounded-lg bg-emerald-900/40 px-3 py-2">
+                      <summary className="cursor-pointer text-xs sm:text-sm font-bold">{f.pregunta}</summary>
+                      <p className="mt-1 text-xs text-emerald-100/90 leading-relaxed">{f.respuesta}</p>
+                    </details>
+                  ))}
+                </div>
+              </BotonVerdeInfo>
+            </div>
+        
+                  </div>
+                </div>
+              )}
+              negociosSeccion={(
+                <div className="flex flex-col gap-6 min-w-0 text-[#0f2d1e]">
+                  <div id="ventas-con-causa" className="scroll-mt-48 md:scroll-mt-36">
+          <div className="text-center max-w-2xl mx-auto mb-6 space-y-3">
             <span className="inline-block rounded-full bg-emerald-200 px-5 py-2 text-lg sm:text-2xl font-black uppercase tracking-wider text-emerald-800 shadow-sm">
               🛍️ Ventas con Causa
             </span>
-            <h2 className="text-4xl sm:text-5xl font-black uppercase tracking-tight leading-none text-[#0f2d1e] font-heading">
+            <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-tight leading-none text-[#0f2d1e] font-heading">
               Productos y servicios que también apoyan la comunidad
             </h2>
             <p className="text-sm sm:text-base text-slate-700 font-bold">
@@ -1452,7 +1272,7 @@ export default function App() {
           <div className="max-w-3xl mx-auto mb-4">
             <PasarelaVentasConCausa />
           </div>
-          <div className="max-w-3xl mx-auto mb-14">
+          <div className="max-w-3xl mx-auto mb-8">
             <BotonNaranjaDesplegable
               titulo="🛍️ Regístrate, ve el catálogo completo y descubre recomendaciones de Compra y Venta"
               abierto={ventasResumenAbierto}
@@ -1525,8 +1345,262 @@ export default function App() {
             </BotonNaranjaDesplegable>
           </div>
 
+
+                  </div>
+                  <div id="publicidad" className="scroll-mt-48 md:scroll-mt-36 rounded-2xl bg-[#17472d] text-white p-4 sm:p-6">
+          <div className="text-center space-y-2 mb-8">
+            <span className="inline-block rounded-full bg-emerald-900/60 px-5 py-2 text-lg sm:text-2xl font-black uppercase tracking-wider text-emerald-400">
+              📢 Publicidad Comunitaria
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-black text-center uppercase tracking-tight text-emerald-300">
+              Publica tu negocio gratis
+            </h2>
+            <p className="text-xs font-bold text-emerald-100/70 uppercase max-w-md mx-auto leading-relaxed">
+              Comparte la información de tu negocio, sube imágenes de tus promociones y publicidad, y agrega tu página o redes sociales. Tu aportación voluntaria es bienvenida.
+            </p>
+          </div>
+          <FormularioPublicidad />
+        
+                  </div>
+                </div>
+              )}
+              regalos={(
+                <div id="retos-regalos" className="scroll-mt-48 md:scroll-mt-36 rounded-2xl bg-[#0f2d1e] p-3 sm:p-4">
+                  <p className="text-white font-black uppercase text-xs sm:text-sm tracking-wide mb-3 px-1 text-center">
+                    🔎 Retos, Regalos y Reconocimientos DCUATES
+                    <span className="block normal-case font-bold text-emerald-100">Porque todo lo bueno merece ser compartido y reconocido, envíanos tus propuestas.</span>
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <BotonesRetosRegalos indices={[0, 1]} />
+                    <div className="rounded-xl overflow-hidden bg-white/5 border border-white/10 flex items-center justify-center min-h-[180px]">
+                      {galeriaRetos.length > 0 ? (
+                        <Carrusel
+                          items={galeriaRetos}
+                          renderItem={(item) => (
+                            <img src={resolverSrcImagen(item.img)} alt={item.nombre} loading="lazy" className="w-full aspect-square object-cover" />
+                          )}
+                        />
+                      ) : (
+                        <p className="text-emerald-200/70 text-[10px] font-bold uppercase tracking-wide text-center px-4">
+                          Sube fotos a la columna "RETOSGALERIA" en Baserow para verlas aquí
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+              gratitud={(
+                <div className="flex flex-col gap-4 min-w-0">
+                  <div className="rounded-2xl bg-[#0f2d1e] p-3 sm:p-4">
+                    <BotonesRetosRegalos indices={[2]} />
+                  </div>
+                  <BotonesNaranjasSeccion modales={["patrocinadores-alianzas"]} onAbrir={(id) => setModalProyecto(id)} />
+                </div>
+              )}
+              nosotros={(
+                <div className="flex flex-col gap-4 min-w-0 lg:grid lg:grid-cols-2 lg:items-start">
+            <div>
+              <h1 className="sr-only">
+                Juntos hacemos una mejor comunidad ⭐ 😊
+              </h1>
+              <p className="text-sm sm:text-base text-slate-800 leading-relaxed text-justify font-medium mt-3">
+                <strong>DCUATES</strong> impulsa proyectos, <strong>PERSONAS, ORGANIZACIONES Y EMPRENDIMIENTOS</strong> que <strong>BENEFICIAN a las FAMILIAS</strong>: <strong>PUBLICIDAD GRATUITA</strong> para tu negocio, préstamo de <strong>LIBROS</strong> y materiales <strong>EDUCATIVOS</strong>, apoyo a <strong>MASCOTAS Y GRUPOS VULNERABLES</strong>, y <strong>ALIANZAS GANAR-GANAR</strong> que generan apoyos y beneficios mutuos y comunitarios. Suma con tu valiosa colaboración o con tu invaluable <strong>APOYO VOLUNTARIO</strong> para lograr nuestros objetivos de forma más efectiva, y forjar <strong>LA CADENA DE VALOR Y DE VALORES</strong> que nos liberará de nuestras limitaciones para ser mejores, Y ASÍ MEJORAR NUESTRO ENTORNO Y NUESTRO MUNDO !!!
+              </p>
+            </div>
+
+            {/* QUIÉNES SOMOS — justo debajo de JUNTOS, resumido con "Mostrar más" */}
+            <div id="quienes-somos" className="scroll-mt-48 md:scroll-mt-36 rounded-2xl bg-[#17472d] text-white p-4 sm:p-5">
+              <span className="flex items-center gap-2 text-xl sm:text-2xl font-black uppercase tracking-wider text-emerald-400 mb-2">
+                <span className="text-3xl sm:text-4xl">✅</span> Quiénes Somos
+              </span>
+              <div>
+                <p className="text-sm sm:text-base text-emerald-50 leading-relaxed font-medium">
+                  {QUIENES_SOMOS.idea}
+                </p>
+                <div className="grid gap-2 text-left pt-3">
+                  {QUIENES_SOMOS.objetivos.map((obj, i) => (
+                    <div key={i} className="flex items-start gap-2 bg-emerald-900/40 rounded-xl px-3 py-2">
+                      <span className="h-2 w-2 mt-1.5 rounded-full bg-[#00c853] flex-shrink-0" />
+                      <p className="text-xs sm:text-sm font-bold text-emerald-100 uppercase leading-snug">{obj}</p>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-xs sm:text-sm text-emerald-200/80 italic leading-relaxed pt-3">
+                  {QUIENES_SOMOS.filosofia}
+                </p>
+                <p className="text-sm sm:text-base font-black uppercase text-white bg-[#0f2d1e]/60 border-2 border-emerald-500/40 rounded-2xl py-4 px-4 mt-3 leading-snug">
+                  {QUIENES_SOMOS.colofon}
+                  <span className="block mt-2 text-emerald-300 tracking-wide">{QUIENES_SOMOS.firma}</span>
+                </p>
+              </div>
+            </div>
+
+            {/* NUESTRA MISIÓN — mismo formato que Quiénes Somos, justo debajo */}
+            <div className="rounded-2xl bg-[#17472d] text-white p-4 sm:p-5">
+              <span className="flex items-center gap-2 text-xl sm:text-2xl font-black uppercase tracking-wider text-emerald-400 mb-2">
+                <span className="text-3xl sm:text-4xl">🎯</span> Nuestra Misión
+              </span>
+              <div>
+                <p className="text-sm sm:text-base text-emerald-50 leading-relaxed font-medium">
+                  <strong>Misión:</strong> {MISION_VISION.mision}
+                </p>
+                <p className="text-sm sm:text-base text-emerald-50 leading-relaxed font-medium pt-2">
+                  <strong>Visión:</strong> {MISION_VISION.vision}
+                </p>
+                <p className="text-xs sm:text-sm text-emerald-200/80 italic leading-relaxed pt-3">
+                  <strong className="not-italic">Filosofía:</strong> {MISION_VISION.filosofia}
+                </p>
+                <p className="text-sm sm:text-base font-black uppercase text-white bg-[#0f2d1e]/60 border-2 border-emerald-500/40 rounded-2xl py-4 px-4 mt-3 leading-snug">
+                  Mucha gente pequeña, en lugares pequeños, haciendo cosas pequeñas, puede cambiar el mundo (Eduardo Galeano)
+                </p>
+              </div>
+            </div>
+
+            {/* CÓMO PODEMOS SUMAR — mismo formato, justo debajo de Misión.
+                Sin truncar: el texto se ve siempre completo. */}
+            <div className="rounded-2xl bg-[#17472d] text-white p-4 sm:p-5">
+              <span className="flex items-center gap-2 text-xl sm:text-2xl font-black uppercase tracking-wider text-emerald-400 mb-2">
+                <span className="text-3xl sm:text-4xl">🤝</span> Cómo Podemos Sumar
+              </span>
+              <div>
+                <p className="text-sm sm:text-base text-emerald-50 leading-relaxed font-medium">{COMO_SUMAR.intro}</p>
+                <p className="text-sm sm:text-base text-emerald-50 leading-relaxed font-medium pt-2">{COMO_SUMAR.ventajas}</p>
+                <p className="text-sm sm:text-base font-bold text-emerald-100 pt-2">{COMO_SUMAR.cierre}</p>
+              </div>
+              <div className="mt-4 flex justify-center">
+                <button
+                  type="button"
+                  onClick={() => setTimeout(() => irASeccion("donaciones"), 50)}
+                  className="rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3.5 px-6 sm:px-8 uppercase tracking-wide text-sm sm:text-lg shadow-lg transition-all hover:scale-105"
+                >
+                  Ir a Apoyo Voluntario 🙏
+                </button>
+              </div>
+            </div>
+
+                </div>
+              )}
+              causas={(
+              <>
+              <div id="donaciones" className="scroll-mt-48 md:scroll-mt-36 flex flex-col gap-y-6 lg:grid lg:grid-cols-2 lg:gap-x-8 lg:gap-y-6 lg:items-start text-[#0f2d1e]">
+                <div className="lg:order-1 min-w-0">
+{/* Bloque 1: intro + CTA — fila 1 en escritorio (col. izquierda) */}
+          <div className="space-y-6">
+            <span className="inline-block rounded-full bg-emerald-200 px-5 py-2 text-lg sm:text-2xl font-black uppercase tracking-wider text-emerald-800 shadow-sm">
+              🟢 Apoyo Voluntario
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-tight leading-none text-[#0f2d1e] font-heading">
+              TU APORTACIÓN IMPULSA A LA COMUNIDAD
+            </h2>
+            <p className="text-base sm:text-lg text-slate-700 leading-relaxed text-justify font-bold">
+              Cada donativo, del formato que decidas, nos ayuda a sostener y hacer crecer los proyectos que benefician a los negocios y familias latinas en conjunto con DCUATES Y CONEXIONES CON CAUSA ♥
+            </p>
+            <p className="text-lg sm:text-xl font-black uppercase text-center text-white bg-[#e65100] border-4 border-[#0f2d1e] rounded-2xl py-4 px-5 shadow-md leading-snug">
+              ¡Tu apoyo hoy es el cambio que nuestra comunidad necesita — súmate ahora! ♥
+            </p>
+          </div>
+
+                          </div>
+                <div className="lg:order-3 min-w-0">
+{/* Bloque 3: transparencia — fila 2 en escritorio (col. izquierda), justo antes del video en móvil */}
+          <div>
+            <div className="h-full rounded-2xl bg-emerald-200 border-2 border-emerald-500/40 p-5 sm:p-6 text-base sm:text-lg font-black text-emerald-900 leading-relaxed flex items-start gap-3 shadow-sm">
+              <span className="text-2xl">💡</span>
+              <p className="text-justify uppercase tracking-wide">
+                Rendimos cuentas de cómo se usa cada aportación con total transparencia. Parte de la utilidad de nuestros proyectos y de lo que los amigos y la comunidad suman se destina al apoyo de causas sociales como esta gran causa y ejemplo de vida y de lo que se puede lograr con la suma de voluntades, talentos y corazones solidarios ♥
+              </p>
+            </div>
+          </div>
+
+                          </div>
+                <div className="lg:order-4 min-w-0">
+{/* Bloque 4: flecha + video de Chuy — fila 2 en escritorio (col. derecha), justo después de la transparencia en móvil.
+              col-start-6 (en vez de 7) para que la flecha quede pegada al cuadro de transparencia, sin columna vacía de por medio;
+              col-span-7 (en vez de 6) le da más ancho al video, y por lo tanto también más alto. */}
+          <div id="chuy-video" className="scroll-mt-48 flex flex-col  items-center gap-2 ">
+            {/* Flecha con relleno naranja: apunta hacia abajo en móvil y hacia la derecha en escritorio */}
+            <div className="flex justify-center items-center shrink-0" aria-hidden="true">
+              <svg
+                viewBox="0 0 100 60"
+                preserveAspectRatio="none"
+                className="w-14 h-24 sm:w-16 sm:h-28 rotate-90  drop-shadow-md"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M4 22 H58 V4 L96 30 L58 56 V38 H4 Z"
+                  fill="#e65100"
+                  stroke="#0f2d1e"
+                  strokeWidth="5"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+
+            <div className="w-full">
+              <div className="rounded-2xl overflow-hidden border-4 border-[#0f2d1e] shadow-lg bg-black aspect-[4/3] sm:aspect-[16/10]">
+                <iframe
+                  className="w-full h-full"
+                  src={`https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID}`}
+                  title="Video de Chuy — DCUATES"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                ></iframe>
+              </div>
+              <a
+                href="https://chuytrujillo.blogspot.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 block cursor-pointer rounded-2xl border-4 border-[#0f2d1e] bg-[#e65100] hover:bg-[#bf360c] text-white font-black uppercase text-sm sm:text-base px-4 py-3.5 shadow-md transition-all hover:scale-[1.01] text-justify leading-snug"
+              >
+                Conoce la vida y obra de nuestro amigo y maestro de vida, Chuy, el Sapo Soñador aquí: https://chuytrujillo.blogspot.com/
+              </a>
+            </div>
+          </div>
+
+                          </div>
+                <div className="lg:order-2 min-w-0">
+{/* Bloque 2: selecciona tu tipo de aportación + botones — fila 1 en escritorio (col. derecha) */}
+          <div className="space-y-3">
+            <p className="text-xl sm:text-2xl font-black uppercase tracking-wide text-[#0f2d1e] mb-4 block leading-tight">
+              Selecciona el tipo de aportación que te agrade más:
+            </p>
+            {[
+              { t: "Aportación Económica", d: "Solicita los datos bancarios de manera directa y segura.", m: "¡Hola DCUATES! Deseo realizar una Aportación Económica. ¿Me podrías proporcionar los datos seguros?" },
+              { t: "Aportación en Especie", d: "Apoya donando herramientas, materiales o insumos útiles.", m: "¡Hola DCUATES! Quiero realizar una Aportación en Especie. ¿Qué tipo de herramientas o insumos se requieren actualmente?" },
+              { t: "Trueque Solidario", d: "Intercambia productos o servicios de valor equivalente.", m: "¡Hola DCUATES! Me interesa el Trueque Solidario. Tengo productos/servicios para intercambiar a favor de la causa." },
+              { t: "Labor Voluntaria", d: "Dona tu valioso tiempo y conocimientos para crecer juntos.", m: "¡Hola DCUATES! Quiero sumarme con Labor Voluntaria aportando mi tiempo y conocimientos comunitarios." }
+            ].map((opc) => (
+              <a
+                key={opc.t}
+                href={enlaceWhatsApp(opc.m)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full text-left rounded-2xl border-4 border-[#0f2d1e] bg-[#e65100] hover:bg-[#bf360c] p-4 sm:p-5 shadow-md transition-all hover:scale-[1.01] group duration-200 block"
+              >
+                <div className="flex justify-between items-center gap-3">
+                  <div>
+                    <p className="text-xl sm:text-2xl font-black text-white uppercase tracking-tight leading-tight">{opc.t}</p>
+                    <p className="text-sm sm:text-base font-bold text-[#0f2d1e] uppercase tracking-wide leading-snug pt-1">{opc.d}</p>
+                  </div>
+                  <svg
+                    viewBox="0 0 100 60"
+                    preserveAspectRatio="none"
+                    className="w-8 h-8 sm:w-10 sm:h-10 shrink-0 opacity-90 group-hover:opacity-100 transition-all drop-shadow"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path d="M4 22 H58 V4 L96 30 L58 56 V38 H4 Z" fill="#ffffff" stroke="#0f2d1e" strokeWidth="6" strokeLinejoin="round" />
+                  </svg>
+                </div>
+              </a>
+            ))}
+          </div>
+
+                </div>
+              </div>
+              <div className="mt-8 text-[#0f2d1e]">
           {/* Pasarela de mascotas, personas y cosas extraviadas */}
-          <div id="extraviados-registro" className="scroll-mt-48 md:scroll-mt-36 mt-14 max-w-5xl mx-auto">
+          <div id="extraviados-registro" className="scroll-mt-48 md:scroll-mt-36 mt-8 max-w-5xl mx-auto">
             <div className="text-center mb-6 space-y-2">
               <span className="inline-block rounded-full bg-emerald-200 px-5 py-2 text-base sm:text-xl font-black uppercase tracking-wider text-emerald-800 shadow-sm">
                 🔎 Mascotas, Personas y Cosas Extraviadas
@@ -1628,236 +1702,58 @@ export default function App() {
               </BotonNaranjaDesplegable>
             </div>
           </div>
+        
+              </div>
+              </>
+              )}
+            />
+          </div>
         </div>
       </section>
 
-      {/* SECCIÓN: APORTE VOLUNTARIO */}
-      <section id="donaciones" className="scroll-mt-48 md:scroll-mt-36 bg-[#e8f5e9] text-[#0f2d1e] py-12 sm:py-20 px-4 border-b-4 border-[#0f2d1e]">
-        <div className="mx-auto max-w-6xl flex flex-col md:grid md:grid-cols-12 gap-y-8 md:gap-x-10 md:gap-y-10">
 
-          {/* Bloque 1: intro + CTA — fila 1 en escritorio (col. izquierda) */}
-          <div className="order-1 md:order-none md:col-start-1 md:col-span-5 md:row-start-1 space-y-6">
-            <span className="inline-block rounded-full bg-emerald-200 px-5 py-2 text-lg sm:text-2xl font-black uppercase tracking-wider text-emerald-800 shadow-sm">
-              🟢 Apoyo Voluntario
-            </span>
-            <h2 className="text-4xl sm:text-5xl font-black uppercase tracking-tight leading-none text-[#0f2d1e] font-heading">
-              TU APORTACIÓN IMPULSA A LA COMUNIDAD
-            </h2>
-            <p className="text-base sm:text-lg text-slate-700 leading-relaxed text-justify font-bold">
-              Cada donativo, del formato que decidas, nos ayuda a sostener y hacer crecer los proyectos que benefician a los negocios y familias latinas en conjunto con DCUATES Y CONEXIONES CON CAUSA ♥
-            </p>
-            <p className="text-lg sm:text-xl font-black uppercase text-center text-white bg-[#e65100] border-4 border-[#0f2d1e] rounded-2xl py-4 px-5 shadow-md leading-snug">
-              ¡Tu apoyo hoy es el cambio que nuestra comunidad necesita — súmate ahora! ♥
-            </p>
-          </div>
+      {/* Accesos rápidos: Avisos y Beneficios · Compartir Más · Inicio */}
+      <BarraAccionesFinal onAbrirComparte={() => setModalFormulario("comparte")} />
 
-          {/* Bloque 2: selecciona tu tipo de aportación + botones — fila 1 en escritorio (col. derecha) */}
-          <div className="order-4 md:order-none md:col-start-6 md:col-span-7 md:row-start-1 space-y-3">
-            <p className="text-xl sm:text-3xl font-black uppercase tracking-wide text-[#0f2d1e] mb-4 block leading-tight">
-              Selecciona el tipo de aportación que te agrade más:
-            </p>
-            {[
-              { t: "Aportación Económica", d: "Solicita los datos bancarios de manera directa y segura.", m: "¡Hola DCUATES! Deseo realizar una Aportación Económica. ¿Me podrías proporcionar los datos seguros?" },
-              { t: "Aportación en Especie", d: "Apoya donando herramientas, materiales o insumos útiles.", m: "¡Hola DCUATES! Quiero realizar una Aportación en Especie. ¿Qué tipo de herramientas o insumos se requieren actualmente?" },
-              { t: "Trueque Solidario", d: "Intercambia productos o servicios de valor equivalente.", m: "¡Hola DCUATES! Me interesa el Trueque Solidario. Tengo productos/servicios para intercambiar a favor de la causa." },
-              { t: "Labor Voluntaria", d: "Dona tu valioso tiempo y conocimientos para crecer juntos.", m: "¡Hola DCUATES! Quiero sumarme con Labor Voluntaria aportando mi tiempo y conocimientos comunitarios." }
-            ].map((opc) => (
-              <a
-                key={opc.t}
-                href={enlaceWhatsApp(opc.m)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full text-left rounded-2xl border-4 border-[#0f2d1e] bg-[#e65100] hover:bg-[#bf360c] p-4 sm:p-5 shadow-md transition-all hover:scale-[1.01] group duration-200 block"
+      {/* HISTORIAS Y REFLEXIONES DCUATES — movida aquí (antes vivía dentro
+          del hero); ahora como barra horizontal de 1-2 videos de alto, con
+          scroll lateral para ver más. Sigue tomando sus videos de las
+          columnas "NOMBRE VIDPORT" / "VIDPORT" en Baserow. */}
+      <section id="historias-reflexiones" className="scroll-mt-48 md:scroll-mt-36 bg-[#0f2d1e] py-6 px-4 border-b-4 border-[#0f2d1e]">
+        <div className="mx-auto max-w-6xl">
+          <p className="text-white font-black uppercase text-xs sm:text-sm tracking-wide mb-2 px-1 text-center">
+            Historias y reflexiones DCUATES que INSPIRAN 💡
+            <br className="sm:hidden" />
+            <span className="block sm:inline sm:ml-1">Dales clic para ampliarlos y disfrutarlos 🎥 🍿 😊</span>
+          </p>
+          <div
+            ref={carruselHistorias.scrollRef}
+            onPointerDown={carruselHistorias.onPointerDown}
+            className="flex gap-2 sm:gap-3 overflow-x-auto pb-1"
+          >
+            {videosPortadaFinal.map((v, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => setVideoEnGrande(v.video)}
+                className="group relative rounded-xl overflow-hidden border-2 border-white/10 hover:border-[#e65100] transition-colors bg-black/30 text-left w-40 sm:w-56 shrink-0"
               >
-                <div className="flex justify-between items-center gap-3">
-                  <div>
-                    <p className="text-xl sm:text-2xl font-black text-white uppercase tracking-tight leading-tight">{opc.t}</p>
-                    <p className="text-sm sm:text-base font-bold text-[#0f2d1e] uppercase tracking-wide leading-snug pt-1">{opc.d}</p>
-                  </div>
-                  <svg
-                    viewBox="0 0 100 60"
-                    preserveAspectRatio="none"
-                    className="w-8 h-8 sm:w-10 sm:h-10 shrink-0 opacity-90 group-hover:opacity-100 transition-all drop-shadow"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path d="M4 22 H58 V4 L96 30 L58 56 V38 H4 Z" fill="#ffffff" stroke="#0f2d1e" strokeWidth="6" strokeLinejoin="round" />
-                  </svg>
+                <div className="aspect-video w-full overflow-hidden">
+                  <MiniaturaVideo video={v.video} nombre={v.nombre} />
                 </div>
-              </a>
+                <span className="absolute inset-0 flex items-center justify-center">
+                  <span className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-[#e65100]/90 flex items-center justify-center text-white text-base sm:text-lg shadow-md group-hover:bg-[#e65100]">▶</span>
+                </span>
+                <p className="px-2 py-1.5 text-[10px] sm:text-xs font-black text-white uppercase tracking-tight leading-tight">
+                  {v.nombre}
+                </p>
+              </button>
             ))}
           </div>
-
-          {/* Bloque 3: transparencia — fila 2 en escritorio (col. izquierda), justo antes del video en móvil */}
-          <div className="order-2 md:order-none md:col-start-1 md:col-span-5 md:row-start-2">
-            <div className="h-full rounded-2xl bg-emerald-200 border-2 border-emerald-500/40 p-5 sm:p-6 text-base sm:text-lg font-black text-emerald-900 leading-relaxed flex items-start gap-3 shadow-sm">
-              <span className="text-2xl">💡</span>
-              <p className="text-justify uppercase tracking-wide">
-                Rendimos cuentas de cómo se usa cada aportación con total transparencia. Parte de la utilidad de nuestros proyectos y de lo que los amigos y la comunidad suman se destina al apoyo de causas sociales como esta gran causa y ejemplo de vida y de lo que se puede lograr con la suma de voluntades, talentos y corazones solidarios ♥
-              </p>
-            </div>
-          </div>
-
-          {/* Bloque 4: flecha + video de Chuy — fila 2 en escritorio (col. derecha), justo después de la transparencia en móvil.
-              col-start-6 (en vez de 7) para que la flecha quede pegada al cuadro de transparencia, sin columna vacía de por medio;
-              col-span-7 (en vez de 6) le da más ancho al video, y por lo tanto también más alto. */}
-          <div id="chuy-video" className="scroll-mt-48 md:scroll-mt-36 order-3 md:order-none md:col-start-6 md:col-span-7 md:row-start-2 flex flex-col md:flex-row items-center gap-2 md:gap-3">
-            {/* Flecha con relleno naranja: apunta hacia abajo en móvil y hacia la derecha en escritorio */}
-            <div className="flex justify-center items-center shrink-0" aria-hidden="true">
-              <svg
-                viewBox="0 0 100 60"
-                preserveAspectRatio="none"
-                className="w-14 h-24 sm:w-16 sm:h-28 md:w-20 md:h-36 rotate-90 md:rotate-0 drop-shadow-md"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M4 22 H58 V4 L96 30 L58 56 V38 H4 Z"
-                  fill="#e65100"
-                  stroke="#0f2d1e"
-                  strokeWidth="5"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </div>
-
-            <div className="w-full">
-              <div className="rounded-2xl overflow-hidden border-4 border-[#0f2d1e] shadow-lg bg-black aspect-[4/3] sm:aspect-[16/10]">
-                <iframe
-                  className="w-full h-full"
-                  src={`https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID}`}
-                  title="Video de Chuy — DCUATES"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                ></iframe>
-              </div>
-              <a
-                href="https://chuytrujillo.blogspot.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-3 block cursor-pointer rounded-2xl border-4 border-[#0f2d1e] bg-[#e65100] hover:bg-[#bf360c] text-white font-black uppercase text-sm sm:text-base px-4 py-3.5 shadow-md transition-all hover:scale-[1.01] text-justify leading-snug"
-              >
-                Conoce la vida y obra de nuestro amigo y maestro de vida, Chuy, el Sapo Soñador aquí: https://chuytrujillo.blogspot.com/
-              </a>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      {/* SECCIÓN 4: FORMULARIO DE PUBLICIDAD */}
-      <section id="publicidad" className="scroll-mt-48 md:scroll-mt-36 bg-[#17472d] text-white py-10 sm:py-16 px-4">
-        <div className="mx-auto max-w-2xl">
-          <div className="text-center space-y-2 mb-8">
-            <span className="inline-block rounded-full bg-emerald-900/60 px-5 py-2 text-lg sm:text-2xl font-black uppercase tracking-wider text-emerald-400">
-              📢 Publicidad Comunitaria
-            </span>
-            <h2 className="text-4xl sm:text-5xl font-black text-center uppercase tracking-tight text-emerald-300">
-              Publica tu negocio gratis
-            </h2>
-            <p className="text-xs font-bold text-emerald-100/70 uppercase max-w-md mx-auto leading-relaxed">
-              Comparte la información de tu negocio, sube imágenes de tus promociones y publicidad, y agrega tu página o redes sociales. Tu aportación voluntaria es bienvenida.
-            </p>
-          </div>
-          <FormularioPublicidad />
         </div>
       </section>
 
       <div className="mt-[1.5cm] mb-[0.5cm]">
-      {/* SECCIÓN: Recomendaciones / Música-Libros-Pelis / Preguntas
-          Frecuentes — antes vivía en la portada; se movió aquí, al final,
-          justo antes de la barra de patrocinadores, para que la portada se
-          vea más corta en celular. */}
-      <section className="bg-[#0f2d1e] py-8 px-4 border-b-4 border-[#0f2d1e]">
-        <div className="max-w-5xl mx-auto">
-          <p className="text-white font-black uppercase text-sm sm:text-base tracking-wide text-center mb-3">
-            🔎 Más recursos e información de valor
-          </p>
-            {/* Recomendaciones / Música-Libros-Pelis / Preguntas Frecuentes,
-                en fila horizontal debajo del video (antes eran una columna
-                al lado del video). */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-3">
-              <BotonVerdeInfo
-                titulo="Recomendaciones ⭐⭐⭐⭐⭐"
-                abierto={infoAbierta === "recomendaciones"}
-                onClick={() => setInfoAbierta((v) => (v === "recomendaciones" ? null : "recomendaciones"))}
-              >
-                <p className="font-black uppercase text-emerald-300 text-[11px] tracking-wide">Recomendaciones DCUATES</p>
-                <ul className="space-y-1">
-                  {recomendacionesDcuates.map((r, i) => (
-                    <li key={i}>
-                      <a href={r.enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-300">
-                        {r.nombre}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-                <p className="font-black uppercase text-emerald-300 text-[11px] tracking-wide pt-2">Recomendaciones de la Comunidad</p>
-                <ul className="space-y-1">
-                  {recomendacionesComunidad.map((r, i) => (
-                    <li key={i}>
-                      <a href={r.enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-300">
-                        {r.nombre}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-                <p className="pt-2 font-black uppercase text-emerald-300">Si necesitas alguna recomendación en especial, contáctanos !!!</p>
-              </BotonVerdeInfo>
-
-              <BotonVerdeInfo
-                titulo="Música, Libros, Pelis y Más... 🎵📚🎬"
-                abierto={infoAbierta === "recursos"}
-                onClick={() => setInfoAbierta((v) => (v === "recursos" ? null : "recursos"))}
-              >
-                <p className="font-black uppercase text-emerald-300 text-[11px] tracking-wide">🎵 Música</p>
-                <ul className="space-y-1">
-                  {musicaLinks.map((enlace, i) => (
-                    <li key={i}>
-                      <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-300">
-                        Música {i + 1}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-                <p className="font-black uppercase text-emerald-300 text-[11px] tracking-wide pt-2">📚 Libros</p>
-                <ul className="space-y-1">
-                  {librosLinks.map((enlace, i) => (
-                    <li key={i}>
-                      <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-300">
-                        Libro {i + 1}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-                <p className="font-black uppercase text-emerald-300 text-[11px] tracking-wide pt-2">🎬 Películas y Más</p>
-                <ul className="space-y-1">
-                  {videosLinks.map((enlace, i) => (
-                    <li key={i}>
-                      <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-300">
-                        Recurso {i + 1}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </BotonVerdeInfo>
-
-              <BotonVerdeInfo
-                titulo="Preguntas Frecuentes ❓💬"
-                abierto={infoAbierta === "faq"}
-                onClick={() => setInfoAbierta((v) => (v === "faq" ? null : "faq"))}
-              >
-                <div className="space-y-2">
-                  {FAQ_ITEMS.map((f, i) => (
-                    <details key={i} className="rounded-lg bg-emerald-900/40 px-3 py-2">
-                      <summary className="cursor-pointer text-xs sm:text-sm font-bold">{f.pregunta}</summary>
-                      <p className="mt-1 text-xs text-emerald-100/90 leading-relaxed">{f.respuesta}</p>
-                    </details>
-                  ))}
-                </div>
-              </BotonVerdeInfo>
-            </div>
-        </div>
-      </section>
 
         <BarraPatrocinadores />
       </div>
@@ -1944,6 +1840,29 @@ export default function App() {
           Todos los derechos reservados
         </p>
       </footer>
+
+      {/* VISOR DE VIDEO EN GRANDE — global: lo usan el carrusel superior y el de Historias */}
+      {videoEnGrande && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 backdrop-blur-sm"
+          onClick={() => setVideoEnGrande(null)}
+        >
+          <div className="relative w-full max-w-3xl" onClick={(e) => e.stopPropagation()}>
+            <button
+              type="button"
+              onClick={() => setVideoEnGrande(null)}
+              className="absolute -top-10 right-0 text-white text-2xl font-black hover:text-[#e65100] transition-colors"
+              aria-label="Cerrar video"
+            >
+              ✕
+            </button>
+            <div className="rounded-2xl overflow-hidden border-4 border-white/20 shadow-2xl aspect-video bg-black">
+              <IframeVideo video={videoEnGrande} className="w-full h-full" />
+            </div>
+          </div>
+        </div>
+      )}
+
 
       {/* MODAL DEL AVISO DE PRIVACIDAD */}
       {showPrivacy && (
@@ -2158,13 +2077,12 @@ function BarraBusqueda({ onAbrirProyecto, onAbrirCategoria, onAbrirFAQ, abierta,
         onClick={abrirBusqueda}
         aria-label="Buscar en DCUATES"
         title="Buscar"
-        className="flex-1 md:flex-none flex items-center justify-center gap-1.5 rounded-full border-2 border-transparent bg-[#17472d] hover:bg-[#0f2d1e] text-white transition-colors uppercase tracking-wide text-center leading-tight px-2 sm:px-4 py-2.5 sm:py-2"
+        className="flex h-7 w-7 sm:h-9 sm:w-9 md:h-10 md:w-10 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-[#0f2d1e] transition-colors hover:bg-emerald-50"
       >
-        <svg viewBox="0 0 24 24" className="h-4 w-4 shrink-0 fill-none stroke-current stroke-[2.5]" aria-hidden="true">
+        <svg viewBox="0 0 24 24" className="h-4 w-4 sm:h-5 sm:w-5 shrink-0 fill-none stroke-current stroke-[2.5]" aria-hidden="true">
           <circle cx="11" cy="11" r="7" />
           <line x1="16.5" y1="16.5" x2="21" y2="21" strokeLinecap="round" />
         </svg>
-        <span className="hidden sm:inline">Buscar</span>
       </button>
     );
   }
@@ -2223,11 +2141,17 @@ function BarraBusqueda({ onAbrirProyecto, onAbrirCategoria, onAbrirFAQ, abierta,
   );
 }
 
-function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSugerencias, onAbrirComparte, onAbrirMapaSitio, onAbrirCategoria, busquedaAbierta, setBusquedaAbierta }) {
-  const [menuMasAbierto, setMenuMasAbierto] = useState(false);
+function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSugerencias, onAbrirMapaSitio, onAbrirCategoria, busquedaAbierta, setBusquedaAbierta }) {
+  const [menuAbierto, setMenuAbierto] = useState(false);
+  // Colores alternados del menú (combinan con el verde, el naranja y el azul
+  // turquesa que ya usa la página).
+  const COLORES_MENU = ["#17472d", "#bf360c", "#1B6F8A"];
+  const cerrar = () => setMenuAbierto(false);
+  const claseFila = "w-full flex items-center gap-3 px-4 py-2.5 text-left uppercase tracking-wide text-[11px] sm:text-xs font-black hover:bg-emerald-50 transition-colors";
+  const claseIcono = "flex h-7 w-7 sm:h-9 sm:w-9 md:h-10 md:w-10 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-[#0f2d1e] transition-colors hover:bg-emerald-50";
   return (
     <header className="border-b border-emerald-800/20 bg-white/95 py-2 px-4 shadow-sm text-slate-900 relative">
-      <div className="mx-auto flex flex-wrap items-center gap-y-2 max-w-6xl">
+      <div className="mx-auto flex items-center gap-3 max-w-6xl">
 
         {/* Logo + nombre — siempre primero, en la misma fila que las redes en móvil */}
         <div className="order-1 flex items-center gap-2 sm:gap-3 min-w-0 flex-1 md:flex-none">
@@ -2250,23 +2174,10 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSug
         </a>
         </div>
 
-        {/* Íconos de redes: comparten la primera fila con el logo (empujados a la derecha) en móvil; en escritorio, a la derecha del todo. Orden: Avisos y Beneficios, Compartir Más, redes — mismo alto y tamaño de letra. */}
-        <div className="order-2 md:order-3 ml-auto flex flex-wrap items-center gap-1.5 sm:gap-3">
-
-          {/* Avisos y Beneficios — suscripción por WhatsApp con intereses. */}
-          <BotonRecibeBeneficios />
-
-          {/* Compartir Más — abre el formulario de Conocer y Compartir Más. */}
-          <button
-            type="button"
-            onClick={() => onAbrirComparte && onAbrirComparte()}
-            className="rounded-full bg-[#e65100] hover:bg-[#bf360c] text-white shadow-sm px-2.5 py-1.5 text-[10px] sm:text-[11px] font-black uppercase tracking-wide transition-colors flex items-center gap-1 min-h-[30px] sm:min-h-[34px]"
-          >
-            <span className="hidden sm:inline">Compartir Más</span>
-            <span className="sm:hidden">Compartir</span>
-            <span aria-hidden="true">🌟</span>
-          </button>
-
+        {/* Íconos a la derecha, en dos filas: arriba las redes; abajo la lupa
+            (bajo YouTube) y el menú de tres rayas (bajo TikTok). */}
+        <div className="ml-auto flex flex-col items-end gap-1.5 sm:gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-3">
           <a href={REDES_SOCIALES.facebook} target="_blank" rel="noreferrer" className="flex h-7 w-7 sm:h-9 sm:w-9 md:h-10 md:w-10 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="Facebook">
             <svg className="h-4 w-4 sm:h-5 sm:w-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" />
@@ -2289,79 +2200,74 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSug
               <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.02 1.59 4.23.94 1.13 2.29 1.89 3.73 2.18l-.02 3.88c-1.63-.03-3.2-.55-4.51-1.52A7.83 7.83 0 0 1 16.43 7.5v8.32a7.83 7.83 0 0 1-3.32 6.42 7.91 7.91 0 0 1-8.73-.24 7.85 7.85 0 0 1-3.23-7.58 7.84 7.84 0 0 1 5.37-6.84V11.5a3.94 3.94 0 0 0-1.5 3.32 3.93 3.93 0 0 0 3.2 3.88 3.93 3.93 0 0 0 4.61-3.2c.04-.33.05-.66.05-.99V.02z" />
             </svg>
           </a>
-        </div>
+          </div>
 
-        {/* Fila única de menú: accesos directos + MÁS (con todo lo demás). */}
-        <div className="order-3 w-full flex flex-wrap md:flex-nowrap items-center gap-2 md:gap-3 pt-1.5 mt-0.5 border-t border-emerald-800/10">
-          <div className="flex w-full md:w-auto items-stretch gap-1.5 sm:gap-2 text-[11px] sm:text-xs md:text-sm font-black">
-            {NAV_LINKS_PRINCIPALES.map(link => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="flex-1 md:flex-none flex items-center justify-center rounded-full border-2 border-transparent bg-[#17472d] hover:bg-[#0f2d1e] text-white transition-colors uppercase tracking-wide text-center leading-tight px-2 sm:px-4 py-2.5 sm:py-2"
-              >
-                {link.label}
-              </a>
-            ))}
+          <div className="flex items-center gap-1.5 sm:gap-3">
+            {/* Búsqueda: ícono de lupa; abre una ventana de búsqueda al tocarlo. */}
+            <BarraBusqueda onAbrirProyecto={onAbrirProyecto} onAbrirCategoria={onAbrirCategoria} onAbrirFAQ={onAbrirFAQ} abierta={busquedaAbierta} setAbierta={setBusquedaAbierta} />
 
-            <div className="relative flex-1 md:flex-none flex">
+            {/* Menú de tres rayas — antes botón "Más". */}
+            <div className="relative">
               <button
                 type="button"
-                onClick={() => setMenuMasAbierto((v) => !v)}
-                className="w-full rounded-full border-2 border-transparent bg-[#17472d] hover:bg-[#0f2d1e] text-white transition-colors uppercase tracking-wide text-center leading-tight px-2 sm:px-4 py-2.5 sm:py-2 flex items-center justify-center gap-1"
+                onClick={() => setMenuAbierto((v) => !v)}
+                aria-label="Abrir menú"
+                aria-expanded={menuAbierto}
+                title="Menú"
+                className={claseIcono}
               >
-                Más
-                <span className={`transition-transform ${menuMasAbierto ? "rotate-180" : ""}`}>▾</span>
+                <svg viewBox="0 0 24 24" className="h-4 w-4 sm:h-5 sm:w-5 fill-none stroke-current stroke-[2.5]" aria-hidden="true">
+                  <line x1="4" y1="6" x2="20" y2="6" strokeLinecap="round" />
+                  <line x1="4" y1="12" x2="20" y2="12" strokeLinecap="round" />
+                  <line x1="4" y1="18" x2="20" y2="18" strokeLinecap="round" />
+                </svg>
               </button>
 
-              {menuMasAbierto && (
+              {menuAbierto && (
                 <>
-                  {/* Fondo invisible para poder cerrar el menú al tocar fuera */}
-                  <div className="fixed inset-0 z-30" onClick={() => setMenuMasAbierto(false)} />
-                  <div className="absolute right-0 md:right-auto md:left-0 top-full mt-2 z-40 w-64 rounded-2xl bg-white shadow-xl border border-emerald-800/10 py-2 flex flex-col max-h-[70vh] overflow-y-auto">
-                    {NAV_LINKS_MAS.map((link) =>
-                      link.href ? (
-                        <a
-                          key={link.label}
-                          href={link.href}
-                          onClick={() => setMenuMasAbierto(false)}
-                          className="px-4 py-2.5 text-left uppercase tracking-wide text-[11px] sm:text-xs font-black text-emerald-900 hover:bg-emerald-50 transition-colors"
-                        >
-                          {link.label}
-                        </a>
+                  {/* Fondo invisible para cerrar el menú al tocar fuera */}
+                  <div className="fixed inset-0 z-30" onClick={cerrar} />
+                  <div className="absolute right-0 top-full mt-2 z-40 w-72 max-w-[calc(100vw-2rem)] rounded-2xl bg-white shadow-2xl border border-emerald-800/10 py-2 flex flex-col max-h-[70vh] overflow-y-auto">
+                    {NAV_LINKS_MAS.map((link, i) => {
+                      const color = COLORES_MENU[i % COLORES_MENU.length];
+                      const contenido = (
+                        <>
+                          <span className="text-lg leading-none w-6 text-center shrink-0" aria-hidden="true">{link.emoji}</span>
+                          <span style={{ color }}>{link.label}</span>
+                        </>
+                      );
+                      return link.href ? (
+                        <a key={link.label} href={link.href} onClick={cerrar} className={claseFila}>{contenido}</a>
                       ) : (
                         <button
                           type="button"
                           key={link.label}
                           onClick={() => {
-                            setMenuMasAbierto(false);
+                            cerrar();
                             if (link.action === "faq") onAbrirFAQ && onAbrirFAQ();
                             else if (link.action === "sugerencias") onAbrirSugerencias && onAbrirSugerencias();
                             else if (link.action === "mapa-sitio") onAbrirMapaSitio && onAbrirMapaSitio();
                             else if (link.modal) onAbrirProyecto && onAbrirProyecto(link.modal);
                           }}
-                          className="px-4 py-2.5 text-left uppercase tracking-wide text-[11px] sm:text-xs font-black text-emerald-900 hover:bg-emerald-50 transition-colors"
+                          className={claseFila}
                         >
-                          {link.label}
+                          {contenido}
                         </button>
-                      )
-                    )}
+                      );
+                    })}
                     <div className="border-t border-emerald-800/10 my-1" />
                     <button
                       type="button"
-                      onClick={() => { setMenuMasAbierto(false); onAbrirPrivacidad && onAbrirPrivacidad(); }}
-                      className="px-4 py-2.5 text-left uppercase tracking-wide text-[11px] sm:text-xs font-black text-emerald-900 hover:bg-emerald-50 transition-colors"
+                      onClick={() => { cerrar(); onAbrirPrivacidad && onAbrirPrivacidad(); }}
+                      className={claseFila}
                     >
-                      Aviso de Privacidad
+                      <span className="text-lg leading-none w-6 text-center shrink-0" aria-hidden="true">🔒</span>
+                      <span style={{ color: COLORES_MENU[NAV_LINKS_MAS.length % COLORES_MENU.length] }}>Aviso de Privacidad</span>
                     </button>
                   </div>
                 </>
               )}
             </div>
-
-            {/* Búsqueda: botón pequeño junto a "Más", del mismo tamaño;
-                se despliega en una ventana superpuesta solo al tocarlo. */}
-            <BarraBusqueda onAbrirProyecto={onAbrirProyecto} onAbrirCategoria={onAbrirCategoria} onAbrirFAQ={onAbrirFAQ} abierta={busquedaAbierta} setAbierta={setBusquedaAbierta} />
           </div>
         </div>
       </div>
@@ -2408,7 +2314,7 @@ function BotonNecesidades({ onAbrirProyecto, onAccionEspecial, onAbrirFAQ }) {
 
   return (
     <>
-      <div className="absolute top-full right-5 sm:right-6 mt-1.5 sm:mt-2 z-50 flex items-center gap-2">
+      <div className="flex items-center gap-2">
         <span className="bg-yellow-400 text-[#0f2d1e] text-[10px] sm:text-xs font-black uppercase tracking-wide px-2.5 py-1.5 rounded-full shadow-lg border border-white/30 whitespace-nowrap animate-pulse">
           ¿Qué necesitas hoy?
         </span>
@@ -2426,11 +2332,11 @@ function BotonNecesidades({ onAbrirProyecto, onAccionEspecial, onAbrirFAQ }) {
 
       {abierto && (
         <div
-          className="fixed inset-0 z-50 flex items-start justify-end bg-black/50 p-4 pt-40 sm:pt-44"
+          className="fixed inset-0 z-[55] flex items-end justify-end bg-black/50 p-4 pb-36 sm:pb-40"
           onClick={cerrarTodo}
         >
           <div
-            className="bg-white text-slate-900 rounded-2xl shadow-2xl max-w-sm w-full max-h-[70vh] overflow-y-auto"
+            className="bg-white text-slate-900 rounded-2xl shadow-2xl max-w-sm w-full max-h-[calc(100dvh-12rem)] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-4 border-b border-emerald-100 flex items-center justify-between gap-3">
@@ -2502,7 +2408,35 @@ function BotonNecesidades({ onAbrirProyecto, onAccionEspecial, onAbrirFAQ }) {
 // Botón "Recibe Beneficios" del encabezado — abre un mini formulario de
 // intereses (ver INTERESES_BENEFICIOS arriba) y arma el mensaje de WhatsApp
 // con lo que la persona seleccionó.
-function BotonRecibeBeneficios() {
+// Accesos rápidos al final de la página (arriba de la barra de videos):
+// Avisos y Beneficios, Compartir Más e Inicio — antes vivían en el menú superior.
+function BarraAccionesFinal({ onAbrirComparte }) {
+  return (
+    <section aria-label="Accesos rápidos" className="bg-[#e8f5e9] px-4 py-5 sm:py-6 border-b-4 border-[#0f2d1e]">
+      <div className="mx-auto max-w-2xl md:max-w-4xl xl:max-w-6xl grid grid-cols-3 gap-2 sm:gap-4 items-stretch">
+        <BotonRecibeBeneficios grande />
+        <button
+          type="button"
+          onClick={() => onAbrirComparte && onAbrirComparte()}
+          className="w-full min-h-[56px] rounded-2xl bg-[#e65100] hover:bg-[#bf360c] text-white shadow-md px-2 py-3 text-[11px] sm:text-sm font-black uppercase tracking-wide transition-colors flex flex-col sm:flex-row items-center justify-center gap-1 text-center leading-tight"
+        >
+          <span>Compartir Más</span>
+          <span aria-hidden="true">🌟</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          className="w-full min-h-[56px] rounded-2xl bg-[#17472d] hover:bg-[#0f2d1e] text-white shadow-md px-2 py-3 text-[11px] sm:text-sm font-black uppercase tracking-wide transition-colors flex flex-col sm:flex-row items-center justify-center gap-1 text-center leading-tight"
+        >
+          <span>Inicio</span>
+          <span aria-hidden="true">🏠</span>
+        </button>
+      </div>
+    </section>
+  );
+}
+
+function BotonRecibeBeneficios({ grande = false }) {
   const [abierto, setAbierto] = useState(false);
   const [seleccion, setSeleccion] = useState([]);
 
@@ -2518,14 +2452,16 @@ function BotonRecibeBeneficios() {
   };
 
   return (
-    <div className="relative">
+    <div className={grande ? "relative h-full" : "relative"}>
       <button
         type="button"
         onClick={() => setAbierto((v) => !v)}
-        className="rounded-full bg-[#e65100] hover:bg-[#bf360c] text-white shadow-sm px-2.5 py-1.5 text-[10px] sm:text-[11px] font-black uppercase tracking-wide transition-colors flex items-center gap-1 min-h-[30px] sm:min-h-[34px]"
+        className={grande
+          ? "w-full h-full min-h-[56px] rounded-2xl bg-[#e65100] hover:bg-[#bf360c] text-white shadow-md px-2 py-3 text-[11px] sm:text-sm font-black uppercase tracking-wide transition-colors flex flex-col sm:flex-row items-center justify-center gap-1 text-center leading-tight"
+          : "rounded-full bg-[#e65100] hover:bg-[#bf360c] text-white shadow-sm px-2.5 py-1.5 text-[10px] sm:text-[11px] font-black uppercase tracking-wide transition-colors flex items-center gap-1 min-h-[30px] sm:min-h-[34px]"}
       >
-        <span className="hidden sm:inline">Avisos y Beneficios</span>
-        <span className="sm:hidden">Avisos</span>
+        <span className={grande ? "" : "hidden sm:inline"}>Avisos y Beneficios</span>
+        {!grande && <span className="sm:hidden">Avisos</span>}
         <span aria-hidden="true">💌</span>
       </button>
 
@@ -2641,7 +2577,7 @@ function ModalFormularioWhatsApp({ titulo, descripcion, opciones, placeholder, o
 // 4. SUBCOMPONENTE: FORMULARIO DE PUBLICIDAD
 // =========================================================================
 function FormularioPublicidad() {
-  const [expandido, setExpandido] = useState(false);
+  const [expandido, setExpandido] = useState(true);
   const [nombre, setNombre] = useState("");
   const [categoria, setCategoria] = useState("");
   const [contacto, setContacto] = useState("");
@@ -2743,13 +2679,6 @@ function FormularioPublicidad() {
         </div>
         <button type="submit" className="w-full rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3.5 uppercase tracking-wider text-xs transition-all mt-2 shadow-md font-heading">
           Enviar registro
-        </button>
-        <button
-          type="button"
-          onClick={() => setExpandido(false)}
-          className="w-full rounded-lg border-2 border-slate-200 text-slate-500 hover:bg-slate-50 font-black uppercase tracking-wide text-[11px] py-2 transition-colors"
-        >
-          ▲ Ver menos
         </button>
       </div>
     </form>
@@ -2859,38 +2788,16 @@ function FlechaBlanca() {
 // dar clic se abre suavemente el contenido de abajo (misma animación tipo
 // "pergamino" que los botones verdes). Se usa en Ventas con Causa y en
 // Apoyo a Causas.
-function BotonNaranjaDesplegable({ titulo, abierto, onClick, children }) {
+// Antes era un acordeón (se abría al tocar). Ahora el contenido se ve
+// siempre completo, para evitar clics: solo queda el título como encabezado.
+function BotonNaranjaDesplegable({ titulo, children }) {
   return (
     <div className="rounded-xl border-2 border-[#0f2d1e] overflow-hidden shadow-sm">
-      <button
-        type="button"
-        onClick={onClick}
-        className="w-full text-left bg-[#e65100] hover:bg-[#bf360c] p-3 transition-colors flex items-center justify-between gap-3"
-      >
+      <div className="w-full text-left bg-[#e65100] p-3">
         <p className="text-sm sm:text-base font-black text-white uppercase tracking-tight leading-tight">{titulo}</p>
-        <span className={`shrink-0 transition-transform ${abierto ? "rotate-90" : ""}`}>
-          <FlechaBlanca />
-        </span>
-      </button>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateRows: abierto ? "1fr" : "0fr",
-          transition: "grid-template-rows 350ms ease-in-out"
-        }}
-      >
-        <div style={{ overflow: "hidden" }}>
-          <div className="p-3 bg-white text-xs sm:text-sm text-slate-700 leading-relaxed space-y-2">
-            {children}
-            <button
-              type="button"
-              onClick={onClick}
-              className="w-full mt-2 rounded-lg border-2 border-[#e65100] text-[#e65100] hover:bg-orange-50 font-black uppercase tracking-wide text-[11px] sm:text-xs py-2 transition-colors"
-            >
-              Cerrar
-            </button>
-          </div>
-        </div>
+      </div>
+      <div className="p-3 bg-white text-xs sm:text-sm text-slate-700 leading-relaxed space-y-2">
+        {children}
       </div>
     </div>
   );
@@ -3071,6 +2978,10 @@ function useFilasEnlaces() {
     fetch(`/api/baserow-rows?table=${encodeURIComponent(BASEROW_TABLE_ID_ENLACES)}&crudo=1`)
       .then((r) => r.json())
       .then((data) => {
+        if (!Array.isArray(data.items)) {
+          // Ayuda para detectar fallas: abre la consola del navegador (F12).
+          console.warn("[DCUATES] /api/baserow-rows no regresó filas. Respuesta:", data);
+        }
         if (!cancelado && Array.isArray(data.items)) {
           const entrada = { datos: data.items, momento: Date.now() };
           cacheEnlacesMemoria = entrada;
@@ -3078,8 +2989,9 @@ function useFilasEnlaces() {
           setFilas(data.items);
         }
       })
-      .catch(() => {
+      .catch((e) => {
         // Sin conexión, tabla vacía, etc. — nos quedamos con los respaldos.
+        console.warn("[DCUATES] No se pudo leer Baserow (/api/baserow-rows):", e);
       });
 
     return () => { cancelado = true; };
@@ -3562,42 +3474,15 @@ function ModalCategoria({ categoria, onCerrar, onAbrirProyecto }) {
 // Botón verde desplegable — usado en la fila de "resumen rápido" junto al
 // video (Nuestra Misión, Cómo Podemos Sumar, Preguntas Frecuentes, Aviso
 // de Privacidad). Al dar clic se expande hacia abajo mostrando su contenido.
-function BotonVerdeInfo({ titulo, abierto, onClick, children }) {
-  // Animación tipo "pergamino": en vez de mostrar/ocultar de golpe (lo que
-  // hacía que la página "saltara" al cerrar un botón y el siguiente
-  // brincara de lugar), se anima suavemente la altura del contenido con
-  // el truco de CSS Grid (0fr -> 1fr). Así el cierre se ve como un
-  // desenrollado suave y el resto de la columna se acomoda poco a poco,
-  // sin brincos ni saltos de scroll.
+// Igual que el naranja: contenido siempre visible, sin acordeón.
+function BotonVerdeInfo({ titulo, children }) {
   return (
     <div className="rounded-xl bg-[#17472d] text-white shadow-md overflow-hidden">
-      <button
-        type="button"
-        onClick={onClick}
-        className="w-full flex items-center justify-between gap-2 px-4 py-3.5 text-left hover:bg-[#0f2d1e] transition-colors"
-      >
+      <div className="px-4 py-3.5">
         <span className="text-xs sm:text-sm font-black uppercase tracking-wide">{titulo}</span>
-        <span className={`text-lg leading-none shrink-0 transition-transform ${abierto ? "rotate-45" : ""}`}>+</span>
-      </button>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateRows: abierto ? "1fr" : "0fr",
-          transition: "grid-template-rows 350ms ease-in-out"
-        }}
-      >
-        <div style={{ overflow: "hidden" }}>
-          <div className="px-4 pb-4 pt-1 text-xs sm:text-sm text-emerald-50 leading-relaxed space-y-2 border-t border-emerald-700/40">
-            {children}
-            <button
-              type="button"
-              onClick={onClick}
-              className="w-full mt-2 rounded-lg border-2 border-emerald-500/50 text-emerald-100 hover:bg-emerald-900/60 font-black uppercase tracking-wide text-[11px] sm:text-xs py-2 transition-colors"
-            >
-              Cerrar
-            </button>
-          </div>
-        </div>
+      </div>
+      <div className="px-4 pb-4 pt-2 text-xs sm:text-sm text-emerald-50 leading-relaxed space-y-2 border-t border-emerald-700/40">
+        {children}
       </div>
     </div>
   );
