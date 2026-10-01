@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
 import BloqueCentral from "./BloqueCentral";
 
 // =========================================================================
@@ -912,12 +912,14 @@ export default function App() {
   // tabla ENLACES de Baserow:
   //  - "PORTADA <PESTAÑA>"  (columna Archivo): una imagen o un PDF por fila.
   //    Opcional: "NOMBRE PORTADA <PESTAÑA>" como texto al pie del cuadro.
-  //  - "NOMBRE VIDEOS <PESTAÑA>" + "VIDEOS <PESTAÑA>": un enlace de video por fila.
+  //  - "VIDEOS <PESTAÑA>" (texto/URL): un enlace de video por fila.
+  //    Opcional: "NOMBRE VIDEOS <PESTAÑA>" como texto al pie del cuadro.
+  //  Pestañas: NOSOTROS, BENEFICIOS, CAUSAS, VALORES, NEGOCIOS, REGALOS, GRATITUD.
   // En CAUSAS se suman además los videos de RETOSVID (el carrusel que antes
   // estaba arriba de todo). Si una pestaña no tiene nada, muestra su imagen de
   // respaldo (ver PORTADAS_BASE en BloqueCentral.jsx).
   const portadasItems = {};
-  ["nosotros", "beneficios", "causas", "valores", "regalos", "gratitud"].forEach((id) => {
+  ["nosotros", "beneficios", "causas", "valores", "negocios", "regalos", "gratitud"].forEach((id) => {
     const K = id.toUpperCase();
     const archivos = filasEnlaces
       .map((f, i) => {
@@ -931,8 +933,13 @@ export default function App() {
       })
       .filter(Boolean)
       .slice(0, 10);
-    const videos = paresBaserow(filasEnlaces, `NOMBRE VIDEOS ${K}`, `VIDEOS ${K}`, 10)
-      .map((v) => ({ video: detectarVideo(v.enlace), nombre: v.nombre }))
+    const videos = filasEnlaces
+      .filter((f) => f && f[`VIDEOS ${K}`] && String(f[`VIDEOS ${K}`]).trim() !== "")
+      .slice(0, 10)
+      .map((f) => ({
+        video: detectarVideo(f[`VIDEOS ${K}`]),
+        nombre: (f[`NOMBRE VIDEOS ${K}`] && String(f[`NOMBRE VIDEOS ${K}`]).trim()) || ""
+      }))
       .filter((v) => v.video)
       .map((v, i) => ({
         id: `${id}-vid-${i}`,
@@ -1004,14 +1011,14 @@ export default function App() {
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           aria-label="Subir al inicio de la página"
           title="Subir"
-          className="fixed bottom-[3.75rem] sm:bottom-16 left-4 z-50 h-11 w-11 sm:h-12 sm:w-12 flex items-center justify-center rounded-full bg-[#0f2d1e] text-white shadow-lg border-2 border-white/30 hover:bg-emerald-800 transition-colors"
+          style={{ bottom: "calc(var(--alto-ticker, 48px) + 6px)" }} className="fixed left-4 z-50 h-11 w-11 sm:h-12 sm:w-12 flex items-center justify-center rounded-full bg-[#0f2d1e] text-white shadow-lg border-2 border-white/30 hover:bg-emerald-800 transition-colors"
         >
           <span className="text-xl leading-none" aria-hidden="true">↑</span>
         </button>
       )}
 
       {/* Botón Flotante Permanente de WhatsApp — efecto 3D + anillo parpadeante + etiqueta */}
-      <div className="fixed bottom-[3.75rem] sm:bottom-16 right-4 sm:right-6 z-50 flex flex-col items-end gap-3">
+      <div className="fixed right-4 sm:right-6 z-50 flex flex-col items-end gap-1.5" style={{ bottom: "calc(var(--alto-ticker, 48px) + 6px)" }}>
         {/* ¿Qué necesitas hoy? — arriba del botón de WhatsApp */}
         <BotonNecesidades
           onAbrirProyecto={(id) => setModalProyecto(id)}
@@ -1848,18 +1855,14 @@ export default function App() {
           onClick={() => setVideoEnGrande(null)}
         >
           <div className="relative w-full max-w-3xl" onClick={(e) => e.stopPropagation()}>
-            <button
-              type="button"
-              onClick={() => setVideoEnGrande(null)}
-              className="absolute -top-10 right-0 text-white text-2xl font-black hover:text-[#e65100] transition-colors"
-              aria-label="Cerrar video"
-            >
-              ✕
-            </button>
             <div className="rounded-2xl overflow-hidden border-4 border-white/20 shadow-2xl aspect-video bg-black">
               <IframeVideo video={videoEnGrande} className="w-full h-full" />
             </div>
-          </div>
+          
+            <div className="mt-3 flex justify-end">
+              <BotonCerrar claro onClick={() => setVideoEnGrande(null)} label="Cerrar video" />
+            </div>
+</div>
         </div>
       )}
 
@@ -1892,8 +1895,9 @@ export default function App() {
             className="bg-[#e8f5e9] text-slate-900 rounded-2xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl flex flex-col max-h-[90vh]"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between gap-2 mb-2">
-              {categoriaAbierta ? (
+            {categoriaAbierta && (
+            <div className="mb-2">
+              {(
                 <button
                   type="button"
                   onClick={() => setModalProyecto(null)}
@@ -1901,15 +1905,9 @@ export default function App() {
                 >
                   <span aria-hidden="true">←</span> Volver a {(CATEGORIAS_PROYECTOS.find((c) => c.id === categoriaAbierta) || {}).titulo}
                 </button>
-              ) : <span />}
-              <button
-                onClick={() => setModalProyecto(null)}
-                aria-label="Cerrar"
-                className="shrink-0 h-9 w-9 flex items-center justify-center rounded-full bg-[#0f2d1e] text-white font-black hover:bg-emerald-800 transition-colors"
-              >
-                ×
-              </button>
+              )}
             </div>
+            )}
             <div className="overflow-y-auto pr-1">
               {/* Logo del proyecto, grande y visible al abrir su ventana.
                   Usa la misma imagen del botón (BOTONES_PORTADA); para
@@ -1928,6 +1926,9 @@ export default function App() {
                 ) : null;
               })()}
               <ContenidoModalProyecto id={modalProyecto} onCerrar={() => setModalProyecto(null)} />
+            </div>
+            <div className="pt-3 flex justify-end shrink-0">
+              <BotonCerrar onClick={() => setModalProyecto(null)} />
             </div>
           </div>
         </div>
@@ -2090,7 +2091,7 @@ function BarraBusqueda({ onAbrirProyecto, onAbrirCategoria, onAbrirFAQ, abierta,
   return (
     <div className="fixed inset-0 z-[65] flex items-start justify-center bg-black/50 p-4 pt-24 sm:pt-28" onClick={() => setAbierta(false)}>
       <div className="w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center gap-2 rounded-full border-2 border-[#0f2d1e]/30 bg-white pl-3.5 pr-2.5 py-2 shadow-2xl focus-within:border-[#e65100]">
+        <div className="flex items-center gap-2 rounded-full border-2 border-[#0f2d1e]/30 bg-white pl-3.5 pr-3.5 py-2 shadow-2xl focus-within:border-[#e65100]">
           <svg viewBox="0 0 24 24" className="h-4 w-4 sm:h-5 sm:w-5 shrink-0 fill-none stroke-[#0f2d1e] stroke-[2.5]" aria-hidden="true">
             <circle cx="11" cy="11" r="7" />
             <line x1="16.5" y1="16.5" x2="21" y2="21" strokeLinecap="round" />
@@ -2105,14 +2106,6 @@ function BarraBusqueda({ onAbrirProyecto, onAbrirCategoria, onAbrirFAQ, abierta,
             aria-label="Buscar en DCUATES"
             className="w-full min-w-0 bg-transparent text-sm font-bold text-[#0f2d1e] placeholder:text-slate-400 focus:outline-none"
           />
-          <button
-            type="button"
-            onClick={() => setAbierta(false)}
-            aria-label="Cerrar búsqueda"
-            className="shrink-0 h-7 w-7 flex items-center justify-center rounded-full bg-slate-100 text-slate-600 font-black hover:bg-slate-200 transition-colors"
-          >
-            ×
-          </button>
         </div>
         {palabras.length > 0 && (
           <div className="mt-1 rounded-2xl bg-white shadow-xl border border-emerald-800/10 py-1 max-h-[60vh] overflow-y-auto">
@@ -2136,8 +2129,26 @@ function BarraBusqueda({ onAbrirProyecto, onAbrirCategoria, onAbrirFAQ, abierta,
             )}
           </div>
         )}
+        <div className="mt-3 flex justify-end">
+          <BotonCerrar claro onClick={() => setAbierta(false)} label="Cerrar búsqueda" />
+        </div>
       </div>
     </div>
+  );
+}
+
+// Botón de cierre (×) redondo. Todas las ventanas lo llevan ABAJO A LA DERECHA.
+function BotonCerrar({ onClick, label = "Cerrar", claro = false }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={label}
+      title={label}
+      className={`shrink-0 h-11 w-11 flex items-center justify-center rounded-full text-2xl leading-none font-black shadow-lg transition-colors ${claro ? "bg-white text-[#0f2d1e] hover:bg-emerald-100" : "bg-[#0f2d1e] text-white hover:bg-emerald-800"}`}
+    >
+      ×
+    </button>
   );
 }
 
@@ -2154,7 +2165,7 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSug
       <div className="mx-auto flex items-center gap-3 max-w-6xl">
 
         {/* Logo + nombre — siempre primero, en la misma fila que las redes en móvil */}
-        <div className="order-1 flex items-center gap-2 sm:gap-3 min-w-0 flex-1 md:flex-none">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1 md:flex-none">
         <a href="#inicio" className="flex items-center gap-2 sm:gap-3 shrink-0">
           <span className="flex h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 items-center justify-center rounded-full overflow-hidden bg-[#0f2d1e] border-2 border-[#0f2d1e]/20 shadow-sm shrink-0">
             <img
@@ -2339,9 +2350,8 @@ function BotonNecesidades({ onAbrirProyecto, onAccionEspecial, onAbrirFAQ }) {
             className="bg-white text-slate-900 rounded-2xl shadow-2xl max-w-sm w-full max-h-[calc(100dvh-12rem)] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-4 border-b border-emerald-100 flex items-center justify-between gap-3">
+            <div className="p-4 border-b border-emerald-100">
               <p className="font-black uppercase text-[#0f2d1e] text-sm">¿Qué necesitas hoy?</p>
-              <button type="button" onClick={cerrarTodo} aria-label="Cerrar" className="h-7 w-7 flex items-center justify-center rounded-full bg-[#0f2d1e] text-white font-black hover:bg-emerald-800 transition-colors shrink-0">×</button>
             </div>
             {NECESIDADES_GRUPOS.map((grupo) => (
               <div key={grupo.id} className="border-b border-emerald-50 last:border-0">
@@ -2397,6 +2407,9 @@ function BotonNecesidades({ onAbrirProyecto, onAccionEspecial, onAbrirFAQ }) {
               >
                 Enviar por WhatsApp
               </button>
+            </div>
+                      <div className="sticky bottom-0 flex justify-end border-t border-emerald-100 bg-white/95 p-3">
+              <BotonCerrar onClick={cerrarTodo} />
             </div>
           </div>
         </div>
@@ -2474,17 +2487,7 @@ function BotonRecibeBeneficios({ grande = false }) {
             className="bg-white text-slate-900 rounded-2xl max-w-sm w-full p-6 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-start justify-between gap-3 mb-3">
-              <p className="text-sm font-black uppercase text-[#0f2d1e]">¿Qué te interesa recibir?</p>
-              <button
-                type="button"
-                onClick={() => setAbierto(false)}
-                aria-label="Cerrar"
-                className="shrink-0 h-7 w-7 flex items-center justify-center rounded-full bg-slate-100 text-slate-600 font-black hover:bg-slate-200 transition-colors"
-              >
-                ×
-              </button>
-            </div>
+            <p className="text-sm font-black uppercase text-[#0f2d1e] mb-3">¿Qué te interesa recibir?</p>
             <div className="space-y-2.5">
               {INTERESES_BENEFICIOS.map((interes) => (
                 <label key={interes} className="flex items-start gap-2 text-sm font-bold text-slate-800 cursor-pointer">
@@ -2505,6 +2508,9 @@ function BotonRecibeBeneficios({ grande = false }) {
             >
               Suscribirme por WhatsApp
             </button>
+            <div className="mt-3 flex justify-end">
+              <BotonCerrar onClick={() => setAbierto(false)} />
+            </div>
           </div>
         </div>
       )}
@@ -2532,19 +2538,9 @@ function ModalFormularioWhatsApp({ titulo, descripcion, opciones, placeholder, o
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm" onClick={onCerrar}>
       <div className="bg-white text-slate-900 rounded-2xl max-w-md w-full p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-start justify-between gap-3 border-b pb-3 mb-4">
-          <h3 className="text-xl font-bold uppercase tracking-tight text-emerald-800 font-heading">
-            {titulo}
-          </h3>
-          <button
-            type="button"
-            onClick={onCerrar}
-            aria-label="Cerrar"
-            className="shrink-0 h-8 w-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-600 font-black hover:bg-slate-200 transition-colors"
-          >
-            ×
-          </button>
-        </div>
+        <h3 className="text-xl font-bold uppercase tracking-tight text-emerald-800 font-heading border-b pb-3 mb-4">
+          {titulo}
+        </h3>
         <p className="text-sm text-slate-600 leading-relaxed font-medium mb-3">{descripcion}</p>
         <select
           value={opcion}
@@ -2568,6 +2564,9 @@ function ModalFormularioWhatsApp({ titulo, descripcion, opciones, placeholder, o
         >
           Enviar por WhatsApp
         </button>
+              <div className="mt-4 flex justify-end">
+          <BotonCerrar onClick={onCerrar} />
+        </div>
       </div>
     </div>
   );
@@ -3361,18 +3360,9 @@ function ModalMapaSitio({ onCerrar, onAbrirProyecto, onAbrirFAQ, onAbrirSugerenc
         className="bg-[#e8f5e9] text-slate-900 rounded-2xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl flex flex-col max-h-[90vh]"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-[#0f2d1e] font-heading">
-            🗺️ Mapa del Sitio
-          </h3>
-          <button
-            onClick={onCerrar}
-            aria-label="Cerrar"
-            className="shrink-0 h-9 w-9 flex items-center justify-center rounded-full bg-[#0f2d1e] text-white font-black hover:bg-emerald-800 transition-colors"
-          >
-            ×
-          </button>
-        </div>
+        <h3 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-[#0f2d1e] font-heading mb-3">
+          🗺️ Mapa del Sitio
+        </h3>
         <p className="text-xs sm:text-sm text-[#0f2d1e]/70 font-medium mb-3">
           Toca cualquier tarjeta para ir directo a esa sección, sin tener que buscarla.
         </p>
@@ -3412,6 +3402,9 @@ function ModalMapaSitio({ onCerrar, onAbrirProyecto, onAbrirFAQ, onAbrirSugerenc
             </button>
           ))}
         </div>
+              <div className="pt-3 flex justify-end shrink-0">
+          <BotonCerrar onClick={onCerrar} />
+        </div>
       </div>
     </div>
   );
@@ -3431,17 +3424,10 @@ function ModalCategoria({ categoria, onCerrar, onAbrirProyecto }) {
         className="bg-white text-slate-900 rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl flex flex-col max-h-[90vh]"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-start justify-between gap-3 mb-2">
+        <div className="mb-2">
           <span className="inline-flex items-center gap-2 rounded-full bg-emerald-200 px-4 py-1.5 text-xs sm:text-sm font-black uppercase tracking-wider text-emerald-800">
             <span aria-hidden="true">{categoria.emoji}</span> {categoria.titulo}
           </span>
-          <button
-            onClick={onCerrar}
-            aria-label="Cerrar"
-            className="shrink-0 h-9 w-9 flex items-center justify-center rounded-full bg-[#0f2d1e] text-white font-black hover:bg-emerald-800 transition-colors"
-          >
-            ×
-          </button>
         </div>
         <p className="text-xs sm:text-sm italic font-black text-[#e65100] mb-2">{categoria.slogan}</p>
         <p className="text-sm text-slate-600 font-medium leading-relaxed mb-4">{categoria.descripcion}</p>
@@ -3465,6 +3451,9 @@ function ModalCategoria({ categoria, onCerrar, onAbrirProyecto }) {
               <span className="uppercase font-black leading-tight text-[11px] sm:text-xs">{btn.t}</span>
             </button>
           ))}
+        </div>
+              <div className="pt-3 flex justify-end shrink-0">
+          <BotonCerrar onClick={onCerrar} />
         </div>
       </div>
     </div>
@@ -4036,16 +4025,12 @@ function BarraPatrocinadores() {
           onClick={() => setImagenEnGrande(null)}
         >
           <div className="relative max-w-3xl w-full" onClick={(e) => e.stopPropagation()}>
-            <button
-              type="button"
-              onClick={() => setImagenEnGrande(null)}
-              className="absolute -top-10 right-0 text-white text-2xl font-black hover:text-[#e65100] transition-colors"
-              aria-label="Cerrar imagen"
-            >
-              ✕
-            </button>
             <img src={imagenEnGrande} alt="" className="w-full h-auto rounded-2xl border-4 border-white/20 shadow-2xl" />
-          </div>
+          
+            <div className="mt-3 flex justify-end">
+              <BotonCerrar claro onClick={() => setImagenEnGrande(null)} label="Cerrar imagen" />
+            </div>
+</div>
         </div>
       )}
 
@@ -4055,18 +4040,14 @@ function BarraPatrocinadores() {
           onClick={() => setVideoEnGrande(null)}
         >
           <div className="relative w-full max-w-3xl" onClick={(e) => e.stopPropagation()}>
-            <button
-              type="button"
-              onClick={() => setVideoEnGrande(null)}
-              className="absolute -top-10 right-0 text-white text-2xl font-black hover:text-[#e65100] transition-colors"
-              aria-label="Cerrar video"
-            >
-              ✕
-            </button>
             <div className="rounded-2xl overflow-hidden border-4 border-white/20 shadow-2xl aspect-video bg-black">
               <IframeVideo video={videoEnGrande} className="w-full h-full" />
             </div>
-          </div>
+          
+            <div className="mt-3 flex justify-end">
+              <BotonCerrar claro onClick={() => setVideoEnGrande(null)} label="Cerrar video" />
+            </div>
+</div>
         </div>
       )}
 
@@ -4075,16 +4056,8 @@ function BarraPatrocinadores() {
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 backdrop-blur-sm"
           onClick={() => setPdfEnGrande(null)}
         >
-          <div className="relative w-full max-w-3xl h-[85vh]" onClick={(e) => e.stopPropagation()}>
-            <button
-              type="button"
-              onClick={() => setPdfEnGrande(null)}
-              className="absolute -top-10 right-0 text-white text-2xl font-black hover:text-[#e65100] transition-colors"
-              aria-label="Cerrar documento"
-            >
-              ✕
-            </button>
-            <div className="w-full h-full rounded-2xl overflow-hidden border-4 border-white/20 shadow-2xl bg-white">
+          <div className="relative w-full max-w-3xl h-[80vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+            <div className="w-full flex-1 min-h-0 rounded-2xl overflow-hidden border-4 border-white/20 shadow-2xl bg-white">
               <iframe src={pdfEnGrande} title="Documento PDF" className="w-full h-full" />
             </div>
             <a
@@ -4095,7 +4068,11 @@ function BarraPatrocinadores() {
             >
               Abrir en pestaña nueva
             </a>
-          </div>
+          
+            <div className="mt-3 flex justify-end">
+              <BotonCerrar claro onClick={() => setPdfEnGrande(null)} label="Cerrar documento" />
+            </div>
+</div>
         </div>
       )}
     </div>
@@ -4126,10 +4103,24 @@ function BarraTicker() {
     return () => clearInterval(id);
   }, [visible, itemsTicker.length]);
 
+  // Publica el alto real de esta barra (--alto-ticker) para que los botones
+  // flotantes queden justo encima, sin importar el dispositivo.
+  const barraRef = useRef(null);
+  useLayoutEffect(() => {
+    const raiz = document.documentElement;
+    if (!visible || !barraRef.current) { raiz.style.setProperty("--alto-ticker", "0px"); return; }
+    const medir = () => raiz.style.setProperty("--alto-ticker", `${Math.round(barraRef.current.getBoundingClientRect().height)}px`);
+    medir();
+    let ro;
+    if (typeof ResizeObserver !== "undefined") { ro = new ResizeObserver(medir); ro.observe(barraRef.current); }
+    window.addEventListener("resize", medir);
+    return () => { ro?.disconnect(); window.removeEventListener("resize", medir); };
+  }, [visible, itemsTicker.length]);
+
   if (!visible) return null;
 
   return (
-    <div className="fixed bottom-0 inset-x-0 z-40 bg-[#17472d] border-t-2 border-emerald-700/50 shadow-[0_-4px_12px_rgba(0,0,0,0.25)]">
+    <div ref={barraRef} className="fixed bottom-0 inset-x-0 z-40 bg-[#17472d] border-t-2 border-emerald-700/50 shadow-[0_-4px_12px_rgba(0,0,0,0.25)]">
       <FilaTicker items={itemsTicker} index={index} onClose={() => setVisible(false)} mostrarCerrar={true} />
     </div>
   );

@@ -38,7 +38,7 @@ const TABS = [
   },
   {
     id: "negocios", label: "Negocios", emoji: "🗺️", color: "#2E9E5B", pastel: "#E4F6EB",
-    cat: "alianzas-y-negocios", mapa: true, fichas: true, ver: true, slot: "negocios",
+    cat: "alianzas-y-negocios", cover: { slogan: "Negocios locales aliados" }, ocultarSinItems: true, mapa: true, fichas: true, ver: true, slot: "negocios",
     texto: "Encuentra comercios aliados en Jardines de Morelos o registra el tuyo gratis.",
     wa: "¡Hola DCUATES! Quiero registrar mi negocio."
   },
@@ -315,16 +315,11 @@ export default function BloqueCentral({
         </div>
 
         <div className="bc-panel" id="bc-panel" role="tabpanel" aria-labelledby={`bc-tab-${tab.id}`} key={tab.id} style={{ background: tab.pastel }}>
-          {tab.mapa ? (
-            <MapaLocal url={mapaUrl} color={tab.color} />
-          ) : tab.cover ? (
+          {tab.cover && !(tab.ocultarSinItems && !(portadasItems[tab.id] || []).length && !imgs[tab.id]) && (
             <CarruselPortada items={portadasItems[tab.id] || []} tab={tab} slogan={textoPortada} fallback={imgs[tab.id]} />
-          ) : tab.encabezado ? (
-            <div className="bc-head" style={{ color: tab.color }}>
-              <span aria-hidden="true">{tab.emoji}</span>
-              <div><b>{tab.label}</b><small>{cat.slogan}</small></div>
-            </div>
-          ) : null}
+          )}
+
+          {tab.mapa && <MapaLocal url={mapaUrl} color={tab.color} />}
 
           {tab.texto && <p className="bc-text">{tab.texto}</p>}
 
@@ -411,15 +406,15 @@ const CSS = `
 .bc-pegado .bc-tabs{padding:4px 6px 2px;gap:4px;justify-content:center}
 .bc-pegado .bc-tab{flex:0 0 auto;flex-direction:row;justify-content:center;gap:6px;min-height:44px;padding:4px 8px;font-size:12px}
 .bc-pegado .bc-tab[aria-selected="false"] .bc-tab-t{display:none}
-.bc-pegado .bc-ico{width:26px;height:26px;font-size:15px}
+.bc-pegado .bc-ico{width:30px;height:30px;font-size:17px}
 .bc-pegado .bc-prog{padding:0 12px 5px}
 .bc-pegado .bc-track{height:4px}
 .bc-pegado .bc-prog-txt{display:none}
 .bc-tabs{display:flex;gap:6px;padding:8px;overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:none;overscroll-behavior-x:contain}
 .bc-tabs::-webkit-scrollbar{display:none}
-.bc-tab{flex:0 0 84px;scroll-snap-align:center;display:flex;flex-direction:column;align-items:center;gap:4px;min-height:64px;padding:8px 4px;border:0;border-radius:14px;background:#f4f6f8;color:var(--ink);font-family:inherit;font-weight:800;font-size:13px;cursor:pointer;transition:background .2s,color .2s}
+.bc-tab{flex:0 0 88px;scroll-snap-align:center;display:flex;flex-direction:column;align-items:center;gap:5px;min-height:72px;padding:8px 4px;border:0;border-radius:14px;background:#f4f6f8;color:var(--ink);font-family:inherit;font-weight:800;font-size:13px;cursor:pointer;transition:background .2s,color .2s}
 .bc-tab:hover{background:#e9edf1}
-.bc-ico{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:17px;line-height:1;transition:background .2s}
+.bc-ico{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-size:22px;line-height:1;transition:background .2s}
 .bc-prog{padding:2px 14px 8px}
 .bc-track{height:6px;border-radius:99px;background:#e8ecef;overflow:hidden}
 .bc-fill{height:100%;border-radius:99px;transition:width .45s ease,background .3s}
@@ -437,10 +432,10 @@ const CSS = `
 .bc-snap{display:flex;gap:12px;margin:8px calc(var(--pad) * -1) 0;padding:4px var(--pad) 12px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:var(--pad);-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;scrollbar-width:none}
 .bc-snap::-webkit-scrollbar{display:none}
 .bc-sub + .bc-snap{margin-top:0}
-.bc-chip{flex:0 0 132px;scroll-snap-align:start;display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 8px;border:0;border-radius:16px;background:#fff;box-shadow:0 4px 12px rgba(31,42,55,.08);font-family:inherit;font-weight:800;font-size:13px;line-height:1.2;text-align:center;color:var(--ink);cursor:pointer;transition:transform .15s}
+.bc-chip{flex:0 0 148px;scroll-snap-align:start;display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 8px;border:0;border-radius:16px;background:#fff;box-shadow:0 4px 12px rgba(31,42,55,.08);font-family:inherit;font-weight:800;font-size:13px;line-height:1.2;text-align:center;color:var(--ink);cursor:pointer;transition:transform .15s}
 .bc-chip:hover{transform:translateY(-2px)}
-.bc-chip img{width:56px;height:56px;object-fit:contain}
-.bc-chip-emoji{width:56px;height:56px;display:grid;place-items:center;font-size:34px}
+.bc-chip img{width:72px;height:72px;object-fit:contain}
+.bc-chip-emoji{width:72px;height:72px;display:grid;place-items:center;font-size:44px}
 .bc-ficha{flex:0 0 min(78%,250px);scroll-snap-align:start;background:#fff;border-radius:16px;padding:14px;box-shadow:0 4px 12px rgba(31,42,55,.08);border:2px solid transparent;display:flex;flex-direction:column;gap:4px}
 .bc-ficha h3{margin:6px 0 0;font-size:16px;font-weight:900;line-height:1.2}
 .bc-ficha p{margin:0;font-size:13px;font-weight:700;color:#5b6675}
@@ -449,7 +444,7 @@ const CSS = `
 .bc-ficha-btns{display:flex;gap:6px;margin-top:auto;padding-top:10px}
 .bc-ficha-btns a,.bc-ficha-btns button{flex:1;min-height:40px;display:grid;place-items:center;border:0;border-radius:12px;color:#fff;font-family:inherit;font-weight:900;font-size:13px;text-decoration:none;cursor:pointer}
 .bc-ficha-cta{border-style:dashed}
-.bc-map{position:relative;margin:calc(var(--pad) * -1) calc(var(--pad) * -1) 14px;height:280px;background:#dfe7e2}
+.bc-map{position:relative;margin:0 0 14px;height:280px;background:#dfe7e2;border-radius:16px;overflow:hidden;box-shadow:0 6px 16px rgba(31,42,55,.12)}
 .bc-map iframe{width:100%;height:100%;border:0;display:block}
 .bc-map-lock{position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:center;padding:12px;touch-action:pan-x pan-y;background:rgba(255,255,255,.04)}
 .bc-pill{min-height:40px;padding:8px 14px;border:0;border-radius:99px;background:rgba(31,42,55,.85);color:#fff;font-family:inherit;font-weight:800;font-size:13px;cursor:pointer}
@@ -466,15 +461,17 @@ const CSS = `
 @media (min-width:768px){
   .bc-root{--pad:24px}
   .bc-tabs{overflow:visible;padding:12px 12px 8px;gap:8px}
-  .bc-tab{flex:1 1 0;min-height:76px;font-size:15px;gap:6px}
+  .bc-tab{flex:1 1 0;min-height:84px;font-size:15px;gap:6px}
   .bc-pegado .bc-tab{flex:1 1 0;min-height:48px;font-size:14px}
   .bc-pegado .bc-tab[aria-selected="false"] .bc-tab-t{display:inline}
-  .bc-ico{width:36px;height:36px;font-size:20px}
+  .bc-ico{width:44px;height:44px;font-size:25px}
   .bc-prog{padding:2px 20px 10px}
       .bc-text{font-size:18px;-webkit-line-clamp:4}
   .bc-sub{font-size:17px}
   .bc-map{height:380px}
-  .bc-snap{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));overflow:visible;margin:8px 0 0;padding:4px 0 12px}
+  .bc-chip img{width:84px;height:84px}
+  .bc-chip-emoji{width:84px;height:84px;font-size:50px}
+  .bc-snap{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));overflow:visible;margin:8px 0 0;padding:4px 0 12px}
   .bc-snap.bc-fichas{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
   .bc-chip,.bc-ficha{flex:none}
   .bc-actions{grid-template-columns:1fr 1fr}

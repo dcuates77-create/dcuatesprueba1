@@ -6,6 +6,9 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 // (imagen, video o PDF) y avanza solo cada 3 segundos, suave y en ciclo
 // continuo. Al tocarlo o deslizarlo a mano se pausa 6 s. Solo avanza si está
 // a la vista (no gasta batería cuando estás leyendo más abajo).
+// Importante: avanza SIEMPRE, incluso en celulares con "reducir animaciones"
+// o ahorro de batería (antes se quedaba quieto ahí); en ese caso el cambio de
+// cuadro es instantáneo en vez de deslizado.
 //
 // items: [{ id, tipo: "imagen" | "video" | "pdf", nombre?, img?, url?,
 //           media?, onClick? }]
@@ -23,6 +26,8 @@ export default function CarruselPortada({ items = [], tab, slogan, fallback }) {
   const rootRef = useRef(null);
   const pistaRef = useRef(null);
   const temporizador = useRef(null);
+  const actualRef = useRef(0);       // índice real (sin esperar a React)
+  const autoHasta = useRef(0);       // mientras dura un deslizamiento automático, el scroll no se "re-sincroniza"
   const [actual, setActual] = useState(0);
   const [pausado, setPausado] = useState(false);
   const [visible, setVisible] = useState(true);
@@ -40,6 +45,7 @@ export default function CarruselPortada({ items = [], tab, slogan, fallback }) {
 
   // Cuando cambia la cantidad de cuadros, vuelve al primero.
   useEffect(() => {
+    actualRef.current = 0;
     setActual(0);
     pistaRef.current?.scrollTo({ left: 0 });
   }, [n]);
@@ -57,19 +63,19 @@ export default function CarruselPortada({ items = [], tab, slogan, fallback }) {
     const pista = pistaRef.current;
     const hijo = pista?.children[i];
     if (!pista || !hijo) return;
+    autoHasta.current = Date.now() + (suave ? 1000 : 150);
     pista.scrollTo({ left: hijo.offsetLeft, behavior: suave ? "smooth" : "auto" });
   }, []);
 
-  // Avance automático cada 3 s.
+  // Avance automático cada 3 s (un cuadro a la vez).
   useEffect(() => {
-    if (n <= 1 || pausado || !visible || reducirMovimiento) return;
+    if (n <= 1 || pausado || !visible) return;
     const id = setInterval(() => {
       if (document.hidden) return;
-      setActual((i) => {
-        const sig = i + 1;
-        irA(sig);
-        return sig;
-      });
+      const sig = actualRef.current + 1;
+      actualRef.current = sig;
+      setActual(sig);
+      irA(sig, !reducirMovimiento);
     }, INTERVALO_MS);
     return () => clearInterval(id);
   }, [n, pausado, visible, irA, reducirMovimiento]);
@@ -83,17 +89,22 @@ export default function CarruselPortada({ items = [], tab, slogan, fallback }) {
       pista.style.scrollSnapType = "none";
       irA(0, false);
       pista.style.scrollSnapType = "";
+      actualRef.current = 0;
       setActual(0);
-    }, 650);
+    }, reducirMovimiento ? 50 : 700);
     return () => clearTimeout(t);
-  }, [actual, n, irA]);
+  }, [actual, n, irA, reducirMovimiento]);
 
   // Si se desliza a mano, sincroniza el índice.
   const alDeslizar = () => {
     const pista = pistaRef.current;
     if (!pista || !pista.clientWidth) return;
+    if (Date.now() < autoHasta.current) return;   // lo está moviendo el avance automático
     const i = Math.round(pista.scrollLeft / pista.clientWidth);
-    if (i !== actual) setActual(i);
+    if (i !== actualRef.current) {
+      actualRef.current = i;
+      setActual(i);
+    }
   };
 
   const pausarUnRato = () => {
