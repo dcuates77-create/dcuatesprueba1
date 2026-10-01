@@ -24,7 +24,7 @@ const TABS = [
   },
   {
     id: "causas", label: "Causas", emoji: "❤️", color: "#E5484D", pastel: "#FFE9EB",
-    cat: "apoya-causas", encabezado: true, slot: "causas", tituloChips: "Proyectos para apoyar"
+    cat: "apoya-causas", cover: { slogan: "Apoyo Voluntario: tu ayuda cambia vidas" }, slot: "causas", tituloChips: "Proyectos para apoyar"
   },
   {
     id: "valores", label: "Valores", emoji: "✨", color: "#7A5AD8", pastel: "#EFEAFE",
@@ -74,9 +74,17 @@ const NEGOCIOS_EJEMPLO = [
   { nombre: "Papelería del Barrio", giro: "Papelería", emoji: "📚", color: "#3B82C4", zona: "Jardines de Morelos", promo: "10% para vecinos DCUATES" }
 ];
 
+// Portada de cada pestaña. Primero se usa la que subas a Baserow (columnas
+// "PORTADA NOSOTROS", "PORTADA BENEFICIOS", etc. en la tabla ENLACES); si no
+// hay, la imagen local /public/images/portada-<pestaña>.png; y si tampoco
+// existe, un degradado de color con el emoji de la pestaña.
 const PORTADAS_BASE = {
   nosotros: "/images/bibliobici-movil.png",
-  beneficios: "/images/bibliobici-movil.png"
+  beneficios: "/images/bibliobici-movil.png",
+  causas: "/images/portada-causas.png",
+  valores: "/images/portada-valores.png",
+  regalos: "/images/portada-regalos.png",
+  gratitud: "/images/portada-gratitud.png"
 };
 
 const MENORES = /^(de|del|y|con|a|el|la|los|las|en)$/i;
@@ -85,6 +93,7 @@ const bonito = (s) =>
 
 function Logo({ src, emoji }) {
   const [fallo, setFallo] = useState(!src);
+  useEffect(() => { setFallo(!src); }, [src]);
   return fallo ? (
     <span className="bc-chip-emoji" aria-hidden="true">{emoji}</span>
   ) : (
@@ -94,6 +103,7 @@ function Logo({ src, emoji }) {
 
 function Portada({ src, tab, slogan }) {
   const [fallo, setFallo] = useState(!src);
+  useEffect(() => { setFallo(!src); }, [src]);
   return (
     <div className="bc-cover" style={{ background: `linear-gradient(135deg, ${tab.color}, ${tab.color}99)` }}>
       {!fallo && <img src={src} alt="" loading="lazy" onError={() => setFallo(true)} />}
@@ -143,7 +153,7 @@ export default function BloqueCentral({
   negocios = NEGOCIOS_EJEMPLO,
   portadas = {},
   nosotros = null, beneficios = null, causas = null, valores = null,
-  negocios: negociosSlot = null, regalos = null, gratitud = null,   // JSX de cada pestaña (viene de App.jsx)
+  negociosSeccion = null, regalos = null, gratitud = null,   // JSX de cada pestaña (viene de App.jsx)
   onAbrirCategoria = () => {},
   onAbrirProyecto = () => {}
 }) {
@@ -154,7 +164,7 @@ export default function BloqueCentral({
   const cat = categorias.find((c) => c.id === tab.cat) || {};
   const pct = Math.round(((idx + 1) / TABS.length) * 100);
   const wa = (m) => `https://wa.me/${whatsappNumero}?text=${encodeURIComponent(m)}`;
-  const slots = { nosotros, beneficios, causas, valores, negocios: negociosSlot, regalos, gratitud };
+  const slots = { nosotros, beneficios, causas, valores, negocios: negociosSeccion, regalos, gratitud };
   const imgs = { ...PORTADAS_BASE, ...portadas };
 
   // Fuente redondeada (Nunito), una sola vez.

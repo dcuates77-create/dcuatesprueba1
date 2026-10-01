@@ -718,10 +718,10 @@ function BotonesNaranjasSeccion({ modales, onAbrir }) {
   ];
   const lista = todos.filter((b) => modales.includes(b.modal));
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+    <div className={lista.length === 1 ? "flex justify-center" : "grid grid-cols-1 md:grid-cols-2 gap-3"}>
       {lista.map((btn, idx) => (
+        <div key={idx} className={lista.length === 1 ? "w-full max-w-md" : "w-full"}>
                     <button
-                      key={idx}
                       type="button"
                       onClick={() => onAbrir(btn.modal)}
                       className="flex flex-col rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white shadow-md transition-all hover:scale-[1.02] overflow-hidden font-heading text-left w-full"
@@ -746,6 +746,7 @@ function BotonesNaranjasSeccion({ modales, onAbrir }) {
                         </ul>
                       </div>
                     </button>
+        </div>
       ))}
     </div>
   );
@@ -757,21 +758,17 @@ function BotonesRetosRegalos({ indices }) {
     <div className="flex flex-col gap-2">
       {RETOS_REGALOS_ITEMS.map((item, i) => {
         if (indices && !indices.includes(i)) return null;
-        const activo = abierto === i;
+        const activo = true;
         return (
           <div key={i} className="rounded-xl overflow-hidden">
-            <button
-              type="button"
-              onClick={() => setAbierto(activo ? null : i)}
-              aria-expanded={activo}
-              className="w-full flex items-center justify-between gap-2 bg-[#e65100] hover:bg-[#bf360c] text-white font-black uppercase text-xs sm:text-sm leading-tight px-4 py-3.5 transition-colors text-left"
+            <div
+              className="w-full flex items-center justify-between gap-2 bg-[#e65100] text-white font-black uppercase text-xs sm:text-sm leading-tight px-4 py-3.5 transition-colors text-left"
             >
               <span>{item.titulo}</span>
               <span className="flex items-center gap-2 shrink-0">
                 <span className="text-xl" aria-hidden="true">{item.icono}</span>
-                <span className={`transition-transform ${activo ? "rotate-180" : ""}`} aria-hidden="true">▾</span>
               </span>
-            </button>
+            </div>
             {activo && (
               <div className="bg-[#fff8f1] border-2 border-t-0 border-[#e65100] rounded-b-xl p-3 space-y-2">
                 <p className="text-[#0f2d1e] text-[11px] sm:text-xs font-black leading-snug">{item.intro}</p>
@@ -822,7 +819,7 @@ export default function App() {
   // Formulario de "Registra tu Solicitud" (junto al mapa): se ve resumido
   // y se despliega completo al querer llenarlo (es un formulario externo
   // -Tally-, así que se expande al tocarlo, no al detectar un campo exacto).
-  const [solicitudExpandida, setSolicitudExpandida] = useState(false);
+  const [solicitudExpandida, setSolicitudExpandida] = useState(true);
   // Botones naranjas junto a los carruseles de Ventas con Causa y de
   // Extraviados: agrupados en un solo botón resumen debajo del carrusel.
   const [ventasResumenAbierto, setVentasResumenAbierto] = useState(false);
@@ -911,6 +908,15 @@ export default function App() {
   // Mientras no subas nada a esas columnas, estas listas simplemente salen
   // vacías y la sección lo indica.
   const galeriaRetos = galeriaDesdeColumna(filasEnlaces, "RETOSGALERIA", 10, "Retos");
+  // Portada de cada pestaña: columnas tipo Archivo "PORTADA NOSOTROS",
+  // "PORTADA BENEFICIOS", "PORTADA CAUSAS", "PORTADA VALORES",
+  // "PORTADA REGALOS" y "PORTADA GRATITUD" en la tabla ENLACES (se usa la
+  // primera imagen que tenga cada columna).
+  const portadasTabs = {};
+  ["nosotros", "beneficios", "causas", "valores", "regalos", "gratitud"].forEach((id) => {
+    const g = galeriaDesdeColumna(filasEnlaces, `PORTADA ${id.toUpperCase()}`, 1, id);
+    if (g[0]) portadasTabs[id] = resolverSrcImagen(g[0].img);
+  });
   const videosRetos = paresBaserow(filasEnlaces, "NOMBRE RETOSVID", "RETOSVID", 8)
     .map((v) => ({ video: detectarVideo(v.enlace), nombre: v.nombre }))
     .filter((v) => v.video);
@@ -1047,6 +1053,7 @@ export default function App() {
               proyectos={BOTONES_PORTADA}
               mapaUrl={MAPA_NEGOCIOS_EMBED_URL}
               whatsappNumero={WHATSAPP_NUMERO}
+              portadas={portadasTabs}
               onAbrirCategoria={(id) => setCategoriaAbierta(id)}
               onAbrirProyecto={(id) => setModalProyecto(id)}
               beneficios={(
@@ -1115,15 +1122,6 @@ export default function App() {
                       </div>
                     )}
                   </div>
-                  {solicitudExpandida && (
-                    <button
-                      type="button"
-                      onClick={() => setSolicitudExpandida(false)}
-                      className="w-full rounded-lg border-2 border-emerald-200 text-emerald-800 hover:bg-emerald-50 font-black uppercase tracking-wide text-[11px] py-2 transition-colors"
-                    >
-                      ▲ Ver menos
-                    </button>
-                  )}
 
                   <div className="text-center pt-1">
                     <p className="text-xs text-slate-500 font-medium mb-2">¿Prefieres contarnos directo?</p>
@@ -1223,7 +1221,7 @@ export default function App() {
               >
                 <div className="space-y-2">
                   {FAQ_ITEMS.map((f, i) => (
-                    <details key={i} className="rounded-lg bg-emerald-900/40 px-3 py-2">
+                    <details open key={i} className="rounded-lg bg-emerald-900/40 px-3 py-2">
                       <summary className="cursor-pointer text-xs sm:text-sm font-bold">{f.pregunta}</summary>
                       <p className="mt-1 text-xs text-emerald-100/90 leading-relaxed">{f.respuesta}</p>
                     </details>
@@ -1235,7 +1233,7 @@ export default function App() {
                   </div>
                 </div>
               )}
-              negocios={(
+              negociosSeccion={(
                 <div className="flex flex-col gap-6 min-w-0 text-[#0f2d1e]">
                   <div id="ventas-con-causa" className="scroll-mt-48 md:scroll-mt-36">
           <div className="text-center max-w-2xl mx-auto mb-6 space-y-3">
@@ -1387,16 +1385,9 @@ export default function App() {
               <h1 className="sr-only">
                 Juntos hacemos una mejor comunidad ⭐ 😊
               </h1>
-              <p className={`text-sm sm:text-base text-slate-800 leading-relaxed text-justify font-medium overflow-hidden mt-3 ${heroExpandido ? "max-h-none" : "max-h-[4.9em]"}`}>
+              <p className="text-sm sm:text-base text-slate-800 leading-relaxed text-justify font-medium mt-3">
                 <strong>DCUATES</strong> impulsa proyectos, <strong>PERSONAS, ORGANIZACIONES Y EMPRENDIMIENTOS</strong> que <strong>BENEFICIAN a las FAMILIAS</strong>: <strong>PUBLICIDAD GRATUITA</strong> para tu negocio, préstamo de <strong>LIBROS</strong> y materiales <strong>EDUCATIVOS</strong>, apoyo a <strong>MASCOTAS Y GRUPOS VULNERABLES</strong>, y <strong>ALIANZAS GANAR-GANAR</strong> que generan apoyos y beneficios mutuos y comunitarios. Suma con tu valiosa colaboración o con tu invaluable <strong>APOYO VOLUNTARIO</strong> para lograr nuestros objetivos de forma más efectiva, y forjar <strong>LA CADENA DE VALOR Y DE VALORES</strong> que nos liberará de nuestras limitaciones para ser mejores, Y ASÍ MEJORAR NUESTRO ENTORNO Y NUESTRO MUNDO !!!
               </p>
-              <button
-                type="button"
-                onClick={() => setHeroExpandido((v) => !v)}
-                className="text-xs font-black uppercase text-emerald-800 underline underline-offset-2 mt-1"
-              >
-                {heroExpandido ? "Leer menos" : "Leer más"}
-              </button>
             </div>
 
             {/* QUIÉNES SOMOS — justo debajo de JUNTOS, resumido con "Mostrar más" */}
@@ -1404,7 +1395,7 @@ export default function App() {
               <span className="flex items-center gap-2 text-xl sm:text-2xl font-black uppercase tracking-wider text-emerald-400 mb-2">
                 <span className="text-3xl sm:text-4xl">✅</span> Quiénes Somos
               </span>
-              <div className={`overflow-hidden ${quienesExpandido ? "max-h-none" : "max-h-[5.6em]"}`}>
+              <div>
                 <p className="text-sm sm:text-base text-emerald-50 leading-relaxed font-medium">
                   {QUIENES_SOMOS.idea}
                 </p>
@@ -1424,13 +1415,6 @@ export default function App() {
                   <span className="block mt-2 text-emerald-300 tracking-wide">{QUIENES_SOMOS.firma}</span>
                 </p>
               </div>
-              <button
-                type="button"
-                onClick={() => setQuienesExpandido((v) => !v)}
-                className="text-xs font-black uppercase text-emerald-300 underline underline-offset-2 mt-2"
-              >
-                {quienesExpandido ? "Mostrar menos" : "Mostrar más"}
-              </button>
             </div>
 
             {/* NUESTRA MISIÓN — mismo formato que Quiénes Somos, justo debajo */}
@@ -1438,7 +1422,7 @@ export default function App() {
               <span className="flex items-center gap-2 text-xl sm:text-2xl font-black uppercase tracking-wider text-emerald-400 mb-2">
                 <span className="text-3xl sm:text-4xl">🎯</span> Nuestra Misión
               </span>
-              <div className={`overflow-hidden ${misionExpandida ? "max-h-none" : "max-h-[5.6em]"}`}>
+              <div>
                 <p className="text-sm sm:text-base text-emerald-50 leading-relaxed font-medium">
                   <strong>Misión:</strong> {MISION_VISION.mision}
                 </p>
@@ -1452,13 +1436,6 @@ export default function App() {
                   Mucha gente pequeña, en lugares pequeños, haciendo cosas pequeñas, puede cambiar el mundo (Eduardo Galeano)
                 </p>
               </div>
-              <button
-                type="button"
-                onClick={() => setMisionExpandida((v) => !v)}
-                className="text-xs font-black uppercase text-emerald-300 underline underline-offset-2 mt-2"
-              >
-                {misionExpandida ? "Mostrar menos" : "Mostrar más"}
-              </button>
             </div>
 
             {/* CÓMO PODEMOS SUMAR — mismo formato, justo debajo de Misión.
@@ -2562,7 +2539,7 @@ function ModalFormularioWhatsApp({ titulo, descripcion, opciones, placeholder, o
 // 4. SUBCOMPONENTE: FORMULARIO DE PUBLICIDAD
 // =========================================================================
 function FormularioPublicidad() {
-  const [expandido, setExpandido] = useState(false);
+  const [expandido, setExpandido] = useState(true);
   const [nombre, setNombre] = useState("");
   const [categoria, setCategoria] = useState("");
   const [contacto, setContacto] = useState("");
@@ -2664,13 +2641,6 @@ function FormularioPublicidad() {
         </div>
         <button type="submit" className="w-full rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3.5 uppercase tracking-wider text-xs transition-all mt-2 shadow-md font-heading">
           Enviar registro
-        </button>
-        <button
-          type="button"
-          onClick={() => setExpandido(false)}
-          className="w-full rounded-lg border-2 border-slate-200 text-slate-500 hover:bg-slate-50 font-black uppercase tracking-wide text-[11px] py-2 transition-colors"
-        >
-          ▲ Ver menos
         </button>
       </div>
     </form>
@@ -2780,38 +2750,16 @@ function FlechaBlanca() {
 // dar clic se abre suavemente el contenido de abajo (misma animación tipo
 // "pergamino" que los botones verdes). Se usa en Ventas con Causa y en
 // Apoyo a Causas.
-function BotonNaranjaDesplegable({ titulo, abierto, onClick, children }) {
+// Antes era un acordeón (se abría al tocar). Ahora el contenido se ve
+// siempre completo, para evitar clics: solo queda el título como encabezado.
+function BotonNaranjaDesplegable({ titulo, children }) {
   return (
     <div className="rounded-xl border-2 border-[#0f2d1e] overflow-hidden shadow-sm">
-      <button
-        type="button"
-        onClick={onClick}
-        className="w-full text-left bg-[#e65100] hover:bg-[#bf360c] p-3 transition-colors flex items-center justify-between gap-3"
-      >
+      <div className="w-full text-left bg-[#e65100] p-3">
         <p className="text-sm sm:text-base font-black text-white uppercase tracking-tight leading-tight">{titulo}</p>
-        <span className={`shrink-0 transition-transform ${abierto ? "rotate-90" : ""}`}>
-          <FlechaBlanca />
-        </span>
-      </button>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateRows: abierto ? "1fr" : "0fr",
-          transition: "grid-template-rows 350ms ease-in-out"
-        }}
-      >
-        <div style={{ overflow: "hidden" }}>
-          <div className="p-3 bg-white text-xs sm:text-sm text-slate-700 leading-relaxed space-y-2">
-            {children}
-            <button
-              type="button"
-              onClick={onClick}
-              className="w-full mt-2 rounded-lg border-2 border-[#e65100] text-[#e65100] hover:bg-orange-50 font-black uppercase tracking-wide text-[11px] sm:text-xs py-2 transition-colors"
-            >
-              Cerrar
-            </button>
-          </div>
-        </div>
+      </div>
+      <div className="p-3 bg-white text-xs sm:text-sm text-slate-700 leading-relaxed space-y-2">
+        {children}
       </div>
     </div>
   );
@@ -2992,6 +2940,10 @@ function useFilasEnlaces() {
     fetch(`/api/baserow-rows?table=${encodeURIComponent(BASEROW_TABLE_ID_ENLACES)}&crudo=1`)
       .then((r) => r.json())
       .then((data) => {
+        if (!Array.isArray(data.items)) {
+          // Ayuda para detectar fallas: abre la consola del navegador (F12).
+          console.warn("[DCUATES] /api/baserow-rows no regresó filas. Respuesta:", data);
+        }
         if (!cancelado && Array.isArray(data.items)) {
           const entrada = { datos: data.items, momento: Date.now() };
           cacheEnlacesMemoria = entrada;
@@ -2999,8 +2951,9 @@ function useFilasEnlaces() {
           setFilas(data.items);
         }
       })
-      .catch(() => {
+      .catch((e) => {
         // Sin conexión, tabla vacía, etc. — nos quedamos con los respaldos.
+        console.warn("[DCUATES] No se pudo leer Baserow (/api/baserow-rows):", e);
       });
 
     return () => { cancelado = true; };
@@ -3483,42 +3436,15 @@ function ModalCategoria({ categoria, onCerrar, onAbrirProyecto }) {
 // Botón verde desplegable — usado en la fila de "resumen rápido" junto al
 // video (Nuestra Misión, Cómo Podemos Sumar, Preguntas Frecuentes, Aviso
 // de Privacidad). Al dar clic se expande hacia abajo mostrando su contenido.
-function BotonVerdeInfo({ titulo, abierto, onClick, children }) {
-  // Animación tipo "pergamino": en vez de mostrar/ocultar de golpe (lo que
-  // hacía que la página "saltara" al cerrar un botón y el siguiente
-  // brincara de lugar), se anima suavemente la altura del contenido con
-  // el truco de CSS Grid (0fr -> 1fr). Así el cierre se ve como un
-  // desenrollado suave y el resto de la columna se acomoda poco a poco,
-  // sin brincos ni saltos de scroll.
+// Igual que el naranja: contenido siempre visible, sin acordeón.
+function BotonVerdeInfo({ titulo, children }) {
   return (
     <div className="rounded-xl bg-[#17472d] text-white shadow-md overflow-hidden">
-      <button
-        type="button"
-        onClick={onClick}
-        className="w-full flex items-center justify-between gap-2 px-4 py-3.5 text-left hover:bg-[#0f2d1e] transition-colors"
-      >
+      <div className="px-4 py-3.5">
         <span className="text-xs sm:text-sm font-black uppercase tracking-wide">{titulo}</span>
-        <span className={`text-lg leading-none shrink-0 transition-transform ${abierto ? "rotate-45" : ""}`}>+</span>
-      </button>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateRows: abierto ? "1fr" : "0fr",
-          transition: "grid-template-rows 350ms ease-in-out"
-        }}
-      >
-        <div style={{ overflow: "hidden" }}>
-          <div className="px-4 pb-4 pt-1 text-xs sm:text-sm text-emerald-50 leading-relaxed space-y-2 border-t border-emerald-700/40">
-            {children}
-            <button
-              type="button"
-              onClick={onClick}
-              className="w-full mt-2 rounded-lg border-2 border-emerald-500/50 text-emerald-100 hover:bg-emerald-900/60 font-black uppercase tracking-wide text-[11px] sm:text-xs py-2 transition-colors"
-            >
-              Cerrar
-            </button>
-          </div>
-        </div>
+      </div>
+      <div className="px-4 pb-4 pt-2 text-xs sm:text-sm text-emerald-50 leading-relaxed space-y-2 border-t border-emerald-700/40">
+        {children}
       </div>
     </div>
   );
