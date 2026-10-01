@@ -1,167 +1,175 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 // =========================================================================
 // CARRUSEL DE PORTADA — DCUATES (CLON8)
-// Reemplaza la imagen inicial de cada pestaña: muestra UN cuadro a la vez
-// (imagen, video o PDF) y avanza solo cada 3 segundos, suave y en ciclo
-// continuo. Al tocarlo o deslizarlo a mano se pausa 6 s. Solo avanza si está
-// a la vista (no gasta batería cuando estás leyendo más abajo).
-// Importante: avanza SIEMPRE, incluso en celulares con "reducir animaciones"
-// o ahorro de batería (antes se quedaba quieto ahí); en ese caso el cambio de
-// cuadro es instantáneo en vez de deslizado.
+// Va al inicio de cada pestaña. Es una TIRA con varios cuadros a la vez
+// (2 en celular, 3 en tableta, 4 en PC); cada imagen, video (miniatura) o PDF
+// se ve COMPLETO (sin recortes). Avanza solo, un cuadro cada 3 segundos, en
+// ciclo continuo. Al tocarlo o deslizarlo a mano se pausa 6 s y luego sigue.
+//
+// El movimiento lo hace el propio código (animación por cuadros) y no depende
+// de "scroll suave" del navegador, así que corre igual en celular y en PC, aun
+// con "reducir animaciones" (en ese caso el cambio es instantáneo).
 //
 // items: [{ id, tipo: "imagen" | "video" | "pdf", nombre?, img?, url?,
 //           media?, onClick? }]
 //   imagen -> img
 //   video  -> media (miniatura) + onClick (abre el visor grande)
 //   pdf    -> url (se abre en pestaña nueva)
-// Si no hay items se muestra una sola imagen de respaldo (fallback) o, si
-// tampoco existe, un degradado con el emoji de la pestaña.
+// Si no hay items y se pasa "fallback", se muestra esa imagen sola.
 // =========================================================================
 
 const INTERVALO_MS = 3000;
+const ANIMACION_MS = 600;
 const REANUDAR_MS = 6000;
 
+function animarScroll(el, destino, ms, alTerminar) {
+  const inicio = el.scrollLeft;
+  const delta = destino - inicio;
+  if (ms <= 0 || Math.abs(delta) < 1) {
+    el.scrollLeft = destino;
+    alTerminar && alTerminar();
+    return null;
+  }
+  const t0 = performance.now();
+  const id = { cancelado: false };
+  const paso = (ahora) => {
+    if (id.cancelado) return;
+    const k = Math.min(1, (ahora - t0) / ms);
+    const suave = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;   // ease-in-out
+    el.scrollLeft = inicio + delta * suave;
+    if (k < 1) requestAnimationFrame(paso);
+    else alTerminar && alTerminar();
+  };
+  requestAnimationFrame(paso);
+  return id;
+}
+
 export default function CarruselPortada({ items = [], tab, slogan, fallback }) {
-  const rootRef = useRef(null);
   const pistaRef = useRef(null);
-  const temporizador = useRef(null);
-  const actualRef = useRef(0);       // índice real (sin esperar a React)
-  const autoHasta = useRef(0);       // mientras dura un deslizamiento automático, el scroll no se "re-sincroniza"
-  const [actual, setActual] = useState(0);
+  const indiceRef = useRef(0);
+  const animRef = useRef(null);
+  const reanudarRef = useRef(null);
+  const ignorarScrollHasta = useRef(0);
   const [pausado, setPausado] = useState(false);
-  const [visible, setVisible] = useState(true);
-  const [falloFondo, setFalloFondo] = useState(!fallback);
-  const n = items.length;
-  // Con 2 o más cuadros se agrega una copia del primero al final: al llegar
-  // a ella se salta (sin animación) al primero real y el ciclo no rebobina.
-  const lista = n > 1 ? [...items, { ...items[0], id: `${items[0].id}-copia`, copia: true }] : items;
+  const [desborda, setDesborda] = useState(false);
+
+  const base = items.length > 0 ? items : fallback ? [{ id: "respaldo", tipo: "imagen", img: fallback }] : [];
+  const n = base.length;
+  const lista = desborda ? [...base, ...base] : base;
 
   const reducirMovimiento =
     typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
-  useEffect(() => { setFalloFondo(!fallback); }, [fallback]);
-  useEffect(() => () => clearTimeout(temporizador.current), []);
-
-  // Cuando cambia la cantidad de cuadros, vuelve al primero.
+  // ¿Los cuadros no caben en el ancho? Solo entonces hay movimiento.
   useEffect(() => {
-    actualRef.current = 0;
-    setActual(0);
-    pistaRef.current?.scrollTo({ left: 0 });
+    const medir = () => {
+      const pista = pistaRef.current;
+      if (!pista || n === 0) return setDesborda(false);
+      const ultimo = pista.children[n - 1];
+      const primero = pista.children[0];
+      if (!ultimo || !primero) return;
+      const ancho = ultimo.offsetLeft + ultimo.offsetWidth - primero.offsetLeft;
+      setDesborda(ancho > pista.clientWidth + 4);
+    };
+    medir();
+    window.addEventListener("resize", medir);
+    return () => window.removeEventListener("resize", medir);
   }, [n]);
 
-  // Solo avanza cuando está a la vista.
-  useEffect(() => {
-    const el = rootRef.current;
-    if (!el || typeof IntersectionObserver === "undefined") return;
-    const obs = new IntersectionObserver(([e]) => setVisible(e.isIntersecting), { threshold: 0.25 });
-    obs.observe(el);
-    return () => obs.disconnect();
+  useEffect(() => () => {
+    clearTimeout(reanudarRef.current);
+    if (animRef.current) animRef.current.cancelado = true;
   }, []);
 
-  const irA = useCallback((i, suave = true) => {
+  // Cuando cambia el contenido, vuelve al primer cuadro.
+  useEffect(() => {
+    indiceRef.current = 0;
+    if (pistaRef.current) pistaRef.current.scrollLeft = 0;
+  }, [n]);
+
+  const posicionDe = (i) => {
     const pista = pistaRef.current;
     const hijo = pista?.children[i];
-    if (!pista || !hijo) return;
-    autoHasta.current = Date.now() + (suave ? 1000 : 150);
-    pista.scrollTo({ left: hijo.offsetLeft, behavior: suave ? "smooth" : "auto" });
-  }, []);
+    if (!pista || !hijo) return null;
+    return hijo.getBoundingClientRect().left - pista.getBoundingClientRect().left + pista.scrollLeft;
+  };
 
-  // Avance automático cada 3 s (un cuadro a la vez).
+  // Avance automático, un cuadro cada 3 s.
   useEffect(() => {
-    if (n <= 1 || pausado || !visible) return;
+    if (!desborda || pausado) return;
     const id = setInterval(() => {
       if (document.hidden) return;
-      const sig = actualRef.current + 1;
-      actualRef.current = sig;
-      setActual(sig);
-      irA(sig, !reducirMovimiento);
-    }, INTERVALO_MS);
-    return () => clearInterval(id);
-  }, [n, pausado, visible, irA, reducirMovimiento]);
-
-  // Al llegar a la copia del primero, salta sin animación al primero real.
-  useEffect(() => {
-    if (n <= 1 || actual !== n) return;
-    const t = setTimeout(() => {
       const pista = pistaRef.current;
       if (!pista) return;
+      const sig = indiceRef.current + 1;
+      const destino = posicionDe(sig);
+      if (destino == null) return;
+      indiceRef.current = sig;
+      ignorarScrollHasta.current = Date.now() + ANIMACION_MS + 400;
       pista.style.scrollSnapType = "none";
-      irA(0, false);
-      pista.style.scrollSnapType = "";
-      actualRef.current = 0;
-      setActual(0);
-    }, reducirMovimiento ? 50 : 700);
-    return () => clearTimeout(t);
-  }, [actual, n, irA, reducirMovimiento]);
+      if (animRef.current) animRef.current.cancelado = true;
+      animRef.current = animarScroll(pista, destino, reducirMovimiento ? 0 : ANIMACION_MS, () => {
+        // Al entrar a la segunda tanda (copias idénticas) salta, sin que se note, a la primera.
+        if (indiceRef.current >= n) {
+          const ancho = posicionDe(n) - posicionDe(0);
+          pista.scrollLeft = pista.scrollLeft - ancho;
+          indiceRef.current -= n;
+        }
+        pista.style.scrollSnapType = "";
+      });
+    }, INTERVALO_MS);
+    return () => clearInterval(id);
+  }, [desborda, pausado, n, reducirMovimiento]);
 
-  // Si se desliza a mano, sincroniza el índice.
+  // Si el usuario desliza a mano, se sincroniza el índice y se pausa un rato.
   const alDeslizar = () => {
     const pista = pistaRef.current;
-    if (!pista || !pista.clientWidth) return;
-    if (Date.now() < autoHasta.current) return;   // lo está moviendo el avance automático
-    const i = Math.round(pista.scrollLeft / pista.clientWidth);
-    if (i !== actualRef.current) {
-      actualRef.current = i;
-      setActual(i);
+    if (!pista || Date.now() < ignorarScrollHasta.current) return;
+    let mejor = 0, dist = Infinity;
+    for (let i = 0; i < pista.children.length; i++) {
+      const d = Math.abs(posicionDe(i) - pista.scrollLeft);
+      if (d < dist) { dist = d; mejor = i; }
     }
+    indiceRef.current = mejor;
   };
 
   const pausarUnRato = () => {
+    if (animRef.current) animRef.current.cancelado = true;
+    const pista = pistaRef.current;
+    if (pista) pista.style.scrollSnapType = "";
     setPausado(true);
-    clearTimeout(temporizador.current);
-    temporizador.current = setTimeout(() => setPausado(false), REANUDAR_MS);
+    clearTimeout(reanudarRef.current);
+    reanudarRef.current = setTimeout(() => setPausado(false), REANUDAR_MS);
   };
 
-  const puntoActivo = n > 1 ? actual % n : 0;
-  const nombreActual = items[puntoActivo]?.nombre;
+  if (n === 0) return null;
 
   return (
-    <section
-      ref={rootRef}
-      className="cp-root"
-      style={{ background: `linear-gradient(135deg, ${tab.color}, ${tab.color}99)` }}
-      aria-roledescription={n > 1 ? "carrusel" : undefined}
-      aria-label={`Imágenes y videos de ${tab.label}`}
-    >
+    <section className="cp-root" aria-roledescription={desborda ? "carrusel" : undefined} aria-label={`Imágenes y videos de ${tab.label}`}>
       <style>{CSS}</style>
-
-      {n === 0 ? (
-        <>
-          {!falloFondo && <img className="cp-fondo" src={fallback} alt="" loading="lazy" onError={() => setFalloFondo(true)} />}
-          {falloFondo && <span className="cp-emoji" aria-hidden="true">{tab.emoji}</span>}
-        </>
-      ) : (
-        <div className="cp-pista" ref={pistaRef} onScroll={alDeslizar} onPointerDown={pausarUnRato}>
-          {lista.map((it, i) => (
-            <Cuadro key={it.id || i} item={it} tab={tab} copia={!!it.copia} />
-          ))}
-        </div>
-      )}
-
-      <div className="cp-pie">
-        <div className="cp-texto">
-          <strong>{slogan}</strong>
-          {nombreActual && <span>{nombreActual}</span>}
-        </div>
-        {n > 1 && (
-          <div className="cp-puntos" aria-hidden="true">
-            {items.map((it, i) => (
-              <span key={it.id || i} className={i === puntoActivo ? "on" : ""} />
-            ))}
-          </div>
-        )}
+      {slogan && <p className="cp-titulo" style={{ color: tab.color }}>{slogan}</p>}
+      <div
+        className={`cp-pista${desborda ? "" : " cp-centrado"}`}
+        ref={pistaRef}
+        onScroll={alDeslizar}
+        onPointerDown={pausarUnRato}
+        onTouchStart={pausarUnRato}
+      >
+        {lista.map((it, i) => (
+          <Cuadro key={`${it.id || i}-${i}`} item={it} tab={tab} copia={i >= n} solo={n === 1} />
+        ))}
       </div>
     </section>
   );
 }
 
-function Cuadro({ item, tab, copia }) {
+function Cuadro({ item, tab, copia, solo }) {
   const [fallo, setFallo] = useState(false);
   const esPdf = item.tipo === "pdf";
   const esVideo = item.tipo === "video";
-  const contenido = (
-    <>
+  const area = (
+    <div className="cp-area">
       {item.media ? (
         <div className="cp-media">{item.media}</div>
       ) : item.img && !fallo ? (
@@ -170,10 +178,20 @@ function Cuadro({ item, tab, copia }) {
         <span className="cp-emoji" aria-hidden="true">{esPdf ? "📄" : tab.emoji}</span>
       )}
       {esVideo && <span className="cp-play" aria-hidden="true">▶</span>}
-      {esPdf && <span className="cp-etq">PDF · toca para abrir</span>}
+      {esPdf && <span className="cp-etq">PDF</span>}
+    </div>
+  );
+  const contenido = (
+    <>
+      {area}
+      {item.nombre ? <span className="cp-nombre">{item.nombre}</span> : null}
     </>
   );
-  const props = { className: "cp-cuadro", "aria-hidden": copia || undefined, tabIndex: copia ? -1 : undefined };
+  const props = {
+    className: `cp-cuadro${solo ? " cp-solo" : ""}`,
+    "aria-hidden": copia || undefined,
+    tabIndex: copia ? -1 : undefined
+  };
   if (esPdf && item.url) {
     return <a {...props} href={item.url} target="_blank" rel="noopener noreferrer" aria-label={item.nombre || "Abrir PDF"}>{contenido}</a>;
   }
@@ -184,28 +202,31 @@ function Cuadro({ item, tab, copia }) {
 }
 
 const CSS = `
-.cp-root{position:relative;border-radius:16px;overflow:hidden;aspect-ratio:16/9;box-shadow:0 6px 16px rgba(31,42,55,.12);margin-bottom:14px;display:grid;place-items:center;font-family:"Nunito",ui-rounded,system-ui,sans-serif}
+.cp-root{font-family:"Nunito",ui-rounded,system-ui,sans-serif;margin-bottom:12px}
 .cp-root *{box-sizing:border-box;font-family:inherit}
-.cp-fondo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.cp-pista{position:absolute;inset:0;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+.cp-titulo{margin:0 2px 8px;font-size:18px;font-weight:900;line-height:1.2}
+.cp-pista{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;padding:2px 2px 8px}
 .cp-pista::-webkit-scrollbar{display:none}
-.cp-cuadro{position:relative;flex:0 0 100%;height:100%;scroll-snap-align:start;border:0;padding:0;display:block;overflow:hidden;background:transparent;color:#fff;text-decoration:none;cursor:default}
+.cp-pista.cp-centrado{justify-content:center}
+.cp-cuadro{flex:0 0 calc((100% - 10px) / 2);scroll-snap-align:start;border:0;padding:0;background:#fff;border-radius:16px;overflow:hidden;display:flex;flex-direction:column;color:#1f2a37;text-align:left;text-decoration:none;cursor:default;box-shadow:0 4px 12px rgba(31,42,55,.12)}
+.cp-cuadro.cp-solo{flex:0 1 min(100%,420px)}
 button.cp-cuadro,a.cp-cuadro{cursor:pointer}
+.cp-area{position:relative;width:100%;aspect-ratio:4/3;background:#f3f5f7;display:grid;place-items:center;overflow:hidden}
 .cp-img,.cp-media{position:absolute;inset:0;width:100%;height:100%}
-.cp-img{object-fit:cover}
-.cp-media>*{width:100%;height:100%;object-fit:cover}
-.cp-emoji{display:grid;place-items:center;width:100%;height:100%;font-size:64px;filter:drop-shadow(0 4px 6px rgba(0,0,0,.2))}
-.cp-play{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);width:52px;height:52px;border-radius:50%;background:rgba(230,81,0,.93);display:grid;place-items:center;font-size:20px;box-shadow:0 4px 12px rgba(0,0,0,.35)}
-.cp-etq{position:absolute;left:10px;top:10px;background:#E5484D;border-radius:8px;padding:2px 9px;font-size:12px;font-weight:900}
-.cp-pie{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:flex-end;justify-content:space-between;gap:10px;padding:26px 14px 10px;color:#fff;background:linear-gradient(transparent,rgba(0,0,0,.66));pointer-events:none}
-.cp-texto{display:flex;flex-direction:column;min-width:0}
-.cp-texto strong{font-size:17px;font-weight:900;line-height:1.2}
-.cp-texto span{font-size:13px;font-weight:700;opacity:.92;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cp-puntos{display:flex;gap:5px;align-items:center;padding-bottom:4px}
-.cp-puntos span{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.55);transition:width .25s,background .25s}
-.cp-puntos span.on{width:18px;border-radius:99px;background:#fff}
-.cp-root button:focus-visible,.cp-root a:focus-visible{outline:3px solid #fff;outline-offset:-3px}
-@media (min-width:768px){.cp-root{aspect-ratio:21/9}.cp-texto strong{font-size:22px}.cp-pie{padding:30px 20px 14px}}
-@media (min-width:1100px){.cp-root{aspect-ratio:3/1}}
-@media (prefers-reduced-motion:reduce){.cp-puntos span{transition:none}}
+.cp-img{object-fit:contain;padding:4px}
+.cp-media{background:#0b1a12}
+.cp-media>*{width:100%;height:100%;object-fit:contain}
+.cp-emoji{font-size:48px}
+.cp-play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:44px;height:44px;border-radius:50%;background:rgba(230,81,0,.93);display:grid;place-items:center;font-size:17px;color:#fff;box-shadow:0 3px 10px rgba(0,0,0,.35)}
+.cp-etq{position:absolute;left:8px;top:8px;background:#E5484D;color:#fff;border-radius:8px;padding:1px 8px;font-size:11px;font-weight:900}
+.cp-nombre{padding:6px 9px 8px;font-size:12px;font-weight:900;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.cp-root button:focus-visible,.cp-root a:focus-visible{outline:3px solid #1f2a37;outline-offset:2px}
+@media (min-width:768px){
+  .cp-cuadro{flex-basis:calc((100% - 20px) / 3)}
+  .cp-titulo{font-size:21px}
+  .cp-nombre{font-size:13px}
+}
+@media (min-width:1100px){
+  .cp-cuadro{flex-basis:calc((100% - 30px) / 4)}
+}
 `;

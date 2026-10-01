@@ -24,6 +24,11 @@ const CLAVE_CIRCULO_CONFIANZA = "confianza2026";
 // agregar, quitar o mover un negocio, edita el mapa directamente en Google
 // Maps/My Maps y pega aquí el nuevo link de "Insertar un mapa" (src del
 // iframe); no hace falta tocar nada más en el código.
+// Sello de versión: se ve en pequeño al final de los accesos rápidos y en la
+// consola del navegador. Sirve para comprobar que el celular ya cargó lo último.
+const VERSION_BUILD = "CLON8 · f5";
+if (typeof console !== "undefined") console.info("[DCUATES] versión", VERSION_BUILD);
+
 const MAPA_NEGOCIOS_EMBED_URL = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15034.541076557625!2d-99.00223799999999!3d19.600120500000003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1ee234c038987%3A0x4b578513910d8103!2sJardines%20de%20Morelos%2C%20Ecatepec%20de%20Morelos%2C%20M%C3%A9x.!5e0!3m2!1ses!2smx!4v1790129394750!5m2!1ses!2smx";
 
 // Ventana de Solicitudes — formulario visible directo en la página (no es
@@ -2165,7 +2170,7 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSug
       <div className="mx-auto flex items-center gap-3 max-w-6xl">
 
         {/* Logo + nombre — siempre primero, en la misma fila que las redes en móvil */}
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1 md:flex-none">
+        <div className="order-1 flex items-center gap-2 sm:gap-3 min-w-0 flex-1 md:flex-none">
         <a href="#inicio" className="flex items-center gap-2 sm:gap-3 shrink-0">
           <span className="flex h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 items-center justify-center rounded-full overflow-hidden bg-[#0f2d1e] border-2 border-[#0f2d1e]/20 shadow-sm shrink-0">
             <img
@@ -2187,7 +2192,7 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSug
 
         {/* Íconos a la derecha, en dos filas: arriba las redes; abajo la lupa
             (bajo YouTube) y el menú de tres rayas (bajo TikTok). */}
-        <div className="ml-auto flex flex-col items-end gap-1.5 sm:gap-2">
+        <div className="order-2 ml-auto flex flex-col items-end gap-1.5 sm:gap-2 shrink-0">
           <div className="flex items-center gap-1.5 sm:gap-3">
           <a href={REDES_SOCIALES.facebook} target="_blank" rel="noreferrer" className="flex h-7 w-7 sm:h-9 sm:w-9 md:h-10 md:w-10 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="Facebook">
             <svg className="h-4 w-4 sm:h-5 sm:w-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -2445,6 +2450,7 @@ function BarraAccionesFinal({ onAbrirComparte }) {
           <span aria-hidden="true">🏠</span>
         </button>
       </div>
+      <p className="mt-3 text-center text-[10px] font-bold text-emerald-900/50">Versión {VERSION_BUILD}</p>
     </section>
   );
 }
