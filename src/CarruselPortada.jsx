@@ -45,7 +45,7 @@ function animarScroll(el, destino, ms, alTerminar) {
   return id;
 }
 
-export default function CarruselPortada({ items = [], tab, slogan, fallback }) {
+export default function CarruselPortada({ items = [], tab, slogan, fallback, cargando = false }) {
   const pistaRef = useRef(null);
   const indiceRef = useRef(0);
   const animRef = useRef(null);
@@ -151,7 +151,20 @@ export default function CarruselPortada({ items = [], tab, slogan, fallback }) {
     reanudarRef.current = setTimeout(() => setPausado(false), REANUDAR_MS);
   };
 
-  if (n === 0) return null;
+  if (n === 0) {
+    // Mientras Baserow responde se muestran cuadros "fantasma" brillando, para
+    // que no haya huecos ni saltos; si ya respondió y no hay nada, se oculta.
+    if (!cargando) return null;
+    return (
+      <section className="cp-root" aria-hidden="true">
+        <style>{CSS}</style>
+        <div className="cp-pista cp-esqueleto">
+          <div className="cp-cuadro"><div className="cp-area cp-brilla" /></div>
+          <div className="cp-cuadro"><div className="cp-area cp-brilla" /></div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="cp-root" aria-roledescription={desborda ? "carrusel" : undefined} aria-label={`Imágenes y videos de ${tab.label}`}>
@@ -228,6 +241,9 @@ button.cp-cuadro,a.cp-cuadro{cursor:pointer}
 .cp-play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:44px;height:44px;border-radius:50%;background:rgba(230,81,0,.93);display:grid;place-items:center;font-size:17px;color:#fff;box-shadow:0 3px 10px rgba(0,0,0,.35)}
 .cp-etq{position:absolute;left:8px;top:8px;background:#E5484D;color:#fff;border-radius:8px;padding:1px 8px;font-size:11px;font-weight:900}
 .cp-nombre{padding:6px 9px 8px;font-size:12px;font-weight:900;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.cp-brilla{background:linear-gradient(90deg,#e6eaee 25%,#f7f9fa 50%,#e6eaee 75%);background-size:200% 100%;animation:cp-brilla 1.3s linear infinite}
+@keyframes cp-brilla{from{background-position:200% 0}to{background-position:-200% 0}}
+@media (prefers-reduced-motion:reduce){.cp-brilla{animation:none}}
 .cp-root button:focus-visible,.cp-root a:focus-visible{outline:3px solid #1f2a37;outline-offset:2px}
 @media (min-width:768px){
   .cp-cuadro{flex-basis:calc((100% - 20px) / 3)}

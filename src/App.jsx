@@ -26,7 +26,7 @@ const CLAVE_CIRCULO_CONFIANZA = "confianza2026";
 // iframe); no hace falta tocar nada más en el código.
 // Sello de versión: se ve en pequeño al final de los accesos rápidos y en la
 // consola del navegador. Sirve para comprobar que el celular ya cargó lo último.
-const VERSION_BUILD = "CLON8 · f6";
+const VERSION_BUILD = "CLON8 · f7";
 if (typeof console !== "undefined") console.info("[DCUATES] versión", VERSION_BUILD);
 
 const MAPA_NEGOCIOS_EMBED_URL = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15034.541076557625!2d-99.00223799999999!3d19.600120500000003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1ee234c038987%3A0x4b578513910d8103!2sJardines%20de%20Morelos%2C%20Ecatepec%20de%20Morelos%2C%20M%C3%A9x.!5e0!3m2!1ses!2smx!4v1790129394750!5m2!1ses!2smx";
@@ -450,6 +450,37 @@ const BOTONES_PORTADA = [
   { t: "PRÉSTAMO GRATUITO DE LIBROS", h: "#libros", modal: "libros", img: "/images/bb.png" }
 ];
 
+// Una línea que explica cada proyecto: aparece en su tarjeta y en el mensaje
+// que se envía al compartirlo. Edítalas aquí cuando quieras.
+const RESUMEN_PROYECTO = {
+  libros: "Préstamo gratuito de libros",
+  bienestar: "Talleres, cursos y recreación",
+  asesorias: "Orientación gratuita",
+  ecatepets: "Adopción y ayuda a peluditos",
+  "circulo-confianza": "Red de confianza vecinal",
+  "publicidad-tarjeta": "Promociona tu negocio gratis",
+  "recomienda-evalua-gana": "Recomienda, evalúa y gana",
+  "alianzas-tarjeta": "Alianzas ganar-ganar",
+  bazares: "Comercio y bazar local",
+  "ventas-con-causa": "Compra y apoya una causa",
+  donaciones: "Tu tiempo, talento o recursos",
+  noticias: "Lo que pasa en tu barrio"
+};
+
+// Comparte un proyecto por WhatsApp con una descripción corta y un enlace
+// que, al abrirse, lleva directo a ese proyecto (#proyecto-<id>).
+function compartirProyecto(id) {
+  if (typeof window === "undefined") return;
+  const base = BOTONES_PORTADA.find((b) => b.modal === id);
+  const titulo = base
+    ? base.t.toLowerCase().split(" ").map((w, i) => (i && /^(de|del|y|con|a|el|la|los|las|en)$/.test(w) ? w : w.charAt(0).toUpperCase() + w.slice(1))).join(" ")
+    : "Un proyecto de la comunidad";
+  const resumen = RESUMEN_PROYECTO[id] ? ` — ${RESUMEN_PROYECTO[id]}` : "";
+  const url = `${window.location.origin}${window.location.pathname}#proyecto-${id}`;
+  const texto = `✨ ${titulo}${resumen}. Conócelo y súmate en DCUATES: ${url}`;
+  window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, "_blank", "noopener,noreferrer");
+}
+
 // Logos para las ventanas que no salen de BOTONES_PORTADA (los 3 botones
 // de abajo: Historias, Cupones, Patrocinadores). Ajusta las rutas si tus
 // archivos se llaman distinto.
@@ -811,6 +842,26 @@ export default function App() {
   // null = cerrada; si tiene un id (ej. "libros", "ecatepets", "ventas-con-causa",
   // "donaciones") se abre con la información de ese proyecto.
   const [modalProyecto, setModalProyecto] = useState(null);
+  // ¿Ya respondió Baserow (bien o mal)? Mientras no, se muestran esqueletos.
+  const [baserowListo, setBaserowListo] = useState(() => typeof window !== "undefined" && !!window.__dcuatesBaserow);
+  useEffect(() => {
+    const listo = () => setBaserowListo(true);
+    window.addEventListener("dcuates:baserow-estado", listo);
+    const tope = setTimeout(listo, 8000);
+    return () => { window.removeEventListener("dcuates:baserow-estado", listo); clearTimeout(tope); };
+  }, []);
+  // Enlace directo a un proyecto: dcuates.com/#proyecto-libros abre su ventana.
+  useEffect(() => {
+    const abrir = () => {
+      const h = decodeURIComponent(window.location.hash || "");
+      if (!h.startsWith("#proyecto-")) return;
+      const id = h.slice("#proyecto-".length);
+      if (BOTONES_PORTADA.some((b) => b.modal === id) || TODOS_LOS_PROYECTOS.some((x) => x.id === id)) setModalProyecto(id);
+    };
+    abrir();
+    window.addEventListener("hashchange", abrir);
+    return () => window.removeEventListener("hashchange", abrir);
+  }, []);
   // Búsqueda: vive aquí (no dentro de SiteHeader) para poder abrirla desde
   // cualquier parte de la página (ej. el acceso rápido de "Registra tu
   // Solicitud"), además del botón del encabezado.
@@ -973,6 +1024,14 @@ export default function App() {
     }))
   ];
 
+  // Logros para la banda de impacto: los de Baserow ("NOMBRE LOGROS" /
+  // "ENLACE LOGROS") o, si no hay, los ejemplos LOGROS_ITEMS (los mismos de
+  // la barra de logros de arriba).
+  const logrosBaserow = paresBaserow(filasEnlaces, "NOMBRE LOGROS", "ENLACE LOGROS", 20);
+  const logrosBanda = logrosBaserow.length > 0
+    ? logrosBaserow.map((l) => ({ texto: l.nombre, enlace: l.enlace }))
+    : LOGROS_ITEMS;
+
   const recomendacionesDcuates = (() => {
     const desdeBaserow = paresBaserow(filasEnlaces, "Nombre Recocasa", "RECASA", 5);
     return desdeBaserow.length > 0 ? desdeBaserow : RECOMENDACIONES_ESTRELLA.dcuates;
@@ -1091,6 +1150,10 @@ export default function App() {
               mapaUrl={MAPA_NEGOCIOS_EMBED_URL}
               whatsappNumero={WHATSAPP_NUMERO}
               portadasItems={portadasItems}
+              resumenes={RESUMEN_PROYECTO}
+              logros={logrosBanda}
+              cargando={!baserowListo}
+              onCompartir={compartirProyecto}
               onAbrirCategoria={(id) => setCategoriaAbierta(id)}
               onAbrirProyecto={(id) => setModalProyecto(id)}
               beneficios={(
@@ -1939,7 +2002,14 @@ export default function App() {
               })()}
               <ContenidoModalProyecto id={modalProyecto} onCerrar={() => setModalProyecto(null)} />
             </div>
-            <div className="pt-3 flex justify-end shrink-0">
+            <div className="pt-3 flex items-center justify-between gap-3 shrink-0">
+              <button
+                type="button"
+                onClick={() => compartirProyecto(modalProyecto)}
+                className="flex items-center gap-2 rounded-full bg-[#25d366] hover:bg-[#1fb657] text-white font-black text-xs sm:text-sm uppercase tracking-wide px-4 h-11 shadow-lg transition-colors"
+              >
+                <span aria-hidden="true">💬</span> Compartir
+              </button>
               <BotonCerrar onClick={() => setModalProyecto(null)} />
             </div>
           </div>
