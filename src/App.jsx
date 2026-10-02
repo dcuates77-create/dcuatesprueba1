@@ -26,7 +26,7 @@ const CLAVE_CIRCULO_CONFIANZA = "confianza2026";
 // iframe); no hace falta tocar nada más en el código.
 // Sello de versión: se ve en pequeño al final de los accesos rápidos y en la
 // consola del navegador. Sirve para comprobar que el celular ya cargó lo último.
-const VERSION_BUILD = "CLON8 · f5";
+const VERSION_BUILD = "CLON8 · f6";
 if (typeof console !== "undefined") console.info("[DCUATES] versión", VERSION_BUILD);
 
 const MAPA_NEGOCIOS_EMBED_URL = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15034.541076557625!2d-99.00223799999999!3d19.600120500000003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1ee234c038987%3A0x4b578513910d8103!2sJardines%20de%20Morelos%2C%20Ecatepec%20de%20Morelos%2C%20M%C3%A9x.!5e0!3m2!1ses!2smx!4v1790129394750!5m2!1ses!2smx";
@@ -927,16 +927,23 @@ export default function App() {
   ["nosotros", "beneficios", "causas", "valores", "negocios", "regalos", "gratitud"].forEach((id) => {
     const K = id.toUpperCase();
     const archivos = filasEnlaces
-      .map((f, i) => {
-        if (!f) return null;
-        const url = urlDesdeCeldaBaserow(f[`PORTADA ${K}`]);
-        if (!url) return null;
+      .flatMap((f, i) => {
+        if (!f) return [];
+        const celda = f[`PORTADA ${K}`];
+        // Una celda de Archivo puede traer varios archivos: se usan todos.
+        const lista = Array.isArray(celda)
+          ? celda
+              .map((x) => x && { url: x.url || (x.thumbnails && x.thumbnails.card && x.thumbnails.card.url), nombreArchivo: x.visible_name || "" })
+              .filter((x) => x && x.url)
+          : [urlDesdeCeldaBaserow(celda)].filter(Boolean).map((url) => ({ url, nombreArchivo: "" }));
         const nombre = (f[`NOMBRE PORTADA ${K}`] && String(f[`NOMBRE PORTADA ${K}`]).trim()) || "";
-        return esPDF(url)
-          ? { id: `${id}-arch-${i}`, tipo: "pdf", url, nombre: nombre || "Documento PDF" }
-          : { id: `${id}-arch-${i}`, tipo: "imagen", img: resolverSrcImagen(url), nombre };
+        return lista.map((x, j) => {
+          const esDoc = esPDF(x.url) || /\.pdf$/i.test(x.nombreArchivo);
+          return esDoc
+            ? { id: `${id}-arch-${i}-${j}`, tipo: "pdf", url: x.url, nombre: (j === 0 && nombre) || "Documento PDF" }
+            : { id: `${id}-arch-${i}-${j}`, tipo: "imagen", img: resolverSrcImagen(x.url), nombre: j === 0 ? nombre : "" };
+        });
       })
-      .filter(Boolean)
       .slice(0, 10);
     const videos = filasEnlaces
       .filter((f) => f && f[`VIDEOS ${K}`] && String(f[`VIDEOS ${K}`]).trim() !== "")
@@ -2428,6 +2435,27 @@ function BotonNecesidades({ onAbrirProyecto, onAccionEspecial, onAbrirFAQ }) {
 // con lo que la persona seleccionó.
 // Accesos rápidos al final de la página (arriba de la barra de videos):
 // Avisos y Beneficios, Compartir Más e Inicio — antes vivían en el menú superior.
+// Sello de versión + estado de Baserow (temporal, para pruebas). Se puede
+// borrar junto con VERSION_BUILD cuando ya no haga falta.
+function SelloVersion() {
+  const [estado, setEstado] = useState(() => (typeof window !== "undefined" && window.__dcuatesBaserow) || null);
+  useEffect(() => {
+    const alCambiar = (e) => setEstado(e.detail);
+    window.addEventListener("dcuates:baserow-estado", alCambiar);
+    return () => window.removeEventListener("dcuates:baserow-estado", alCambiar);
+  }, []);
+  const texto = !estado
+    ? "conectando…"
+    : estado.ok
+      ? `✓ ${estado.filas} filas`
+      : `✗ ${String(estado.mensaje).slice(0, 90)}`;
+  return (
+    <p className="mt-3 text-center text-[10px] font-bold text-emerald-900/60 break-words">
+      Versión {VERSION_BUILD} · Baserow: {texto}
+    </p>
+  );
+}
+
 function BarraAccionesFinal({ onAbrirComparte }) {
   return (
     <section aria-label="Accesos rápidos" className="bg-[#e8f5e9] px-4 py-5 sm:py-6 border-b-4 border-[#0f2d1e]">
@@ -2450,7 +2478,7 @@ function BarraAccionesFinal({ onAbrirComparte }) {
           <span aria-hidden="true">🏠</span>
         </button>
       </div>
-      <p className="mt-3 text-center text-[10px] font-bold text-emerald-900/50">Versión {VERSION_BUILD}</p>
+      <SelloVersion />
     </section>
   );
 }
@@ -2954,6 +2982,15 @@ function TarjetaCarrusel({ item, etiqueta, mostrarDetallesVenta = false }) {
 const CACHE_ENLACES_MS = 5 * 60 * 1000;
 let cacheEnlacesMemoria = null; // { datos, momento }
 
+// Avisa a la página qué pasó con la lectura de Baserow (lo muestra el sello de
+// versión al final de los accesos rápidos): sirve para detectar fallas sin
+// abrir la consola del navegador.
+function reportarBaserow(estado) {
+  if (typeof window === "undefined") return;
+  window.__dcuatesBaserow = estado;
+  window.dispatchEvent(new CustomEvent("dcuates:baserow-estado", { detail: estado }));
+}
+
 function useFilasEnlaces() {
   const [filas, setFilas] = useState(() => cacheEnlacesMemoria ? cacheEnlacesMemoria.datos : []);
 
@@ -2963,6 +3000,7 @@ function useFilasEnlaces() {
     const ahora = Date.now();
     if (cacheEnlacesMemoria && ahora - cacheEnlacesMemoria.momento < CACHE_ENLACES_MS) {
       setFilas(cacheEnlacesMemoria.datos);
+      reportarBaserow({ ok: true, filas: cacheEnlacesMemoria.datos.length });
       return;
     }
     try {
@@ -2972,6 +3010,7 @@ function useFilasEnlaces() {
         if (parseado && ahora - parseado.momento < CACHE_ENLACES_MS) {
           cacheEnlacesMemoria = parseado;
           setFilas(parseado.datos);
+          reportarBaserow({ ok: true, filas: parseado.datos.length });
           return;
         }
       }
@@ -2986,17 +3025,20 @@ function useFilasEnlaces() {
         if (!Array.isArray(data.items)) {
           // Ayuda para detectar fallas: abre la consola del navegador (F12).
           console.warn("[DCUATES] /api/baserow-rows no regresó filas. Respuesta:", data);
+          reportarBaserow({ ok: false, mensaje: (data && (data.error || data.message)) ? String(data.error || data.message) : "respuesta sin filas" });
         }
         if (!cancelado && Array.isArray(data.items)) {
           const entrada = { datos: data.items, momento: Date.now() };
           cacheEnlacesMemoria = entrada;
           try { sessionStorage.setItem("dcuates_enlaces_cache", JSON.stringify(entrada)); } catch (e) {}
           setFilas(data.items);
+          reportarBaserow({ ok: true, filas: data.items.length });
         }
       })
       .catch((e) => {
         // Sin conexión, tabla vacía, etc. — nos quedamos con los respaldos.
         console.warn("[DCUATES] No se pudo leer Baserow (/api/baserow-rows):", e);
+        reportarBaserow({ ok: false, mensaje: String((e && e.message) || e) });
       });
 
     return () => { cancelado = true; };

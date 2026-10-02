@@ -53,8 +53,16 @@ export default function CarruselPortada({ items = [], tab, slogan, fallback }) {
   const ignorarScrollHasta = useRef(0);
   const [pausado, setPausado] = useState(false);
   const [desborda, setDesborda] = useState(false);
+  const [respaldoRoto, setRespaldoRoto] = useState(false);
+  useEffect(() => { setRespaldoRoto(false); }, [fallback]);
 
-  const base = items.length > 0 ? items : fallback ? [{ id: "respaldo", tipo: "imagen", img: fallback }] : [];
+  // Sin contenido ni imagen de respaldo que exista, el carrusel no se muestra
+  // (así no queda una tarjeta vacía con solo un emoji).
+  const base = items.length > 0
+    ? items
+    : fallback && !respaldoRoto
+      ? [{ id: "respaldo", tipo: "imagen", img: fallback, alFallar: () => setRespaldoRoto(true) }]
+      : [];
   const n = base.length;
   const lista = desborda ? [...base, ...base] : base;
 
@@ -173,7 +181,7 @@ function Cuadro({ item, tab, copia, solo }) {
       {item.media ? (
         <div className="cp-media">{item.media}</div>
       ) : item.img && !fallo ? (
-        <img className="cp-img" src={item.img} alt="" loading="lazy" onError={() => setFallo(true)} />
+        <img className="cp-img" src={item.img} alt="" loading="lazy" onError={() => { setFallo(true); item.alFallar && item.alFallar(); }} />
       ) : (
         <span className="cp-emoji" aria-hidden="true">{esPdf ? "📄" : tab.emoji}</span>
       )}
