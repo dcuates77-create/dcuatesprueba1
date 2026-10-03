@@ -47,7 +47,8 @@ export default function TiraAuto({ children, intervalo = 2000, etiqueta = "Carru
   const animRef = useRef(null);
   const reanudarRef = useRef(null);
   const ignorarHasta = useRef(0);
-  const [pausado, setPausado] = useState(false);
+  const [pausado, setPausado] = useState(false);          // pausa temporal (al tocar)
+  const [pausaManual, setPausaManual] = useState(false);   // pausa elegida con el botón
   const [desborda, setDesborda] = useState(false);
 
   const reducir = typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
@@ -114,10 +115,10 @@ export default function TiraAuto({ children, intervalo = 2000, etiqueta = "Carru
 
   // Avance automático: un cuadro cada "intervalo" ms.
   useEffect(() => {
-    if (!desborda || pausado) return;
+    if (!desborda || pausado || pausaManual) return;
     const id = setInterval(() => { if (!document.hidden) irPor(1); }, intervalo);
     return () => clearInterval(id);
-  }, [desborda, pausado, intervalo, n]);
+  }, [desborda, pausado, pausaManual, intervalo, n]);
 
   const pausarUnRato = () => {
     if (animRef.current) animRef.current.cancelado = true;
@@ -159,6 +160,13 @@ export default function TiraAuto({ children, intervalo = 2000, etiqueta = "Carru
           <button type="button" className="ta-flecha ta-next" onClick={flecha(1)} aria-label="Siguiente">›</button>
         </>
       )}
+      {desborda && (
+        <div className="ta-pie">
+          <button type="button" className="ta-pausa" onClick={() => setPausaManual((v) => !v)} aria-pressed={pausaManual}>
+            {pausaManual ? "▶ Reanudar" : "❚❚ Pausar"}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -170,8 +178,12 @@ const CSS = `
 .ta-pista.ta-centrado{justify-content:center}
 .ta-pista>*{scroll-snap-align:start;flex:0 0 auto}
 .ta-borde{position:absolute;top:0;bottom:0;right:0;width:46px;pointer-events:none;background:linear-gradient(to left,var(--ta-fondo),transparent)}
-.ta-flecha{position:absolute;top:50%;transform:translateY(-50%);z-index:3;width:38px;height:38px;border:0;border-radius:50%;background:#fff;color:#1f2a37;font-family:inherit;font-size:26px;font-weight:900;line-height:1;display:grid;place-items:center;padding:0 0 3px;box-shadow:0 4px 12px rgba(0,0,0,.28);cursor:pointer}
+.ta-flecha{position:absolute;top:calc(50% - 16px);transform:translateY(-50%);z-index:3;width:38px;height:38px;border:0;border-radius:50%;background:#fff;color:#1f2a37;font-family:inherit;font-size:26px;font-weight:900;line-height:1;display:grid;place-items:center;padding:0 0 3px;box-shadow:0 4px 12px rgba(0,0,0,.28);cursor:pointer}
 .ta-flecha:hover{background:#f1f5f2}
+.ta-pie{display:flex;justify-content:flex-end;margin-top:-4px}
+.ta-pausa{border:0;border-radius:99px;background:rgba(31,42,55,.09);color:#1f2a37;font-family:inherit;font-weight:800;font-size:12px;padding:6px 14px;min-height:32px;cursor:pointer}
+.ta-pausa:hover{background:rgba(31,42,55,.16)}
+.ta-pausa:focus-visible{outline:3px solid #1f2a37;outline-offset:2px}
 .ta-prev{left:-8px}
 .ta-next{right:-8px}
 .ta-flecha:focus-visible{outline:3px solid #1f2a37;outline-offset:2px}

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
 import CarruselPortada from "./CarruselPortada";
 import TiraAuto from "./TiraAuto";
 import BotonCompartir from "./BotonCompartir";
+import { registrar } from "./analitica";
 
 // =========================================================================
 // BLOQUE CENTRAL INTERACTIVO — DCUATES (CLON8) · FASE 5
@@ -149,31 +150,66 @@ function MapaLocal({ url, color }) {
 // cuentan hacia arriba. Solo se usan los logros que traen un número.
 const EMOJI_INICIAL = /^(\p{Extended_Pictographic}(?:\uFE0F|\u200D\p{Extended_Pictographic}|\p{Emoji_Modifier})*)\s*/u;
 
-function parsearLogro(item) {
+// Pasa a minúsculas (con la primera en mayúscula) los textos escritos casi
+// todo en MAYÚSCULAS, para que las etiquetas de las cifras se lean con calma.
+function enFrase(t) {
+  const letras = t.replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ]/g, "");
+  const mayus = letras.replace(/[^A-ZÁÉÍÓÚÜÑ]/g, "");
+  const base = letras.length && mayus.length / letras.length > 0.35 ? t.toLowerCase() : t;
+  return base.charAt(0).toUpperCase() + base.slice(1);
+}
+
+const SEGUNDO_NUMERO = /,?\s+y\s+m[aá]s de\s+(\d[\d.,]*)\s+(.+)$/i;
+
+// Un logro puede dar una o dos cifras:
+//  "Más de 200 libros FÍSICOS DONADOS …, y más de 2500 COMPARTIDOS EN FORMATO DIGITAL"
+//  -> 200 "Libros físicos donados …" y 2,500 "Libros compartidos en formato digital".
+// Un texto entre paréntesis al final se muestra aparte, en letra pequeña.
+function parsearLogros(item) {
   const texto = String((item && (item.texto || item.nombre)) || "").trim();
-  if (!texto) return null;
+  if (!texto) return [];
   const mE = texto.match(EMOJI_INICIAL);
   const emoji = mE ? mE[1] : "✨";
-  const resto = (mE ? texto.slice(mE[0].length) : texto).replace(/^m[aá]s de\s+/i, "");
-  let valor = null, prefijo = "", etiqueta = "";
+  let resto = (mE ? texto.slice(mE[0].length) : texto).replace(/^m[aá]s de\s+/i, "");
+
+  let nota = "";
+  const mp = resto.match(/\(([^)]*)\)\s*$/);
+  if (mp) { nota = mp[1].trim(); resto = resto.slice(0, mp.index).trim(); }
+
+  let valor = null, prefijo = "", etiqueta = "", segundo = null;
   const mm = resto.match(/mill[oó]n de pesos\s*(.*)$/i);
   if (mm) {
     valor = 1000000; prefijo = "$";
     etiqueta = ("pesos gestionados " + (mm[1] || "")).trim();
   } else {
+    const m2 = resto.match(SEGUNDO_NUMERO);
+    if (m2) {
+      segundo = { valor: parseInt(m2[1].replace(/[.,]/g, ""), 10), etiqueta: m2[2].trim() };
+      resto = resto.slice(0, m2.index).trim();
+    }
     const m = resto.match(/^(\d[\d.,]*)\s+(.+)$/);
     if (m) { valor = parseInt(m[1].replace(/[.,]/g, ""), 10); etiqueta = m[2]; }
   }
-  if (!valor || !isFinite(valor)) return null;
-  etiqueta = etiqueta.charAt(0).toUpperCase() + etiqueta.slice(1);
-  return { emoji, valor, prefijo, etiqueta, enlace: item.enlace };
+  if (!valor || !isFinite(valor)) return [];
+
+  const salida = [{ emoji, valor, prefijo, etiqueta: enFrase(etiqueta), nota: nota ? enFrase(nota) : "", enlace: item.enlace }];
+  if (segundo && isFinite(segundo.valor)) {
+    const sustantivo = etiqueta.split(/\s+/)[0].toLowerCase();
+    const resto2 = segundo.etiqueta.toLowerCase();
+    salida.push({
+      emoji: /digital/i.test(resto2) ? "💻" : emoji,
+      valor: segundo.valor, prefijo: "",
+      etiqueta: enFrase(`${sustantivo} ${resto2}`), nota: "", enlace: item.enlace
+    });
+  }
+  return salida;
 }
 
 // Qué logros conviene mostrar en cada pestaña (por el enlace que traen); lo
 // que falte se completa con los demás, en su orden.
 const LOGROS_PREFERIDOS = {
-  beneficios: ["#libros", "#asesorias", "#ecatepets", "#bienestar"],
-  causas: ["#donaciones", "#ecatepets", "#circulo-confianza", "#libros"],
+  beneficios: ["#libros", "#libros", "#libros", "#asesorias"],
+  causas: ["#donaciones", "#donaciones", "#ecatepets", "#circulo-confianza"],
   valores: ["#circulo-confianza", "#bazares", "#asesorias", "#bienestar"],
   negocios: ["#bazares", "#circulo-confianza", "#iniciativas", "#donaciones"]
 };
@@ -229,7 +265,7 @@ function BandaImpacto({ logros, cargando, tab }) {
       </section>
     );
   }
-  const lista = elegirLogros(logros.map(parsearLogro).filter(Boolean), tab.id);
+  const lista = elegirLogros(logros.flatMap(parsearLogros), tab.id);
   if (lista.length < 2) return null;
   return (
     <section className="bc-banda" aria-label={tab.banda.titulo} style={{ "--c": tab.color }}>
@@ -240,6 +276,7 @@ function BandaImpacto({ logros, cargando, tab }) {
             <span className="bc-stat-e" aria-hidden="true">{l.emoji}</span>
             <b className="bc-stat-n"><Contador valor={l.valor} prefijo={l.prefijo} /></b>
             <span className="bc-stat-l">{l.etiqueta}</span>
+            {l.nota && <span className="bc-stat-nota">{l.nota}</span>}
           </div>
         ))}
       </div>
@@ -424,6 +461,7 @@ export default function BloqueCentral({
 
   const cambiar = (i) => {
     setIdx(i);
+    registrar("pestana", { id: TABS[i].id });
     // Si el usuario ya bajó por el contenido, regresa al inicio del bloque.
     const h = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--alto-header-real")) || 0;
     const top = rootRef.current?.getBoundingClientRect().top ?? 0;
@@ -634,6 +672,7 @@ const CSS = `
 .bc-stat-e{font-size:22px;line-height:1}
 .bc-stat-n{font-size:27px;font-weight:900;line-height:1.05;color:#FFD84D;font-variant-numeric:tabular-nums}
 .bc-stat-l{font-size:12px;font-weight:700;line-height:1.25;color:#eaf6ee;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.bc-stat-nota{font-size:10.5px;font-weight:700;font-style:italic;line-height:1.25;color:#bfe3cb;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .bc-esq{background:linear-gradient(90deg,rgba(255,255,255,.08) 25%,rgba(255,255,255,.22) 50%,rgba(255,255,255,.08) 75%);background-size:200% 100%;animation:bc-brilla 1.3s linear infinite}
 @keyframes bc-brilla{from{background-position:200% 0}to{background-position:-200% 0}}
 

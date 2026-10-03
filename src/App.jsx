@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
 import BloqueCentral from "./BloqueCentral";
 import BotonCompartir from "./BotonCompartir";
+import { iniciarAnalitica, registrar } from "./analitica";
 
 // =========================================================================
 // 1. CONFIGURACIÓN CENTRALIZADA DE VARIABLES, REDES Y HOJA DE CÁLCULO y BORRADO DE TODOS LOS ANTERIORES JSX CAMBIOS VIDEOS
@@ -27,7 +28,7 @@ const CLAVE_CIRCULO_CONFIANZA = "confianza2026";
 // iframe); no hace falta tocar nada más en el código.
 // Sello de versión: se ve en pequeño al final de los accesos rápidos y en la
 // consola del navegador. Sirve para comprobar que el celular ya cargó lo último.
-const VERSION_BUILD = "CLON8 · f8";
+const VERSION_BUILD = "CLON8 · f9";
 if (typeof console !== "undefined") console.info("[DCUATES] versión", VERSION_BUILD);
 
 const MAPA_NEGOCIOS_EMBED_URL = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15034.541076557625!2d-99.00223799999999!3d19.600120500000003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1ee234c038987%3A0x4b578513910d8103!2sJardines%20de%20Morelos%2C%20Ecatepec%20de%20Morelos%2C%20M%C3%A9x.!5e0!3m2!1ses!2smx!4v1790129394750!5m2!1ses!2smx";
@@ -165,6 +166,8 @@ const TICKER_ETIQUETAS = {
 const LOGROS_ITEMS = [
   { texto: "🤝 Más de 2,000 recomendaciones y conexiones de apoyo", enlace: "#circulo-confianza" },
   { texto: "📚 Más de 1,000 libros y materiales educativos prestados", enlace: "#libros" },
+  { texto: "🎁 Más de 500 libros y materiales DONADOS POR NUESTRA COMUNIDAD (MUCHAS GRACIAS POR SU VALIOSO APOYO Y CONFIANZA)", enlace: "#donaciones" },
+  { texto: "📘 Más de 200 libros FÍSICOS DONADOS a quienes más los NECESITAN, y más de 2500 COMPARTIDOS EN FORMATO DIGITAL", enlace: "#libros" },
   { texto: "🎓 Más de 300 asesorías y orientación educativa y laboral gratuitas", enlace: "#asesorias" },
   { texto: "🐾 Más de 200 adopciones y apoyo a rescate de peluditos", enlace: "#ecatepets" },
   { texto: "💰 Gestión y fondeo de más de un millón de pesos en apoyos para personas y grupos vulnerables", enlace: "#donaciones" },
@@ -836,6 +839,9 @@ export default function App() {
   // null = cerrada; si tiene un id (ej. "libros", "ecatepets", "ventas-con-causa",
   // "donaciones") se abre con la información de ese proyecto.
   const [modalProyecto, setModalProyecto] = useState(null);
+  // Analítica: cuenta visitas y registra qué proyectos se abren.
+  useEffect(() => { iniciarAnalitica(); }, []);
+  useEffect(() => { if (modalProyecto) registrar("proyecto_abrir", { id: String(modalProyecto) }); }, [modalProyecto]);
   // ¿Ya respondió Baserow (bien o mal)? Mientras no, se muestran esqueletos.
   const [baserowListo, setBaserowListo] = useState(() => typeof window !== "undefined" && !!window.__dcuatesBaserow);
   useEffect(() => {
@@ -1514,9 +1520,16 @@ export default function App() {
               <h1 className="sr-only">
                 Juntos hacemos una mejor comunidad ⭐ 😊
               </h1>
-              <p className="text-sm sm:text-base text-slate-800 leading-relaxed text-justify font-medium mt-3">
-                <strong>DCUATES</strong> impulsa proyectos, <strong>PERSONAS, ORGANIZACIONES Y EMPRENDIMIENTOS</strong> que <strong>BENEFICIAN a las FAMILIAS</strong>: <strong>PUBLICIDAD GRATUITA</strong> para tu negocio, préstamo de <strong>LIBROS</strong> y materiales <strong>EDUCATIVOS</strong>, apoyo a <strong>MASCOTAS Y GRUPOS VULNERABLES</strong>, y <strong>ALIANZAS GANAR-GANAR</strong> que generan apoyos y beneficios mutuos y comunitarios. Suma con tu valiosa colaboración o con tu invaluable <strong>APOYO VOLUNTARIO</strong> para lograr nuestros objetivos de forma más efectiva, y forjar <strong>LA CADENA DE VALOR Y DE VALORES</strong> que nos liberará de nuestras limitaciones para ser mejores, Y ASÍ MEJORAR NUESTRO ENTORNO Y NUESTRO MUNDO !!!
+              <p className="text-sm sm:text-base text-slate-900 leading-relaxed text-justify font-bold mt-3">
+                <strong className="font-black">DCUATES</strong> impulsa proyectos, <strong className="font-black">PERSONAS, ORGANIZACIONES Y EMPRENDIMIENTOS</strong> que <strong className="font-black">BENEFICIAN a las FAMILIAS</strong>: <strong className="font-black">PUBLICIDAD GRATUITA</strong> para tu negocio, préstamo de <strong className="font-black">LIBROS</strong> y materiales <strong className="font-black">EDUCATIVOS</strong>, apoyo a <strong className="font-black">MASCOTAS Y GRUPOS VULNERABLES</strong>, y <strong className="font-black">ALIANZAS GANAR-GANAR</strong> que generan apoyos y beneficios mutuos y comunitarios. Suma con tu valiosa colaboración o con tu invaluable <strong className="font-black">APOYO VOLUNTARIO</strong> para lograr nuestros objetivos de forma más efectiva, y forjar <strong className="font-black">LA CADENA DE VALOR Y DE VALORES</strong> que nos liberará de nuestras limitaciones para ser mejores, Y ASÍ MEJORAR NUESTRO ENTORNO Y NUESTRO MUNDO !!!
               </p>
+              <img
+                src="/images/bibliobici-movil.png"
+                alt="Bibliobici móvil DCUATES: la lectura que llega hasta tu colonia"
+                loading="lazy"
+                className="mt-4 w-full max-h-[560px] rounded-2xl object-cover shadow-lg border-4 border-white"
+                onError={(e) => { e.currentTarget.style.display = "none"; }}
+              />
             </div>
 
             {/* QUIÉNES SOMOS — justo debajo de JUNTOS, resumido con "Mostrar más" */}
@@ -2413,15 +2426,16 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSug
 function BotonNecesidades({ onAbrirProyecto, onAccionEspecial, onAbrirFAQ }) {
   const [abierto, setAbierto] = useState(false);
   const [grupoAbierto, setGrupoAbierto] = useState(null);
-  // Texto libre para la opción "Otro(s)" — al final de la lista de
-  // necesidades, para lo que no encaje en ninguna categoría.
+  // Texto libre para la opción "Otro(s)" — al final de la ventana, para lo
+  // que no encaje en ninguna categoría.
   const [textoOtro, setTextoOtro] = useState("");
 
-  const enviarOtro = () => {
-    if (!textoOtro.trim()) return;
-    window.open(enlaceWhatsApp(`¡Hola DCUATES! ${textoOtro.trim()}`), "_blank", "noopener,noreferrer");
-    setTextoOtro("");
-    cerrarTodo();
+  // Cómo se ve cada categoría (emoji y colores alternados terracota / verde).
+  const ESTILO_GRUPO = {
+    mascotas: { emoji: "🐾", fondo: "#d9856a" },
+    negocios: { emoji: "🤝", fondo: "#7fb08f" },
+    "apoyos-mutuos": { emoji: "🎁", fondo: "#7fb08f" },
+    "conocer-mas": { emoji: "⭐", fondo: "#d9856a" }
   };
 
   const cerrarTodo = () => {
@@ -2429,12 +2443,28 @@ function BotonNecesidades({ onAbrirProyecto, onAccionEspecial, onAbrirFAQ }) {
     setGrupoAbierto(null);
   };
 
+  const enviarOtro = () => {
+    if (!textoOtro.trim()) return;
+    registrar("necesidad_otro");
+    window.open(enlaceWhatsApp(`¡Hola DCUATES! ${textoOtro.trim()}`), "_blank", "noopener,noreferrer");
+    setTextoOtro("");
+    cerrarTodo();
+  };
+
   const alTocarPregunta = (p) => {
+    registrar("necesidad", { tema: String(p.texto).slice(0, 50) });
     cerrarTodo();
     if (p.modal) onAbrirProyecto && onAbrirProyecto(p.modal);
     else if (p.action) onAccionEspecial && onAccionEspecial(p.action);
     else if (p.enlace) window.open(p.enlace, "_blank", "noopener,noreferrer");
   };
+
+  const irA = (id) => {
+    cerrarTodo();
+    setTimeout(() => irASeccion(id), 150);
+  };
+
+  const grupo = NECESIDADES_GRUPOS.find((g) => g.id === grupoAbierto);
 
   return (
     <>
@@ -2445,7 +2475,7 @@ function BotonNecesidades({ onAbrirProyecto, onAccionEspecial, onAbrirFAQ }) {
         <button
           type="button"
           onClick={() => setAbierto((v) => !v)}
-          className="relative flex h-14 w-14 items-center justify-center rounded-full bg-yellow-400 text-[#0f2d1e] shadow-[0_10px_20px_rgba(0,0,0,0.35),inset_0_-3px_6px_rgba(0,0,0,0.25),inset_0_3px_4px_rgba(255,255,255,0.4)] transition-all hover:scale-110 active:scale-95 border-2 border-white/40 shrink-0"
+          className="relative flex h-14 w-14 items-center justify-center rounded-full bg-yellow-400 text-[#0f2d1e] shadow-[0_10px_20px_rgba(0,0,0,0.35),inset_0_-3px_6px_rgba(0,0,0,0.25),inset_0_3px_4px_rgba(255,255,255,0.5)] transition-transform active:scale-95"
           title="¿Qué necesitas hoy?"
           aria-label="¿Qué necesitas hoy?"
         >
@@ -2456,54 +2486,100 @@ function BotonNecesidades({ onAbrirProyecto, onAccionEspecial, onAbrirFAQ }) {
 
       {abierto && (
         <div
-          className="fixed inset-0 z-[55] flex items-end justify-end bg-black/50 p-4 pb-36 sm:pb-40"
+          className="fixed inset-0 z-[55] flex items-end sm:items-center justify-center bg-black/55 p-3"
           onClick={cerrarTodo}
         >
           <div
-            className="bg-white text-slate-900 rounded-2xl shadow-2xl max-w-sm w-full max-h-[calc(100dvh-12rem)] overflow-y-auto"
+            className="bg-white text-slate-900 rounded-3xl shadow-2xl w-full max-w-md max-h-[calc(100dvh-1.5rem)] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-label="¿Qué necesitas hoy?"
           >
-            <div className="p-4 border-b border-emerald-100">
-              <p className="font-black uppercase text-[#0f2d1e] text-sm">¿Qué necesitas hoy?</p>
+            <div className="p-5 pb-3">
+              <p className="font-black uppercase text-[#0f2d1e] text-xl sm:text-2xl leading-tight">
+                ¿Qué necesitas hoy? <span aria-hidden="true">😊</span>
+              </p>
             </div>
-            {NECESIDADES_GRUPOS.map((grupo) => (
-              <div key={grupo.id} className="border-b border-emerald-50 last:border-0">
+
+            {!grupo ? (
+              <div className="px-5 pb-2 space-y-3">
+                {/* Las 4 categorías, como tarjetas grandes */}
+                <div className="grid grid-cols-2 gap-3">
+                  {NECESIDADES_GRUPOS.map((g) => {
+                    const est = ESTILO_GRUPO[g.id] || { emoji: "✨", fondo: "#7fb08f" };
+                    return (
+                      <button
+                        key={g.id}
+                        type="button"
+                        onClick={() => setGrupoAbierto(g.id)}
+                        style={{ backgroundColor: est.fondo }}
+                        className="flex flex-col items-center justify-center gap-2 rounded-2xl px-2 py-4 min-h-[118px] text-center text-white shadow-md border-b-4 border-black/20 active:translate-y-0.5 active:border-b-2 transition-all"
+                      >
+                        <span className="text-4xl leading-none drop-shadow" aria-hidden="true">{est.emoji}</span>
+                        <span className="font-black uppercase text-[13px] sm:text-sm leading-tight [text-shadow:0_1px_2px_rgba(0,0,0,0.35)]">{g.titulo}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
                 <button
                   type="button"
-                  onClick={() => setGrupoAbierto((g) => (g === grupo.id ? null : grupo.id))}
-                  style={grupoAbierto === grupo.id ? { backgroundColor: grupo.colorFuerte, color: grupo.colorTexto } : undefined}
-                  className="w-full flex items-center justify-between px-4 py-3 text-left font-black uppercase text-xs text-emerald-900 hover:bg-emerald-50 transition-colors"
+                  onClick={() => irA("extraviados-registro")}
+                  className="w-full flex items-center justify-center gap-3 rounded-2xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black uppercase text-[13px] sm:text-sm leading-tight px-4 py-4 shadow-md text-center transition-colors"
                 >
-                  {grupo.titulo}
-                  <span className={`text-lg font-black leading-none transition-transform ${grupoAbierto === grupo.id ? "rotate-45" : ""}`}>+</span>
+                  <span className="text-2xl" aria-hidden="true">🐾</span>
+                  Reportar caso: mascotas, personas, cosas
                 </button>
-                {grupoAbierto === grupo.id && (
-                  <div className="pb-1">
-                    {grupo.preguntas.map((p, i) => (
-                      <button
-                        key={i}
-                        type="button"
-                        onClick={() => alTocarPregunta(p)}
-                        style={{ backgroundColor: i % 2 === 0 ? grupo.colorClaro : "#ffffff", color: grupo.colorTexto }}
-                        className="w-full text-left px-5 py-3 text-sm font-bold hover:brightness-95 transition-all leading-snug"
-                      >
-                        {p.texto}
-                      </button>
-                    ))}
-                  </div>
-                )}
+                <button
+                  type="button"
+                  onClick={() => irA("mapa-negocios")}
+                  className="w-full flex items-center justify-center gap-3 rounded-2xl bg-[#4f9d6a] hover:bg-[#3f8657] text-white font-black uppercase text-[13px] sm:text-sm leading-tight px-4 py-4 shadow-md text-center transition-colors"
+                >
+                  <span className="text-2xl" aria-hidden="true">🗺️</span>
+                  Ver mapa de negocios locales
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { cerrarTodo(); onAbrirFAQ && onAbrirFAQ(); }}
+                  className="w-full flex items-center justify-center gap-2 rounded-2xl bg-emerald-50 hover:bg-emerald-100 text-[#0f2d1e] font-black uppercase text-xs px-4 py-3 border-2 border-emerald-200 transition-colors"
+                >
+                  <span aria-hidden="true">❓</span> Preguntas frecuentes
+                </button>
               </div>
-            ))}
-            <button
-              type="button"
-              onClick={() => { cerrarTodo(); onAbrirFAQ && onAbrirFAQ(); }}
-              className="w-full flex items-center justify-between px-4 py-3 text-left font-black uppercase text-xs text-emerald-900 hover:bg-emerald-50 transition-colors border-b border-emerald-50"
-            >
-              ❓ Preguntas Frecuentes
-              <span aria-hidden="true">›</span>
-            </button>
+            ) : (
+              <div className="px-5 pb-2">
+                {/* Preguntas de la categoría elegida */}
+                <button
+                  type="button"
+                  onClick={() => setGrupoAbierto(null)}
+                  className="mb-3 inline-flex items-center gap-1 rounded-full bg-slate-100 hover:bg-slate-200 px-3 py-1.5 text-xs font-black uppercase text-[#0f2d1e] transition-colors"
+                >
+                  ‹ Volver
+                </button>
+                <p
+                  className="mb-2 rounded-xl px-3 py-2 font-black uppercase text-sm"
+                  style={{ backgroundColor: grupo.colorFuerte, color: grupo.colorTexto }}
+                >
+                  {(ESTILO_GRUPO[grupo.id] || {}).emoji} {grupo.titulo}
+                </p>
+                <div className="overflow-hidden rounded-xl border border-slate-200">
+                  {grupo.preguntas.map((p, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => alTocarPregunta(p)}
+                      style={{ backgroundColor: i % 2 === 0 ? grupo.colorClaro : "#ffffff", color: grupo.colorTexto }}
+                      className="w-full text-left px-4 py-3 text-sm font-bold hover:brightness-95 transition-all leading-snug"
+                    >
+                      {p.texto}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
-            <div className="p-4 space-y-2">
+            <div className="p-5 pt-3 space-y-2">
               <p className="font-black uppercase text-[#0f2d1e] text-xs">Otro(s)</p>
               <textarea
                 value={textoOtro}
@@ -2511,17 +2587,19 @@ function BotonNecesidades({ onAbrirProyecto, onAccionEspecial, onAbrirFAQ }) {
                 onClick={(e) => e.stopPropagation()}
                 placeholder="Cuéntanos qué necesitas y te contactamos por WhatsApp..."
                 rows={2}
-                className="w-full rounded-lg border-2 border-emerald-200 px-3 py-2 text-sm font-medium focus:outline-none focus:border-[#0f2d1e]"
+                className="w-full rounded-xl border-2 border-emerald-200 px-3 py-2 text-sm font-medium focus:outline-none focus:border-[#0f2d1e]"
               />
               <button
                 type="button"
                 onClick={enviarOtro}
-                className="w-full rounded-lg bg-yellow-400 text-[#0f2d1e] font-black uppercase text-xs py-2.5 hover:brightness-95 transition-all"
+                className="w-full flex items-center justify-center gap-2 rounded-full bg-yellow-400 text-[#0f2d1e] font-black uppercase text-sm py-3 shadow-md hover:brightness-95 transition-all"
               >
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#25d366] text-white text-sm" aria-hidden="true">💬</span>
                 Enviar por WhatsApp
               </button>
             </div>
-                      <div className="sticky bottom-0 flex justify-end border-t border-emerald-100 bg-white/95 p-3">
+
+            <div className="sticky bottom-0 flex justify-end border-t border-emerald-100 bg-white/95 p-3">
               <BotonCerrar onClick={cerrarTodo} />
             </div>
           </div>
@@ -2666,6 +2744,7 @@ function ModalFormularioWhatsApp({ titulo, descripcion, opciones, placeholder, o
       setError("Escribe un mensaje antes de enviar.");
       return;
     }
+    registrar("formulario_enviado", { form: String(titulo).slice(0, 40) });
     window.open(enlaceWhatsApp(`¡Hola DCUATES! ${opcion}: ${mensaje.trim()}`), "_blank", "noopener,noreferrer");
     onCerrar();
   };
@@ -2722,6 +2801,7 @@ function FormularioPublicidad() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    registrar("formulario_enviado", { form: "publicidad" });
     const fecha = new Date().toLocaleString();
 
     // Apps Script (doPost) lee e.parameter.X, así que se envía como

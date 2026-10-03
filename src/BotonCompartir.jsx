@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
+import { registrar } from "./analitica";
 
 // =========================================================================
 // BOTÓN DE COMPARTIR — DCUATES (CLON8)
@@ -65,10 +66,11 @@ export default function BotonCompartir({ hash = "", titulo = "DCUATES", texto = 
       try { document.execCommand("copy"); } catch { /* sin permiso */ }
       document.body.removeChild(t);
     }
+    registrar("compartir", { destino: "copiar", seccion: hash });
     setCopiado(true);
     setTimeout(() => setCopiado(false), 2200);
   };
-  const nativo = () => navigator.share({ title: titulo, text: mensaje, url }).catch(() => {});
+  const nativo = () => registrar("compartir", { destino: "nativo", seccion: hash }) || navigator.share({ title: titulo, text: mensaje, url }).catch(() => {});
 
   const clase = `cb-btn cb-${variante} ${className}`.trim();
   const contenidoBoton = variante === "pastilla" || variante === "bloque"
@@ -94,7 +96,7 @@ export default function BotonCompartir({ hash = "", titulo = "DCUATES", texto = 
             <p className="cb-s">{titulo}</p>
             <div className="cb-grid">
               {opciones.map((o) => (
-                <a key={o.id} className="cb-op" href={o.href} target="_blank" rel="noopener noreferrer" onClick={() => setAbierto(false)}>
+                <a key={o.id} className="cb-op" href={o.href} target="_blank" rel="noopener noreferrer" onClick={() => { registrar("compartir", { destino: o.id, seccion: hash }); setAbierto(false); }}>
                   <span aria-hidden="true">{o.emoji}</span> {o.nombre}
                 </a>
               ))}

@@ -51,7 +51,8 @@ export default function CarruselPortada({ items = [], tab, slogan, fallback, car
   const animRef = useRef(null);
   const reanudarRef = useRef(null);
   const ignorarScrollHasta = useRef(0);
-  const [pausado, setPausado] = useState(false);
+  const [pausado, setPausado] = useState(false);          // pausa temporal (al tocar)
+  const [pausaManual, setPausaManual] = useState(false);   // pausa elegida con el botón
   const [desborda, setDesborda] = useState(false);
   const [respaldoRoto, setRespaldoRoto] = useState(false);
   useEffect(() => { setRespaldoRoto(false); }, [fallback]);
@@ -105,7 +106,7 @@ export default function CarruselPortada({ items = [], tab, slogan, fallback, car
 
   // Avance automático, un cuadro cada 3 s.
   useEffect(() => {
-    if (!desborda || pausado) return;
+    if (!desborda || pausado || pausaManual) return;
     const id = setInterval(() => {
       if (document.hidden) return;
       const pista = pistaRef.current;
@@ -128,7 +129,7 @@ export default function CarruselPortada({ items = [], tab, slogan, fallback, car
       });
     }, INTERVALO_MS);
     return () => clearInterval(id);
-  }, [desborda, pausado, n, reducirMovimiento]);
+  }, [desborda, pausado, pausaManual, n, reducirMovimiento]);
 
   // Si el usuario desliza a mano, se sincroniza el índice y se pausa un rato.
   const alDeslizar = () => {
@@ -181,6 +182,13 @@ export default function CarruselPortada({ items = [], tab, slogan, fallback, car
           <Cuadro key={`${it.id || i}-${i}`} item={it} tab={tab} copia={i >= n} solo={n === 1} />
         ))}
       </div>
+      {desborda && (
+        <div className="cp-pie">
+          <button type="button" className="cp-pausa" onClick={() => setPausaManual((v) => !v)} aria-pressed={pausaManual}>
+            {pausaManual ? "▶ Reanudar" : "❚❚ Pausar"}
+          </button>
+        </div>
+      )}
     </section>
   );
 }
@@ -244,6 +252,9 @@ button.cp-cuadro,a.cp-cuadro{cursor:pointer}
 .cp-brilla{background:linear-gradient(90deg,#e6eaee 25%,#f7f9fa 50%,#e6eaee 75%);background-size:200% 100%;animation:cp-brilla 1.3s linear infinite}
 @keyframes cp-brilla{from{background-position:200% 0}to{background-position:-200% 0}}
 @media (prefers-reduced-motion:reduce){.cp-brilla{animation:none}}
+.cp-pie{display:flex;justify-content:flex-end;margin-top:-2px}
+.cp-pausa{border:0;border-radius:99px;background:rgba(31,42,55,.09);color:#1f2a37;font-family:inherit;font-weight:800;font-size:12px;padding:6px 14px;min-height:32px;cursor:pointer}
+.cp-pausa:hover{background:rgba(31,42,55,.16)}
 .cp-root button:focus-visible,.cp-root a:focus-visible{outline:3px solid #1f2a37;outline-offset:2px}
 @media (min-width:768px){
   .cp-cuadro{flex-basis:calc((100% - 20px) / 3)}
