@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
 import CarruselPortada from "./CarruselPortada";
+import TiraAuto from "./TiraAuto";
+import BotonCompartir from "./BotonCompartir";
 
 // =========================================================================
-// BLOQUE CENTRAL INTERACTIVO — DCUATES (CLON8) · FASE 4
+// BLOQUE CENTRAL INTERACTIVO — DCUATES (CLON8) · FASE 5
 // Estructura única de 7 pestañas. Cada pestaña recibe desde App.jsx, en su
 // prop (nosotros, beneficios, causas, valores, negocios, regalos, gratitud),
 // el mismo JSX de siempre con sus estados. Orden dentro de cada pestaña:
@@ -81,14 +83,6 @@ const ID_A_TAB = {
   "retos-regalos": "regalos"
 };
 
-// Fichas de EJEMPLO — reemplázalas con tus negocios reales (o usa la prop
-// "negocios"). tel = número con lada, sin "+" (ej. 525512345678).
-const NEGOCIOS_EJEMPLO = [
-  { nombre: "Taquería El Sol", giro: "Comida", emoji: "🌮", color: "#F07A1A", zona: "Jardines de Morelos", promo: "20% en tu primera visita" },
-  { nombre: "Estética Lupita", giro: "Belleza", emoji: "💇", color: "#E5484D", zona: "Jardines de Morelos", promo: "Corte + peinado con descuento" },
-  { nombre: "Panadería Café Sol", giro: "Panadería", emoji: "🥐", color: "#C58A1B", zona: "Jardines de Morelos", promo: "Aliado de la Bibliobici" },
-  { nombre: "Papelería del Barrio", giro: "Papelería", emoji: "📚", color: "#3B82C4", zona: "Jardines de Morelos", promo: "10% para vecinos DCUATES" }
-];
 
 // Portada de cada pestaña. Primero se usa la que subas a Baserow (columnas
 // "PORTADA NOSOTROS", "PORTADA BENEFICIOS", etc. en la tabla ENLACES); si no
@@ -135,6 +129,7 @@ function MapaLocal({ url, color }) {
   return (
     <div className="bc-map">
       <iframe src={url} title="Mapa de negocios locales DCUATES" loading="lazy" referrerPolicy="strict-origin-when-cross-origin" />
+      <BotonCompartir variante="flotante" className="bc-map-share" hash="mapa-negocios" titulo="Mapa de negocios locales" texto="Descubre los comercios aliados de Jardines de Morelos" />
       {tactil && !activo && (
         <div className="bc-map-lock" onTouchStart={(e) => { if (e.touches.length >= 2) setActivo(true); }}>
           <button type="button" className="bc-pill" onClick={() => setActivo(true)}>✌️ Dos dedos para mover el mapa</button>
@@ -252,20 +247,12 @@ function BandaImpacto({ logros, cargando, tab }) {
   );
 }
 
-function IconoCompartir() {
-  return (
-    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
-      <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z" />
-    </svg>
-  );
-}
-
 export default function BloqueCentral({
   categorias = [],          // CATEGORIAS_PROYECTOS
   proyectos = [],           // BOTONES_PORTADA
   mapaUrl,                  // MAPA_NEGOCIOS_EMBED_URL
   whatsappNumero,           // WHATSAPP_NUMERO
-  negocios = NEGOCIOS_EJEMPLO,
+  negocios = [],            // [{ nombre, giro, zona, promo, tel, emoji, logo, color }] (de Baserow, columnas NEGOCIO …)
   portadas = {},            // respaldo local por pestaña
   portadasItems = {},       // { idPestaña: [cuadros] } imágenes, videos y PDFs
   nosotros = null, beneficios = null, causas = null, valores = null,
@@ -273,7 +260,6 @@ export default function BloqueCentral({
   resumenes = {},           // { idProyecto: "una línea" } para las tarjetas
   logros = [],              // [{ texto, enlace }] para la banda de impacto
   cargando = false,         // true mientras Baserow aún no responde (muestra esqueletos)
-  onCompartir = () => {},   // compartir un proyecto por WhatsApp
   onAbrirCategoria = () => {},
   onAbrirProyecto = () => {}
 }) {
@@ -494,22 +480,25 @@ export default function BloqueCentral({
             <div className="bc-snap bc-fichas" aria-label="Comercios aliados">
               {negocios.map((n) => (
                 <article className="bc-ficha" key={n.nombre}>
-                  <span className="bc-ficha-ico" style={{ background: n.color }} aria-hidden="true">{n.emoji}</span>
+                  <BotonCompartir variante="circulo" className="bc-ficha-share" hash="mapa-negocios" titulo={n.nombre} texto={n.promo || `${n.giro} en ${n.zona}`} />
+                  {n.logo
+                    ? <img className="bc-ficha-logo" src={n.logo} alt="" loading="lazy" />
+                    : <span className="bc-ficha-ico" style={{ background: n.color }} aria-hidden="true">{n.emoji}</span>}
                   <h3>{n.nombre}</h3>
                   <p>{n.giro} · {n.zona}</p>
                   {n.promo && <p className="bc-promo">{n.promo}</p>}
                   <div className="bc-ficha-btns">
                     <a href={n.tel ? `https://wa.me/${n.tel}` : wa(`¡Hola! Vi ${n.nombre} en DCUATES.`)} target="_blank" rel="noopener noreferrer" style={{ background: "#25d366" }}>WhatsApp</a>
-                    <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${n.nombre} ${n.zona} Ecatepec`)}`} target="_blank" rel="noopener noreferrer" style={{ background: tab.color }}>Cómo llegar</a>
+                    <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${n.nombre} ${n.zona} Ecatepec`)}`} target="_blank" rel="noopener noreferrer" style={{ background: tab.boton || tab.color }}>Cómo llegar</a>
                   </div>
                 </article>
               ))}
               <article className="bc-ficha bc-ficha-cta" style={{ borderColor: tab.color }}>
-                <span className="bc-ficha-ico" style={{ background: tab.color }} aria-hidden="true">💼</span>
+                <span className="bc-ficha-ico" style={{ background: tab.boton || tab.color }} aria-hidden="true">💼</span>
                 <h3>Registra tu negocio gratis</h3>
                 <p>Aparece en el mapa y en esta lista.</p>
                 <div className="bc-ficha-btns">
-                  <button type="button" onClick={() => onAbrirProyecto("publicidad-tarjeta")} style={{ background: "#F07A1A" }}>Empezar ›</button>
+                  <button type="button" onClick={() => document.getElementById("publicidad")?.scrollIntoView({ behavior: "smooth", block: "start" })} style={{ background: "#D1530A" }}>Empezar ›</button>
                 </div>
               </article>
             </div>
@@ -519,8 +508,8 @@ export default function BloqueCentral({
             <section className="bc-proyectos" style={{ "--c": tab.boton || tab.color }} aria-label="Proyectos de esta sección">
               <h3 className="bc-inv-t" style={{ color: tab.boton || tab.color }}>{tab.invitacion?.titulo || "Conoce los proyectos"}</h3>
               {tab.invitacion?.texto && <p className="bc-inv-p">{tab.invitacion.texto}</p>}
-              <p className="bc-hint">👇 Toca un proyecto para entrar<span className="bc-desliza"> · desliza para ver más ›</span></p>
-              <div className="bc-snap">
+              <p className="bc-hint">👇 Toca un proyecto para entrar</p>
+              <TiraAuto intervalo={2000} etiqueta="Proyectos de esta sección" fondo={tab.pastel}>
                 {chips.map((p) => {
                   const nombre = bonito(p.t);
                   return (
@@ -531,13 +520,11 @@ export default function BloqueCentral({
                         {resumenes[p.modal] && <span className="bc-chip-d">{resumenes[p.modal]}</span>}
                         <span className="bc-chip-go">Entrar ›</span>
                       </button>
-                      <button type="button" className="bc-share" onClick={() => onCompartir(p.modal)} aria-label={`Compartir ${nombre} por WhatsApp`} title="Compartir por WhatsApp">
-                        <IconoCompartir />
-                      </button>
+                      <BotonCompartir variante="circulo" className="bc-share" hash={`proyecto-${p.modal}`} titulo={nombre} texto={resumenes[p.modal] || ""} />
                     </div>
                   );
                 })}
-              </div>
+              </TiraAuto>
             </section>
           )}
 
@@ -561,6 +548,10 @@ export default function BloqueCentral({
               )}
             </div>
           )}
+
+          <div className="bc-compartir-seccion">
+            <BotonCompartir variante="bloque" etiqueta="Compartir esta sección" hash={tab.id} titulo={tab.label} texto={tab.invitacion?.texto || tab.texto || "Conoce lo que hacemos por la comunidad"} />
+          </div>
 
           <div className="bc-nav">
             <button type="button" disabled={idx === 0} onClick={() => cambiar(idx - 1)}>‹ {idx > 0 ? TABS[idx - 1].label : "Anterior"}</button>
@@ -614,7 +605,7 @@ const CSS = `
 .bc-snap{display:flex;gap:12px;margin:8px calc(var(--pad) * -1) 0;padding:4px var(--pad) 12px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:var(--pad);-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;scrollbar-width:none}
 .bc-snap::-webkit-scrollbar{display:none}
 .bc-sub + .bc-snap{margin-top:0}
-.bc-ficha{flex:0 0 min(78%,250px);scroll-snap-align:start;background:#fff;border-radius:16px;padding:14px;box-shadow:0 4px 12px rgba(31,42,55,.08);border:2px solid transparent;display:flex;flex-direction:column;gap:4px}
+.bc-ficha{position:relative;flex:0 0 min(78%,250px);scroll-snap-align:start;background:#fff;border-radius:16px;padding:14px;box-shadow:0 4px 12px rgba(31,42,55,.08);border:2px solid transparent;display:flex;flex-direction:column;gap:4px}
 .bc-ficha h3{margin:6px 0 0;font-size:16px;font-weight:900;line-height:1.2}
 .bc-ficha p{margin:0;font-size:13px;font-weight:700;color:#5b6675}
 .bc-ficha .bc-promo{color:var(--ink);background:#fff7d6;border-radius:8px;padding:4px 8px;margin-top:4px}
@@ -651,7 +642,7 @@ const CSS = `
 .bc-inv-t{margin:0 2px 4px;font-size:21px;font-weight:900;line-height:1.15}
 .bc-inv-p{margin:0 2px 6px;font-size:15px;font-weight:700;line-height:1.45;color:#3b4654}
 .bc-hint{margin:0 2px 2px;font-size:12px;font-weight:800;color:#5b6675}
-.bc-card{position:relative;flex:0 0 158px;scroll-snap-align:start;display:flex}
+.bc-card{position:relative;width:158px;display:flex}
 .bc-chip{width:100%;display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 10px 12px;background:#fff;border:2px solid rgba(31,42,55,.08);border-bottom:6px solid var(--c);border-radius:18px;box-shadow:0 6px 14px rgba(31,42,55,.10);cursor:pointer;color:var(--ink);text-align:center;font-family:inherit;transition:transform .12s ease,border-bottom-width .12s ease,box-shadow .12s ease}
 .bc-chip:hover{transform:translateY(-2px);box-shadow:0 10px 18px rgba(31,42,55,.14)}
 .bc-chip:active{transform:translateY(4px);border-bottom-width:2px;box-shadow:0 2px 6px rgba(31,42,55,.12)}
@@ -660,10 +651,12 @@ const CSS = `
 .bc-chip-n{font-weight:900;font-size:13px;line-height:1.15}
 .bc-chip-d{font-size:11.5px;font-weight:700;color:#5b6675;line-height:1.25}
 .bc-chip-go{margin-top:auto;display:inline-flex;align-items:center;justify-content:center;min-height:34px;padding:6px 18px;border-radius:99px;background:var(--c);color:#fff;font-weight:900;font-size:13px;letter-spacing:.01em}
-.bc-share{position:absolute;top:8px;right:8px;width:34px;height:34px;border:0;border-radius:50%;background:#25d366;color:#fff;display:grid;place-items:center;box-shadow:0 3px 8px rgba(0,0,0,.22);cursor:pointer;transition:transform .12s}
-.bc-share:hover{transform:scale(1.08)}
-@media (max-width:767px){.bc-snap .bc-card:first-child{animation:bc-empuja 1.1s ease .9s 2}}
-@keyframes bc-empuja{0%,100%{transform:translateX(0)}40%{transform:translateX(-14px)}}
+
+.bc-share{position:absolute;top:8px;right:8px;z-index:2}
+.bc-ficha-share{position:absolute;top:10px;right:10px}
+.bc-ficha-logo{width:44px;height:44px;border-radius:14px;object-fit:cover;background:#f3f5f7}
+.bc-map-share{position:absolute;top:10px;right:10px;z-index:6}
+.bc-compartir-seccion{margin-top:10px}
 
 /* ---- TABLETA (>= 768 px): las 7 pestañas caben sin deslizar ---- */
 @media (min-width:768px){
@@ -681,9 +674,9 @@ const CSS = `
   .bc-chip-emoji{width:84px;height:84px;font-size:50px}
   .bc-snap{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));overflow:visible;margin:8px 0 0;padding:4px 0 12px}
   .bc-snap.bc-fichas{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
-  .bc-card,.bc-ficha{flex:none}
-  .bc-desliza{display:none}
-  .bc-banda-g{grid-template-columns:repeat(4,1fr)}
+  .bc-card{width:190px}
+  .bc-ficha{flex:none}
+    .bc-banda-g{grid-template-columns:repeat(4,1fr)}
   .bc-inv-t{font-size:25px}
   .bc-inv-p{font-size:17px}
   .bc-actions{grid-template-columns:1fr 1fr}
@@ -695,5 +688,5 @@ const CSS = `
     .bc-map{height:460px}
   .bc-text{font-size:19px}
 }
-@media (prefers-reduced-motion:reduce){.bc-panel{animation:none}.bc-fill,.bc-tab,.bc-chip,#encabezado-fijo,.bc-fija{transition:none}.bc-esq,.bc-snap .bc-card:first-child{animation:none}}
+@media (prefers-reduced-motion:reduce){.bc-panel{animation:none}.bc-fill,.bc-tab,.bc-chip,#encabezado-fijo,.bc-fija{transition:none}.bc-esq{animation:none}}
 `;

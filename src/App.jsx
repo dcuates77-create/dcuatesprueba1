@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
 import BloqueCentral from "./BloqueCentral";
+import BotonCompartir from "./BotonCompartir";
 
 // =========================================================================
 // 1. CONFIGURACIÓN CENTRALIZADA DE VARIABLES, REDES Y HOJA DE CÁLCULO y BORRADO DE TODOS LOS ANTERIORES JSX CAMBIOS VIDEOS
@@ -26,7 +27,7 @@ const CLAVE_CIRCULO_CONFIANZA = "confianza2026";
 // iframe); no hace falta tocar nada más en el código.
 // Sello de versión: se ve en pequeño al final de los accesos rápidos y en la
 // consola del navegador. Sirve para comprobar que el celular ya cargó lo último.
-const VERSION_BUILD = "CLON8 · f7";
+const VERSION_BUILD = "CLON8 · f8";
 if (typeof console !== "undefined") console.info("[DCUATES] versión", VERSION_BUILD);
 
 const MAPA_NEGOCIOS_EMBED_URL = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15034.541076557625!2d-99.00223799999999!3d19.600120500000003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1ee234c038987%3A0x4b578513910d8103!2sJardines%20de%20Morelos%2C%20Ecatepec%20de%20Morelos%2C%20M%C3%A9x.!5e0!3m2!1ses!2smx!4v1790129394750!5m2!1ses!2smx";
@@ -467,18 +468,11 @@ const RESUMEN_PROYECTO = {
   noticias: "Lo que pasa en tu barrio"
 };
 
-// Comparte un proyecto por WhatsApp con una descripción corta y un enlace
-// que, al abrirse, lleva directo a ese proyecto (#proyecto-<id>).
-function compartirProyecto(id) {
-  if (typeof window === "undefined") return;
+// Nombre "bonito" de un proyecto (para los mensajes al compartir).
+function tituloProyecto(id) {
   const base = BOTONES_PORTADA.find((b) => b.modal === id);
-  const titulo = base
-    ? base.t.toLowerCase().split(" ").map((w, i) => (i && /^(de|del|y|con|a|el|la|los|las|en)$/.test(w) ? w : w.charAt(0).toUpperCase() + w.slice(1))).join(" ")
-    : "Un proyecto de la comunidad";
-  const resumen = RESUMEN_PROYECTO[id] ? ` — ${RESUMEN_PROYECTO[id]}` : "";
-  const url = `${window.location.origin}${window.location.pathname}#proyecto-${id}`;
-  const texto = `✨ ${titulo}${resumen}. Conócelo y súmate en DCUATES: ${url}`;
-  window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, "_blank", "noopener,noreferrer");
+  if (!base) return "Un proyecto de la comunidad";
+  return base.t.toLowerCase().split(" ").map((w, i) => (i && /^(de|del|y|con|a|el|la|los|las|en)$/.test(w) ? w : w.charAt(0).toUpperCase() + w.slice(1))).join(" ");
 }
 
 // Logos para las ventanas que no salen de BOTONES_PORTADA (los 3 botones
@@ -850,12 +844,18 @@ export default function App() {
     const tope = setTimeout(listo, 8000);
     return () => { window.removeEventListener("dcuates:baserow-estado", listo); clearTimeout(tope); };
   }, []);
-  // Enlace directo a un proyecto: dcuates.com/#proyecto-libros abre su ventana.
+  // Enlaces con # que abren la ventana de un proyecto:
+  //   dcuates.com/#proyecto-libros  (el que se comparte)  y  dcuates.com/#libros
+  // (el de la barra de logros). Los ids de secciones de la página (#donaciones,
+  // #solicitudes…) no abren ventana: los maneja BloqueCentral.
   useEffect(() => {
+    const IDS_DE_SECCION = new Set(["donaciones", "chuy-video", "extraviados-registro", "quienes-somos", "solicitudes", "recursos", "mapa-negocios", "ventas-con-causa", "publicidad", "retos-regalos", "inicio", "historias-reflexiones"]);
     const abrir = () => {
       const h = decodeURIComponent(window.location.hash || "");
-      if (!h.startsWith("#proyecto-")) return;
-      const id = h.slice("#proyecto-".length);
+      if (h.length < 2) return;
+      let id = h.slice(1);
+      if (id.startsWith("proyecto-")) id = id.slice("proyecto-".length);
+      else if (IDS_DE_SECCION.has(id)) return;
       if (BOTONES_PORTADA.some((b) => b.modal === id) || TODOS_LOS_PROYECTOS.some((x) => x.id === id)) setModalProyecto(id);
     };
     abrir();
@@ -1032,6 +1032,30 @@ export default function App() {
     ? logrosBaserow.map((l) => ({ texto: l.nombre, enlace: l.enlace }))
     : LOGROS_ITEMS;
 
+  // Negocios que aparecen en las fichas debajo del mapa. Se dan de alta en la
+  // tabla ENLACES de Baserow, una fila por negocio, con estas columnas (solo
+  // "NEGOCIO NOMBRE" es obligatoria):
+  //   NEGOCIO NOMBRE · NEGOCIO GIRO · NEGOCIO ZONA · NEGOCIO PROMO ·
+  //   NEGOCIO TEL (con lada, sin +) · NEGOCIO EMOJI · NEGOCIO LOGO (Archivo)
+  const PALETA_NEGOCIOS = ["#F07A1A", "#E5484D", "#C58A1B", "#3B82C4", "#2E9E5B", "#7A5AD8"];
+  const textoDe = (f, col) => (f[col] && String(f[col]).trim()) || "";
+  const negociosBaserow = filasEnlaces
+    .filter((f) => f && textoDe(f, "NEGOCIO NOMBRE"))
+    .slice(0, 20)
+    .map((f, i) => {
+      const logo = f["NEGOCIO LOGO"] ? urlDesdeCeldaBaserow(f["NEGOCIO LOGO"]) : "";
+      return {
+        nombre: textoDe(f, "NEGOCIO NOMBRE"),
+        giro: textoDe(f, "NEGOCIO GIRO") || "Negocio local",
+        zona: textoDe(f, "NEGOCIO ZONA") || "Jardines de Morelos",
+        promo: textoDe(f, "NEGOCIO PROMO"),
+        tel: textoDe(f, "NEGOCIO TEL").replace(/\D/g, ""),
+        emoji: textoDe(f, "NEGOCIO EMOJI") || "🏪",
+        logo: logo ? resolverSrcImagen(logo) : "",
+        color: PALETA_NEGOCIOS[i % PALETA_NEGOCIOS.length]
+      };
+    });
+
   const recomendacionesDcuates = (() => {
     const desdeBaserow = paresBaserow(filasEnlaces, "Nombre Recocasa", "RECASA", 5);
     return desdeBaserow.length > 0 ? desdeBaserow : RECOMENDACIONES_ESTRELLA.dcuates;
@@ -1153,13 +1177,14 @@ export default function App() {
               resumenes={RESUMEN_PROYECTO}
               logros={logrosBanda}
               cargando={!baserowListo}
-              onCompartir={compartirProyecto}
+              negocios={negociosBaserow}
               onAbrirCategoria={(id) => setCategoriaAbierta(id)}
               onAbrirProyecto={(id) => setModalProyecto(id)}
               beneficios={(
                 <div className="flex flex-col gap-4 min-w-0">
                   <BotonesNaranjasSeccion modales={["cupones-promos"]} onAbrir={(id) => setModalProyecto(id)} />
-<div id="solicitudes" className="mt-3 scroll-mt-40 sm:scroll-mt-36 rounded-2xl overflow-hidden border-4 border-[#0f2d1e]/30 shadow-lg bg-white">
+<div id="solicitudes" className="relative mt-3 scroll-mt-40 sm:scroll-mt-36 rounded-2xl overflow-hidden border-4 border-[#0f2d1e]/30 shadow-lg bg-white">
+<BotonCompartir variante="claro" className="absolute top-2 right-2 z-10" hash="solicitudes" titulo="Registra tu solicitud" texto="Cuéntanos qué necesitas y te contactamos por WhatsApp" />
                 <div className="bg-[#e65100] px-3 py-2">
                   <p className="text-white font-black uppercase text-xs sm:text-sm tracking-wide text-center">
                     📝 Registra tu Solicitud
@@ -1241,7 +1266,8 @@ export default function App() {
               valores={(
                 <div className="flex flex-col gap-4 min-w-0">
                   <BotonesNaranjasSeccion modales={["historias-dcuates"]} onAbrir={(id) => setModalProyecto(id)} />
-                  <div id="recursos" className="scroll-mt-48 md:scroll-mt-36 rounded-2xl bg-[#0f2d1e] p-4">
+                  <div id="recursos" className="relative scroll-mt-48 md:scroll-mt-36 rounded-2xl bg-[#0f2d1e] p-4">
+<BotonCompartir variante="claro" className="absolute top-2 right-2 z-10" hash="recursos" titulo="Más recursos e información de valor" texto="Recomendaciones, música, libros, películas y preguntas frecuentes" />
           <p className="text-white font-black uppercase text-sm sm:text-base tracking-wide text-center mb-3">
             🔎 Más recursos e información de valor
           </p>
@@ -1335,7 +1361,8 @@ export default function App() {
               )}
               negociosSeccion={(
                 <div className="flex flex-col gap-6 min-w-0 text-[#0f2d1e]">
-                  <div id="ventas-con-causa" className="scroll-mt-48 md:scroll-mt-36">
+                  <div id="ventas-con-causa" className="relative scroll-mt-48 md:scroll-mt-36">
+<BotonCompartir variante="circulo" className="absolute top-2 right-2 z-10" hash="ventas-con-causa" titulo="Ventas con Causa" texto="Compra y apoya una causa de tu comunidad" />
           <div className="text-center max-w-2xl mx-auto mb-6 space-y-3">
             <span className="inline-block rounded-full bg-emerald-200 px-5 py-2 text-lg sm:text-2xl font-black uppercase tracking-wider text-emerald-800 shadow-sm">
               🛍️ Ventas con Causa
@@ -1429,7 +1456,8 @@ export default function App() {
 
 
                   </div>
-                  <div id="publicidad" className="scroll-mt-48 md:scroll-mt-36 rounded-2xl bg-[#17472d] text-white p-4 sm:p-6">
+                  <div id="publicidad" className="relative scroll-mt-48 md:scroll-mt-36 rounded-2xl bg-[#17472d] text-white p-4 sm:p-6">
+<BotonCompartir variante="claro" className="absolute top-2 right-2 z-10" hash="publicidad" titulo="Publicidad gratuita para tu negocio" texto="Registra tu negocio y aparece en el mapa de DCUATES" />
           <div className="text-center space-y-2 mb-8">
             <span className="inline-block rounded-full bg-emerald-900/60 px-5 py-2 text-lg sm:text-2xl font-black uppercase tracking-wider text-emerald-400">
               📢 Publicidad Comunitaria
@@ -1447,7 +1475,8 @@ export default function App() {
                 </div>
               )}
               regalos={(
-                <div id="retos-regalos" className="scroll-mt-48 md:scroll-mt-36 rounded-2xl bg-[#0f2d1e] p-3 sm:p-4">
+                <div id="retos-regalos" className="relative scroll-mt-48 md:scroll-mt-36 rounded-2xl bg-[#0f2d1e] p-3 sm:p-4">
+<BotonCompartir variante="claro" className="absolute top-2 right-2 z-10" hash="retos-regalos" titulo="Retos, regalos y reconocimientos" texto="Porque todo lo bueno merece ser compartido y reconocido" />
                   <p className="text-white font-black uppercase text-xs sm:text-sm tracking-wide mb-3 px-1 text-center">
                     🔎 Retos, Regalos y Reconocimientos DCUATES
                     <span className="block normal-case font-bold text-emerald-100">Porque todo lo bueno merece ser compartido y reconocido, envíanos tus propuestas.</span>
@@ -1491,7 +1520,8 @@ export default function App() {
             </div>
 
             {/* QUIÉNES SOMOS — justo debajo de JUNTOS, resumido con "Mostrar más" */}
-            <div id="quienes-somos" className="scroll-mt-48 md:scroll-mt-36 rounded-2xl bg-[#17472d] text-white p-4 sm:p-5">
+            <div id="quienes-somos" className="relative scroll-mt-48 md:scroll-mt-36 rounded-2xl bg-[#17472d] text-white p-4 sm:p-5">
+<BotonCompartir variante="claro" className="absolute top-2 right-2 z-10" hash="quienes-somos" titulo="Quiénes somos" texto="Conoce a DCUATES y su comunidad" />
               <span className="flex items-center gap-2 text-xl sm:text-2xl font-black uppercase tracking-wider text-emerald-400 mb-2">
                 <span className="text-3xl sm:text-4xl">✅</span> Quiénes Somos
               </span>
@@ -1564,7 +1594,8 @@ export default function App() {
               )}
               causas={(
               <>
-              <div id="donaciones" className="scroll-mt-48 md:scroll-mt-36 flex flex-col gap-y-6 lg:grid lg:grid-cols-2 lg:gap-x-8 lg:gap-y-6 lg:items-start text-[#0f2d1e]">
+              <div id="donaciones" className="relative scroll-mt-48 md:scroll-mt-36 flex flex-col gap-y-6 lg:grid lg:grid-cols-2 lg:gap-x-8 lg:gap-y-6 lg:items-start text-[#0f2d1e]">
+<BotonCompartir variante="circulo" className="absolute top-2 right-2 z-10" hash="donaciones" titulo="Apoyo Voluntario" texto="Tu tiempo, tu talento o tus recursos cambian vidas" />
                 <div className="lg:order-1 min-w-0">
 {/* Bloque 1: intro + CTA — fila 1 en escritorio (col. izquierda) */}
           <div className="space-y-6">
@@ -1682,7 +1713,8 @@ export default function App() {
               </div>
               <div className="mt-8 text-[#0f2d1e]">
           {/* Pasarela de mascotas, personas y cosas extraviadas */}
-          <div id="extraviados-registro" className="scroll-mt-48 md:scroll-mt-36 mt-8 max-w-5xl mx-auto">
+          <div id="extraviados-registro" className="relative scroll-mt-48 md:scroll-mt-36 mt-8 max-w-5xl mx-auto">
+<BotonCompartir variante="circulo" className="absolute top-2 right-2 z-10" hash="extraviados-registro" titulo="Mascotas, personas y cosas extraviadas" texto="Ayúdanos a difundir y a encontrar" />
             <div className="text-center mb-6 space-y-2">
               <span className="inline-block rounded-full bg-emerald-200 px-5 py-2 text-base sm:text-xl font-black uppercase tracking-wider text-emerald-800 shadow-sm">
                 🔎 Mascotas, Personas y Cosas Extraviadas
@@ -2003,13 +2035,12 @@ export default function App() {
               <ContenidoModalProyecto id={modalProyecto} onCerrar={() => setModalProyecto(null)} />
             </div>
             <div className="pt-3 flex items-center justify-between gap-3 shrink-0">
-              <button
-                type="button"
-                onClick={() => compartirProyecto(modalProyecto)}
-                className="flex items-center gap-2 rounded-full bg-[#25d366] hover:bg-[#1fb657] text-white font-black text-xs sm:text-sm uppercase tracking-wide px-4 h-11 shadow-lg transition-colors"
-              >
-                <span aria-hidden="true">💬</span> Compartir
-              </button>
+              <BotonCompartir
+                variante="pastilla"
+                hash={`proyecto-${modalProyecto}`}
+                titulo={tituloProyecto(modalProyecto)}
+                texto={RESUMEN_PROYECTO[modalProyecto] || ""}
+              />
               <BotonCerrar onClick={() => setModalProyecto(null)} />
             </div>
           </div>
