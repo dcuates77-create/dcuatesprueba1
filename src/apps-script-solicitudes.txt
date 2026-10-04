@@ -1,0 +1,35 @@
+// ============================================================
+// Apps Script — agregar el registro de SOLICITUDES
+// ============================================================
+// 1) Abre tu hoja de cálculo de DCUATES -> Extensiones -> Apps Script.
+// 2) Busca la función  function doPost(e) {
+// 3) Pega el bloque de abajo JUSTO DESPUÉS de esa línea (antes de todo
+//    lo que ya tenías). No borres nada de lo anterior.
+// 4) Guarda (icono de disquete).
+// 5) Implementar -> Administrar implementaciones -> lápiz (editar) ->
+//    Versión: "Nueva versión" -> Implementar.  (La dirección /exec NO cambia.)
+// ============================================================
+
+  // --- SOLICITUDES (formulario "Registra tu Solicitud") ---
+  if (e && e.parameter && e.parameter.Tipo === "Solicitud") {
+    var libro = SpreadsheetApp.getActiveSpreadsheet();
+    var hoja = libro.getSheetByName("Solicitudes");
+    if (!hoja) {
+      hoja = libro.insertSheet("Solicitudes");
+      hoja.appendRow(["Fecha", "Nombre", "WhatsApp", "Colonia", "Tipo de apoyo", "Detalle"]);
+      hoja.setFrozenRows(1);
+    }
+    hoja.appendRow([
+      e.parameter.Fecha || new Date(),
+      e.parameter.Nombre || "",
+      "'" + (e.parameter.Telefono || ""),
+      e.parameter.Colonia || "",
+      e.parameter.TipoApoyo || "",
+      e.parameter.Detalle || ""
+    ]);
+    // OPCIONAL: aviso por correo cada vez que llega una solicitud.
+    // Quita las dos diagonales de la línea siguiente y pon tu correo.
+    // MailApp.sendEmail("TU_CORREO@gmail.com", "Nueva solicitud DCUATES", "Nombre: " + e.parameter.Nombre + "\nWhatsApp: " + e.parameter.Telefono + "\nTipo: " + e.parameter.TipoApoyo + "\nDetalle: " + e.parameter.Detalle);
+    return ContentService.createTextOutput("ok");
+  }
+  // --- fin SOLICITUDES ---

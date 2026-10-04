@@ -29,7 +29,7 @@ const CLAVE_CIRCULO_CONFIANZA = "confianza2026";
 // iframe); no hace falta tocar nada más en el código.
 // Sello de versión: se ve en pequeño al final de los accesos rápidos y en la
 // consola del navegador. Sirve para comprobar que el celular ya cargó lo último.
-const VERSION_BUILD = "CLON8 · f10";
+const VERSION_BUILD = "CLON8 · f11";
 if (typeof console !== "undefined") console.info("[DCUATES] versión", VERSION_BUILD);
 
 const MAPA_NEGOCIOS_EMBED_URL = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15034.541076557625!2d-99.00223799999999!3d19.600120500000003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1ee234c038987%3A0x4b578513910d8103!2sJardines%20de%20Morelos%2C%20Ecatepec%20de%20Morelos%2C%20M%C3%A9x.!5e0!3m2!1ses!2smx!4v1790129394750!5m2!1ses!2smx";
@@ -42,23 +42,9 @@ const MAPA_NEGOCIOS_EMBED_URL = "https://www.google.com/maps/embed?pb=!1m18!1m12
 // necesitar nada de código extra.
 //
 // CÓMO CONFIGURARLO (nada de esto se toca en código, solo en Google):
-// 1) Crea un Google Form con las preguntas que quieras pedir (nombre,
-//    teléfono, qué necesitas, colonia, etc.).
-// 2) En "Respuestas", pulsa el ícono verde de Sheets para ligarlo a una
-//    Hoja de Cálculo nueva — ahí se guardará cada solicitud SOLA, sin
-//    código.
-// 3) En el engrane ⚙️ de Configuración → Presentación → "Mensaje de
-//    confirmación", pega el texto que quieras que vea la gente justo
-//    después de enviar (dale clic también a "Recibir notificaciones por
-//    correo electrónico para las respuestas nuevas" — así te avisa cada
-//    vez que llega una solicitud nueva, sin instalar nada).
-// 4) Botón "Enviar" del formulario → pestaña "<>" (insertar HTML) → copia
-//    el link que está dentro de src="..." y pégalo aquí abajo.
-// FORMULARIO DE MUESTRA (Tally): https://tally.so/r/7RGQK6 — ya está
-// publicado y funcionando; para verlo en la página basta con esta liga de
-// "embed". Cuando prefieras uno propio (Google Forms u otro), reemplaza
-// solo esta liga por la de tu formulario.
-const GOOGLE_FORM_SOLICITUDES_URL = "https://tally.so/embed/7RGQK6?hideTitle=1&transparentBackground=1";
+// El formulario es propio (ver FormularioSolicitud más abajo): guarda cada
+// solicitud en Google Sheets (el mismo Apps Script de GOOGLE_SHEETS_URL,
+// con Tipo "Solicitud") y abre WhatsApp con el mensaje ya escrito.
 
 const REDES_SOCIALES = {
   facebook: "https://www.facebook.com/abelzarem/",
@@ -863,6 +849,8 @@ export default function App() {
       const h = decodeURIComponent(window.location.hash || "");
       if (h.length < 2) return;
       let id = h.slice(1);
+      if (id === "avisos") { window.dispatchEvent(new Event("dcuates:abrir-avisos")); return; }
+      if (id === "compartir") { setModalFormulario("comparte"); return; }
       if (id.startsWith("proyecto-")) id = id.slice("proyecto-".length);
       else if (IDS_DE_SECCION.has(id)) return;
       if (BOTONES_PORTADA.some((b) => b.modal === id) || TODOS_LOS_PROYECTOS.some((x) => x.id === id)) setModalProyecto(id);
@@ -876,9 +864,8 @@ export default function App() {
   // Solicitud"), además del botón del encabezado.
   const [busquedaAbierta, setBusquedaAbierta] = useState(false);
 
-  // Formulario de "Registra tu Solicitud" (junto al mapa): se ve resumido
-  // y se despliega completo al querer llenarlo (es un formulario externo
-  // -Tally-, así que se expande al tocarlo, no al detectar un campo exacto).
+  // Formulario de "Registra tu Solicitud" (junto al mapa): ahora es propio y
+  // siempre se ve completo.
   const [solicitudExpandida, setSolicitudExpandida] = useState(true);
   // Botones naranjas junto a los carruseles de Ventas con Causa y de
   // Extraviados: agrupados en un solo botón resumen debajo del carrusel.
@@ -2134,19 +2121,7 @@ export default function App() {
         />
       )}
       {modalFormulario === "comparte" && (
-        <ModalFormularioWhatsApp
-          titulo="Compartir Más"
-          emoji="🌟"
-          degradado={DEGRADADO_COMPARTIR}
-          suave="#e3f3f8"
-          invitacion="DCUATES se construye con lo que cada quien aporta. Dinos qué te gustaría ver en la página o qué quieres compartir tú: una historia, un negocio, un talento, una causa o una buena noticia."
-          cierre="Lo que compartes hoy puede ser la ayuda que alguien necesita mañana. ¡Gracias por sumar! 🌟"
-          descripcion="¿Qué te gustaría o necesitas que compartiéramos, y qué te gustaría compartir tú?"
-          opciones={["Quiero que compartan más o también sobre", "Quiero compartir algo"]}
-          placeholder="Cuéntanos..."
-          etiquetaBoton="Compartir por WhatsApp"
-          onCerrar={() => setModalFormulario(null)}
-        />
+        <ModalCompartirMas onCerrar={() => setModalFormulario(null)} />
       )}
 
       {/* VENTANA DE DUDAS — la abre el botón flotante de WhatsApp */}
@@ -2722,7 +2697,7 @@ function LogoMarca({ tam = 64 }) {
 // invitación que introduce el contenido, el contenido (children), una frase
 // de cierre y la cruz de cerrar abajo a la derecha. La usan Avisos y
 // Beneficios, Compartir Más, Sugerencias y Dudas.
-function VentanaMarca({ degradado, suave, emoji, titulo, invitacion, cierre, onCerrar, children, ancho = "max-w-md" }) {
+function VentanaMarca({ degradado, suave, emoji, titulo, invitacion, cierre, compartir, onCerrar, children, ancho = "max-w-md" }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-3 sm:p-4 backdrop-blur-sm" onClick={onCerrar}>
       <div
@@ -2732,7 +2707,16 @@ function VentanaMarca({ degradado, suave, emoji, titulo, invitacion, cierre, onC
         className={`bg-white text-slate-900 rounded-3xl ${ancho} w-full max-h-[92vh] overflow-y-auto shadow-2xl`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="px-5 pt-5 pb-7 text-white text-center" style={{ background: degradado }}>
+        <div className="relative px-5 pt-5 pb-7 text-white text-center" style={{ background: degradado }}>
+          {compartir && (
+            <BotonCompartir
+              variante="claro"
+              className="absolute top-3 right-3 z-10"
+              hash={compartir.hash}
+              titulo={compartir.titulo}
+              texto={compartir.texto}
+            />
+          )}
           <div className="flex justify-center"><LogoMarca tam={68} /></div>
           <p className="mt-2 text-[11px] font-black uppercase tracking-widest text-white/90">DCUATES · ¡Comparte y Gana!</p>
           <h3 className="mt-1 text-xl sm:text-2xl font-black leading-tight">
@@ -2776,6 +2760,13 @@ function BotonRecibeBeneficios({ grande = false }) {
     setSeleccion((prev) => (prev.includes(interes) ? prev.filter((i) => i !== interes) : [...prev, interes]));
   };
 
+  // Enlace compartido dcuates.com/#avisos: abre esta ventana.
+  useEffect(() => {
+    const abrirDesdeEnlace = () => setAbierto(true);
+    window.addEventListener("dcuates:abrir-avisos", abrirDesdeEnlace);
+    return () => window.removeEventListener("dcuates:abrir-avisos", abrirDesdeEnlace);
+  }, []);
+
   const enviar = () => {
     const lista = seleccion.length > 0 ? seleccion.join(", ") : "todas las novedades";
     registrar("formulario_enviado", { form: "avisos" });
@@ -2806,6 +2797,7 @@ function BotonRecibeBeneficios({ grande = false }) {
           titulo="Avisos y Beneficios"
           invitacion="Sé de los primeros en enterarte. Elige lo que te interesa y te escribimos por WhatsApp con promociones de negocios locales, mascotas que buscan hogar, eventos del barrio y oportunidades de apoyo."
           cierre="Una comunidad bien informada es una comunidad más fuerte. ¡Qué gusto tenerte aquí! 💚"
+          compartir={{ hash: "avisos", titulo: "Avisos y Beneficios", texto: "Entérate de promociones, mascotas, eventos y apoyos de tu colonia" }}
           onCerrar={() => setAbierto(false)}
         >
           <p className="text-xs font-black uppercase tracking-wide text-[#bf360c] mb-2">¿Qué te interesa recibir?</p>
@@ -2886,6 +2878,90 @@ function ModalFormularioWhatsApp({ titulo, emoji = "💬", degradado = DEGRADADO
         style={{ background: degradado }}
       >
         {etiquetaBoton}
+      </button>
+    </VentanaMarca>
+  );
+}
+
+// Compartir Más: la persona marca una o las dos opciones y escribe en cada una.
+function ModalCompartirMas({ onCerrar }) {
+  const [quiereVer, setQuiereVer] = useState(false);
+  const [textoVer, setTextoVer] = useState("");
+  const [quiereCompartir, setQuiereCompartir] = useState(false);
+  const [textoComp, setTextoComp] = useState("");
+  const [error, setError] = useState("");
+
+  const enviar = () => {
+    if (!quiereVer && !quiereCompartir) {
+      setError("Marca al menos una de las dos opciones.");
+      return;
+    }
+    if ((quiereVer && !textoVer.trim()) || (quiereCompartir && !textoComp.trim())) {
+      setError("Cuéntanos un poco en cada opción que marcaste.");
+      return;
+    }
+    const partes = [];
+    if (quiereVer) partes.push(`Quiero que compartan más o también sobre: ${textoVer.trim()}`);
+    if (quiereCompartir) partes.push(`Quiero compartir algo: ${textoComp.trim()}`);
+    registrar("formulario_enviado", { form: "compartir", opciones: quiereVer && quiereCompartir ? "ambas" : quiereVer ? "ver" : "compartir" });
+    window.open(enlaceWhatsApp(`¡Hola DCUATES!\n\n${partes.join("\n\n")}`), "_blank", "noopener,noreferrer");
+    onCerrar();
+  };
+
+  const tarjeta = (activa) => `rounded-2xl border-2 px-3 py-3 transition-colors ${activa ? "border-[#1B6F8A] bg-sky-50" : "border-slate-200 bg-white"}`;
+
+  return (
+    <VentanaMarca
+      degradado={DEGRADADO_COMPARTIR}
+      suave="#e3f3f8"
+      emoji="🌟"
+      titulo="Compartir Más"
+      invitacion="DCUATES se construye con lo que cada quien aporta. Dinos qué te gustaría ver en la página, qué quieres compartir tú (una historia, un negocio, un talento, una causa o una buena noticia), o las dos cosas."
+      cierre="Lo que TÚ COMPARTES hoy puede ser la ayuda que alguien necesita mañana; y lo que OTROS COMPARTEN puede ser de AYUDA TAMBIÉN PARA TI ;) !!! ¡GRACIAS POR COMPARTIR, TODOS SUMAMOS MÁS Y MEJOR !!! 🌟"
+      compartir={{ hash: "compartir", titulo: "Compartir Más", texto: "Cuéntanos qué quieres ver y qué quieres compartir en DCUATES" }}
+      onCerrar={onCerrar}
+    >
+      <p className="text-xs font-black uppercase tracking-wide text-[#1B6F8A] mb-2">Marca una o las dos:</p>
+      <div className="space-y-2.5">
+        <div className={tarjeta(quiereVer)}>
+          <label className="flex items-start gap-3 cursor-pointer">
+            <input type="checkbox" checked={quiereVer} onChange={(e) => { setQuiereVer(e.target.checked); if (error) setError(""); }} className="mt-0.5 h-5 w-5 shrink-0 accent-[#1B6F8A]" />
+            <span className="text-sm font-black text-[#0f2d1e] leading-snug">🙋 Quiero que compartan más (o también) sobre…</span>
+          </label>
+          {quiereVer && (
+            <textarea
+              value={textoVer}
+              onChange={(e) => { setTextoVer(e.target.value); if (error) setError(""); }}
+              rows={3}
+              placeholder="Ej. ofertas de empleo, eventos de salud, recetas…"
+              className="mt-2 w-full rounded-xl border-2 border-slate-200 px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-[#1B6F8A]"
+            />
+          )}
+        </div>
+        <div className={tarjeta(quiereCompartir)}>
+          <label className="flex items-start gap-3 cursor-pointer">
+            <input type="checkbox" checked={quiereCompartir} onChange={(e) => { setQuiereCompartir(e.target.checked); if (error) setError(""); }} className="mt-0.5 h-5 w-5 shrink-0 accent-[#1B6F8A]" />
+            <span className="text-sm font-black text-[#0f2d1e] leading-snug">🎁 Quiero compartir algo…</span>
+          </label>
+          {quiereCompartir && (
+            <textarea
+              value={textoComp}
+              onChange={(e) => { setTextoComp(e.target.value); if (error) setError(""); }}
+              rows={3}
+              placeholder="Ej. mi negocio, una historia, un talento, una causa…"
+              className="mt-2 w-full rounded-xl border-2 border-slate-200 px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-[#1B6F8A]"
+            />
+          )}
+        </div>
+      </div>
+      {error && <p className="text-xs text-red-600 font-bold mt-2">{error}</p>}
+      <button
+        type="button"
+        onClick={enviar}
+        className="mt-4 w-full rounded-2xl text-white font-black py-3.5 uppercase text-xs sm:text-sm tracking-wide shadow-md hover:opacity-90 transition-opacity"
+        style={{ background: DEGRADADO_COMPARTIR }}
+      >
+        Compartir por WhatsApp
       </button>
     </VentanaMarca>
   );
@@ -3939,43 +4015,130 @@ function BotonVerdeInfo({ titulo, children }) {
 // Decide qué mostrar dentro del modal según el id recibido: los 10 proyectos
 // "normales" (con tarjeta propia), o los 2 casos especiales sin tarjeta
 // (Ventas con Causa y Apoyo Voluntario/donaciones).
-// Formulario de solicitudes (Tally) con altura AUTOMÁTICA: al enviar, la
-// ventana se encoge a la pantalla de agradecimiento (antes quedaba un hueco
-// en blanco) y la página sube para que se vea completa. Si el script de
-// Tally no carga, se usa el iframe normal como respaldo.
+// Formulario de "Registra tu Solicitud": guarda el registro en Google Sheets
+// (mismo Apps Script de Publicidad, con Tipo "Solicitud") y, en paralelo,
+// abre WhatsApp con el mensaje ya escrito. Al terminar muestra el logo y un
+// mensaje de agradecimiento.
+const TIPOS_DE_APOYO = [
+  "Libros o materiales educativos",
+  "Asesoría gratuita",
+  "Mascotas (adopción, extravío o rescate)",
+  "Apoyo en especie o económico",
+  "Publicidad para mi negocio",
+  "Apoyo voluntario",
+  "Otro"
+];
+
 function FormularioSolicitud() {
-  const [respaldo, setRespaldo] = useState(false);
-  const urlDinamica = GOOGLE_FORM_SOLICITUDES_URL + (GOOGLE_FORM_SOLICITUDES_URL.includes("?") ? "&" : "?") + "dynamicHeight=1";
-  useEffect(() => {
-    const cargar = () => window.Tally && window.Tally.loadEmbeds && window.Tally.loadEmbeds();
-    let script = document.querySelector('script[src="https://tally.so/widgets/embed.js"]');
-    if (window.Tally) cargar();
-    else if (script) script.addEventListener("load", cargar);
-    else {
-      script = document.createElement("script");
-      script.src = "https://tally.so/widgets/embed.js";
-      script.onload = cargar;
-      script.onerror = () => setRespaldo(true);
-      document.body.appendChild(script);
+  const [nombre, setNombre] = useState("");
+  const [telefono, setTelefono] = useState("");
+  const [colonia, setColonia] = useState("");
+  const [tipo, setTipo] = useState(TIPOS_DE_APOYO[0]);
+  const [detalle, setDetalle] = useState("");
+  const [error, setError] = useState("");
+  const [enviado, setEnviado] = useState(false);
+  const [enlaceRespaldo, setEnlaceRespaldo] = useState("");
+
+  const claseCampo = "w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium";
+  const claseEtiqueta = "block text-xs sm:text-sm font-black uppercase tracking-wider text-slate-700 mb-1";
+
+  const enviar = (e) => {
+    e.preventDefault();
+    const tel = telefono.replace(/\D/g, "");
+    if (!nombre.trim()) return setError("Escribe tu nombre.");
+    if (tel.length < 10) return setError("Escribe tu número de WhatsApp a 10 dígitos.");
+    if (!detalle.trim()) return setError("Cuéntanos brevemente qué necesitas.");
+    setError("");
+
+    registrar("formulario_enviado", { form: "solicitud" });
+
+    // 1) Registro en Google Sheets (sin esperar respuesta, para no perder el
+    //    permiso del navegador de abrir WhatsApp).
+    try {
+      fetch(GOOGLE_SHEETS_URL, {
+        method: "POST",
+        mode: "no-cors",
+        keepalive: true,
+        body: new URLSearchParams({
+          Tipo: "Solicitud",
+          Nombre: nombre.trim(),
+          Telefono: tel,
+          Colonia: colonia.trim(),
+          TipoApoyo: tipo,
+          Detalle: detalle.trim(),
+          Fecha: new Date().toLocaleString()
+        })
+      }).catch(() => {});
+    } catch (err) {
+      console.error("Error guardando la solicitud en Sheets:", err);
     }
-    const alMensaje = (e) => {
-      if (typeof e.data === "string" && e.data.includes("Tally.FormSubmitted")) {
-        setTimeout(() => irASeccion("solicitudes"), 150);
-      }
-    };
-    window.addEventListener("message", alMensaje);
-    return () => window.removeEventListener("message", alMensaje);
-  }, []);
-  return respaldo ? (
-    <iframe src={GOOGLE_FORM_SOLICITUDES_URL} title="Formulario de solicitud DCUATES" className="w-full" style={{ minHeight: 640, border: 0 }} />
-  ) : (
-    <iframe
-      data-tally-src={urlDinamica}
-      title="Formulario de solicitud DCUATES"
-      className="w-full"
-      style={{ minHeight: 320, border: 0 }}
-      loading="lazy"
-    />
+
+    // 2) Aviso por WhatsApp, en paralelo.
+    const mensaje = `¡Hola DCUATES!\n\nRegistré una solicitud en la página:\n• Nombre: ${nombre.trim()}\n• WhatsApp: ${tel}\n• Colonia: ${colonia.trim() || "No especificada"}\n• Tipo de apoyo: ${tipo}\n• Detalle: ${detalle.trim()}`;
+    const enlace = enlaceWhatsApp(mensaje);
+    setEnlaceRespaldo(enlace);
+    window.open(enlace, "_blank", "noopener,noreferrer");
+
+    setEnviado(true);
+    setTimeout(() => irASeccion("solicitudes"), 150);
+  };
+
+  if (enviado) {
+    return (
+      <div className="text-center py-6 px-4">
+        <div className="flex justify-center"><LogoMarca tam={88} /></div>
+        <p className="mt-4 text-lg font-black text-[#0f2d1e] leading-snug">¡Tu solicitud quedó registrada!</p>
+        <p className="mt-2 text-base font-bold text-slate-700">En la primera oportunidad atenderemos tu solicitud…</p>
+        <p className="mt-3 text-xl font-black text-[#e65100] uppercase tracking-wide">¡Gracias y saludos!</p>
+        <p className="mt-4 text-[11px] text-slate-500 font-medium">
+          ¿No se abrió WhatsApp?{" "}
+          <a href={enlaceRespaldo} target="_blank" rel="noopener noreferrer" className="font-black text-[#128c7e] underline">Tócalo aquí</a>
+        </p>
+        <button
+          type="button"
+          onClick={() => { setEnviado(false); setNombre(""); setTelefono(""); setColonia(""); setDetalle(""); setTipo(TIPOS_DE_APOYO[0]); }}
+          className="mt-4 rounded-full border-2 border-[#0f2d1e] px-4 py-1.5 text-[11px] font-black uppercase tracking-wide text-[#0f2d1e] hover:bg-emerald-50 transition-colors"
+        >
+          Registrar otra solicitud
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={enviar} className="space-y-3 p-4" noValidate>
+      <div>
+        <label className={claseEtiqueta} htmlFor="sol-nombre">Nombre</label>
+        <input id="sol-nombre" type="text" value={nombre} onChange={(e) => { setNombre(e.target.value); if (error) setError(""); }} className={claseCampo} placeholder="Ej. María López" autoComplete="name" />
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div>
+          <label className={claseEtiqueta} htmlFor="sol-tel">WhatsApp</label>
+          <input id="sol-tel" type="tel" inputMode="tel" value={telefono} onChange={(e) => { setTelefono(e.target.value); if (error) setError(""); }} className={claseCampo} placeholder="Ej. 5512345678" autoComplete="tel" />
+        </div>
+        <div>
+          <label className={claseEtiqueta} htmlFor="sol-colonia">Colonia</label>
+          <input id="sol-colonia" type="text" value={colonia} onChange={(e) => setColonia(e.target.value)} className={claseCampo} placeholder="Ej. Jardines de Morelos" />
+        </div>
+      </div>
+      <div>
+        <label className={claseEtiqueta} htmlFor="sol-tipo">Tipo de apoyo</label>
+        <select id="sol-tipo" value={tipo} onChange={(e) => setTipo(e.target.value)} className={claseCampo}>
+          {TIPOS_DE_APOYO.map((t) => <option key={t} value={t}>{t}</option>)}
+        </select>
+      </div>
+      <div>
+        <label className={claseEtiqueta} htmlFor="sol-detalle">¿Qué necesitas?</label>
+        <textarea id="sol-detalle" rows={4} value={detalle} onChange={(e) => { setDetalle(e.target.value); if (error) setError(""); }} className={claseCampo} placeholder="Cuéntanos con detalle cómo podemos apoyarte…" />
+      </div>
+      {error && <p className="text-xs text-red-600 font-bold">{error}</p>}
+      <button type="submit" className="w-full rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3.5 uppercase tracking-wider text-xs sm:text-sm transition-colors shadow-md">
+        Enviar mi solicitud
+      </button>
+      <p className="text-[11px] text-slate-500 font-medium leading-snug text-center">
+        Usamos tus datos solo para atender tu solicitud. Consulta el Aviso de Privacidad en el pie de página.
+      </p>
+    </form>
   );
 }
 
