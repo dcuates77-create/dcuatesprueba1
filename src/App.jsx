@@ -29,7 +29,7 @@ const CLAVE_CIRCULO_CONFIANZA = "confianza2026";
 // iframe); no hace falta tocar nada más en el código.
 // Sello de versión: se ve en pequeño al final de los accesos rápidos y en la
 // consola del navegador. Sirve para comprobar que el celular ya cargó lo último.
-const VERSION_BUILD = "CLON8 · f11";
+const VERSION_BUILD = "CLON8 · f13";
 if (typeof console !== "undefined") console.info("[DCUATES] versión", VERSION_BUILD);
 
 const MAPA_NEGOCIOS_EMBED_URL = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15034.541076557625!2d-99.00223799999999!3d19.600120500000003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1ee234c038987%3A0x4b578513910d8103!2sJardines%20de%20Morelos%2C%20Ecatepec%20de%20Morelos%2C%20M%C3%A9x.!5e0!3m2!1ses!2smx!4v1790129394750!5m2!1ses!2smx";
@@ -564,7 +564,156 @@ const COMO_SUMAR = {
   cierre: "Te invitamos a colaborar si hay algún proyecto DCUATES en el que te interese SUMARTE — dinos cuál y platicamos los siguientes pasos."
 };
 
-// Texto del Aviso de Privacidad — se usa tanto en su modal como en el
+// =========================================================================
+// TEXTOS LEGALES — Aviso de Privacidad Integral y Términos y Condiciones.
+// IMPORTANTE: llena los datos del responsable en DATOS_LEGALES (nombre,
+// domicilio y correo). Edita solo lo que está entre comillas. El resto del texto es el de tus documentos oficiales.
+// =========================================================================
+const DATOS_LEGALES = {
+  nombre: "ABEL MERAZ ALVARADO",
+  colonia: "Jardines de Morelos, Sección Ríos",
+  municipio: "Ecatepec de Morelos",
+  cp: "55070", // si lo dejas vacío ("") el Aviso omite el código postal
+  estado: "México",
+  correo: "dcuates77@gmail.com"
+};
+
+// Cada sección: titulo, parrafos (antes), lista (viñetas; texto o {b, t}),
+// despues (párrafos después de la lista).
+const AVISO_PRIVACIDAD_INTEGRAL = {
+  titulo: "Aviso de Privacidad Integral (Fase de Lanzamiento)",
+  secciones: [
+    {
+      titulo: "1. Responsable del tratamiento de sus datos personales",
+      parrafos: [
+        `El Responsable del tratamiento de sus datos personales es ${DATOS_LEGALES.nombre}, operando bajo el nombre comercial DCUATES y a través del sitio web dcuates.com. Para efectos del presente aviso y la protección de los datos de nuestros usuarios, se señala como domicilio general de atención, correspondencia y solicitudes relativas a la privacidad el ubicado en la Colonia ${DATOS_LEGALES.colonia}, Municipio o Alcaldía ${DATOS_LEGALES.municipio}${DATOS_LEGALES.cp ? `, C.P. ${DATOS_LEGALES.cp}` : ""}, en el Estado de ${DATOS_LEGALES.estado}, México. Usted puede ponerse en contacto directo con el responsable a través del correo electrónico exclusivo: ${DATOS_LEGALES.correo}.`
+      ]
+    },
+    {
+      titulo: "2. Datos personales que se recabarán",
+      parrafos: [
+        "Para permitir su interacción, el uso de las ventanas de registro y el alta de iniciativas en nuestra plataforma, recabaremos únicamente los siguientes datos de identificación y contacto a través de nuestros formularios web:"
+      ],
+      lista: [
+        "Nombre completo (o alias del usuario).",
+        "Número de teléfono celular (WhatsApp).",
+        "Colonia de residencia.",
+        "Tipo de apoyo solicitado o requerido.",
+        "Descripción detallada de la necesidad o aportación."
+      ],
+      despues: [
+        "DCUATES no recaba, almacena ni trata bajo ninguna circunstancia datos personales sensibles (como ideología, religión, política, estado de salud o datos financieros)."
+      ]
+    },
+    {
+      titulo: "3. Finalidades del tratamiento",
+      parrafos: [
+        "Los datos personales recabados serán utilizados exclusivamente para las siguientes finalidades primarias, las cuales son estrictamente necesarias para el servicio solicitado dentro de la plataforma:"
+      ],
+      lista: [
+        "Gestionar su registro, cuenta y participación dentro de la plataforma de proyectos comunitarios.",
+        "Almacenar de forma segura su solicitud en nuestra base de datos interna (alojada en Google Sheets) para dar seguimiento a su caso.",
+        "Establecer comunicación directa con usted a través de la aplicación WhatsApp para validar, confirmar o coordinar el apoyo solicitado.",
+        "Brindar soporte técnico y atender reportes de la comunidad."
+      ],
+      despues: [
+        "Finalidades secundarias: No utilizaremos sus datos para fines publicitarios masivos ajenos a la comunidad, ni los venderemos o cederemos a terceros. Cualquier boletín informativo interno de la plataforma requerirá su autorización previa."
+      ]
+    },
+    {
+      titulo: "4. Transferencia de datos personales",
+      parrafos: [
+        "Le informamos que sus datos personales no serán compartidos, transferidos ni tratados por personas, empresas o entidades terceras, salvo por las excepciones estrictas previstas en el artículo 37 de la Ley Federal de Protección de Datos Personales en Posesión de los Particulares (LFPDPPP) o por requerimientos judiciales de las autoridades competentes."
+      ]
+    },
+    {
+      titulo: "5. Derechos ARCO y Revocación del Consentimiento",
+      parrafos: [
+        "Usted tiene en todo momento el derecho de Acceder a sus datos, Rectificarlos si son incorrectos o están desactualizados, Cancelar su registro para que sean borrados por completo de nuestra base de datos de Google Sheets, u Oponerse al uso de los mismos para fines específicos (Derechos ARCO).",
+        `Para ejercer estos derechos o revocar el consentimiento que nos ha otorgado, deberá enviar una solicitud por escrito al correo electrónico: ${DATOS_LEGALES.correo}. Su solicitud deberá contener su nombre completo, el número de WhatsApp con el que se registró y la descripción clara del derecho que desea ejercer. Le responderemos y ejecutaremos la acción en un plazo máximo de 20 días hábiles.`
+      ]
+    },
+    {
+      titulo: "6. Tecnologías de Análisis y Rendimiento (Vercel Analytics)",
+      parrafos: [
+        "Le informamos que este sitio web utiliza la herramienta de medición integrada de nuestro proveedor de alojamiento (Vercel Analytics). Esta tecnología recopila exclusivamente datos estadísticos y de rendimiento de forma totalmente anónima (tales como el país de origen del visitante, tipo de navegador, sistema operativo y velocidad de carga de la página). Esta herramienta no utiliza cookies de rastreo, no recopila datos que permitan identificar personalmente al usuario ni realiza un seguimiento de sus hábitos de navegación fuera de este sitio web. Debido a su naturaleza puramente técnica y estadística, no genera archivos de rastreo en su dispositivo."
+      ]
+    },
+    {
+      titulo: "7. Modificaciones por formalización legal",
+      parrafos: [
+        "Este aviso de privacidad es de carácter temporal y sufrirá modificaciones y actualizaciones una vez que el proyecto DCUATES culmine su proceso de transición hacia una figura jurídica colectiva (Sociedad Cooperativa). Las actualizaciones estarán siempre disponibles para su consulta en esta misma sección del sitio web."
+      ]
+    }
+  ],
+  fecha: "Fecha de última actualización: Octubre de 2026."
+};
+
+const TERMINOS_CONDICIONES = {
+  titulo: "Términos y Condiciones de la Comunidad (DCUATES)",
+  intro: "Bienvenido a DCUATES (dcuates.com). Al utilizar nuestra plataforma, registrar tus datos o publicar una solicitud de apoyo, aceptas cumplir de manera íntegra con las siguientes reglas, normas de convivencia y condiciones de servicio. Si no estás de acuerdo con alguna de ellas, te pedimos amablemente que te abstengas de utilizar el sitio.",
+  secciones: [
+    {
+      titulo: "1. Naturaleza de la Plataforma",
+      parrafos: [
+        "DCUATES es una iniciativa de carácter social e independiente. Nuestro único objetivo es servir como un puente de vinculación directa entre personas que necesitan un apoyo comunitario y personas o colectivos dispuestos a brindarlo de forma voluntaria. DCUATES no es una empresa de servicios, no es una casa de beneficencia con fondos propios, ni actúa como intermediario legal en los acuerdos alcanzados entre los usuarios."
+      ]
+    },
+    {
+      titulo: "2. Proyectos e Iniciativas Permitidas",
+      parrafos: [
+        "La plataforma está diseñada exclusivamente para albergar solicitudes y proyectos que generen un impacto positivo, colaborativo o solidario en la comunidad. Los tipos de proyectos bienvenidos incluyen:"
+      ],
+      lista: [
+        { b: "Educación y Cultura:", t: "Solicitudes o donaciones de libros, materiales didácticos, asesorías escolares y talleres gratuitos." },
+        { b: "Apoyo Social y Comunitario:", t: "Iniciativas de mejora barrial, recolección de víveres, ropa en buen estado o voluntariados locales." },
+        { b: "Cuidado Animal y Ambiental:", t: "Proyectos de rescate de mascotas, campañas de esterilización comunitaria, reforestación o reciclaje local." },
+        { b: "Herramientas de Trabajo:", t: "Solicitudes de colaboración mutua para proyectos de emprendimiento social o solidario." }
+      ]
+    },
+    {
+      titulo: "3. Contenido y Proyectos Estrictamente Prohibidos",
+      parrafos: [
+        "Para garantizar un espacio seguro y confiable, queda estrictamente prohibida la publicación de cualquier solicitud o contenido que involucre:"
+      ],
+      lista: [
+        { b: "Fines de Lucro Exclusivos:", t: "Venta directa de productos comerciales, publicidad de empresas privadas que no tengan un esquema de donación o beneficio social claro, o esquemas de negocio multinivel." },
+        { b: "Proselitismo Político o Religioso:", t: "Campañas de partidos políticos, promoción de candidatos, propaganda ideológica o religiosa de cualquier índole." },
+        { b: "Contenido Ilícito o Peligroso:", t: "Solicitud o intercambio de armas, sustancias prohibidas, medicamentos controlados o actividades penadas por las leyes mexicanas." },
+        { b: "Conductas de Odio o Discriminación:", t: "Mensajes que promuevan la violencia, el racismo, el sexismo, la intolerancia o que vulneren la dignidad de las personas." },
+        { b: "Fraudes y Préstamos:", t: "Solicitudes de dinero en efectivo directo de procedencia dudosa, esquemas de tandas, pirámides financieras o solicitud de datos bancarios confidenciales." }
+      ],
+      despues: [
+        "Cualquier registro que infrinja estas normas será eliminado inmediatamente de la base de datos de Google Sheets sin previo aviso y no se le dará seguimiento por WhatsApp."
+      ]
+    },
+    {
+      titulo: "4. Responsabilidad de los Usuarios",
+      lista: [
+        { b: "Veracidad de la Información:", t: "Al registrarte, garantizas que los datos proporcionados (Nombre, WhatsApp, Colonia) son reales y te pertenecen." },
+        { b: "Uso del Canal de WhatsApp:", t: "Entiendes que al presionar el botón de confirmación, inicias un chat de WhatsApp de forma voluntaria. Te comprometes a mantener una comunicación respetuosa, clara y cordial con el administrador y con otros miembros de la comunidad con los que te vincules." },
+        { b: "Seguridad Física:", t: "Dado que la plataforma facilita que personas de la misma zona se apoyen (por ejemplo, para entregar libros o materiales), cada usuario es enteramente responsable de su propia seguridad física. Recomendamos realizar cualquier entrega o encuentro exclusivamente en lugares públicos, concurridos y de preferencia a la luz del día." }
+      ]
+    },
+    {
+      titulo: "5. Deslinde de Responsabilidad de la Plataforma (Límites Legales)",
+      lista: [
+        "DCUATES no se hace responsable por la calidad, entrega, veracidad o resultado de los apoyos coordinados entre los usuarios.",
+        "No garantizamos que todas las solicitudes registradas reciban apoyo, ya que esto depende enteramente de la participación voluntaria de la comunidad.",
+        "El administrador de la página no se hace responsable de los daños, pérdidas, malentendidos o conflictos derivados de las interacciones generadas fuera del sitio web (chats privados de WhatsApp, llamadas o reuniones físicas)."
+      ]
+    },
+    {
+      titulo: "6. Modificaciones",
+      parrafos: [
+        "Nos reservamos el derecho de actualizar estas normas en cualquier momento para adaptarlas al crecimiento de la comunidad o a futuras regulaciones legales. Al continuar usando la página tras una actualización, aceptas los nuevos términos establecidos."
+      ]
+    }
+  ],
+  fecha: "Fecha de actualización: Octubre de 2026."
+};
+
+// (Texto anterior, simplificado — ya no se usa) Aviso de Privacidad — se usaba en el
 // botón verde desplegable "Aviso de Privacidad" de la portada, para no
 // tener el mismo texto escrito dos veces.
 const AVISO_PRIVACIDAD_PARRAFOS = [
@@ -817,6 +966,15 @@ function BotonesRetosRegalos({ indices }) {
 // =========================================================================
 export default function App() {
   const [showPrivacy, setShowPrivacy] = useState(false);
+  const [showTerminos, setShowTerminos] = useState(false);
+  useEffect(() => {
+    const alPedir = (e) => {
+      if (e.detail === "privacidad") setShowPrivacy(true);
+      else if (e.detail === "terminos") setShowTerminos(true);
+    };
+    window.addEventListener("dcuates:abrir-legal", alPedir);
+    return () => window.removeEventListener("dcuates:abrir-legal", alPedir);
+  }, []);
   const [showFAQ, setShowFAQ] = useState(false);
   const [showDudas, setShowDudas] = useState(false);
   // Modal del Mapa de Sitio — tarjetas con acceso directo a todo lo que
@@ -1147,6 +1305,7 @@ export default function App() {
         <SiteHeader
           onAbrirFAQ={() => setShowFAQ(true)}
           onAbrirPrivacidad={() => setShowPrivacy(true)}
+          onAbrirTerminos={() => setShowTerminos(true)}
           onAbrirProyecto={(id) => setModalProyecto(id)}
           onAbrirSugerencias={() => setModalFormulario("sugerencias")}
           onAbrirMapaSitio={() => setShowMapaSitio(true)}
@@ -1954,6 +2113,12 @@ export default function App() {
           >
             Aviso de Privacidad
           </button>
+          <button
+            onClick={() => setShowTerminos(true)}
+            className="underline underline-offset-4 hover:text-[#0f2d1e] bg-transparent border-none cursor-pointer font-bold transition-colors"
+          >
+            Términos y Condiciones
+          </button>
         </nav>
 
         <p className="text-sm sm:text-base text-[#0f2d1e] pt-4 border-t border-[#0f2d1e]/30 max-w-md sm:max-w-lg mx-auto font-black">
@@ -1981,24 +2146,12 @@ export default function App() {
       )}
 
 
-      {/* MODAL DEL AVISO DE PRIVACIDAD */}
+      {/* AVISO DE PRIVACIDAD INTEGRAL Y TÉRMINOS Y CONDICIONES */}
       {showPrivacy && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
-          <div className="bg-white text-slate-900 rounded-2xl max-w-xl w-full p-6 shadow-2xl flex flex-col max-h-[85vh]">
-            <h3 className="text-xl font-bold uppercase tracking-tight border-b pb-3 mb-4 text-emerald-800 font-heading">
-              Aviso de Privacidad Simplificado
-            </h3>
-            <div className="overflow-y-auto space-y-3 pr-2 text-sm text-slate-600 leading-relaxed text-justify font-medium">
-              {AVISO_PRIVACIDAD_PARRAFOS.map((p, i) => <p key={i}>{p}</p>)}
-            </div>
-            <button
-              onClick={() => setShowPrivacy(false)}
-              className="mt-6 w-full rounded-xl bg-emerald-700 text-white font-black py-3.5 text-center transition-colors hover:bg-emerald-800 uppercase text-xs tracking-wider font-heading"
-            >
-              Aceptar y Cerrar
-            </button>
-          </div>
-        </div>
+        <ModalLegal documento={AVISO_PRIVACIDAD_INTEGRAL} emoji="🔒" degradado="linear-gradient(135deg,#17472d 0%,#1B6F8A 100%)" onCerrar={() => setShowPrivacy(false)} />
+      )}
+      {showTerminos && (
+        <ModalLegal documento={TERMINOS_CONDICIONES} emoji="📜" degradado="linear-gradient(135deg,#7A5AD8 0%,#1B6F8A 100%)" onCerrar={() => setShowTerminos(false)} />
       )}
 
       {/* MODAL ÚNICO DE PROYECTO — se abre al dar clic en cualquiera de los
@@ -2279,7 +2432,7 @@ function BotonCerrar({ onClick, label = "Cerrar", claro = false }) {
   );
 }
 
-function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSugerencias, onAbrirMapaSitio, onAbrirCategoria, busquedaAbierta, setBusquedaAbierta }) {
+function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirTerminos, onAbrirProyecto, onAbrirSugerencias, onAbrirMapaSitio, onAbrirCategoria, busquedaAbierta, setBusquedaAbierta }) {
   const [menuAbierto, setMenuAbierto] = useState(false);
   // Colores alternados del menú (combinan con el verde, el naranja y el azul
   // turquesa que ya usa la página).
@@ -2402,6 +2555,14 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSug
                       <span className="text-lg leading-none w-6 text-center shrink-0" aria-hidden="true">🔒</span>
                       <span style={{ color: COLORES_MENU[NAV_LINKS_MAS.length % COLORES_MENU.length] }}>Aviso de Privacidad</span>
                     </button>
+                    <button
+                      type="button"
+                      onClick={() => { cerrar(); onAbrirTerminos && onAbrirTerminos(); }}
+                      className={claseFila}
+                    >
+                      <span className="text-lg leading-none w-6 text-center shrink-0" aria-hidden="true">📜</span>
+                      <span style={{ color: COLORES_MENU[(NAV_LINKS_MAS.length + 1) % COLORES_MENU.length] }}>Términos y Condiciones</span>
+                    </button>
                   </div>
                 </>
               )}
@@ -2425,6 +2586,7 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSug
 // necesita los 2 callbacks para abrir el modal de proyecto o una acción
 // especial (por ahora, solo "comparte").
 function BotonNecesidades({ onAbrirProyecto, onAccionEspecial, onAbrirFAQ }) {
+  const ac = useAceptacion();
   const [abierto, setAbierto] = useState(false);
   const [grupoAbierto, setGrupoAbierto] = useState(null);
   // Texto libre para la opción "Otro(s)" — al final de la ventana, para lo
@@ -2445,10 +2607,12 @@ function BotonNecesidades({ onAbrirProyecto, onAccionEspecial, onAbrirFAQ }) {
   };
 
   const enviarOtro = () => {
+    if (!ac.validar()) return;
     if (!textoOtro.trim()) return;
     registrar("necesidad_otro");
     window.open(enlaceWhatsApp(`¡Hola DCUATES! ${textoOtro.trim()}`), "_blank", "noopener,noreferrer");
     setTextoOtro("");
+    ac.reiniciar();
     cerrarTodo();
   };
 
@@ -2590,6 +2754,7 @@ function BotonNecesidades({ onAbrirProyecto, onAccionEspecial, onAbrirFAQ }) {
                 rows={2}
                 className="w-full rounded-xl border-2 border-emerald-200 px-3 py-2 text-sm font-medium focus:outline-none focus:border-[#0f2d1e]"
               />
+              <CasillaAcepto ac={ac} id="acepta_terminos_privacidad_otro" />
               <button
                 type="button"
                 onClick={enviarOtro}
@@ -2598,6 +2763,7 @@ function BotonNecesidades({ onAbrirProyecto, onAccionEspecial, onAbrirFAQ }) {
                 <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#25d366] text-white text-sm" aria-hidden="true">💬</span>
                 Enviar por WhatsApp
               </button>
+              <ErrorAcepto ac={ac} id="acepta_terminos_privacidad_otro" />
             </div>
 
             <div className="sticky bottom-0 flex justify-end border-t border-emerald-100 bg-white/95 p-3">
@@ -2697,9 +2863,9 @@ function LogoMarca({ tam = 64 }) {
 // invitación que introduce el contenido, el contenido (children), una frase
 // de cierre y la cruz de cerrar abajo a la derecha. La usan Avisos y
 // Beneficios, Compartir Más, Sugerencias y Dudas.
-function VentanaMarca({ degradado, suave, emoji, titulo, invitacion, cierre, compartir, onCerrar, children, ancho = "max-w-md" }) {
+function VentanaMarca({ degradado, suave, emoji, titulo, invitacion, cierre, compartir, onCerrar, children, ancho = "max-w-md", capa = "z-50" }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-3 sm:p-4 backdrop-blur-sm" onClick={onCerrar}>
+    <div className={`fixed inset-0 ${capa} flex items-center justify-center bg-black/80 p-3 sm:p-4 backdrop-blur-sm`} onClick={onCerrar}>
       <div
         role="dialog"
         aria-modal="true"
@@ -2744,6 +2910,94 @@ function VentanaMarca({ degradado, suave, emoji, titulo, invitacion, cierre, com
   );
 }
 
+// ----- Aceptación del Aviso de Privacidad y los Términos (todos los formularios) -----
+// useAceptacion() lleva el estado de la casilla; CasillaAcepto la dibuja y
+// ErrorAcepto muestra el mensaje rojo DEBAJO del botón de enviar. Los enlaces
+// abren las ventanas legales del pie de página (las escucha App()).
+function useAceptacion() {
+  const [acepta, setAcepta] = useState(false);
+  const [error, setError] = useState(false);
+  return {
+    acepta,
+    error,
+    cambiar: (v) => { setAcepta(v); if (v) setError(false); },
+    // true = puede continuar; false = se bloquea todo el envío
+    validar: () => { if (!acepta) { setError(true); return false; } return true; },
+    reiniciar: () => { setAcepta(false); setError(false); }
+  };
+}
+
+function abrirLegal(cual) {
+  window.dispatchEvent(new CustomEvent("dcuates:abrir-legal", { detail: cual }));
+}
+
+function CasillaAcepto({ ac, id = "acepta_terminos_privacidad" }) {
+  return (
+    <div className={`flex items-start gap-3 rounded-xl border-2 px-3 py-2.5 text-left ${ac.error ? "border-red-500 bg-red-50" : "border-slate-200 bg-slate-50"}`}>
+      <input
+        type="checkbox"
+        id={id}
+        checked={ac.acepta}
+        onChange={(e) => ac.cambiar(e.target.checked)}
+        aria-describedby={ac.error ? `${id}_error` : undefined}
+        className="mt-0.5 h-5 w-5 shrink-0 accent-[#e65100]"
+      />
+      <label htmlFor={id} className="text-xs sm:text-[13px] leading-snug font-semibold text-slate-800">
+        He leído y acepto el{" "}
+        <button type="button" onClick={(ev) => { ev.preventDefault(); abrirLegal("privacidad"); }} className="font-black text-[#1B6F8A] underline underline-offset-2">Aviso de Privacidad</button>
+        {" "}y los{" "}
+        <button type="button" onClick={(ev) => { ev.preventDefault(); abrirLegal("terminos"); }} className="font-black text-[#1B6F8A] underline underline-offset-2">Términos y Condiciones</button>
+        {" "}de la Comunidad.
+      </label>
+    </div>
+  );
+}
+
+function ErrorAcepto({ ac, id = "acepta_terminos_privacidad" }) {
+  if (!ac.error) return null;
+  return (
+    <p id={`${id}_error`} role="alert" className="mt-2 text-sm text-red-600 font-black text-center">
+      Debes aceptar el Aviso de Privacidad y los Términos y Condiciones para continuar
+    </p>
+  );
+}
+
+// Ventana con texto legal largo (Aviso de Privacidad / Términos y Condiciones).
+function ModalLegal({ documento, emoji, degradado, onCerrar }) {
+  return (
+    <VentanaMarca
+      degradado={degradado}
+      suave="#f1f5f9"
+      emoji={emoji}
+      titulo={documento.titulo}
+      invitacion={documento.intro}
+      onCerrar={onCerrar}
+      ancho="max-w-2xl"
+      capa="z-[80]"
+    >
+      <div className="space-y-5 text-sm text-slate-700 leading-relaxed text-left font-medium">
+        {documento.secciones.map((sec, i) => (
+          <section key={i}>
+            <h4 className="text-[15px] font-black text-[#0f2d1e] mb-1.5">{sec.titulo}</h4>
+            {(sec.parrafos || []).map((t, j) => <p key={j} className="mb-2">{t}</p>)}
+            {sec.lista && (
+              <ul className="list-disc pl-5 space-y-1.5 mb-2">
+                {sec.lista.map((it, j) => (
+                  <li key={j}>
+                    {typeof it === "string" ? it : (<><b className="font-black text-[#0f2d1e]">{it.b}</b> {it.t}</>)}
+                  </li>
+                ))}
+              </ul>
+            )}
+            {(sec.despues || []).map((t, j) => <p key={j} className="mb-2">{t}</p>)}
+          </section>
+        ))}
+        <p className="text-xs font-black text-slate-500 pt-1">{documento.fecha}</p>
+      </div>
+    </VentanaMarca>
+  );
+}
+
 const DEGRADADO_AVISOS = "linear-gradient(135deg,#e65100 0%,#ff8f00 100%)";
 const DEGRADADO_COMPARTIR = "linear-gradient(135deg,#17472d 0%,#1B6F8A 100%)";
 const DEGRADADO_SUGERENCIAS = "linear-gradient(135deg,#1B6F8A 0%,#7A5AD8 100%)";
@@ -2753,6 +3007,7 @@ const EMOJIS_INTERESES = ["🛍️", "🐾", "📰", "🧘", "🤝"];
 // Botón "Avisos y Beneficios" — abre una ventana de intereses y arma el
 // mensaje de WhatsApp con lo que la persona seleccionó.
 function BotonRecibeBeneficios({ grande = false }) {
+  const ac = useAceptacion();
   const [abierto, setAbierto] = useState(false);
   const [seleccion, setSeleccion] = useState([]);
 
@@ -2768,11 +3023,13 @@ function BotonRecibeBeneficios({ grande = false }) {
   }, []);
 
   const enviar = () => {
+    if (!ac.validar()) return;
     const lista = seleccion.length > 0 ? seleccion.join(", ") : "todas las novedades";
     registrar("formulario_enviado", { form: "avisos" });
     window.open(enlaceWhatsApp(`¡Hola DCUATES! Quiero recibir información de valor sobre: ${lista}.`), "_blank", "noopener,noreferrer");
     setAbierto(false);
     setSeleccion([]);
+    ac.reiniciar();
   };
 
   return (
@@ -2822,13 +3079,15 @@ function BotonRecibeBeneficios({ grande = false }) {
             })}
           </div>
           <p className="mt-2 text-[11px] text-slate-500 font-medium italic">Si no eliges ninguno, te compartimos un poco de todo.</p>
+          <div className="mt-4"><CasillaAcepto ac={ac} id="acepta_terminos_privacidad_avisos" /></div>
           <button
             type="button"
             onClick={enviar}
-            className="mt-4 w-full rounded-2xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3.5 text-xs sm:text-sm uppercase tracking-wide transition-colors shadow-md"
+            className="mt-3 w-full rounded-2xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3.5 text-xs sm:text-sm uppercase tracking-wide transition-colors shadow-md"
           >
             Quiero recibir avisos por WhatsApp
           </button>
+          <ErrorAcepto ac={ac} id="acepta_terminos_privacidad_avisos" />
         </VentanaMarca>
       )}
     </div>
@@ -2839,11 +3098,13 @@ function BotonRecibeBeneficios({ grande = false }) {
 // Quejas" y para "Compartir Más". Ambos arman un mensaje de WhatsApp con la
 // opción elegida + el texto libre.
 function ModalFormularioWhatsApp({ titulo, emoji = "💬", degradado = DEGRADADO_SUGERENCIAS, suave = "#e3f3f8", invitacion, cierre, descripcion, opciones, placeholder, etiquetaBoton = "Enviar por WhatsApp", onCerrar }) {
+  const ac = useAceptacion();
   const [opcion, setOpcion] = useState(opciones[0]);
   const [mensaje, setMensaje] = useState("");
   const [error, setError] = useState("");
 
   const enviar = () => {
+    if (!ac.validar()) return;
     if (!mensaje.trim()) {
       setError("Escribe un mensaje antes de enviar.");
       return;
@@ -2871,6 +3132,7 @@ function ModalFormularioWhatsApp({ titulo, emoji = "💬", degradado = DEGRADADO
         className="w-full rounded-xl border-2 border-slate-200 px-3 py-2.5 text-sm mb-1 text-slate-800 focus:outline-none focus:border-emerald-600"
       />
       {error && <p className="text-xs text-red-600 font-bold mb-2">{error}</p>}
+      <div className="mt-3"><CasillaAcepto ac={ac} id="acepta_terminos_privacidad_mensaje" /></div>
       <button
         type="button"
         onClick={enviar}
@@ -2879,12 +3141,14 @@ function ModalFormularioWhatsApp({ titulo, emoji = "💬", degradado = DEGRADADO
       >
         {etiquetaBoton}
       </button>
+      <ErrorAcepto ac={ac} id="acepta_terminos_privacidad_mensaje" />
     </VentanaMarca>
   );
 }
 
 // Compartir Más: la persona marca una o las dos opciones y escribe en cada una.
 function ModalCompartirMas({ onCerrar }) {
+  const ac = useAceptacion();
   const [quiereVer, setQuiereVer] = useState(false);
   const [textoVer, setTextoVer] = useState("");
   const [quiereCompartir, setQuiereCompartir] = useState(false);
@@ -2892,6 +3156,7 @@ function ModalCompartirMas({ onCerrar }) {
   const [error, setError] = useState("");
 
   const enviar = () => {
+    if (!ac.validar()) return;
     if (!quiereVer && !quiereCompartir) {
       setError("Marca al menos una de las dos opciones.");
       return;
@@ -2955,14 +3220,16 @@ function ModalCompartirMas({ onCerrar }) {
         </div>
       </div>
       {error && <p className="text-xs text-red-600 font-bold mt-2">{error}</p>}
+      <div className="mt-4"><CasillaAcepto ac={ac} id="acepta_terminos_privacidad_compartir" /></div>
       <button
         type="button"
         onClick={enviar}
-        className="mt-4 w-full rounded-2xl text-white font-black py-3.5 uppercase text-xs sm:text-sm tracking-wide shadow-md hover:opacity-90 transition-opacity"
+        className="mt-3 w-full rounded-2xl text-white font-black py-3.5 uppercase text-xs sm:text-sm tracking-wide shadow-md hover:opacity-90 transition-opacity"
         style={{ background: DEGRADADO_COMPARTIR }}
       >
         Compartir por WhatsApp
       </button>
+      <ErrorAcepto ac={ac} id="acepta_terminos_privacidad_compartir" />
     </VentanaMarca>
   );
 }
@@ -2971,6 +3238,7 @@ function ModalCompartirMas({ onCerrar }) {
 // frecuentes y buscador; si no alcanzan, una caja para escribir la duda que
 // se envía por WhatsApp y una pantalla de agradecimiento con el logo.
 function ModalDudas({ onCerrar, onBuscarEnPagina }) {
+  const ac = useAceptacion();
   const [consulta, setConsulta] = useState("");
   const [abierta, setAbierta] = useState(null);
   const [mensaje, setMensaje] = useState("");
@@ -2985,6 +3253,7 @@ function ModalDudas({ onCerrar, onBuscarEnPagina }) {
   const textoWa = () => `¡Hola DCUATES! Tengo una duda o solicitud:\n\n${mensaje.trim()}`;
 
   const enviar = () => {
+    if (!ac.validar()) return;
     if (!mensaje.trim()) {
       setError("Escribe tu duda o comentario antes de enviar.");
       return;
@@ -3079,6 +3348,7 @@ function ModalDudas({ onCerrar, onBuscarEnPagina }) {
           className="mt-3 w-full rounded-xl border-2 border-slate-200 px-3 py-2.5 text-sm text-slate-800 focus:outline-none focus:border-[#128c7e]"
         />
         {error && <p className="text-xs text-red-600 font-bold mt-1">{error}</p>}
+        <div className="mt-3"><CasillaAcepto ac={ac} id="acepta_terminos_privacidad_dudas" /></div>
         <button
           type="button"
           onClick={enviar}
@@ -3087,6 +3357,7 @@ function ModalDudas({ onCerrar, onBuscarEnPagina }) {
         >
           <span aria-hidden="true">📲</span> Enviar por WhatsApp
         </button>
+        <ErrorAcepto ac={ac} id="acepta_terminos_privacidad_dudas" />
       </div>
     </VentanaMarca>
   );
@@ -3096,6 +3367,7 @@ function ModalDudas({ onCerrar, onBuscarEnPagina }) {
 // 4. SUBCOMPONENTE: FORMULARIO DE PUBLICIDAD
 // =========================================================================
 function FormularioPublicidad() {
+  const ac = useAceptacion();
   const [expandido, setExpandido] = useState(true);
   const [nombre, setNombre] = useState("");
   const [categoria, setCategoria] = useState("");
@@ -3107,6 +3379,7 @@ function FormularioPublicidad() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!ac.validar()) return;
     registrar("formulario_enviado", { form: "publicidad" });
     const fecha = new Date().toLocaleString();
 
@@ -3141,6 +3414,7 @@ function FormularioPublicidad() {
     setCanal1("");
     setCanal2("");
     setCanal3("");
+    ac.reiniciar();
   };
 
   return (
@@ -3197,9 +3471,11 @@ function FormularioPublicidad() {
           <input type="text" value={canal2} onChange={e => setCanal2(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="2. Perfil o Página de Facebook (Opcional)" />
           <input type="text" value={canal3} onChange={e => setCanal3(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="3. Cualquier otra Red Social (Opcional)" />
         </div>
+        <CasillaAcepto ac={ac} id="acepta_terminos_privacidad_publicidad" />
         <button type="submit" className="w-full rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3.5 uppercase tracking-wider text-xs transition-all mt-2 shadow-md font-heading">
           Enviar registro
         </button>
+        <ErrorAcepto ac={ac} id="acepta_terminos_privacidad_publicidad" />
       </div>
     </form>
   );
@@ -3209,6 +3485,7 @@ function FormularioPublicidad() {
 // 4B. SUBCOMPONENTE: FORMULARIO DE VENTAS CON CAUSA
 // =========================================================================
 function FormularioVentasConCausa() {
+  const ac = useAceptacion();
   const [contacto, setContacto] = useState("");
   const [telefono, setTelefono] = useState("");
   const [meInteresa, setMeInteresa] = useState("");
@@ -3216,6 +3493,7 @@ function FormularioVentasConCausa() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!ac.validar()) return;
     const fecha = new Date().toLocaleString();
 
     // Mismo patrón que FormularioPublicidad: se envía como
@@ -3250,6 +3528,7 @@ function FormularioVentasConCausa() {
     setTelefono("");
     setMeInteresa("");
     setEstoyBuscando("");
+    ac.reiniciar();
   };
 
   return (
@@ -3272,9 +3551,11 @@ function FormularioVentasConCausa() {
         <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-emerald-800 mb-1">¿Qué estás buscando?</label>
         <textarea value={estoyBuscando} onChange={e => setEstoyBuscando(e.target.value)} rows={2} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium resize-none" placeholder="Ej. Busco quién pueda hacer reparaciones de bicicletas" />
       </div>
+      <CasillaAcepto ac={ac} id="acepta_terminos_privacidad_ventas" />
       <button type="submit" className="w-full rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3.5 uppercase tracking-wider text-xs transition-all mt-2 shadow-md font-heading">
         Enviar registro
       </button>
+      <ErrorAcepto ac={ac} id="acepta_terminos_privacidad_ventas" />
     </form>
   );
 }
@@ -4038,12 +4319,16 @@ function FormularioSolicitud() {
   const [error, setError] = useState("");
   const [enviado, setEnviado] = useState(false);
   const [enlaceRespaldo, setEnlaceRespaldo] = useState("");
+  const ac = useAceptacion();
 
   const claseCampo = "w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium";
   const claseEtiqueta = "block text-xs sm:text-sm font-black uppercase tracking-wider text-slate-700 mb-1";
 
   const enviar = (e) => {
     e.preventDefault();
+    // Sin aceptar el Aviso de Privacidad y los Términos: se detiene TODO (no se
+    // guarda en Google Sheets ni se abre WhatsApp).
+    if (!ac.validar()) return;
     const tel = telefono.replace(/\D/g, "");
     if (!nombre.trim()) return setError("Escribe tu nombre.");
     if (tel.length < 10) return setError("Escribe tu número de WhatsApp a 10 dígitos.");
@@ -4066,6 +4351,7 @@ function FormularioSolicitud() {
           Colonia: colonia.trim(),
           TipoApoyo: tipo,
           Detalle: detalle.trim(),
+          AceptaTerminos: "Sí (Aviso y Términos, oct-2026)",
           Fecha: new Date().toLocaleString()
         })
       }).catch(() => {});
@@ -4096,7 +4382,7 @@ function FormularioSolicitud() {
         </p>
         <button
           type="button"
-          onClick={() => { setEnviado(false); setNombre(""); setTelefono(""); setColonia(""); setDetalle(""); setTipo(TIPOS_DE_APOYO[0]); }}
+          onClick={() => { setEnviado(false); setNombre(""); setTelefono(""); setColonia(""); setDetalle(""); setTipo(TIPOS_DE_APOYO[0]); ac.reiniciar(); }}
           className="mt-4 rounded-full border-2 border-[#0f2d1e] px-4 py-1.5 text-[11px] font-black uppercase tracking-wide text-[#0f2d1e] hover:bg-emerald-50 transition-colors"
         >
           Registrar otra solicitud
@@ -4132,12 +4418,11 @@ function FormularioSolicitud() {
         <textarea id="sol-detalle" rows={4} value={detalle} onChange={(e) => { setDetalle(e.target.value); if (error) setError(""); }} className={claseCampo} placeholder="Cuéntanos con detalle cómo podemos apoyarte…" />
       </div>
       {error && <p className="text-xs text-red-600 font-bold">{error}</p>}
+      <CasillaAcepto ac={ac} />
       <button type="submit" className="w-full rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3.5 uppercase tracking-wider text-xs sm:text-sm transition-colors shadow-md">
         Enviar mi solicitud
       </button>
-      <p className="text-[11px] text-slate-500 font-medium leading-snug text-center">
-        Usamos tus datos solo para atender tu solicitud. Consulta el Aviso de Privacidad en el pie de página.
-      </p>
+      <ErrorAcepto ac={ac} />
     </form>
   );
 }
