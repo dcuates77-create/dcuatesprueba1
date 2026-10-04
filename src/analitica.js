@@ -35,6 +35,21 @@ export function iniciarAnalitica() {
     v.onerror = () => {};
     document.head.appendChild(v);
 
+    // De dónde llegó la visita: enlaces y QR con ?origen=cartel-parque (o
+    // /qr/cartel-parque). Se registra y se limpia de la barra de direcciones
+    // para que nadie comparta el enlace con la marca de origen.
+    try {
+      const url = new URL(window.location.href);
+      const origen = url.searchParams.get("origen");
+      if (origen) {
+        registrar("visita_origen", { origen: origen.slice(0, 40) });
+        url.searchParams.delete("origen");
+        window.history.replaceState(null, "", url.pathname + url.search + url.hash);
+      }
+    } catch {
+      /* ignorar */
+    }
+
     if (GOATCOUNTER_CODIGO) {
       const g = document.createElement("script");
       g.async = true;

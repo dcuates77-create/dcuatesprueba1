@@ -41,14 +41,6 @@ const TABS = [
     invitacion: { titulo: "Tu ayuda cambia vidas", texto: "Cada proyecto es una forma concreta de apoyar a alguien de tu comunidad. Elige el que te mueva y conoce cómo sumarte." }
   },
   {
-    id: "valores", label: "Valores", emoji: "✨", color: "#7A5AD8", pastel: "#EFEAFE",
-    boton: "#6A47C9",
-    cat: "sumando-valores", cover: {}, ver: true, slot: "valores",
-    banda: { titulo: "Valores que se multiplican" },
-    invitacion: { titulo: "Los valores que nos unen", texto: "Confianza, alianzas y buenas noticias del barrio. Entra y mira cómo los vivimos." },
-    wa: "¡Hola DCUATES! Quiero saber más sobre sus valores y alianzas."
-  },
-  {
     id: "negocios", label: "Negocios", emoji: "🗺️", color: "#2E9E5B", pastel: "#E4F6EB",
     boton: "#23804A",
     cat: "alianzas-y-negocios", cover: { slogan: "Negocios locales aliados" }, ocultarSinItems: true, mapa: true, fichas: true, ver: true, slot: "negocios",
@@ -56,6 +48,14 @@ const TABS = [
     banda: { titulo: "Comunidad que mueve el barrio" },
     invitacion: { titulo: "Compra local, crece en comunidad", texto: "Alianzas que mueven la economía del barrio. Descubre cómo participar." },
     wa: "¡Hola DCUATES! Quiero registrar mi negocio."
+  },
+  {
+    id: "valores", label: "Valores", emoji: "✨", color: "#7A5AD8", pastel: "#EFEAFE",
+    boton: "#6A47C9",
+    cat: "sumando-valores", cover: {}, ver: true, slot: "valores",
+    banda: { titulo: "Valores que se multiplican" },
+    invitacion: { titulo: "Los valores que nos unen", texto: "Confianza, alianzas y buenas noticias del barrio. Entra y mira cómo los vivimos." },
+    wa: "¡Hola DCUATES! Quiero saber más sobre sus valores y alianzas."
   },
   {
     id: "regalos", label: "Regalos", emoji: "🎉", color: "#D6336C", pastel: "#FDE8F1", boton: "#C2255C",

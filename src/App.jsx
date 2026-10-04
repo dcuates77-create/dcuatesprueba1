@@ -2,6 +2,7 @@ import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
 import BloqueCentral from "./BloqueCentral";
 import BotonCompartir from "./BotonCompartir";
 import { iniciarAnalitica, registrar } from "./analitica";
+import { iniciarPWA, puedeInstalar, instalarApp, suscribirPWA, yaInstalada, esIOS } from "./pwa";
 
 // =========================================================================
 // 1. CONFIGURACIÓN CENTRALIZADA DE VARIABLES, REDES Y HOJA DE CÁLCULO y BORRADO DE TODOS LOS ANTERIORES JSX CAMBIOS VIDEOS
@@ -28,7 +29,7 @@ const CLAVE_CIRCULO_CONFIANZA = "confianza2026";
 // iframe); no hace falta tocar nada más en el código.
 // Sello de versión: se ve en pequeño al final de los accesos rápidos y en la
 // consola del navegador. Sirve para comprobar que el celular ya cargó lo último.
-const VERSION_BUILD = "CLON8 · f9";
+const VERSION_BUILD = "CLON8 · f10";
 if (typeof console !== "undefined") console.info("[DCUATES] versión", VERSION_BUILD);
 
 const MAPA_NEGOCIOS_EMBED_URL = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15034.541076557625!2d-99.00223799999999!3d19.600120500000003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1ee234c038987%3A0x4b578513910d8103!2sJardines%20de%20Morelos%2C%20Ecatepec%20de%20Morelos%2C%20M%C3%A9x.!5e0!3m2!1ses!2smx!4v1790129394750!5m2!1ses!2smx";
@@ -101,7 +102,9 @@ const NAV_LINKS_MAS = [
   { label: "Ventas con Causa", emoji: "🛍️", href: "#ventas-con-causa" },
   { label: "Alianzas Solidarias", emoji: "🤝", modal: "alianzas-tarjeta" },
   { label: "Apoyo a Causas", emoji: "❤️", href: "#extraviados-registro" },
+  { label: "Historias que inspiran (videos)", emoji: "🎥", href: "#historias-reflexiones" },
   { label: "Mapa del Sitio", emoji: "🗺️", action: "mapa-sitio" },
+  { label: "Código QR e instalar la app", emoji: "📲", action: "qr" },
   { label: "Registra tu Solicitud", emoji: "📝", href: "#solicitudes" },
   { label: "Préstamo Gratuito de Libros", emoji: "📚", modal: "libros" },
   { label: "Ecatepets Mascotas", emoji: "🐾", modal: "ecatepets" },
@@ -830,6 +833,8 @@ function BotonesRetosRegalos({ indices }) {
 export default function App() {
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [showFAQ, setShowFAQ] = useState(false);
+  const [showDudas, setShowDudas] = useState(false);
+  const [showQR, setShowQR] = useState(false);
   // Modal del Mapa de Sitio — tarjetas con acceso directo a todo lo que
   // hay en la página (accesible desde el pie de página y el menú "Más").
   const [showMapaSitio, setShowMapaSitio] = useState(false);
@@ -840,7 +845,7 @@ export default function App() {
   // "donaciones") se abre con la información de ese proyecto.
   const [modalProyecto, setModalProyecto] = useState(null);
   // Analítica: cuenta visitas y registra qué proyectos se abren.
-  useEffect(() => { iniciarAnalitica(); }, []);
+  useEffect(() => { iniciarAnalitica(); iniciarPWA(); }, []);
   useEffect(() => { if (modalProyecto) registrar("proyecto_abrir", { id: String(modalProyecto) }); }, [modalProyecto]);
   // ¿Ya respondió Baserow (bien o mal)? Mientras no, se muestran esqueletos.
   const [baserowListo, setBaserowListo] = useState(() => typeof window !== "undefined" && !!window.__dcuatesBaserow);
@@ -1105,21 +1110,21 @@ export default function App() {
       {/* Barra Ticker Inferior Fija — combina negocios, mascotas, avisos y momentos */}
       <BarraTicker />
 
-      {/* Botón flotante "Subir" — aparece solo después de bajar un poco */}
-      {mostrarSubir && (
-        <button
-          type="button"
-          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          aria-label="Subir al inicio de la página"
-          title="Subir"
-          style={{ bottom: "calc(var(--alto-ticker, 48px) + 6px)" }} className="fixed left-4 z-50 h-11 w-11 sm:h-12 sm:w-12 flex items-center justify-center rounded-full bg-[#0f2d1e] text-white shadow-lg border-2 border-white/30 hover:bg-emerald-800 transition-colors"
-        >
-          <span className="text-xl leading-none" aria-hidden="true">↑</span>
-        </button>
-      )}
-
       {/* Botón Flotante Permanente de WhatsApp — efecto 3D + anillo parpadeante + etiqueta */}
       <div className="fixed right-4 sm:right-6 z-50 flex flex-col items-end gap-1.5" style={{ bottom: "calc(var(--alto-ticker, 48px) + 6px)" }}>
+        {/* Flecha "Subir" — a la derecha, arriba de ¿Qué necesitas hoy?; aparece
+            solo después de bajar un poco. */}
+        {mostrarSubir && (
+          <button
+            type="button"
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            aria-label="Subir al inicio de la página"
+            title="Subir al menú"
+            className="h-12 w-12 flex items-center justify-center rounded-full bg-[#0f2d1e] text-white shadow-lg border-2 border-white/40 hover:bg-emerald-800 transition-colors"
+          >
+            <span className="text-2xl leading-none font-black" aria-hidden="true">↑</span>
+          </button>
+        )}
         {/* ¿Qué necesitas hoy? — arriba del botón de WhatsApp */}
         <BotonNecesidades
           onAbrirProyecto={(id) => setModalProyecto(id)}
@@ -1127,21 +1132,25 @@ export default function App() {
           onAbrirFAQ={() => setShowFAQ(true)}
         />
         <div className="flex items-center gap-3">
-        <span className="bg-[#25d366] text-white text-[11px] sm:text-sm font-black uppercase tracking-wide px-3 py-2 rounded-full shadow-lg border border-white/30 whitespace-nowrap animate-pulse">
+        <button
+          type="button"
+          onClick={() => { registrar("dudas_abrir"); setShowDudas(true); }}
+          className="bg-[#25d366] text-white text-[11px] sm:text-sm font-black uppercase tracking-wide px-3 py-2 rounded-full shadow-lg border border-white/30 whitespace-nowrap animate-pulse"
+        >
           Dudas y Atención
-        </span>
-        <a
-          href={enlaceWhatsApp("¡Hola DCUATES! Me gustaría más información.")}
-          target="_blank"
-          rel="noopener noreferrer"
+        </button>
+        <button
+          type="button"
+          onClick={() => { registrar("dudas_abrir"); setShowDudas(true); }}
+          aria-label="Abrir ventana de dudas y atención"
           className="relative flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[#34e372] to-[#128c7e] text-white shadow-[0_10px_20px_rgba(0,0,0,0.35),inset_0_-3px_6px_rgba(0,0,0,0.25),inset_0_3px_4px_rgba(255,255,255,0.4)] transition-all hover:scale-110 active:scale-95 border-2 border-white/40"
-          title="Chat de Atención Directa"
+          title="Dudas y Atención"
         >
           <span className="absolute inset-0 rounded-full bg-[#25d366] animate-ping opacity-60"></span>
           <svg className="relative z-10 h-7 w-7 fill-current drop-shadow" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.503-5.729-1.458L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.965C16.428 1.978 13.96 1.951 12.01 1.951c-5.438 0-9.863 4.374-9.867 9.802 0 1.685.459 3.324 1.333 4.766L2.483 20.3l3.966-.995zM17.15 14.34c-.283-.141-1.674-.824-1.933-.917-.26-.093-.448-.14-.637.142-.188.282-.729.917-.894 1.105-.165.188-.33.212-.613.07a9.23 9.23 0 0 1-2.28-1.401 10.15 10.15 0 0 1-1.579-1.954c-.165-.282-.018-.434.124-.574.127-.127.283-.329.424-.494.141-.165.188-.282.283-.47.094-.188.047-.353-.024-.494-.071-.141-.637-1.53-.873-2.102-.229-.554-.46-.478-.637-.487-.164-.008-.353-.01-.542-.01-.189 0-.495.07-.755.353-.26.282-.99 1.011-.99 2.467 0 1.457 1.06 2.867 1.201 3.056.142.188 2.086 3.178 5.053 4.462.705.305 1.256.488 1.684.624.708.226 1.353.194 1.863.118.568-.085 1.674-.682 1.909-1.34.236-.658.236-1.223.165-1.34-.07-.117-.26-.188-.542-.329z"/>
           </svg>
-        </a>
+        </button>
               </div>
       </div>
 
@@ -1156,6 +1165,7 @@ export default function App() {
           onAbrirProyecto={(id) => setModalProyecto(id)}
           onAbrirSugerencias={() => setModalFormulario("sugerencias")}
           onAbrirMapaSitio={() => setShowMapaSitio(true)}
+          onAbrirQR={() => { registrar("qr_abrir"); setShowQR(true); }}
           onAbrirCategoria={(id) => setCategoriaAbierta(id)}
           busquedaAbierta={busquedaAbierta}
           setBusquedaAbierta={setBusquedaAbierta}
@@ -1842,6 +1852,11 @@ export default function App() {
       {/* Accesos rápidos: Avisos y Beneficios · Compartir Más · Inicio */}
       <BarraAccionesFinal onAbrirComparte={() => setModalFormulario("comparte")} />
 
+      <div className="mt-[1.5cm] mb-[0.5cm]">
+
+        <BarraPatrocinadores />
+      </div>
+
       {/* HISTORIAS Y REFLEXIONES DCUATES — movida aquí (antes vivía dentro
           del hero); ahora como barra horizontal de 1-2 videos de alto, con
           scroll lateral para ver más. Sigue tomando sus videos de las
@@ -1879,11 +1894,6 @@ export default function App() {
           </div>
         </div>
       </section>
-
-      <div className="mt-[1.5cm] mb-[0.5cm]">
-
-        <BarraPatrocinadores />
-      </div>
 
       {/* FOOTER */}
       <footer className="bg-[#e8f5e9] text-[#0f2d1e] py-12 px-4 text-center space-y-8 border-t-4 border-[#0f2d1e]">
@@ -1930,6 +1940,12 @@ export default function App() {
           <a href="#inicio" className="hover:text-[#0f2d1e] transition-colors">Proyectos</a>
           <a href="#publicidad" className="hover:text-[#0f2d1e] transition-colors">Publicidad</a>
           <a href="#donaciones" className="hover:text-[#0f2d1e] transition-colors">Donaciones</a>
+          <button
+            onClick={() => { registrar("qr_abrir"); setShowQR(true); }}
+            className="underline underline-offset-4 hover:text-[#0f2d1e] bg-transparent border-none cursor-pointer font-bold transition-colors"
+          >
+            Código QR
+          </button>
           <button
             onClick={() => setShowMapaSitio(true)}
             className="underline underline-offset-4 hover:text-[#0f2d1e] bg-transparent border-none cursor-pointer font-bold transition-colors"
@@ -2115,19 +2131,41 @@ export default function App() {
       {modalFormulario === "sugerencias" && (
         <ModalFormularioWhatsApp
           titulo="Sugerencias y Quejas"
-          descripcion="Tu opinión nos ayuda a mejorar. Cuéntanos qué tienes en mente:"
+          emoji="💬"
+          degradado={DEGRADADO_SUGERENCIAS}
+          suave="#e3f3f8"
+          invitacion="Tu voz mejora esta comunidad. Cuéntanos qué te gustó, qué falló o qué podríamos hacer mejor; cada mensaje lo leemos con atención."
+          cierre="Gracias por ayudarnos a mejorar. ¡Juntos lo hacemos mejor! 💬"
           opciones={["Sugerencia", "Queja", "Reporte de error en la página", "Otro"]}
           placeholder="Escribe aquí tu mensaje..."
+          etiquetaBoton="Enviar por WhatsApp"
           onCerrar={() => setModalFormulario(null)}
         />
       )}
       {modalFormulario === "comparte" && (
         <ModalFormularioWhatsApp
-          titulo="Compartir"
+          titulo="Compartir Más"
+          emoji="🌟"
+          degradado={DEGRADADO_COMPARTIR}
+          suave="#e3f3f8"
+          invitacion="DCUATES se construye con lo que cada quien aporta. Dinos qué te gustaría ver en la página o qué quieres compartir tú: una historia, un negocio, un talento, una causa o una buena noticia."
+          cierre="Lo que compartes hoy puede ser la ayuda que alguien necesita mañana. ¡Gracias por sumar! 🌟"
           descripcion="¿Qué te gustaría o necesitas que compartiéramos, y qué te gustaría compartir tú?"
           opciones={["Quiero que compartan más o también sobre", "Quiero compartir algo"]}
           placeholder="Cuéntanos..."
+          etiquetaBoton="Compartir por WhatsApp"
           onCerrar={() => setModalFormulario(null)}
+        />
+      )}
+
+      {/* CÓDIGO QR OFICIAL + INSTALAR LA APP */}
+      {showQR && <ModalCompartirQR onCerrar={() => setShowQR(false)} />}
+
+      {/* VENTANA DE DUDAS — la abre el botón flotante de WhatsApp */}
+      {showDudas && (
+        <ModalDudas
+          onCerrar={() => setShowDudas(false)}
+          onBuscarEnPagina={() => { setBusquedaAbierta(true); window.scrollTo({ top: 0, behavior: "smooth" }); }}
         />
       )}
 
@@ -2278,7 +2316,7 @@ function BotonCerrar({ onClick, label = "Cerrar", claro = false }) {
   );
 }
 
-function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSugerencias, onAbrirMapaSitio, onAbrirCategoria, busquedaAbierta, setBusquedaAbierta }) {
+function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSugerencias, onAbrirMapaSitio, onAbrirQR, onAbrirCategoria, busquedaAbierta, setBusquedaAbierta }) {
   const [menuAbierto, setMenuAbierto] = useState(false);
   // Colores alternados del menú (combinan con el verde, el naranja y el azul
   // turquesa que ya usa la página).
@@ -2384,6 +2422,7 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSug
                             if (link.action === "faq") onAbrirFAQ && onAbrirFAQ();
                             else if (link.action === "sugerencias") onAbrirSugerencias && onAbrirSugerencias();
                             else if (link.action === "mapa-sitio") onAbrirMapaSitio && onAbrirMapaSitio();
+                            else if (link.action === "qr") onAbrirQR && onAbrirQR();
                             else if (link.modal) onAbrirProyecto && onAbrirProyecto(link.modal);
                           }}
                           className={claseFila}
@@ -2657,11 +2696,91 @@ function BarraAccionesFinal({ onAbrirComparte }) {
           <span aria-hidden="true">🏠</span>
         </button>
       </div>
+      {/* Enlace directo a la barra de videos del final de la página */}
+      <div className="mx-auto max-w-2xl md:max-w-4xl xl:max-w-6xl mt-3">
+        <button
+          type="button"
+          onClick={() => irASeccion("historias-reflexiones")}
+          className="w-full min-h-[48px] rounded-2xl border-2 border-[#0f2d1e] bg-white hover:bg-emerald-50 text-[#0f2d1e] shadow-sm px-3 py-2.5 text-[11px] sm:text-sm font-black uppercase tracking-wide transition-colors flex items-center justify-center gap-2 text-center leading-tight"
+        >
+          <span aria-hidden="true">🎥</span>
+          <span>Mira las historias que inspiran</span>
+          <span aria-hidden="true">↓</span>
+        </button>
+      </div>
       <SelloVersion />
     </section>
   );
 }
 
+// Logo circular de DCUATES para encabezar las ventanas (si la imagen no
+// carga, se muestra "DC" en su lugar).
+function LogoMarca({ tam = 64 }) {
+  const [fallo, setFallo] = useState(false);
+  return (
+    <span
+      style={{ width: tam, height: tam }}
+      className="flex items-center justify-center rounded-full overflow-hidden bg-[#0f2d1e] border-4 border-white shadow-lg shrink-0"
+    >
+      {fallo ? (
+        <span className="text-white font-black" style={{ fontSize: tam * 0.36 }}>DC</span>
+      ) : (
+        <img src="/images/logo-circular.png" alt="Logo DCUATES" className="w-full h-full object-contain" onError={() => setFallo(true)} />
+      )}
+    </span>
+  );
+}
+
+// Ventana con presencia de marca: encabezado de color con el logo, una
+// invitación que introduce el contenido, el contenido (children), una frase
+// de cierre y la cruz de cerrar abajo a la derecha. La usan Avisos y
+// Beneficios, Compartir Más, Sugerencias y Dudas.
+function VentanaMarca({ degradado, suave, emoji, titulo, invitacion, cierre, onCerrar, children, ancho = "max-w-md" }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-3 sm:p-4 backdrop-blur-sm" onClick={onCerrar}>
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={titulo}
+        className={`bg-white text-slate-900 rounded-3xl ${ancho} w-full max-h-[92vh] overflow-y-auto shadow-2xl`}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="px-5 pt-5 pb-7 text-white text-center" style={{ background: degradado }}>
+          <div className="flex justify-center"><LogoMarca tam={68} /></div>
+          <p className="mt-2 text-[11px] font-black uppercase tracking-widest text-white/90">DCUATES · ¡Comparte y Gana!</p>
+          <h3 className="mt-1 text-xl sm:text-2xl font-black leading-tight">
+            <span aria-hidden="true">{emoji} </span>{titulo}
+          </h3>
+        </div>
+        <div className="-mt-3 rounded-t-3xl bg-white px-5 pt-5 pb-5">
+          {invitacion && (
+            <p className="rounded-2xl px-4 py-3 text-sm sm:text-[15px] leading-relaxed font-semibold text-slate-800 mb-4" style={{ background: suave }}>
+              {invitacion}
+            </p>
+          )}
+          {children}
+          {cierre && (
+            <p className="mt-5 text-center text-sm font-black italic leading-snug text-[#0f2d1e]">
+              {cierre}
+            </p>
+          )}
+          <div className="mt-4 flex justify-end">
+            <BotonCerrar onClick={onCerrar} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const DEGRADADO_AVISOS = "linear-gradient(135deg,#e65100 0%,#ff8f00 100%)";
+const DEGRADADO_COMPARTIR = "linear-gradient(135deg,#17472d 0%,#1B6F8A 100%)";
+const DEGRADADO_SUGERENCIAS = "linear-gradient(135deg,#1B6F8A 0%,#7A5AD8 100%)";
+const DEGRADADO_DUDAS = "linear-gradient(135deg,#0b6e5f 0%,#25d366 100%)";
+const EMOJIS_INTERESES = ["🛍️", "🐾", "📰", "🧘", "🤝"];
+
+// Botón "Avisos y Beneficios" — abre una ventana de intereses y arma el
+// mensaje de WhatsApp con lo que la persona seleccionó.
 function BotonRecibeBeneficios({ grande = false }) {
   const [abierto, setAbierto] = useState(false);
   const [seleccion, setSeleccion] = useState([]);
@@ -2672,6 +2791,7 @@ function BotonRecibeBeneficios({ grande = false }) {
 
   const enviar = () => {
     const lista = seleccion.length > 0 ? seleccion.join(", ") : "todas las novedades";
+    registrar("formulario_enviado", { form: "avisos" });
     window.open(enlaceWhatsApp(`¡Hola DCUATES! Quiero recibir información de valor sobre: ${lista}.`), "_blank", "noopener,noreferrer");
     setAbierto(false);
     setSeleccion([]);
@@ -2692,49 +2812,54 @@ function BotonRecibeBeneficios({ grande = false }) {
       </button>
 
       {abierto && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
-          onClick={() => setAbierto(false)}
+        <VentanaMarca
+          degradado={DEGRADADO_AVISOS}
+          suave="#fff3e0"
+          emoji="💌"
+          titulo="Avisos y Beneficios"
+          invitacion="Sé de los primeros en enterarte. Elige lo que te interesa y te escribimos por WhatsApp con promociones de negocios locales, mascotas que buscan hogar, eventos del barrio y oportunidades de apoyo."
+          cierre="Una comunidad bien informada es una comunidad más fuerte. ¡Qué gusto tenerte aquí! 💚"
+          onCerrar={() => setAbierto(false)}
         >
-          <div
-            className="bg-white text-slate-900 rounded-2xl max-w-sm w-full p-6 shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <p className="text-sm font-black uppercase text-[#0f2d1e] mb-3">¿Qué te interesa recibir?</p>
-            <div className="space-y-2.5">
-              {INTERESES_BENEFICIOS.map((interes) => (
-                <label key={interes} className="flex items-start gap-2 text-sm font-bold text-slate-800 cursor-pointer">
+          <p className="text-xs font-black uppercase tracking-wide text-[#bf360c] mb-2">¿Qué te interesa recibir?</p>
+          <div className="space-y-2">
+            {INTERESES_BENEFICIOS.map((interes, i) => {
+              const marcado = seleccion.includes(interes);
+              return (
+                <label
+                  key={interes}
+                  className={`flex items-center gap-3 rounded-2xl border-2 px-3 py-2.5 text-sm font-bold cursor-pointer transition-colors ${marcado ? "border-[#e65100] bg-orange-50 text-[#7a2e00]" : "border-slate-200 bg-white text-slate-800 hover:border-orange-300"}`}
+                >
                   <input
                     type="checkbox"
-                    checked={seleccion.includes(interes)}
+                    checked={marcado}
                     onChange={() => alternar(interes)}
-                    className="mt-0.5 accent-[#17472d]"
+                    className="h-5 w-5 shrink-0 accent-[#e65100]"
                   />
-                  {interes}
+                  <span aria-hidden="true" className="text-lg">{EMOJIS_INTERESES[i % EMOJIS_INTERESES.length]}</span>
+                  <span className="leading-snug">{interes}</span>
                 </label>
-              ))}
-            </div>
-            <button
-              type="button"
-              onClick={enviar}
-              className="mt-5 w-full rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3 text-xs uppercase tracking-wide transition-colors"
-            >
-              Suscribirme por WhatsApp
-            </button>
-            <div className="mt-3 flex justify-end">
-              <BotonCerrar onClick={() => setAbierto(false)} />
-            </div>
+              );
+            })}
           </div>
-        </div>
+          <p className="mt-2 text-[11px] text-slate-500 font-medium italic">Si no eliges ninguno, te compartimos un poco de todo.</p>
+          <button
+            type="button"
+            onClick={enviar}
+            className="mt-4 w-full rounded-2xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3.5 text-xs sm:text-sm uppercase tracking-wide transition-colors shadow-md"
+          >
+            Quiero recibir avisos por WhatsApp
+          </button>
+        </VentanaMarca>
       )}
     </div>
   );
 }
 
 // Modal de formulario reutilizable — mismo componente para "Sugerencias y
-// Quejas" y para "Conocer y Compartir Más" (Necesidades). Ambos arman un
-// mensaje de WhatsApp con la opción elegida + el texto libre.
-function ModalFormularioWhatsApp({ titulo, descripcion, opciones, placeholder, onCerrar }) {
+// Quejas" y para "Compartir Más". Ambos arman un mensaje de WhatsApp con la
+// opción elegida + el texto libre.
+function ModalFormularioWhatsApp({ titulo, emoji = "💬", degradado = DEGRADADO_SUGERENCIAS, suave = "#e3f3f8", invitacion, cierre, descripcion, opciones, placeholder, etiquetaBoton = "Enviar por WhatsApp", onCerrar }) {
   const [opcion, setOpcion] = useState(opciones[0]);
   const [mensaje, setMensaje] = useState("");
   const [error, setError] = useState("");
@@ -2750,39 +2875,246 @@ function ModalFormularioWhatsApp({ titulo, descripcion, opciones, placeholder, o
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm" onClick={onCerrar}>
-      <div className="bg-white text-slate-900 rounded-2xl max-w-md w-full p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
-        <h3 className="text-xl font-bold uppercase tracking-tight text-emerald-800 font-heading border-b pb-3 mb-4">
-          {titulo}
-        </h3>
-        <p className="text-sm text-slate-600 leading-relaxed font-medium mb-3">{descripcion}</p>
-        <select
-          value={opcion}
-          onChange={(e) => setOpcion(e.target.value)}
-          className="w-full rounded-lg border border-emerald-200 px-3 py-2 text-sm mb-3 text-slate-700"
-        >
-          {opciones.map((o) => <option key={o} value={o}>{o}</option>)}
-        </select>
+    <VentanaMarca degradado={degradado} suave={suave} emoji={emoji} titulo={titulo} invitacion={invitacion} cierre={cierre} onCerrar={onCerrar}>
+      {descripcion && <p className="text-sm text-slate-700 leading-relaxed font-bold mb-3">{descripcion}</p>}
+      <select
+        value={opcion}
+        onChange={(e) => setOpcion(e.target.value)}
+        className="w-full rounded-xl border-2 border-slate-200 bg-white px-3 py-2.5 text-sm font-bold mb-3 text-slate-800"
+      >
+        {opciones.map((o) => <option key={o} value={o}>{o}</option>)}
+      </select>
+      <textarea
+        value={mensaje}
+        onChange={(e) => { setMensaje(e.target.value); if (error) setError(""); }}
+        rows={4}
+        placeholder={placeholder}
+        className="w-full rounded-xl border-2 border-slate-200 px-3 py-2.5 text-sm mb-1 text-slate-800 focus:outline-none focus:border-emerald-600"
+      />
+      {error && <p className="text-xs text-red-600 font-bold mb-2">{error}</p>}
+      <button
+        type="button"
+        onClick={enviar}
+        className="mt-3 w-full rounded-2xl text-white font-black py-3.5 text-center transition-opacity hover:opacity-90 uppercase text-xs sm:text-sm tracking-wide shadow-md"
+        style={{ background: degradado }}
+      >
+        {etiquetaBoton}
+      </button>
+    </VentanaMarca>
+  );
+}
+
+// Código QR oficial de la página + guía para usarlo con confianza + botón
+// para instalar la página como app. La imagen /images/qr-dcuates.png la
+// genera el archivo que acompaña a esta versión (ver instrucciones).
+const SITIO_OFICIAL = "dcuates.com";
+function ModalCompartirQR({ onCerrar }) {
+  const [instalable, setInstalable] = useState(puedeInstalar());
+  const [copiado, setCopiado] = useState(false);
+  useEffect(() => suscribirPWA(() => setInstalable(puedeInstalar())), []);
+  const instalada = yaInstalada();
+
+  const instalar = async () => {
+    const ok = await instalarApp();
+    registrar(ok ? "pwa_aceptada" : "pwa_rechazada");
+    setInstalable(puedeInstalar());
+  };
+  const copiar = async () => {
+    try {
+      await navigator.clipboard.writeText(`https://${SITIO_OFICIAL}`);
+      setCopiado(true);
+      setTimeout(() => setCopiado(false), 2000);
+    } catch { /* ignorar */ }
+  };
+
+  return (
+    <VentanaMarca
+      degradado="linear-gradient(135deg,#17472d 0%,#2E9E5B 100%)"
+      suave="#e4f6eb"
+      emoji="📲"
+      titulo="Lleva DCUATES contigo"
+      invitacion="Escanea el código con la cámara de tu celular para abrir la página, o muéstraselo a quien quieras invitar a la comunidad."
+      cierre="Un código, una comunidad: compártelo con quien lo necesite. 💚"
+      onCerrar={onCerrar}
+    >
+      <div className="flex flex-col items-center">
+        <div className="rounded-2xl border-4 border-[#0f2d1e] bg-white p-3 shadow-md">
+          <img src="/images/qr-dcuates.png" alt={`Código QR para abrir ${SITIO_OFICIAL}`} className="h-52 w-52 sm:h-60 sm:w-60" />
+        </div>
+        <p className="mt-3 text-2xl font-black tracking-tight text-[#0f2d1e]">{SITIO_OFICIAL}</p>
+        <p className="text-[11px] font-bold text-slate-500">Esta es la única dirección oficial</p>
+        <div className="mt-3 grid w-full grid-cols-2 gap-2">
+          <a
+            href="/images/qr-dcuates.png"
+            download="QR-DCUATES.png"
+            className="rounded-xl bg-[#17472d] hover:bg-[#0f2d1e] px-2 py-3 text-center text-[11px] font-black uppercase tracking-wide text-white transition-colors"
+          >
+            ⬇ Descargar QR
+          </a>
+          <button
+            type="button"
+            onClick={copiar}
+            className="rounded-xl border-2 border-[#17472d] px-2 py-3 text-[11px] font-black uppercase tracking-wide text-[#17472d] hover:bg-emerald-50 transition-colors"
+          >
+            {copiado ? "✓ Copiado" : "🔗 Copiar enlace"}
+          </button>
+        </div>
+      </div>
+
+      <div className="mt-5 rounded-2xl bg-amber-50 border-2 border-amber-200 px-4 py-3">
+        <p className="text-xs font-black uppercase tracking-wide text-amber-800 mb-1.5">🛡️ Cómo usar un QR con confianza</p>
+        <ul className="space-y-1.5 text-[13px] leading-snug font-semibold text-slate-800">
+          <li>• Antes de abrir, mira la dirección que aparece en tu celular: debe decir <b>{SITIO_OFICIAL}</b>.</li>
+          <li>• Escanéalo solo de carteles o volantes que veas con nuestro logo, y no sobre otro QR pegado encima.</li>
+          <li>• DCUATES nunca te pide contraseñas, datos de tarjeta ni depósitos por un QR.</li>
+          <li>• ¿Dudas? Escríbenos antes por WhatsApp desde la página.</li>
+        </ul>
+      </div>
+
+      {!instalada && (
+        <div className="mt-4 rounded-2xl bg-emerald-50 border-2 border-emerald-200 px-4 py-3">
+          <p className="text-xs font-black uppercase tracking-wide text-emerald-800 mb-1.5">📱 Instálala como app</p>
+          {instalable ? (
+            <button
+              type="button"
+              onClick={instalar}
+              className="w-full rounded-xl bg-[#e65100] hover:bg-[#bf360c] py-3 text-xs font-black uppercase tracking-wide text-white transition-colors"
+            >
+              Instalar DCUATES en mi celular
+            </button>
+          ) : esIOS() ? (
+            <p className="text-[13px] leading-snug font-semibold text-slate-800">En iPhone: toca el botón <b>Compartir</b> de Safari (el cuadrado con la flecha) y elige <b>“Añadir a pantalla de inicio”</b>.</p>
+          ) : (
+            <p className="text-[13px] leading-snug font-semibold text-slate-800">En el menú de tu navegador (⋮) elige <b>“Instalar aplicación”</b> o <b>“Añadir a pantalla de inicio”</b>. Así abre con un toque, como cualquier app.</p>
+          )}
+        </div>
+      )}
+    </VentanaMarca>
+  );
+}
+
+// Ventana de dudas (botón flotante de WhatsApp): primero preguntas
+// frecuentes y buscador; si no alcanzan, una caja para escribir la duda que
+// se envía por WhatsApp y una pantalla de agradecimiento con el logo.
+function ModalDudas({ onCerrar, onBuscarEnPagina }) {
+  const [consulta, setConsulta] = useState("");
+  const [abierta, setAbierta] = useState(null);
+  const [mensaje, setMensaje] = useState("");
+  const [error, setError] = useState("");
+  const [enviado, setEnviado] = useState(false);
+
+  const q = normalizarBusqueda(consulta).trim();
+  const lista = FAQ_ITEMS
+    .map((f, i) => ({ ...f, i }))
+    .filter((f) => !q || normalizarBusqueda(f.pregunta + " " + f.respuesta).includes(q));
+
+  const textoWa = () => `¡Hola DCUATES! Tengo una duda o solicitud:\n\n${mensaje.trim()}`;
+
+  const enviar = () => {
+    if (!mensaje.trim()) {
+      setError("Escribe tu duda o comentario antes de enviar.");
+      return;
+    }
+    registrar("dudas_enviada");
+    window.open(enlaceWhatsApp(textoWa()), "_blank", "noopener,noreferrer");
+    setEnviado(true);
+  };
+
+  if (enviado) {
+    return (
+      <VentanaMarca degradado={DEGRADADO_DUDAS} suave="#e7f9ee" emoji="✅" titulo="¡Mensaje enviado!" onCerrar={onCerrar}>
+        <div className="text-center py-2">
+          <div className="flex justify-center"><LogoMarca tam={96} /></div>
+          <p className="mt-4 text-base sm:text-lg font-black text-[#0f2d1e] leading-snug">
+            En la primera oportunidad atenderemos tu solicitud…
+          </p>
+          <p className="mt-3 text-xl font-black text-[#128c7e] uppercase tracking-wide">¡Gracias y saludos!</p>
+          <p className="mt-4 text-[11px] text-slate-500 font-medium">
+            ¿No se abrió WhatsApp?{" "}
+            <a href={enlaceWhatsApp(textoWa())} target="_blank" rel="noopener noreferrer" className="font-black text-[#128c7e] underline">Tócalo aquí</a>
+          </p>
+        </div>
+      </VentanaMarca>
+    );
+  }
+
+  return (
+    <VentanaMarca
+      degradado={DEGRADADO_DUDAS}
+      suave="#e7f9ee"
+      emoji="💬"
+      titulo="¿En qué podemos ayudarte?"
+      invitacion="Quizá tu duda ya tiene respuesta. Busca una palabra o toca una pregunta frecuente."
+      onCerrar={onCerrar}
+    >
+      <label className="relative block">
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-base" aria-hidden="true">🔍</span>
+        <input
+          type="search"
+          value={consulta}
+          onChange={(e) => { setConsulta(e.target.value); setAbierta(null); }}
+          placeholder="Ej. libros, mascota, negocio, donar…"
+          className="w-full rounded-2xl border-2 border-slate-200 pl-10 pr-3 py-2.5 text-sm font-semibold text-slate-800 focus:outline-none focus:border-[#128c7e]"
+          aria-label="Buscar en las preguntas frecuentes"
+        />
+      </label>
+
+      <div className="mt-3 space-y-2">
+        {lista.length === 0 && (
+          <p className="rounded-xl bg-slate-50 px-3 py-3 text-sm font-semibold text-slate-600 text-center">
+            No encontramos esa palabra en las preguntas. Cuéntanos tu duda abajo 👇
+          </p>
+        )}
+        {lista.map((f) => {
+          const activa = abierta === f.i;
+          return (
+            <div key={f.i} className={`rounded-2xl border-2 transition-colors ${activa ? "border-[#128c7e] bg-emerald-50" : "border-slate-200 bg-white"}`}>
+              <button
+                type="button"
+                onClick={() => setAbierta(activa ? null : f.i)}
+                aria-expanded={activa}
+                className="w-full flex items-center gap-2 px-3 py-2.5 text-left text-sm font-black text-[#0f2d1e]"
+              >
+                <span aria-hidden="true">❓</span>
+                <span className="flex-1 leading-snug">{f.pregunta}</span>
+                <span aria-hidden="true" className="text-[#128c7e]">{activa ? "−" : "+"}</span>
+              </button>
+              {activa && <p className="px-3 pb-3 text-sm text-slate-700 font-medium leading-relaxed">{f.respuesta}</p>}
+            </div>
+          );
+        })}
+      </div>
+
+      <button
+        type="button"
+        onClick={() => { onCerrar(); onBuscarEnPagina && onBuscarEnPagina(); }}
+        className="mt-3 w-full rounded-2xl border-2 border-[#128c7e] text-[#0b6e5f] hover:bg-emerald-50 font-black py-2.5 text-xs uppercase tracking-wide transition-colors"
+      >
+        🔍 Buscar en toda la página
+      </button>
+
+      <div className="mt-5 border-t-2 border-dashed border-slate-200 pt-4">
+        <p className="text-sm font-black text-[#0f2d1e] leading-snug">
+          Si no encontraste lo que buscabas, o tienes alguna duda o cuestión que podamos resolver o apoyar, coméntanos a detalle a continuación:
+        </p>
         <textarea
           value={mensaje}
           onChange={(e) => { setMensaje(e.target.value); if (error) setError(""); }}
           rows={4}
-          placeholder={placeholder}
-          className="w-full rounded-lg border border-emerald-200 px-3 py-2 text-sm mb-1 text-slate-700"
+          placeholder="Escribe aquí tu duda, solicitud o comentario…"
+          className="mt-3 w-full rounded-xl border-2 border-slate-200 px-3 py-2.5 text-sm text-slate-800 focus:outline-none focus:border-[#128c7e]"
         />
-        {error && <p className="text-xs text-red-600 font-bold mb-3">{error}</p>}
+        {error && <p className="text-xs text-red-600 font-bold mt-1">{error}</p>}
         <button
           type="button"
           onClick={enviar}
-          className="mt-3 w-full rounded-xl bg-emerald-700 text-white font-black py-3.5 text-center transition-colors hover:bg-emerald-800 uppercase text-xs tracking-wider font-heading"
+          className="mt-3 w-full rounded-2xl text-white font-black py-3.5 uppercase text-xs sm:text-sm tracking-wide shadow-md hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+          style={{ background: DEGRADADO_DUDAS }}
         >
-          Enviar por WhatsApp
+          <span aria-hidden="true">📲</span> Enviar por WhatsApp
         </button>
-              <div className="mt-4 flex justify-end">
-          <BotonCerrar onClick={onCerrar} />
-        </div>
       </div>
-    </div>
+    </VentanaMarca>
   );
 }
 
