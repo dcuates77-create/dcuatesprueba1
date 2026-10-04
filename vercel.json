@@ -1,0 +1,18 @@
+{
+  "rewrites": [
+    {
+      "source": "/:alias(libros|bienestar|asesorias|ecatepets|mascotas|circulo|publicidad|recomienda|alianzas|bazar|ventas|apoyo|donar|noticias|nosotros|beneficios|causas|negocios|valores|regalos|gratitud|solicitud|mapa|historias)",
+      "destination": "/api/p?id=:alias"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/sw.js",
+      "headers": [{ "key": "Cache-Control", "value": "no-cache" }]
+    },
+    {
+      "source": "/manifest.webmanifest",
+      "headers": [{ "key": "Content-Type", "value": "application/manifest+json" }]
+    }
+  ]
+}
