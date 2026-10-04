@@ -35,8 +35,8 @@ export function iniciarAnalitica() {
     v.onerror = () => {};
     document.head.appendChild(v);
 
-    // De dónde llegó la visita: enlaces y QR con ?origen=cartel-parque (o
-    // /qr/cartel-parque). Se registra y se limpia de la barra de direcciones
+    // De dónde llegó la visita: enlaces con ?origen=nombre (por ejemplo los
+    // enlaces cortos). Se registra y se limpia de la barra de direcciones
     // para que nadie comparta el enlace con la marca de origen.
     try {
       const url = new URL(window.location.href);

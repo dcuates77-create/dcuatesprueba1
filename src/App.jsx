@@ -2,7 +2,7 @@ import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
 import BloqueCentral from "./BloqueCentral";
 import BotonCompartir from "./BotonCompartir";
 import { iniciarAnalitica, registrar } from "./analitica";
-import { iniciarPWA, puedeInstalar, instalarApp, suscribirPWA, yaInstalada, esIOS } from "./pwa";
+import { iniciarPWA } from "./pwa";
 
 // =========================================================================
 // 1. CONFIGURACIÓN CENTRALIZADA DE VARIABLES, REDES Y HOJA DE CÁLCULO y BORRADO DE TODOS LOS ANTERIORES JSX CAMBIOS VIDEOS
@@ -104,7 +104,6 @@ const NAV_LINKS_MAS = [
   { label: "Apoyo a Causas", emoji: "❤️", href: "#extraviados-registro" },
   { label: "Historias que inspiran (videos)", emoji: "🎥", href: "#historias-reflexiones" },
   { label: "Mapa del Sitio", emoji: "🗺️", action: "mapa-sitio" },
-  { label: "Código QR e instalar la app", emoji: "📲", action: "qr" },
   { label: "Registra tu Solicitud", emoji: "📝", href: "#solicitudes" },
   { label: "Préstamo Gratuito de Libros", emoji: "📚", modal: "libros" },
   { label: "Ecatepets Mascotas", emoji: "🐾", modal: "ecatepets" },
@@ -834,7 +833,6 @@ export default function App() {
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [showFAQ, setShowFAQ] = useState(false);
   const [showDudas, setShowDudas] = useState(false);
-  const [showQR, setShowQR] = useState(false);
   // Modal del Mapa de Sitio — tarjetas con acceso directo a todo lo que
   // hay en la página (accesible desde el pie de página y el menú "Más").
   const [showMapaSitio, setShowMapaSitio] = useState(false);
@@ -1165,7 +1163,6 @@ export default function App() {
           onAbrirProyecto={(id) => setModalProyecto(id)}
           onAbrirSugerencias={() => setModalFormulario("sugerencias")}
           onAbrirMapaSitio={() => setShowMapaSitio(true)}
-          onAbrirQR={() => { registrar("qr_abrir"); setShowQR(true); }}
           onAbrirCategoria={(id) => setCategoriaAbierta(id)}
           busquedaAbierta={busquedaAbierta}
           setBusquedaAbierta={setBusquedaAbierta}
@@ -1941,12 +1938,6 @@ export default function App() {
           <a href="#publicidad" className="hover:text-[#0f2d1e] transition-colors">Publicidad</a>
           <a href="#donaciones" className="hover:text-[#0f2d1e] transition-colors">Donaciones</a>
           <button
-            onClick={() => { registrar("qr_abrir"); setShowQR(true); }}
-            className="underline underline-offset-4 hover:text-[#0f2d1e] bg-transparent border-none cursor-pointer font-bold transition-colors"
-          >
-            Código QR
-          </button>
-          <button
             onClick={() => setShowMapaSitio(true)}
             className="underline underline-offset-4 hover:text-[#0f2d1e] bg-transparent border-none cursor-pointer font-bold transition-colors"
           >
@@ -2158,9 +2149,6 @@ export default function App() {
         />
       )}
 
-      {/* CÓDIGO QR OFICIAL + INSTALAR LA APP */}
-      {showQR && <ModalCompartirQR onCerrar={() => setShowQR(false)} />}
-
       {/* VENTANA DE DUDAS — la abre el botón flotante de WhatsApp */}
       {showDudas && (
         <ModalDudas
@@ -2316,7 +2304,7 @@ function BotonCerrar({ onClick, label = "Cerrar", claro = false }) {
   );
 }
 
-function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSugerencias, onAbrirMapaSitio, onAbrirQR, onAbrirCategoria, busquedaAbierta, setBusquedaAbierta }) {
+function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSugerencias, onAbrirMapaSitio, onAbrirCategoria, busquedaAbierta, setBusquedaAbierta }) {
   const [menuAbierto, setMenuAbierto] = useState(false);
   // Colores alternados del menú (combinan con el verde, el naranja y el azul
   // turquesa que ya usa la página).
@@ -2422,7 +2410,6 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirProyecto, onAbrirSug
                             if (link.action === "faq") onAbrirFAQ && onAbrirFAQ();
                             else if (link.action === "sugerencias") onAbrirSugerencias && onAbrirSugerencias();
                             else if (link.action === "mapa-sitio") onAbrirMapaSitio && onAbrirMapaSitio();
-                            else if (link.action === "qr") onAbrirQR && onAbrirQR();
                             else if (link.modal) onAbrirProyecto && onAbrirProyecto(link.modal);
                           }}
                           className={claseFila}
@@ -2900,95 +2887,6 @@ function ModalFormularioWhatsApp({ titulo, emoji = "💬", degradado = DEGRADADO
       >
         {etiquetaBoton}
       </button>
-    </VentanaMarca>
-  );
-}
-
-// Código QR oficial de la página + guía para usarlo con confianza + botón
-// para instalar la página como app. La imagen /images/qr-dcuates.png la
-// genera el archivo que acompaña a esta versión (ver instrucciones).
-const SITIO_OFICIAL = "dcuates.com";
-function ModalCompartirQR({ onCerrar }) {
-  const [instalable, setInstalable] = useState(puedeInstalar());
-  const [copiado, setCopiado] = useState(false);
-  useEffect(() => suscribirPWA(() => setInstalable(puedeInstalar())), []);
-  const instalada = yaInstalada();
-
-  const instalar = async () => {
-    const ok = await instalarApp();
-    registrar(ok ? "pwa_aceptada" : "pwa_rechazada");
-    setInstalable(puedeInstalar());
-  };
-  const copiar = async () => {
-    try {
-      await navigator.clipboard.writeText(`https://${SITIO_OFICIAL}`);
-      setCopiado(true);
-      setTimeout(() => setCopiado(false), 2000);
-    } catch { /* ignorar */ }
-  };
-
-  return (
-    <VentanaMarca
-      degradado="linear-gradient(135deg,#17472d 0%,#2E9E5B 100%)"
-      suave="#e4f6eb"
-      emoji="📲"
-      titulo="Lleva DCUATES contigo"
-      invitacion="Escanea el código con la cámara de tu celular para abrir la página, o muéstraselo a quien quieras invitar a la comunidad."
-      cierre="Un código, una comunidad: compártelo con quien lo necesite. 💚"
-      onCerrar={onCerrar}
-    >
-      <div className="flex flex-col items-center">
-        <div className="rounded-2xl border-4 border-[#0f2d1e] bg-white p-3 shadow-md">
-          <img src="/images/qr-dcuates.png" alt={`Código QR para abrir ${SITIO_OFICIAL}`} className="h-52 w-52 sm:h-60 sm:w-60" />
-        </div>
-        <p className="mt-3 text-2xl font-black tracking-tight text-[#0f2d1e]">{SITIO_OFICIAL}</p>
-        <p className="text-[11px] font-bold text-slate-500">Esta es la única dirección oficial</p>
-        <div className="mt-3 grid w-full grid-cols-2 gap-2">
-          <a
-            href="/images/qr-dcuates.png"
-            download="QR-DCUATES.png"
-            className="rounded-xl bg-[#17472d] hover:bg-[#0f2d1e] px-2 py-3 text-center text-[11px] font-black uppercase tracking-wide text-white transition-colors"
-          >
-            ⬇ Descargar QR
-          </a>
-          <button
-            type="button"
-            onClick={copiar}
-            className="rounded-xl border-2 border-[#17472d] px-2 py-3 text-[11px] font-black uppercase tracking-wide text-[#17472d] hover:bg-emerald-50 transition-colors"
-          >
-            {copiado ? "✓ Copiado" : "🔗 Copiar enlace"}
-          </button>
-        </div>
-      </div>
-
-      <div className="mt-5 rounded-2xl bg-amber-50 border-2 border-amber-200 px-4 py-3">
-        <p className="text-xs font-black uppercase tracking-wide text-amber-800 mb-1.5">🛡️ Cómo usar un QR con confianza</p>
-        <ul className="space-y-1.5 text-[13px] leading-snug font-semibold text-slate-800">
-          <li>• Antes de abrir, mira la dirección que aparece en tu celular: debe decir <b>{SITIO_OFICIAL}</b>.</li>
-          <li>• Escanéalo solo de carteles o volantes que veas con nuestro logo, y no sobre otro QR pegado encima.</li>
-          <li>• DCUATES nunca te pide contraseñas, datos de tarjeta ni depósitos por un QR.</li>
-          <li>• ¿Dudas? Escríbenos antes por WhatsApp desde la página.</li>
-        </ul>
-      </div>
-
-      {!instalada && (
-        <div className="mt-4 rounded-2xl bg-emerald-50 border-2 border-emerald-200 px-4 py-3">
-          <p className="text-xs font-black uppercase tracking-wide text-emerald-800 mb-1.5">📱 Instálala como app</p>
-          {instalable ? (
-            <button
-              type="button"
-              onClick={instalar}
-              className="w-full rounded-xl bg-[#e65100] hover:bg-[#bf360c] py-3 text-xs font-black uppercase tracking-wide text-white transition-colors"
-            >
-              Instalar DCUATES en mi celular
-            </button>
-          ) : esIOS() ? (
-            <p className="text-[13px] leading-snug font-semibold text-slate-800">En iPhone: toca el botón <b>Compartir</b> de Safari (el cuadrado con la flecha) y elige <b>“Añadir a pantalla de inicio”</b>.</p>
-          ) : (
-            <p className="text-[13px] leading-snug font-semibold text-slate-800">En el menú de tu navegador (⋮) elige <b>“Instalar aplicación”</b> o <b>“Añadir a pantalla de inicio”</b>. Así abre con un toque, como cualquier app.</p>
-          )}
-        </div>
-      )}
     </VentanaMarca>
   );
 }
