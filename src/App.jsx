@@ -29,7 +29,7 @@ const CLAVE_CIRCULO_CONFIANZA = "confianza2026";
 // iframe); no hace falta tocar nada más en el código.
 // Sello de versión: se ve en pequeño al final de los accesos rápidos y en la
 // consola del navegador. Sirve para comprobar que el celular ya cargó lo último.
-const VERSION_BUILD = "CLON8 · f15";
+const VERSION_BUILD = "CLON8 · f16";
 if (typeof console !== "undefined") console.info("[DCUATES] versión", VERSION_BUILD);
 
 const MAPA_NEGOCIOS_EMBED_URL = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15034.541076557625!2d-99.00223799999999!3d19.600120500000003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1ee234c038987%3A0x4b578513910d8103!2sJardines%20de%20Morelos%2C%20Ecatepec%20de%20Morelos%2C%20M%C3%A9x.!5e0!3m2!1ses!2smx!4v1790129394750!5m2!1ses!2smx";
@@ -2098,45 +2098,45 @@ export default function App() {
         </div>
 
         <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm sm:text-base font-bold text-[#0f2d1e]/80">
-          <a href="#quienes-somos" className="hover:text-[#0f2d1e] transition-colors">Quiénes Somos</a>
-          <a href="#inicio" className="hover:text-[#0f2d1e] transition-colors">Proyectos</a>
-          <a href="#publicidad" className="hover:text-[#0f2d1e] transition-colors">Publicidad</a>
-          <a href="#donaciones" className="hover:text-[#0f2d1e] transition-colors">Donaciones</a>
+          <a href="#quienes-somos" className="hover:text-[#0f2d1e] transition-colors">👋 Quiénes Somos</a>
+          <a href="#inicio" className="hover:text-[#0f2d1e] transition-colors">🌱 Proyectos</a>
+          <a href="#publicidad" className="hover:text-[#0f2d1e] transition-colors">📣 Publicidad</a>
+          <a href="#donaciones" className="hover:text-[#0f2d1e] transition-colors">💚 Donaciones</a>
           <button
             onClick={() => setShowMapaSitio(true)}
             className="underline underline-offset-4 hover:text-[#0f2d1e] bg-transparent border-none cursor-pointer font-bold transition-colors"
           >
-            Mapa del Sitio
+            🗺️ Mapa del Sitio
           </button>
           <button
             onClick={() => irASeccion("solicitudes")}
             className="underline underline-offset-4 hover:text-[#0f2d1e] bg-transparent border-none cursor-pointer font-bold transition-colors"
           >
-            Registra tu Solicitud
+            📝 Registra tu Solicitud
           </button>
           <button
             onClick={() => setShowFAQ(true)}
             className="underline underline-offset-4 hover:text-[#0f2d1e] bg-transparent border-none cursor-pointer font-bold transition-colors"
           >
-            Preguntas Frecuentes
+            ❓ Preguntas Frecuentes
           </button>
           <button
             onClick={() => setModalFormulario("sugerencias")}
             className="underline underline-offset-4 hover:text-[#0f2d1e] bg-transparent border-none cursor-pointer font-bold transition-colors"
           >
-            Sugerencias y Quejas
+            💬 Sugerencias y Quejas
           </button>
           <button
             onClick={() => setShowPrivacy(true)}
             className="underline underline-offset-4 hover:text-[#0f2d1e] bg-transparent border-none cursor-pointer font-bold transition-colors"
           >
-            Aviso de Privacidad
+            🔒 Aviso de Privacidad
           </button>
           <button
             onClick={() => setShowTerminos(true)}
             className="underline underline-offset-4 hover:text-[#0f2d1e] bg-transparent border-none cursor-pointer font-bold transition-colors"
           >
-            Términos y Condiciones
+            📜 Términos y Condiciones
           </button>
           <button
             onClick={() => setShowSeguridad(true)}
