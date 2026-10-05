@@ -1,0 +1,5258 @@
+import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
+import BloqueCentral from "./BloqueCentral";
+import BotonCompartir from "./BotonCompartir";
+import { iniciarAnalitica, registrar } from "./analitica";
+import { iniciarPWA } from "./pwa";
+
+// =========================================================================
+// 1. CONFIGURACIÓN CENTRALIZADA DE VARIABLES, REDES Y HOJA DE CÁLCULO y BORRADO DE TODOS LOS ANTERIORES JSX CAMBIOS VIDEOS
+// =========================================================================
+const GOOGLE_SHEETS_URL = "https://script.google.com/macros/s/AKfycbxngMxuH03w0rI7AyJHRap9QCVf_Xs5roypGXnnkSGr_22SyfxWAVAiH614r1eGC2DW2g/exec";
+
+// Número de WhatsApp centralizado — cámbialo aquí una sola vez si cambia el teléfono
+const WHATSAPP_NUMERO = "525520696627";
+
+// ID del video de portada en YouTube — reemplaza esto por el ID real de "Chuy el Sapo Soñador"
+// (el ID es lo que va después de "v=" en la URL normal de YouTube)
+const YOUTUBE_VIDEO_ID = "SUnE27QnnyI";
+
+// Clave de acceso del candado que protege el botón "Únete a Nuestra Red de
+// Confianza" dentro de Círculo de Confianza — cámbiala aquí cuando quieras.
+// AVISO: esto NO es seguridad real (cualquiera puede verla si revisa el
+// código fuente de la página), solo filtra visitas casuales.
+const CLAVE_CIRCULO_CONFIANZA = "confianza2026";
+
+// Mapa de negocios locales — embed de Google Maps / My Maps, se muestra
+// debajo de los botones de Historias, Cupones y Patrocinadores. Para
+// agregar, quitar o mover un negocio, edita el mapa directamente en Google
+// Maps/My Maps y pega aquí el nuevo link de "Insertar un mapa" (src del
+// iframe); no hace falta tocar nada más en el código.
+// Sello de versión: se ve en pequeño al final de los accesos rápidos y en la
+// consola del navegador. Sirve para comprobar que el celular ya cargó lo último.
+const VERSION_BUILD = "CLON8 · f16";
+if (typeof console !== "undefined") console.info("[DCUATES] versión", VERSION_BUILD);
+
+const MAPA_NEGOCIOS_EMBED_URL = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15034.541076557625!2d-99.00223799999999!3d19.600120500000003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1ee234c038987%3A0x4b578513910d8103!2sJardines%20de%20Morelos%2C%20Ecatepec%20de%20Morelos%2C%20M%C3%A9x.!5e0!3m2!1ses!2smx!4v1790129394750!5m2!1ses!2smx";
+
+// Ventana de Solicitudes — formulario visible directo en la página (no es
+// modal), debajo del mapa de negocios (busca id="solicitudes" más abajo en
+// el archivo). Para dirigir tráfico desde WhatsApp Business a esta sección
+// exacta, comparte el link "dcuates.com/#solicitudes" (o el dominio que
+// uses en cada rama/proyecto) — el navegador baja solo hasta ahí, sin
+// necesitar nada de código extra.
+//
+// CÓMO CONFIGURARLO (nada de esto se toca en código, solo en Google):
+// El formulario es propio (ver FormularioSolicitud más abajo): guarda cada
+// solicitud en Google Sheets (el mismo Apps Script de GOOGLE_SHEETS_URL,
+// con Tipo "Solicitud") y abre WhatsApp con el mensaje ya escrito.
+
+const REDES_SOCIALES = {
+  facebook: "https://www.facebook.com/abelzarem/",
+  instagram: "https://www.instagram.com/conexionesconcausa/",
+  youtube: "http://www.youtube.com/@abelmeraz",
+  tiktok: "https://www.tiktok.com/@dcuates"
+};
+
+// Enlaces del botón "⭐ Recomendaciones" — separados en 2 grupos. Los de
+// "comunidad" son EJEMPLOS, edítalos con los negocios/personas reales que
+// quieras recomendar (de 5 a 10 en total entre los dos grupos).
+const RECOMENDACIONES_ESTRELLA = {
+  dcuates: [
+    { nombre: "Facebook DCUATES", enlace: REDES_SOCIALES.facebook },
+    { nombre: "Instagram DCUATES", enlace: REDES_SOCIALES.instagram },
+    { nombre: "YouTube DCUATES", enlace: REDES_SOCIALES.youtube },
+    { nombre: "TikTok DCUATES", enlace: REDES_SOCIALES.tiktok }
+  ],
+  comunidad: [
+    { nombre: "Panadería Café Sol", enlace: "#" },
+    { nombre: "Taquería El Sol", enlace: "#" },
+    { nombre: "Refugio Animal Ecatepec", enlace: "#" }
+  ]
+};
+
+// Botón "🎵 Escucha Música DCUATES" — pega aquí la ruta de tu archivo de
+// audio (colócalo en /public/audio/, ej. /public/audio/musica-dcuates.mp3).
+// Mientras esté vacío, el botón se muestra pero no reproduce nada.
+const MUSICA_DCUATES_URL = "/audio/musica-dcuates.mp3";
+
+// Barra fija de navegación: una sola fila de accesos directos + un menú
+// "MÁS" con todo lo demás (se despliega hacia abajo). Para agregar/quitar
+// algo del menú "MÁS", edita NAV_LINKS_MAS — no se necesita tocar el
+// componente SiteHeader. Cada elemento de NAV_LINKS_MAS puede ser:
+// - { label, href }   -> enlace normal a una sección de la página
+// - { label, action: "faq" } -> abre la ventana de Preguntas Frecuentes
+// - { label, modal }  -> abre la ventana emergente de ese proyecto (mismo
+//   id que en TODOS_LOS_PROYECTOS)
+const NAV_LINKS_MAS = [
+  { label: "Publicidad Gratuita", emoji: "📣", href: "#publicidad" },
+  { label: "Ventas con Causa", emoji: "🛍️", href: "#ventas-con-causa" },
+  { label: "Alianzas Solidarias", emoji: "🤝", modal: "alianzas-tarjeta" },
+  { label: "Apoyo a Causas", emoji: "❤️", href: "#extraviados-registro" },
+  { label: "Historias que inspiran (videos)", emoji: "🎥", href: "#historias-reflexiones" },
+  { label: "Mapa del Sitio", emoji: "🗺️", action: "mapa-sitio" },
+  { label: "Registra tu Solicitud", emoji: "📝", href: "#solicitudes" },
+  { label: "Préstamo Gratuito de Libros", emoji: "📚", modal: "libros" },
+  { label: "Ecatepets Mascotas", emoji: "🐾", modal: "ecatepets" },
+  { label: "Círculo de Confianza", emoji: "👥", modal: "circulo-confianza" },
+  { label: "Recomienda, Evalúa y Gana", emoji: "⭐", modal: "recomienda-evalua-gana" },
+  { label: "Asesorías Gratuitas", emoji: "🎓", modal: "asesorias" },
+  { label: "Bazar y Comercio", emoji: "🏪", modal: "bazares" },
+  { label: "Noticias de Barrio", emoji: "📰", modal: "noticias" },
+  { label: "Bienestar y Recreación", emoji: "🧘", modal: "bienestar" },
+  { label: "Sugerencias y Quejas", emoji: "💬", action: "sugerencias" },
+  { label: "Preguntas Frecuentes", emoji: "❓", action: "faq" }
+];
+
+// Función helper para armar enlaces directos de WhatsApp de forma consistente
+function enlaceWhatsApp(mensaje) {
+  return `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(mensaje)}`;
+}
+
+// Función helper para hacer scroll suave hacia una sección/registro de la
+// misma página (usada por los botones que en vez de abrir WhatsApp llevan
+// directo a un formulario, ej. "Publicar mi negocio" o "Extraviados y Adopciones").
+function irASeccion(id) {
+  // El mapa vive dentro de la pestaña NEGOCIOS: aunque el contenedor exista
+  // siempre, hay que abrir esa pestaña primero y luego bajar hasta el mapa.
+  if (id === "mapa-negocios") {
+    window.dispatchEvent(new CustomEvent("dcuates:abrir-seccion", { detail: id }));
+    setTimeout(() => (document.getElementById("mapa-local") || document.getElementById(id))?.scrollIntoView({ behavior: "smooth", block: "start" }), 350);
+    return;
+  }
+  const el = document.getElementById(id);
+  if (el) {
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+    return;
+  }
+  // La sección vive dentro de una pestaña que está cerrada (ej. Apoyo
+  // Voluntario en Causas): se le pide al bloque de pestañas que la abra y
+  // después se baja hasta ella.
+  window.dispatchEvent(new CustomEvent("dcuates:abrir-seccion", { detail: id }));
+  setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" }), 300);
+}
+
+// Datos de EJEMPLO para la barra ticker inferior — reemplázalos por contenido real
+// cuando tengas fotos/avisos definitivos. Los 4 tipos rotan automáticamente.
+const TICKER_ITEMS = [
+  { tipo: "negocio", nombre: "Taquería El Sol — 20% en tu primera visita", img: "/images/ticker-negocio-1.png", enlace: enlaceWhatsApp("¡Hola! Vi la promoción de Taquería El Sol en DCUATES.") },
+  { tipo: "mascota", nombre: "Firulais — en búsqueda por la colonia centro", img: "/images/ticker-mascota-1.png", enlace: "#ecatepets" },
+  { tipo: "aviso", texto: "🎉 Bazar comunitario este sábado en la plaza principal, 10am–4pm" },
+  { tipo: "momento", nombre: "Entrega de libros de la Bibliobici, agosto 2026", img: "/images/ticker-momento-1.png", enlace: "#libros" },
+  { tipo: "negocio", nombre: "Estética Lupita — corte + peinado con descuento", img: "/images/ticker-negocio-2.png", enlace: enlaceWhatsApp("¡Hola! Vi la promoción de Estética Lupita en DCUATES.") },
+  { tipo: "mascota", nombre: "Michi — en adopción, ya vacunada y esterilizada", img: "/images/ticker-mascota-2.png", enlace: "#ecatepets" },
+  { tipo: "aviso", texto: "📚 Nueva alianza con la papelería del barrio: 10% para vecinos DCUATES" },
+  { tipo: "momento", nombre: "Taller de bienestar comunitario, julio 2026", img: "/images/ticker-momento-2.png", enlace: "#bienestar" }
+];
+
+const TICKER_ETIQUETAS = {
+  negocio: { emoji: "🏪", label: "Negocio Local" },
+  mascota: { emoji: "🐾", label: "Ecatepets" },
+  aviso: { emoji: "📢", label: "Aviso" },
+  momento: { emoji: "📸", label: "Momento DCUATES" },
+  frase: { emoji: "💚", label: "DCUATES" }
+};
+
+// Barra de Logros y Resultados — ejemplos FICTICIOS mientras no haya datos
+// reales; reemplázalos o (mejor) aliméntalos desde Baserow sin tocar
+// código: crea en la tabla ENLACES 2 columnas de texto — "NOMBRE LOGROS" y
+// "ENLACE LOGROS" — una fila por logro. En cuanto haya al menos una fila
+// con esas 2 columnas llenas, sustituyen automáticamente a estos ejemplos
+// (ver BarraLogros más abajo).
+const LOGROS_ITEMS = [
+  { texto: "🤝 Más de 2,000 recomendaciones y conexiones de apoyo", enlace: "#circulo-confianza" },
+  { texto: "📚 Más de 1,000 libros y materiales educativos prestados", enlace: "#libros" },
+  { texto: "🎁 Más de 500 libros y materiales DONADOS POR NUESTRA COMUNIDAD (MUCHAS GRACIAS POR SU VALIOSO APOYO Y CONFIANZA)", enlace: "#donaciones" },
+  { texto: "📘 Más de 200 libros FÍSICOS DONADOS a quienes más los NECESITAN, y más de 2500 COMPARTIDOS EN FORMATO DIGITAL", enlace: "#libros" },
+  { texto: "🎓 Más de 300 asesorías y orientación educativa y laboral gratuitas", enlace: "#asesorias" },
+  { texto: "🐾 Más de 200 adopciones y apoyo a rescate de peluditos", enlace: "#ecatepets" },
+  { texto: "💰 Gestión y fondeo de más de un millón de pesos en apoyos para personas y grupos vulnerables", enlace: "#donaciones" },
+  { texto: "🌱 Formación y desarrollo de talento que genera cadena de valor y de valores", enlace: "#asesorias" },
+  { texto: "🌟 Apoyos y sinergia con quienes también se preocupan por apoyar a nuestra comunidad", enlace: "#iniciativas" },
+  { texto: "📖 Más de 100 reuniones de negocios y tertulias literarias y de sana convivencia", enlace: "#bazares" },
+  { texto: "💻 Más de 500 cursos y talleres digitales para nuestro desarrollo personal y social", enlace: "#bienestar" }
+];
+
+// Ticker SUPERIOR (debajo de la barra fija de menú): frases sobre
+// solidaridad y causas afines, más llamados a la acción para sumarse.
+// Edítalas o agrégalas aquí — cada una puede enlazar a cualquier sección
+// de la página. Si más adelante quieres alimentarlas desde Baserow, se
+// puede conectar igual que las demás pasarelas (crea una tabla con
+// columnas "texto" y "enlace", y pide que se conecte con useCatalogoBaserow).
+const TICKER_FRASES = [
+  { tipo: "frase", texto: "“Nadie es tan rico que no necesite ayuda, ni tan pobre que no pueda ofrecerla.”", enlace: "#quienes-somos" },
+  { tipo: "frase", texto: "“Solos avanzamos más rápido; juntos llegamos más lejos.” — Proverbio africano", enlace: "#donaciones" },
+  { tipo: "frase", texto: "💚 ¿Ya eres parte de la RED DCUATES? Súmate hoy mismo", enlace: "#donaciones" },
+  { tipo: "frase", texto: "“La solidaridad no es un acto de caridad, es un acto de justicia.” — E. Galeano", enlace: "#quienes-somos" },
+  { tipo: "frase", texto: "🤝 Comparte tu talento, tiempo o recursos — cada aportación suma", enlace: "#donaciones" },
+  { tipo: "frase", texto: "“El bien que haces hoy será olvidado mañana. Haz el bien de todos modos.” — Madre Teresa de Calcuta", enlace: "#quienes-somos" }
+];
+
+// Arreglo de los 4 Proyectos Iniciales con Enlaces Directos de WhatsApp
+const INICIATIVAS_PRINCIPALES = [
+  {
+    id: "libros",
+    categoria: "EDUCACIÓN Y DESARROLLO",
+    titulo: "LA BIBLIOBICI Y AMIGOS",
+    descripcion: "Préstamo gratuito de libros y materiales educativos para el desarrollo personal y social. La lectura que llega hasta tu colonia para fortalecer a la COMUNIDAD.",
+    puntos: ["Préstamo sin costo", "Materiales para todas las edades", "Recibimos y hacemos donaciones"],
+    textoBoton: "NECESITO UN MATERIAL / QUIERO COLABORAR",
+    enlaceDirectoWA: enlaceWhatsApp("¡Hola DCUATES! Necesito un material o quiero colaborar con el proyecto de La Bibliobici y Amigos."),
+    segundoBoton: {
+      titulo: "Ver Libros y Materiales en Préstamo, Trueque, Donación y Más...",
+      enlace: "https://whatsapp.com/channel/0029VbE8Mri4Crfe0r8cuj2n"
+    }
+  },
+  {
+    id: "ecatepets",
+    categoria: "BIENESTAR ANIMAL",
+    titulo: "ECATEPETS",
+    descripcion: "Apoyo en la búsqueda de mascotas extraviadas, y fomento de la adopción y el cuidado animal responsable en conjunto con los vecinos de DCUATES.",
+    puntos: ["Difusión de extravíos", "Adopción responsable", "Cuidado y concientización"],
+    textoBoton: "Publicar Extravíos y Adopciones",
+    // En vez de abrir WhatsApp, este botón lleva directo al registro de
+    // extraviados/adopciones dentro de la sección "Ventas con Causa".
+    scrollDestino: "extraviados-registro",
+    enlaceDirectoWA: enlaceWhatsApp("¡Hola DCUATES! Quiero sumarme a la causa de Ecatepets para el bienestar animal."),
+    segundoBoton: {
+      titulo: "Ver Adopciones, Extraviados y Temas sobre Cuidado Animal",
+      enlace: "https://www.whatsapp.com/channel/0029Vb6OjCQGk1FkkmvSzP3S"
+    }
+  },
+  {
+    id: "alianzas-tarjeta",
+    categoria: "CRECIMIENTO CONJUNTO",
+    titulo: "ALIANZAS GANAR-GANAR",
+    descripcion: "Emprendedores, organizaciones y particulares que desean hacer sinergia para crecer juntos y robustecer el tejido social de la COMUNIDAD.",
+    puntos: ["Colaboración mutua", "Red de contactos", "Impacto comunitario"],
+    textoBoton: "Generar alianza",
+    enlaceDirectoWA: enlaceWhatsApp("¡Hola DCUATES! Me interesa generar una alianza ganar-ganar con ustedes."),
+    segundoBoton: {
+      titulo: "Apoyos y Beneficios para Nuestros Aliados (Con Clave de Acceso)",
+      enlace: "https://chat.whatsapp.com/F2Rdvu5ueSlJ0YuDYGi8VL"
+    }
+  },
+  {
+    id: "circulo-confianza",
+    categoria: "APOYOS Y BENEFICIOS MUTUOS",
+    titulo: "CÍRCULO DE CONFIANZA",
+    descripcion: "Si eres una persona o negocio TOTALMENTE CONFIABLE que desea SUMAR con perfiles que están en la misma sintonía, o conoces personas o negocios que les gustaría formar parte de nuestro círculo, ¡serán muy BIENVENIDOS!",
+    puntos: ["Perfiles verificados por confianza", "Sinergia que multiplica", "Red exclusiva de contactos"],
+    textoBoton: "Me interesa sumar",
+    enlaceDirectoWA: enlaceWhatsApp("¡Hola DCUATES! Me interesa sumarme al Círculo de Confianza y sus Apoyos y Beneficios Mutuos."),
+    segundoBoton: {
+      titulo: "Únete a Nuestra Red de Confianza (Con Clave de Acceso)",
+      enlace: "https://chat.whatsapp.com/F2Rdvu5ueSlJ0YuDYGi8VL",
+      // Al tener "claveAcceso", este botón sale bloqueado con un candado en
+      // vez de abrir el enlace directo (ver BotonModalProtegido más abajo).
+      claveAcceso: CLAVE_CIRCULO_CONFIANZA
+    }
+  },
+  {
+    id: "recomienda-evalua-gana",
+    categoria: "CONOCIMIENTOS Y EXPERIENCIAS QUE VALEN",
+    titulo: "RECOMIENDA, EVALÚA Y GANA",
+    descripcion: "Tus recomendaciones y comentarios sobre las buenas o malas prácticas, acciones y calidad que tienen los negocios con sus productos y servicios, y las personas que están a cargo de estos, APORTAN VALOR Y MERECEN ser RECOMPENSADOS de alguna forma.",
+    puntos: ["Recomendaciones con valor real", "Reconocimiento por tu experiencia", "Mejora continua de negocios"],
+    textoBoton: "Me interesa colaborar",
+    enlaceDirectoWA: enlaceWhatsApp("¡Hola DCUATES! Me interesa colaborar con Recomienda, Evalúa y Gana compartiendo mi experiencia.")
+  },
+  {
+    id: "publicidad-tarjeta",
+    categoria: "APOYOS COMUNITARIOS",
+    titulo: "PUBLICIDAD GRATUITA",
+    descripcion: "Difunde tu negocio, promociones y servicios de forma gratuita. Con aportación voluntaria ya ayudas a que la plataforma de DCUATES llegue a más familias.",
+    puntos: ["Registro gratuito", "Comparte promociones e imágenes", "Más clientes de tu zona"],
+    textoBoton: "Publicar mi negocio",
+    // En vez de abrir WhatsApp, este botón lleva directo al formulario de
+    // registro "Publicar mi Negocio" dentro de la sección de Publicidad.
+    scrollDestino: "publicidad",
+    enlaceDirectoWA: enlaceWhatsApp("¡Hola DCUATES! Deseo publicar mi negocio en la plataforma de publicidad comunitaria.")
+  }
+];
+
+// Arreglo de los 4 Proyectos Nuevos con Enlaces Directos de WhatsApp
+const NUEVOS_PROYECTOS_DATA = [
+  {
+    id: "asesorias",
+    categoria: "DESARROLLO PROFESIONAL",
+    titulo: "Asesorías Personales y de Negocios",
+    descripcion: "Orientación profesional sin barreras para impulsar tus metas o regularizar tu modelo de negocio de manera efectiva.",
+    puntos: ["Asesoría gratuita", "Aportación voluntaria", "Impulso de metas"],
+    textoBoton: "Solicitar asesoría",
+    enlaceDirectoWA: enlaceWhatsApp("¡Hola DCUATES! Me gustaría solicitar una asesoría personal o de negocios.")
+  },
+  {
+    id: "bazares",
+    categoria: "VENTAS CON CAUSA",
+    titulo: "Comercios Físicos y Digitales",
+    descripcion: "Ventas caseras y de calle basadas en la confianza mutua para el apoyo de la economía familiar y solidaria.",
+    puntos: ["Comercio local seguro", "Barrio de confianza", "Apoyo a causas"],
+    textoBoton: "Incluir mi negocio",
+    enlaceDirectoWA: enlaceWhatsApp("¡Hola DCUATES! Quiero obtener información para participar en los bazares y mercados.")
+  },
+  {
+    id: "noticias",
+    categoria: "COMUNICACIÓN COLECTIVA",
+    titulo: "Noticias y Agenda Cultural",
+    descripcion: "Mantente al día con los eventos culturales, convocatorias comunitarias y acontecimientos sociales de la zona.",
+    puntos: ["Eventos culturales", "Convocatorias vecinales", "Acontecimientos sociales"],
+    textoBoton: "Sumar Actividades",
+    enlaceDirectoWA: enlaceWhatsApp("¡Hola DCUATES! Me interesa conocer la agenda cultural y las noticias del barrio.")
+  },
+  {
+    id: "bienestar",
+    categoria: "SALUD Y ESPARCIMIENTO",
+    titulo: "Bienestar, Salud y Recreación",
+    descripcion: "Actividades recreativas y talleres enfocados en el desarrollo integral, la salud mental y el esparcimiento familiar.",
+    puntos: ["Desarrollo Personal y Social", "Salud Integral", "Disfrute Personal y Social"],
+    textoBoton: "Sumar Actividades",
+    enlaceDirectoWA: enlaceWhatsApp("¡Hola DCUATES! Solicito información sobre los talleres de bienestar, salud y recreación.")
+  }
+];
+
+// Catálogo de "Ventas con Causa". Mientras no esté conectado a Baserow
+// (ver BASEROW_TABLE_ID_VENTAS_CON_CAUSA abajo), el carrusel usa esta
+// lista de EJEMPLO como respaldo. BASEROW_GALLERY_URL se deja como
+// enlace — "ver catálogo completo" — apuntando a tu galería pública real.
+const BASEROW_GALLERY_URL = "https://baserow.io/public/gallery/xCYm1NOc3A5wuJC1NeYlVYyVeY_w7O2tQdNRKcDsiyE";
+
+const VENTAS_CON_CAUSA_ITEMS = [
+  { id: "vc1", tipo: "Artesanías", nombre: "Bordados hechos a mano", descripcion: "Piezas únicas bordadas por manos locales. Pregunta por diseños personalizados.", img: "/images/ventas-causa-1.png" },
+  { id: "vc2", tipo: "Alimentos", nombre: "Pan casero y repostería", descripcion: "Pedidos con un día de anticipación. Ideal para eventos y reuniones.", img: "/images/ventas-causa-2.png" },
+  { id: "vc3", tipo: "Servicios", nombre: "Jardinería a domicilio", descripcion: "Poda, mantenimiento y diseño de jardines. Cotización sin costo.", img: "/images/ventas-causa-3.png" },
+  { id: "vc4", tipo: "Segunda mano", nombre: "Ropa y accesorios", descripcion: "Prendas en buen estado a precios accesibles. Nuevo inventario cada semana.", img: "/images/ventas-causa-4.png" }
+];
+
+const EXTRAVIADOS_ITEMS = [
+  { id: "ex1", tipo: "Mascota", nombre: "Firulais", descripcion: "Perrito café, orejas caídas, visto por última vez cerca de la colonia centro.", img: "/images/extraviado-1.png" },
+  { id: "ex2", tipo: "Persona", nombre: "Sr. Ramírez", descripcion: "Adulto mayor, salió de casa el martes por la tarde y no ha regresado.", img: "/images/extraviado-2.png" },
+  { id: "ex3", tipo: "Cosa", nombre: "Mochila escolar azul", descripcion: "Olvidada en la parada del camión sobre la avenida principal.", img: "/images/extraviado-3.png" },
+  { id: "ex4", tipo: "Mascota", nombre: "Michi", descripcion: "Gata blanca con manchas grises, muy asustadiza, extraviada desde el fin de semana.", img: "/images/extraviado-4.png" }
+];
+
+// =========================================================================
+// CONEXIÓN REAL A BASEROW (segura: el token vive en el servidor, ver
+// /api/baserow-rows.js, nunca en este archivo). Mientras el ID de una
+// tabla esté vacío ("") o la función /api/baserow-rows todavía no
+// responda datos, el carrusel correspondiente sigue mostrando su lista de
+// EJEMPLO de arriba — nada se rompe entretanto.
+//
+// Para activar el catálogo REAL de Ventas con Causa, pega aquí el Table ID
+// de tu tabla en Baserow (instrucciones de cómo encontrarlo, y cómo
+// configurar el token, están en /api/baserow-rows.js).
+const BASEROW_TABLE_ID_VENTAS_CON_CAUSA = "1164149"; // tabla "Productos"
+const BASEROW_TABLE_ID_EXTRAVIADOS = "1165684";      // tabla "Servicios DC"
+
+// Pega aquí el ID de tabla en cuanto crees las tablas nuevas en Baserow
+// (mismo procedimiento que las 2 de arriba). Mientras estén vacías (""),
+// las pasarelas de Noticias/Comunicación y Bienestar/Salud siguen usando
+// los datos de ejemplo (NOTICIAS_GALERIA_ITEMS / BIENESTAR_GALERIA_ITEMS)
+// sin romper nada.
+// Nota: las galerías de Noticias y Bienestar ya NO usan tablas propias —
+// ahora se alimentan de las columnas GALCULTURA y GALSALUD dentro de la
+// misma tabla ENLACES (ver BASEROW_TABLE_ID_ENLACES más abajo).
+
+// Tabla "ENLACES" en Baserow (la que ya armaste con columnas VIDPORT,
+// RECASA, RECOMUN, RECMUSIC, RECLIBROS, RECVIDEOSYMAS, GALCULTURA, GALSALUD,
+// etc.). Un solo ID de tabla alimenta el video de portada, las
+// recomendaciones, la música y las 2 galerías — cada quien lee su propia
+// columna. IMPORTANTE: esto asume que /api/baserow-rows.js devuelve las
+// filas "crudas" (con el nombre exacto de cada columna de Baserow como
+// llave). Si aún no lo hace así para esta tabla, compárteme ese archivo
+// para ajustarlo — mientras tanto, todo sigue funcionando con los datos
+// de respaldo, sin romper nada.
+const BASEROW_TABLE_ID_ENLACES = "1178299";
+// =========================================================================
+
+// Galerías de EJEMPLO para la prueba de "pasarela en ventana emergente"
+// (ver GALERIAS_PROYECTOS y el modal correspondiente más abajo). Por ahora
+// solo Noticias y Bienestar la tienen, a modo de prueba — si el resultado
+// gusta, se puede replicar para cualquier otro proyecto agregando su propio
+// arreglo aquí y una entrada en GALERIAS_PROYECTOS.
+const NOTICIAS_GALERIA_ITEMS = [
+  { id: "not1", tipo: "Evento", nombre: "Feria cultural de agosto", descripcion: "Música en vivo, gastronomía local y actividades para toda la familia en la plaza principal.", img: "/images/noticias-1.png" },
+  { id: "not2", tipo: "Convocatoria", nombre: "Taller de muralismo vecinal", descripcion: "Convocatoria abierta para pintar un mural comunitario. Se proporcionan materiales.", img: "/images/noticias-2.png" },
+  { id: "not3", tipo: "Aviso", nombre: "Jornada de limpieza del parque", descripcion: "Súmate el próximo sábado a la jornada de limpieza y reforestación del parque de la colonia.", img: "/images/noticias-3.png" }
+];
+
+const BIENESTAR_GALERIA_ITEMS = [
+  { id: "bien1", tipo: "Taller", nombre: "Yoga al aire libre", descripcion: "Sesiones gratuitas los domingos por la mañana, para todos los niveles.", img: "/images/bienestar-1.png" },
+  { id: "bien2", tipo: "Actividad", nombre: "Grupo de caminata vecinal", descripcion: "Caminatas ligeras entre semana para fomentar la actividad física y la convivencia.", img: "/images/bienestar-2.png" },
+  { id: "bien3", tipo: "Charla", nombre: "Salud mental y comunidad", descripcion: "Plática abierta sobre bienestar emocional, con espacio para preguntas.", img: "/images/bienestar-3.png" }
+];
+
+// 3 secciones naranjas nuevas, debajo de los botones verdes (Historias,
+// Cupones/Promos y Patrocinadores/Alianzas). Cada arreglo alimenta su
+// propio carrusel — reemplaza estas fotos/textos de EJEMPLO por las reales
+// cuando las tengas. Misma estructura que las galerías de arriba, así que
+// también se pueden conectar a Baserow más adelante si se desea.
+const HISTORIAS_DCUATES_ITEMS = [
+  { id: "hist1", tipo: "Historia", nombre: "El renacer de la Panadería Café Sol", descripcion: "Cómo una alianza vecinal ayudó a reabrir sus puertas después de un momento difícil.", img: "/images/historias-1.png" },
+  { id: "hist2", tipo: "Historia", nombre: "De la calle a un hogar: la adopción de Firulais", descripcion: "Una historia de Ecatepets con final feliz gracias a la red de vecinos.", img: "/images/historias-2.png" },
+  { id: "hist3", tipo: "Historia", nombre: "Voluntarios que cambian vidas", descripcion: "El testimonio de una familia apoyada por la comunidad DCUATES.", img: "/images/historias-3.png" }
+];
+
+const CUPONES_PROMOS_ITEMS = [
+  { id: "cup1", tipo: "Cupón", nombre: "20% en tu primera visita — Taquería El Sol", descripcion: "Válido presentando este cupón digital directo desde tu celular.", img: "/images/cupones-1.png" },
+  { id: "cup2", tipo: "Promo", nombre: "2x1 en tu primera consulta de asesoría", descripcion: "Cupo limitado — agenda tu lugar directo por WhatsApp.", img: "/images/cupones-2.png" },
+  { id: "cup3", tipo: "Promo", nombre: "Descuento en Ventas con Causa", descripcion: "Pregunta por la promoción vigente del mes en el catálogo.", img: "/images/cupones-3.png" }
+];
+
+const PATROCINADORES_ALIANZAS_ITEMS = [
+  { id: "aliado1", tipo: "Aliado", nombre: "Panadería Café Sol", descripcion: "Aliado fundador de la Bibliobici Móvil DCUATES.", img: "/images/aliados-1.png" },
+  { id: "aliado2", tipo: "Patrocinador", nombre: "Refugio Animal Ecatepec", descripcion: "Apoya activamente la difusión de Ecatepets.", img: "/images/aliados-2.png" },
+  { id: "aliado3", tipo: "Aliado", nombre: "Conexiones con Causa", descripcion: "Organización impulsora del programa DCUATES.", img: "/images/aliados-3.png" }
+];
+
+// Mapa que conecta cada id de proyecto con su galería y título de modal —
+// así el botón "Ver galería" sabe qué mostrar sin más configuración.
+const GALERIAS_PROYECTOS = {
+  noticias: { titulo: "Agenda Cultural — Noticias de Barrio", items: NOTICIAS_GALERIA_ITEMS },
+  bienestar: { titulo: "Actividades de Bienestar, Salud y Recreación", items: BIENESTAR_GALERIA_ITEMS }
+};
+
+// =========================================================================
+// 1B. VENTANA EMERGENTE ÚNICA DE PROYECTO (reemplaza el "solo scroll" de
+// los 12 botones naranjas de portada). Junta la info de los 10 proyectos
+// que ya tienen tarjeta (INICIATIVAS_PRINCIPALES + NUEVOS_PROYECTOS_DATA)
+// y agrega, a mano, el contenido de los 2 casos especiales que no son una
+// sola tarjeta: "Ventas con Causa" y "Apoyo Voluntario" (donaciones).
+// =========================================================================
+const TODOS_LOS_PROYECTOS = [...INICIATIVAS_PRINCIPALES, ...NUEVOS_PROYECTOS_DATA];
+
+// Los mismos 12 botones naranjas de la cuadrícula de portada — se sacó a
+// nivel de archivo (antes vivía solo dentro del JSX de la portada) para
+// poder reutilizarlo también en el Mapa de Sitio. "modal" = id que se
+// busca en TODOS_LOS_PROYECTOS (o los 2 casos especiales
+// "ventas-con-causa" / "donaciones") para llenar la ventana emergente.
+// "h" se conserva solo como respaldo por si JavaScript llegara a fallar
+// (accesibilidad).
+// Orden A→L pedido explícitamente (de izquierda a derecha / de arriba hacia
+// abajo): Ecatepets, Publicidad, Apoyo Voluntario, Recomienda, Alianzas,
+// Círculo, Asesorías, Bazar, Ventas, Noticias, Bienestar, Libros.
+// Ya NO se muestra directo en la portada (que ahora usa las 4 categorías
+// de CATEGORIAS_PROYECTOS, más abajo) — este arreglo sigue vivo porque lo
+// usan el Mapa de Sitio (ModalMapaSitio) y las tarjetas de cada categoría
+// (ModalCategoria), así que reordenarlo aquí los reordena a ambos.
+const BOTONES_PORTADA = [
+  { t: "ECATEPETS MASCOTAS", h: "#ecatepets", modal: "ecatepets", img: "/images/Ecatepets.png" },
+  { t: "PUBLICIDAD GRATUITA", h: "#publicidad", modal: "publicidad-tarjeta", img: "/images/Publicidad2.png" },
+  { t: "APOYO VOLUNTARIO", h: "#donaciones", modal: "donaciones", img: "/images/ApoyoVoluntario.png" },
+  { t: "RECOMIENDA, EVALÚA Y GANA", h: "#recomienda-evalua-gana", modal: "recomienda-evalua-gana", img: "/images/Recomienda.png" },
+  { t: "ALIANZAS SOLIDARIAS", h: "#iniciativas", modal: "alianzas-tarjeta", img: "/images/Alianzas.png" },
+  { t: "CÍRCULO DE CONFIANZA", h: "#circulo-confianza", modal: "circulo-confianza", img: "/images/Círculo.png" },
+  { t: "ASESORÍAS GRATUITAS", h: "#asesorias", modal: "asesorias", img: "/images/Asesorías.png" },
+  { t: "BAZAR Y COMERCIO", h: "#bazares", modal: "bazares", img: "/images/Bazar.png" },
+  { t: "VENTAS CON CAUSA", h: "#ventas-con-causa", modal: "ventas-con-causa", img: "/images/VentasConCausa.png" },
+  { t: "NOTICIAS DE BARRIO", h: "#noticias", modal: "noticias", img: "/images/Noticias.png" },
+  { t: "BIENESTAR Y RECREACIÓN", h: "#bienestar", modal: "bienestar", img: "/images/Bienestar.png" },
+  { t: "PRÉSTAMO GRATUITO DE LIBROS", h: "#libros", modal: "libros", img: "/images/bb.png" }
+];
+
+// Una línea que explica cada proyecto: aparece en su tarjeta y en el mensaje
+// que se envía al compartirlo. Edítalas aquí cuando quieras.
+const RESUMEN_PROYECTO = {
+  libros: "Préstamo gratuito de libros",
+  bienestar: "Talleres, cursos y recreación",
+  asesorias: "Orientación gratuita",
+  ecatepets: "Adopción y ayuda a peluditos",
+  "circulo-confianza": "Red de confianza vecinal",
+  "publicidad-tarjeta": "Promociona tu negocio gratis",
+  "recomienda-evalua-gana": "Recomienda, evalúa y gana",
+  "alianzas-tarjeta": "Alianzas ganar-ganar",
+  bazares: "Comercio y bazar local",
+  "ventas-con-causa": "Compra y apoya una causa",
+  donaciones: "Tu tiempo, talento o recursos",
+  noticias: "Lo que pasa en tu barrio"
+};
+
+// Nombre "bonito" de un proyecto (para los mensajes al compartir).
+function tituloProyecto(id) {
+  const base = BOTONES_PORTADA.find((b) => b.modal === id);
+  if (!base) return "Un proyecto de la comunidad";
+  return base.t.toLowerCase().split(" ").map((w, i) => (i && /^(de|del|y|con|a|el|la|los|las|en)$/.test(w) ? w : w.charAt(0).toUpperCase() + w.slice(1))).join(" ");
+}
+
+// Logos para las ventanas que no salen de BOTONES_PORTADA (los 3 botones
+// de abajo: Historias, Cupones, Patrocinadores). Ajusta las rutas si tus
+// archivos se llaman distinto.
+const LOGOS_EXTRA_MODAL = {
+  "historias-dcuates": "/images/HistoriasDCUATES.png"
+};
+
+// Items extra del Mapa de Sitio que NO abren un modal de proyecto, sino
+// una acción especial (igual que en NAV_LINKS_MAS): FAQ y Sugerencias.
+const MAPA_SITIO_EXTRA = [
+  { t: "PREGUNTAS FRECUENTES", accion: "faq", emoji: "❓" },
+  { t: "SUGERENCIAS Y QUEJAS", accion: "sugerencias", emoji: "💬" },
+  { t: "AVISO DE SEGURIDAD", accion: "seguridad", emoji: "⚠️" },
+  { t: "ESCUDO DE SEGURIDAD", accion: "escudo", emoji: "🛡️" }
+];
+
+// Portada simplificada: en vez de los 12 botones de proyecto, se muestran
+// solo estas 4 categorías (más grandes). Cada una agrupa varios proyectos
+// — al tocarla se abre un modal de presentación con acceso directo a cada
+// proyecto incluido (ver ModalCategoria). Los 12 proyectos originales
+// siguen totalmente accesibles uno por uno desde el Mapa de Sitio (usa
+// BOTONES_PORTADA arriba, sin tocar).
+// "emoji" es el respaldo mientras no exista un logo propio: en cuanto
+// tengas la imagen, solo agrega "img: '/images/NombreDelArchivo.png'" y se
+// usará automáticamente en su lugar (mismo patrón que los botones de
+// proyecto). Slogans son provisionales — cámbialos cuando quieras.
+// Nota: "Bazar y Comercio" no estaba en ninguna de las 4 categorías que
+// diste, así que se agregó a "Alianzas y Negocios" por ser lo más afín
+// (comercio local) — muévelo si lo quieres en otra.
+const CATEGORIAS_PROYECTOS = [
+  {
+    id: "beneficios-comunitarios",
+    titulo: "BENEFICIOS COMUNITARIOS",
+    slogan: "Todo lo que la comunidad te regala",
+    emoji: "🎁",
+    img: null,
+    descripcion: "Recursos pensados para tu bienestar y el de tu familia, sin costo: préstamo de libros, actividades de bienestar, asesorías, apoyo para tus mascotas y una red de confianza vecinal.",
+    proyectos: ["libros", "bienestar", "asesorias", "ecatepets", "circulo-confianza"]
+  },
+  {
+    id: "alianzas-y-negocios",
+    titulo: "ALIANZAS Y NEGOCIOS",
+    slogan: "Creciendo juntos, ganamos más",
+    emoji: "🤝",
+    img: null,
+    descripcion: "Todo lo que impulsa tu negocio o emprendimiento: publicidad gratuita, recomendaciones que valen, alianzas ganar-ganar, asesoría profesional, comercio local y ventas con causa, y una red de confianza para crecer sin miedo.",
+    proyectos: ["publicidad-tarjeta", "recomienda-evalua-gana", "alianzas-tarjeta", "asesorias", "bazares", "ventas-con-causa", "circulo-confianza"]
+  },
+  {
+    id: "apoya-causas",
+    titulo: "APOYANDO CAUSAS",
+    slogan: "Tu ayuda, su bienestar",
+    emoji: "💚",
+    img: null,
+    descripcion: "Formas de aportar tu tiempo, dinero o talento para causas que transforman: apoyo voluntario, asesoría a quien la necesita, bienestar comunitario, préstamo de libros y apoyo a mascotas.",
+    proyectos: ["donaciones", "asesorias", "bienestar", "libros", "ecatepets"]
+  },
+  {
+    id: "sumando-valores",
+    titulo: "SUMANDO VALORES",
+    slogan: "Valores que se multiplican",
+    emoji: "✨",
+    img: null,
+    descripcion: "Proyectos que fortalecen el tejido comunitario desde distintos frentes: asesoría, alianzas, noticias de barrio, bienestar, mascotas y una red basada en la confianza.",
+    proyectos: ["asesorias", "alianzas-tarjeta", "noticias", "bienestar", "ecatepets", "circulo-confianza"]
+  }
+];
+
+// Las 4 formas de aportación — se reutilizan aquí y en la sección de Apoyo
+// Voluntario más abajo, para no tener el mismo texto escrito dos veces.
+const OPCIONES_APORTACION = [
+  { t: "Aportación Económica", d: "Solicita los datos bancarios de manera directa y segura.", m: "¡Hola DCUATES! Deseo realizar una Aportación Económica. ¿Me podrías proporcionar los datos seguros?" },
+  { t: "Aportación en Especie", d: "Apoya donando herramientas, materiales o insumos útiles.", m: "¡Hola DCUATES! Quiero realizar una Aportación en Especie. ¿Qué tipo de herramientas o insumos se requieren actualmente?" },
+  { t: "Trueque Solidario", d: "Intercambia productos o servicios de valor equivalente.", m: "¡Hola DCUATES! Me interesa el Trueque Solidario. Tengo productos/servicios para intercambiar a favor de la causa." },
+  { t: "Labor Voluntaria", d: "Dona tu valioso tiempo y conocimientos para crecer juntos.", m: "¡Hola DCUATES! Quiero sumarme con Labor Voluntaria aportando mi tiempo y conocimientos comunitarios." }
+];
+
+// Contenido de "Quiénes Somos" — edítalo aquí, se usa en la nueva sección
+// justo después de la portada.
+const QUIENES_SOMOS = {
+  idea: "DCUATES nace como un programa de CONEXIONES CON CAUSA ♥ para conectar a vecinos, negocios y organizaciones de la comunidad, y así generar apoyos y beneficios mutuos reales, todos los días.",
+  objetivos: ["Difundir de forma gratuita a negocios, personas y causas de la zona", "Facilitar el acceso a libros, asesorías y bienestar para todas las familias", "Conectar a quien necesita ayuda con quien puede darla, sin barreras", "Fortalecer el tejido social a través de alianzas ganar-ganar", "Apoyar a quienes AYUDAN a AYUDAR MÁS Y MEJOR !!!"],
+  filosofia: "Creemos en la CADENA DE VALOR Y DE VALORES: cuando una persona o negocio suma su talento, tiempo o recursos, se multiplica el beneficio para todos. Ninguna aportación es demasiado pequeña.",
+  colofon: "AYUDAR A QUIEN LO NECESITA ES UN GUSTO, UN PRIVILEGIO Y UNA BENDICIÓN; AYUDAR A QUIENES AYUDAN ES UNA GRAN BENDICIÓN, Y GENERAR APOYOS MUTUOS ES UNA LLUVIA DE BENDICIONES PARA TODOS !!!",
+  firma: "ATTE: CONEXIONES CON CAUSA ♥"
+};
+
+// Contenido de los 4 botones verdes desplegables que van junto al video
+// (entre la portada y la sección de Proyectos Base). Edítalo aquí.
+const MISION_VISION = {
+  mision: "Conectar personas, negocios, causas y organizaciones de la comunidad para generar apoyos y beneficios mutuos reales, todos los días, sin costo y sin barreras.",
+  vision: "Ser la red comunitaria de referencia donde cualquier persona o negocio de la zona encuentre, en un solo lugar, difusión gratuita, alianzas confiables y oportunidades de ayudar y ser ayudado.",
+  filosofia: "Creemos en LA CADENA DE VALOR Y DE VALORES: cada aportación, por pequeña que parezca, se multiplica cuando se comparte con la comunidad."
+};
+const COMO_SUMAR = {
+  intro: "Si hay algo en lo que podamos APOYAR O SUMAR a tus proyectos, negocios o causas, escríbenos — con gusto vemos cómo conectar esfuerzos.",
+  ventajas: "Sumarte a una RED CONFIABLE Y DE VALOR como DCUATES multiplica tu alcance: más ojos ven tu negocio o causa, más manos pueden ayudarte, y toda la comunidad sale ganando.",
+  cierre: "Te invitamos a colaborar si hay algún proyecto DCUATES en el que te interese SUMARTE — dinos cuál y platicamos los siguientes pasos."
+};
+
+// =========================================================================
+// TEXTOS LEGALES — Aviso de Privacidad Integral y Términos y Condiciones.
+// IMPORTANTE: llena los datos del responsable en DATOS_LEGALES (nombre,
+// domicilio y correo). Edita solo lo que está entre comillas. El resto del texto es el de tus documentos oficiales.
+// =========================================================================
+const DATOS_LEGALES = {
+  nombre: "ABEL MERAZ ALVARADO",
+  colonia: "Jardines de Morelos, Sección Ríos",
+  municipio: "Ecatepec de Morelos",
+  cp: "55070", // si lo dejas vacío ("") el Aviso omite el código postal
+  estado: "México",
+  correo: "dcuates77@gmail.com"
+};
+
+// Cada sección: titulo, parrafos (antes), lista (viñetas; texto o {b, t}),
+// despues (párrafos después de la lista).
+const AVISO_PRIVACIDAD_INTEGRAL = {
+  titulo: "Aviso de Privacidad Integral (Fase de Lanzamiento)",
+  secciones: [
+    {
+      titulo: "1. Responsable del tratamiento de sus datos personales",
+      parrafos: [
+        `El Responsable del tratamiento de sus datos personales es ${DATOS_LEGALES.nombre}, operando bajo el nombre comercial DCUATES y a través del sitio web dcuates.com. Para efectos del presente aviso y la protección de los datos de nuestros usuarios, se señala como domicilio general de atención, correspondencia y solicitudes relativas a la privacidad el ubicado en la Colonia ${DATOS_LEGALES.colonia}, Municipio o Alcaldía ${DATOS_LEGALES.municipio}${DATOS_LEGALES.cp ? `, C.P. ${DATOS_LEGALES.cp}` : ""}, en el Estado de ${DATOS_LEGALES.estado}, México. Usted puede ponerse en contacto directo con el responsable a través del correo electrónico exclusivo: ${DATOS_LEGALES.correo}.`
+      ]
+    },
+    {
+      titulo: "2. Datos personales que se recabarán",
+      parrafos: [
+        "Para permitir su interacción, el uso de las ventanas de registro y el alta de iniciativas en nuestra plataforma, recabaremos únicamente los siguientes datos de identificación y contacto a través de nuestros formularios web:"
+      ],
+      lista: [
+        "Nombre completo (o alias del usuario).",
+        "Número de teléfono celular (WhatsApp).",
+        "Colonia de residencia.",
+        "Tipo de apoyo solicitado o requerido.",
+        "Descripción detallada de la necesidad o aportación."
+      ],
+      despues: [
+        "DCUATES no recaba, almacena ni trata bajo ninguna circunstancia datos personales sensibles (como ideología, religión, política, estado de salud o datos financieros)."
+      ]
+    },
+    {
+      titulo: "3. Finalidades del tratamiento",
+      parrafos: [
+        "Los datos personales recabados serán utilizados exclusivamente para las siguientes finalidades primarias, las cuales son estrictamente necesarias para el servicio solicitado dentro de la plataforma:"
+      ],
+      lista: [
+        "Gestionar su registro, cuenta y participación dentro de la plataforma de proyectos comunitarios.",
+        "Almacenar de forma segura su solicitud en nuestra base de datos interna (alojada en Google Sheets) para dar seguimiento a su caso.",
+        "Establecer comunicación directa con usted a través de la aplicación WhatsApp para validar, confirmar o coordinar el apoyo solicitado.",
+        "Brindar soporte técnico y atender reportes de la comunidad."
+      ],
+      despues: [
+        "Finalidades secundarias: No utilizaremos sus datos para fines publicitarios masivos ajenos a la comunidad, ni los venderemos o cederemos a terceros. Cualquier boletín informativo interno de la plataforma requerirá su autorización previa."
+      ]
+    },
+    {
+      titulo: "4. Transferencia de datos personales",
+      parrafos: [
+        "Le informamos que sus datos personales no serán compartidos, transferidos ni tratados por personas, empresas o entidades terceras, salvo por las excepciones estrictas previstas en el artículo 37 de la Ley Federal de Protección de Datos Personales en Posesión de los Particulares (LFPDPPP) o por requerimientos judiciales de las autoridades competentes."
+      ]
+    },
+    {
+      titulo: "5. Derechos ARCO y Revocación del Consentimiento",
+      parrafos: [
+        "Usted tiene en todo momento el derecho de Acceder a sus datos, Rectificarlos si son incorrectos o están desactualizados, Cancelar su registro para que sean borrados por completo de nuestra base de datos de Google Sheets, u Oponerse al uso de los mismos para fines específicos (Derechos ARCO).",
+        `Para ejercer estos derechos o revocar el consentimiento que nos ha otorgado, deberá enviar una solicitud por escrito al correo electrónico: ${DATOS_LEGALES.correo}. Su solicitud deberá contener su nombre completo, el número de WhatsApp con el que se registró y la descripción clara del derecho que desea ejercer. Le responderemos y ejecutaremos la acción en un plazo máximo de 20 días hábiles.`
+      ]
+    },
+    {
+      titulo: "6. Tecnologías de Análisis y Rendimiento (Vercel Analytics)",
+      parrafos: [
+        "Le informamos que este sitio web utiliza la herramienta de medición integrada de nuestro proveedor de alojamiento (Vercel Analytics). Esta tecnología recopila exclusivamente datos estadísticos y de rendimiento de forma totalmente anónima (tales como el país de origen del visitante, tipo de navegador, sistema operativo y velocidad de carga de la página). Esta herramienta no utiliza cookies de rastreo, no recopila datos que permitan identificar personalmente al usuario ni realiza un seguimiento de sus hábitos de navegación fuera de este sitio web. Debido a su naturaleza puramente técnica y estadística, no genera archivos de rastreo en su dispositivo."
+      ]
+    },
+    {
+      titulo: "7. Modificaciones por formalización legal",
+      parrafos: [
+        "Este aviso de privacidad es de carácter temporal y sufrirá modificaciones y actualizaciones una vez que el proyecto DCUATES culmine su proceso de transición hacia una figura jurídica colectiva (Sociedad Cooperativa). Las actualizaciones estarán siempre disponibles para su consulta en esta misma sección del sitio web."
+      ]
+    }
+  ],
+  fecha: "Fecha de última actualización: Octubre de 2026."
+};
+
+const TERMINOS_CONDICIONES = {
+  titulo: "Términos y Condiciones de la Comunidad (DCUATES)",
+  intro: "Bienvenido a DCUATES (dcuates.com). Al utilizar nuestra plataforma, registrar tus datos o publicar una solicitud de apoyo, aceptas cumplir de manera íntegra con las siguientes reglas, normas de convivencia y condiciones de servicio. Si no estás de acuerdo con alguna de ellas, te pedimos amablemente que te abstengas de utilizar el sitio.",
+  secciones: [
+    {
+      titulo: "1. Naturaleza de la Plataforma",
+      parrafos: [
+        "DCUATES es una iniciativa de carácter social e independiente. Nuestro único objetivo es servir como un puente de vinculación directa entre personas que necesitan un apoyo comunitario y personas o colectivos dispuestos a brindarlo de forma voluntaria. DCUATES no es una empresa de servicios, no es una casa de beneficencia con fondos propios, ni actúa como intermediario legal en los acuerdos alcanzados entre los usuarios."
+      ]
+    },
+    {
+      titulo: "2. Proyectos e Iniciativas Permitidas",
+      parrafos: [
+        "La plataforma está diseñada exclusivamente para albergar solicitudes y proyectos que generen un impacto positivo, colaborativo o solidario en la comunidad. Los tipos de proyectos bienvenidos incluyen:"
+      ],
+      lista: [
+        { b: "Educación y Cultura:", t: "Solicitudes o donaciones de libros, materiales didácticos, asesorías escolares y talleres gratuitos." },
+        { b: "Apoyo Social y Comunitario:", t: "Iniciativas de mejora barrial, recolección de víveres, ropa en buen estado o voluntariados locales." },
+        { b: "Cuidado Animal y Ambiental:", t: "Proyectos de rescate de mascotas, campañas de esterilización comunitaria, reforestación o reciclaje local." },
+        { b: "Herramientas de Trabajo:", t: "Solicitudes de colaboración mutua para proyectos de emprendimiento social o solidario." }
+      ]
+    },
+    {
+      titulo: "3. Contenido y Proyectos Estrictamente Prohibidos",
+      parrafos: [
+        "Para garantizar un espacio seguro y confiable, queda estrictamente prohibida la publicación de cualquier solicitud o contenido que involucre:"
+      ],
+      lista: [
+        { b: "Fines de Lucro Exclusivos:", t: "Venta directa de productos comerciales, publicidad de empresas privadas que no tengan un esquema de donación o beneficio social claro, o esquemas de negocio multinivel." },
+        { b: "Proselitismo Político o Religioso:", t: "Campañas de partidos políticos, promoción de candidatos, propaganda ideológica o religiosa de cualquier índole." },
+        { b: "Contenido Ilícito o Peligroso:", t: "Solicitud o intercambio de armas, sustancias prohibidas, medicamentos controlados o actividades penadas por las leyes mexicanas." },
+        { b: "Conductas de Odio o Discriminación:", t: "Mensajes que promuevan la violencia, el racismo, el sexismo, la intolerancia o que vulneren la dignidad de las personas." },
+        { b: "Fraudes y Préstamos:", t: "Solicitudes de dinero en efectivo directo de procedencia dudosa, esquemas de tandas, pirámides financieras o solicitud de datos bancarios confidenciales." }
+      ],
+      despues: [
+        "Cualquier registro que infrinja estas normas será eliminado inmediatamente de la base de datos de Google Sheets sin previo aviso y no se le dará seguimiento por WhatsApp."
+      ]
+    },
+    {
+      titulo: "4. Responsabilidad de los Usuarios",
+      lista: [
+        { b: "Veracidad de la Información:", t: "Al registrarte, garantizas que los datos proporcionados (Nombre, WhatsApp, Colonia) son reales y te pertenecen." },
+        { b: "Uso del Canal de WhatsApp:", t: "Entiendes que al presionar el botón de confirmación, inicias un chat de WhatsApp de forma voluntaria. Te comprometes a mantener una comunicación respetuosa, clara y cordial con el administrador y con otros miembros de la comunidad con los que te vincules." },
+        { b: "Seguridad Física:", t: "Dado que la plataforma facilita que personas de la misma zona se apoyen (por ejemplo, para entregar libros o materiales), cada usuario es enteramente responsable de su propia seguridad física. Recomendamos realizar cualquier entrega o encuentro exclusivamente en lugares públicos, concurridos y de preferencia a la luz del día." }
+      ]
+    },
+    {
+      titulo: "5. Deslinde de Responsabilidad de la Plataforma (Límites Legales)",
+      lista: [
+        "DCUATES no se hace responsable por la calidad, entrega, veracidad o resultado de los apoyos coordinados entre los usuarios.",
+        "No garantizamos que todas las solicitudes registradas reciban apoyo, ya que esto depende enteramente de la participación voluntaria de la comunidad.",
+        "El administrador de la página no se hace responsable de los daños, pérdidas, malentendidos o conflictos derivados de las interacciones generadas fuera del sitio web (chats privados de WhatsApp, llamadas o reuniones físicas)."
+      ]
+    },
+    {
+      titulo: "6. Modificaciones",
+      parrafos: [
+        "Nos reservamos el derecho de actualizar estas normas en cualquier momento para adaptarlas al crecimiento de la comunidad o a futuras regulaciones legales. Al continuar usando la página tras una actualización, aceptas los nuevos términos establecidos."
+      ]
+    }
+  ],
+  fecha: "Fecha de actualización: Octubre de 2026."
+};
+
+// (Texto anterior, simplificado — ya no se usa) Aviso de Privacidad — se usaba en el
+// botón verde desplegable "Aviso de Privacidad" de la portada, para no
+// tener el mismo texto escrito dos veces.
+const AVISO_PRIVACIDAD_PARRAFOS = [
+  "En cumplimiento con la normativa de protección de datos, DCUATES le informa que los datos recabados en este formulario (Nombre de Negocio, Categoría y Enlaces Digitales) tienen la única y exclusiva finalidad de promover de forma comunitaria y gratuita sus actividades comerciales.",
+  "Sus datos no serán vendidos, transferidos ni compartidos con terceros con fines de lucro. Al enviar la información y continuar la interacción en WhatsApp, usted acepta el tratamiento de los mismos para los fines de difusión colectiva estipulados en nuestras iniciativas de Apoyo al Emprendimiento.",
+  "Usted puede solicitar la baja, rectificación o eliminación de los datos publicitados en cualquier momento poniéndose en contacto directo mediante nuestros canales oficiales de atención."
+];
+
+// Preguntas frecuentes — cada una se despliega al dar clic (como un
+// acordeón). Para agregar una nueva, solo copia un bloque { pregunta, respuesta } más.
+const FAQ_ITEMS = [
+  { pregunta: "¿DCUATES tiene algún costo para participar?", respuesta: "No. Todos los proyectos (libros, publicidad, Ecatepets, asesorías, etc.) son gratuitos. Las aportaciones voluntarias solo ayudan a que la plataforma llegue a más familias." },
+  { pregunta: "¿Cómo publico mi negocio o servicio?", respuesta: "Usa el botón \"Publicidad Gratuita\" en la portada, o baja hasta la sección de Publicidad Comunitaria y llena el formulario. También puedes escribirnos directo por WhatsApp." },
+  { pregunta: "¿Cómo reporto una mascota, persona o cosa extraviada?", respuesta: "Entra al botón \"Ecatepets\" o a la sección \"Ventas con Causa\" y da clic en \"Reportar un caso por WhatsApp\"; te contactamos directo." },
+  { pregunta: "¿Qué pasa con mis datos si lleno un formulario?", respuesta: "Solo se usan para la difusión comunitaria del proyecto que elegiste. Puedes ver el detalle completo en nuestro Aviso de Privacidad, en el pie de página." },
+  { pregunta: "¿Cómo puedo apoyar como voluntario o con una donación?", respuesta: "En el botón \"Apoyo Voluntario\" puedes elegir entre aportación económica, en especie, trueque solidario o labor voluntaria — cada opción te conecta directo por WhatsApp." },
+  { pregunta: "¿Necesito ser un negocio formal para participar?", respuesta: "No. DCUATES está abierto a negocios formales, informales, personas y organizaciones de la comunidad; lo importante es la intención de sumar y beneficiar a la zona." },
+  { pregunta: "¿Cómo me entero de las noticias y actividades nuevas?", respuesta: "Sigue nuestras redes sociales (Facebook, Instagram, YouTube y TikTok) y revisa el botón de \"Noticias de Barrio\" en la portada; ahí publicamos convocatorias y eventos." }
+];
+
+// Navegación por Necesidades — botón flotante naranja (arriba a la derecha)
+// que agrupa TODAS las preguntas por necesidad del visitante en 4 categorías,
+// cada una con su propio color (a partir de los logos de cada sección).
+// Cada pregunta lleva a un "modal" (mismo id que en TODOS_LOS_PROYECTOS o en
+// las 3 cajas naranjas nuevas), o a un "enlace" directo (para las necesidades
+// "próximamente" que aún no tienen su propia sección/modal).
+const NECESIDADES_GRUPOS = [
+  {
+    id: "mascotas",
+    titulo: "Mascotas",
+    colorClaro: "#fbeaf0",
+    colorFuerte: "#ed93b1",
+    colorTexto: "#4b1528",
+    preguntas: [
+      { texto: "Perdí a mi mascota", modal: "ecatepets" },
+      { texto: "Quiero adoptar una mascota", modal: "ecatepets" },
+      { texto: "Rescaté a un peludito y no sé qué hacer", modal: "ecatepets" },
+      { texto: "Busco una recomendación de atención veterinaria de confianza (próximamente)", enlace: enlaceWhatsApp("¡Hola DCUATES! Busco una recomendación de atención veterinaria de confianza.") },
+      { texto: "Busco accesorios, alimentos o productos de calidad para mi mascota (próximamente)", enlace: enlaceWhatsApp("¡Hola DCUATES! Busco accesorios, alimentos o productos de calidad para mi mascota.") }
+    ]
+  },
+  {
+    id: "negocios",
+    titulo: "Negocios",
+    colorClaro: "#faece7",
+    colorFuerte: "#f0997b",
+    colorTexto: "#4a1b0c",
+    preguntas: [
+      { texto: "Tengo un negocio y quiero más clientes de mi zona", modal: "publicidad-tarjeta" },
+      { texto: "Quiero anunciar una promoción o evento de mi negocio", modal: "publicidad-tarjeta" },
+      { texto: "Busco aliados o proveedores de confianza para crecer", modal: "alianzas-tarjeta" },
+      { texto: "Quiero vender o comprar algo de segunda mano de forma segura", modal: "bazares" },
+      { texto: "Busco un bazar comunitario donde participar", modal: "bazares" },
+      { texto: "Busco un producto o servicio local que también apoye una causa", modal: "ventas-con-causa" },
+      { texto: "Quiero vender mi producto o servicio con causa", modal: "ventas-con-causa" },
+      { texto: "Busco descuentos en negocios locales", modal: "cupones-promos" },
+      { texto: "Mi negocio quiere patrocinar o aliarse con DCUATES", modal: "patrocinadores-alianzas" },
+      { texto: "Busco trabajo o quiero ofrecer una vacante (próximamente)", enlace: enlaceWhatsApp("¡Hola DCUATES! Me interesa la futura bolsa de empleo comunitaria.") }
+    ]
+  },
+  {
+    id: "apoyos-mutuos",
+    titulo: "Beneficios y Apoyos Mutuos",
+    colorClaro: "#e1f5ee",
+    colorFuerte: "#5dcaa5",
+    colorTexto: "#04342c",
+    preguntas: [
+      { texto: "Busco un libro o material educativo prestado", modal: "libros" },
+      { texto: "Tengo libros para donar o intercambiar", modal: "libros" },
+      { texto: "Necesito un servicio y quiero una recomendación de confianza", modal: "circulo-confianza" },
+      { texto: "Quiero unirme a una red de apoyo mutuo", modal: "circulo-confianza" },
+      { texto: "Tuve una experiencia con un negocio y quiero compartirla", modal: "recomienda-evalua-gana" },
+      { texto: "Quiero apoyar con dinero, en especie, trueque o mi tiempo", modal: "donaciones" },
+      { texto: "Mi familia o yo necesitamos apoyo y no sabemos a quién acudir", modal: "donaciones" },
+      { texto: "Quiero avisar o enterarme de algo importante de mi colonia (próximamente)", enlace: enlaceWhatsApp("¡Hola DCUATES! Quiero compartir o enterarme de alertas de mi colonia.") }
+    ]
+  },
+  {
+    id: "conocer-mas",
+    titulo: "Conocer y Compartir Más",
+    colorClaro: "#eeedfe",
+    colorFuerte: "#afa9ec",
+    colorTexto: "#26215c",
+    preguntas: [
+      { texto: "Necesito orientación (legal, de negocio, personal)", modal: "asesorias" },
+      { texto: "Tengo conocimientos que quiero compartir como asesor voluntario", modal: "asesorias" },
+      { texto: "Quiero inspirarme con testimonios reales de la comunidad", modal: "historias-dcuates" },
+      { texto: "Tengo una historia que quiero compartir", modal: "historias-dcuates" },
+      { texto: "Quiero enterarme de eventos y convocatorias de mi colonia", modal: "noticias" },
+      { texto: "Tengo una noticia o evento que quiero compartir", modal: "noticias" },
+      { texto: "Busco actividades para mi salud física o mental", modal: "bienestar" },
+      { texto: "Quiero organizarme o sumarme a una actividad recreativa comunitaria", modal: "bienestar" }
+    ]
+  }
+];
+
+// Botón "Recibe Beneficios" del encabezado — abre un mini formulario de
+// intereses y arma un mensaje de WhatsApp con lo seleccionado (sin backend:
+// tú decides después si lo que envías es un boletín periódico o avisos
+// puntuales). Para agregar/quitar un interés, solo edita este arreglo.
+const INTERESES_BENEFICIOS = [
+  "Promociones y negocios locales",
+  "Mascotas (adopciones y extravíos)",
+  "Noticias y eventos del barrio",
+  "Bienestar y actividades comunitarias",
+  "Otros Beneficios y Apoyos/Voluntariado"
+];
+
+// Retos, Regalos y Reconocimientos DCUATES — 3 botones naranjas que arman
+// un mensaje de WhatsApp distinto cada uno. Para cambiar el texto o el
+// ícono de alguno, solo edita este arreglo (mismo patrón que los demás).
+const RETOS_REGALOS_ITEMS = [
+  {
+    titulo: "RETOS que nos hacen MEJORES !!!",
+    icono: "🎯",
+    intro: "Ejemplos de retos que podríamos lanzar entre vecinos, familias y negocios:",
+    ejemplos: [
+      "🧹 Reto Cuadra Limpia: 30 días dejando tu banqueta y tu cuadra más limpias; sube foto de antes y después.",
+      "📚 Reto Un Libro al Mes: lee un libro (de nuestro préstamo gratuito) y comparte tu reseña en una frase.",
+      "🛍️ Reto Compra Local: una semana comprando en negocios de la colonia y recomendando tu favorito.",
+      "💚 Reto Un Acto de Bondad al Día: ayuda a alguien sin esperar nada y cuéntanos la historia.",
+      "🌱 Reto Cuadra Verde: siembra una planta o adopta un árbol y cuídalo durante 3 meses."
+    ],
+    cta: "💡 Propón tu propio RETO",
+    enlace: enlaceWhatsApp("¡Hola DCUATES! Quiero proponer o participar en un Reto que nos haga mejores.")
+  },
+  {
+    titulo: "REGALOS que motivan",
+    icono: "🎁",
+    intro: "Ejemplos de regalos que pueden motivar la participación (donados por vecinos y negocios aliados):",
+    ejemplos: [
+      "🎟️ Sorteo mensual de una canasta de productos de negocios aliados entre quienes cumplan los retos.",
+      "📖 Un libro nuevo para quien complete el Reto Un Libro al Mes.",
+      "🏷️ Cupones y descuentos exclusivos en negocios de la comunidad.",
+      "✂️ Un servicio gratis donado por un negocio: corte de cabello, asesoría, clase de prueba, etc.",
+      "🐶 Un kit para mascota (croquetas, collar o placa) para quien adopte o cuide a un peludito en apuros."
+    ],
+    cta: "🎁 Propón tu propio REGALO",
+    enlace: enlaceWhatsApp("¡Hola DCUATES! Tengo una propuesta de Regalo que motive a la comunidad.")
+  },
+  {
+    titulo: "RECONOCIMIENTO a quienes nos INSPIRAN",
+    icono: "🏅",
+    intro: "Ejemplos de reconocimientos que podríamos entregar y difundir en nuestras redes:",
+    ejemplos: [
+      "🏆 Vecino/a del Mes: por su ayuda constante a la comunidad.",
+      "🏪 Negocio con Causa del Mes: por apoyar a familias y causas sociales.",
+      "🤝 Voluntario/a Constante: por sumar tiempo y talento sin descanso.",
+      "🐾 Héroe/Heroína de Ecatepets: por rescatar, cuidar o dar hogar a una mascota.",
+      "👩‍🏫 Promotor/a de la Lectura: por acercar libros y educación a niñas y niños."
+    ],
+    cta: "🏅 Propón a quien merece un RECONOCIMIENTO",
+    enlace: enlaceWhatsApp("¡Hola DCUATES! Quiero proponer a alguien para un Reconocimiento que inspira.")
+  }
+];
+
+// Los 3 botones naranjas de Retos/Regalos/Reconocimiento se despliegan
+// (uno a la vez) mostrando ejemplos y un botón inferior para que el público
+// mande su propia propuesta por WhatsApp. Edita "ejemplos" en el arreglo de arriba.
+// Botones naranjas de portada (Historias, Cupones, Patrocinadores): cada
+// uno vive ahora dentro de su pestaña. "modales" elige cuáles mostrar.
+function BotonesNaranjasSeccion({ modales, onAbrir }) {
+  const todos = [
+                    { t: "HISTORIAS DCUATES", modal: "historias-dcuates", img: "/images/HistoriasDCUATES.png", puntos: ["TESTIMONIOS REALES", "HISTORIAS CON CAUSA", "INSPIRACIÓN COMUNITARIA"] },
+                    { t: "CUPONES, PROMOS Y MÁS", modal: "cupones-promos", img: "/images/CuponesPromos.png", puntos: ["DESCUENTOS EXCLUSIVOS", "PROMOCIONES LOCALES", "SE ACTUALIZA CADA MES"] },
+                    { t: "PATROCINADORES Y ALIANZAS DCUATES", modal: "patrocinadores-alianzas", img: "/images/PatrocinadoresAlianzas.png", puntos: ["NEGOCIOS ALIADOS", "ORGANIZACIONES QUE APOYAN", "¡GRACIAS POR SUMAR!"] }
+  ];
+  const lista = todos.filter((b) => modales.includes(b.modal));
+  return (
+    <div className={lista.length === 1 ? "flex justify-center" : "grid grid-cols-1 md:grid-cols-2 gap-3"}>
+      {lista.map((btn, idx) => (
+        <div key={idx} className={lista.length === 1 ? "w-full max-w-md" : "w-full"}>
+                    <button
+                      type="button"
+                      onClick={() => onAbrir(btn.modal)}
+                      className="flex flex-col rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white shadow-md transition-all hover:scale-[1.02] overflow-hidden font-heading text-left w-full"
+                    >
+                      <div className="px-2 pt-3 pb-1 text-center border-b border-white/20">
+                        <h4 className="uppercase font-black leading-tight text-sm sm:text-base lg:text-lg">
+                          {btn.t}
+                        </h4>
+                      </div>
+                      <div className="flex flex-1 items-center gap-2 px-2 py-2">
+                        <div className="w-2/5 h-full flex items-center justify-center">
+                          <img
+                            src={btn.img}
+                            alt=""
+                            loading="lazy"
+                            className="max-h-16 sm:max-h-20 w-auto object-contain drop-shadow"
+                            onError={(e) => { e.target.style.display = 'none'; }}
+                          />
+                        </div>
+                        <ul className="w-3/5 space-y-1 text-left text-[10px] sm:text-xs font-bold leading-snug">
+                          {btn.puntos.map((p, i) => <li key={i}>* {p}</li>)}
+                        </ul>
+                      </div>
+                    </button>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function BotonesRetosRegalos({ indices }) {
+  const [abierto, setAbierto] = useState(null);
+  return (
+    <div className="flex flex-col gap-2">
+      {RETOS_REGALOS_ITEMS.map((item, i) => {
+        if (indices && !indices.includes(i)) return null;
+        const activo = true;
+        return (
+          <div key={i} className="rounded-xl overflow-hidden">
+            <div
+              className="w-full flex items-center justify-between gap-2 bg-[#e65100] text-white font-black uppercase text-xs sm:text-sm leading-tight px-4 py-3.5 transition-colors text-left"
+            >
+              <span>{item.titulo}</span>
+              <span className="flex items-center gap-2 shrink-0">
+                <span className="text-xl" aria-hidden="true">{item.icono}</span>
+              </span>
+            </div>
+            {activo && (
+              <div className="bg-[#fff8f1] border-2 border-t-0 border-[#e65100] rounded-b-xl p-3 space-y-2">
+                <p className="text-[#0f2d1e] text-[11px] sm:text-xs font-black leading-snug">{item.intro}</p>
+                <ul className="space-y-1.5">
+                  {item.ejemplos.map((ej, j) => (
+                    <li key={j} className="text-[#0f2d1e] text-[11px] sm:text-xs font-semibold leading-snug bg-white rounded-lg border border-[#e65100]/20 px-2.5 py-1.5">
+                      {ej}
+                    </li>
+                  ))}
+                </ul>
+                <a
+                  href={item.enlace}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full text-center rounded-full bg-[#17472d] hover:bg-[#0f2d1e] text-white font-black uppercase text-[11px] sm:text-xs tracking-wide px-4 py-2.5 transition-colors"
+                >
+                  {item.cta}
+                </a>
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// =========================================================================
+// 2. COMPONENTE PRINCIPAL (INICIO DEL RENDERIZADO)
+// =========================================================================
+export default function App() {
+  const [showPrivacy, setShowPrivacy] = useState(false);
+  const [showTerminos, setShowTerminos] = useState(false);
+  const [showSeguridad, setShowSeguridad] = useState(false);
+  const [showEscudo, setShowEscudo] = useState(false);
+  useEffect(() => {
+    const alPedir = (e) => {
+      if (e.detail === "privacidad") setShowPrivacy(true);
+      else if (e.detail === "terminos") setShowTerminos(true);
+      else if (e.detail === "seguridad") setShowSeguridad(true);
+      else if (e.detail === "escudo") setShowEscudo(true);
+    };
+    window.addEventListener("dcuates:abrir-legal", alPedir);
+    return () => window.removeEventListener("dcuates:abrir-legal", alPedir);
+  }, []);
+  const [showFAQ, setShowFAQ] = useState(false);
+  const [showDudas, setShowDudas] = useState(false);
+  // Modal del Mapa de Sitio — tarjetas con acceso directo a todo lo que
+  // hay en la página (accesible desde el pie de página y el menú "Más").
+  const [showMapaSitio, setShowMapaSitio] = useState(false);
+  // Categoría abierta (portada simplificada de 4 botones) — null = cerrada.
+  const [categoriaAbierta, setCategoriaAbierta] = useState(null);
+  // Ventana emergente única para los 12 botones naranjas de portada.
+  // null = cerrada; si tiene un id (ej. "libros", "ecatepets", "ventas-con-causa",
+  // "donaciones") se abre con la información de ese proyecto.
+  const [modalProyecto, setModalProyecto] = useState(null);
+  // Analítica: cuenta visitas y registra qué proyectos se abren.
+  useEffect(() => { iniciarAnalitica(); iniciarPWA(); }, []);
+  useEffect(() => { if (modalProyecto) registrar("proyecto_abrir", { id: String(modalProyecto) }); }, [modalProyecto]);
+  // ¿Ya respondió Baserow (bien o mal)? Mientras no, se muestran esqueletos.
+  const [baserowListo, setBaserowListo] = useState(() => typeof window !== "undefined" && !!window.__dcuatesBaserow);
+  useEffect(() => {
+    const listo = () => setBaserowListo(true);
+    window.addEventListener("dcuates:baserow-estado", listo);
+    const tope = setTimeout(listo, 8000);
+    return () => { window.removeEventListener("dcuates:baserow-estado", listo); clearTimeout(tope); };
+  }, []);
+  // Enlaces con # que abren la ventana de un proyecto:
+  //   dcuates.com/#proyecto-libros  (el que se comparte)  y  dcuates.com/#libros
+  // (el de la barra de logros). Los ids de secciones de la página (#donaciones,
+  // #solicitudes…) no abren ventana: los maneja BloqueCentral.
+  useEffect(() => {
+    const IDS_DE_SECCION = new Set(["donaciones", "chuy-video", "extraviados-registro", "quienes-somos", "solicitudes", "recursos", "mapa-negocios", "ventas-con-causa", "publicidad", "retos-regalos", "inicio", "historias-reflexiones"]);
+    const abrir = () => {
+      const h = decodeURIComponent(window.location.hash || "");
+      if (h.length < 2) return;
+      let id = h.slice(1);
+      if (id === "avisos") { window.dispatchEvent(new Event("dcuates:abrir-avisos")); return; }
+      if (id === "compartir") { setModalFormulario("comparte"); return; }
+      if (id === "seguridad") { setShowSeguridad(true); return; }
+      if (id === "escudo") { setShowEscudo(true); return; }
+      if (id.startsWith("proyecto-")) id = id.slice("proyecto-".length);
+      else if (IDS_DE_SECCION.has(id)) return;
+      if (BOTONES_PORTADA.some((b) => b.modal === id) || TODOS_LOS_PROYECTOS.some((x) => x.id === id)) setModalProyecto(id);
+    };
+    abrir();
+    window.addEventListener("hashchange", abrir);
+    return () => window.removeEventListener("hashchange", abrir);
+  }, []);
+  // Búsqueda: vive aquí (no dentro de SiteHeader) para poder abrirla desde
+  // cualquier parte de la página (ej. el acceso rápido de "Registra tu
+  // Solicitud"), además del botón del encabezado.
+  const [busquedaAbierta, setBusquedaAbierta] = useState(false);
+
+  // Formulario de "Registra tu Solicitud" (junto al mapa): ahora es propio y
+  // siempre se ve completo.
+  const [solicitudExpandida, setSolicitudExpandida] = useState(true);
+  // Botones naranjas junto a los carruseles de Ventas con Causa y de
+  // Extraviados: agrupados en un solo botón resumen debajo del carrusel.
+  const [ventasResumenAbierto, setVentasResumenAbierto] = useState(false);
+  const [extraviadosResumenAbierto, setExtraviadosResumenAbierto] = useState(false);
+  // Botón flotante "Subir" + barra de progreso de lectura (aparecen solo
+  // después de bajar un poco en la página).
+  const [mostrarSubir, setMostrarSubir] = useState(false);
+  const [progresoLectura, setProgresoLectura] = useState(0);
+  useEffect(() => {
+    const onScroll = () => {
+      const alto = document.documentElement.scrollHeight - window.innerHeight;
+      const pct = alto > 0 ? Math.min(100, Math.max(0, (window.scrollY / alto) * 100)) : 0;
+      setProgresoLectura(pct);
+      setMostrarSubir(window.scrollY > 500);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Enlaces con "#algo" (ej. dcuatesmini.vercel.app/#solicitudes): la página
+  // se dibuja con React DESPUÉS de cargar, así que el navegador no encuentra
+  // la sección a tiempo y se queda arriba. Aquí, al entrar, esperamos a que
+  // exista y bajamos hasta ella (reintentando unos segundos, porque el
+  // contenido de Baserow puede mover la altura de la página al cargar).
+  // Si el "#algo" es el id de un proyecto (ej. #ecatepets), abre su ventana.
+  useEffect(() => {
+    const id = decodeURIComponent(window.location.hash.replace("#", ""));
+    if (!id) return;
+    let intentos = 0;
+    const timer = setInterval(() => {
+      intentos += 1;
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+        clearInterval(timer);
+      } else if (TODOS_LOS_PROYECTOS.some((p) => p.id === id)) {
+        setModalProyecto(id);
+        clearInterval(timer);
+      } else if (intentos >= 20) {
+        clearInterval(timer);
+      }
+    }, 250);
+    return () => clearInterval(timer);
+  }, []);
+  // Formulario emergente reutilizable: null = cerrado; "sugerencias" abre el
+  // de Sugerencias y Quejas (pie de página / menú "MÁS"); "comparte" abre el
+  // de Conocer y Compartir Más (desde el botón naranja "Compartir Más" del encabezado).
+  const [modalFormulario, setModalFormulario] = useState(null);
+  // Id de YouTube del video que se está viendo en grande (ventana flotante),
+  // al tocar una miniatura de la barra de videos de portada.
+  const [videoEnGrande, setVideoEnGrande] = useState(null);
+  // Controla si el párrafo largo de la portada se ve completo o resumido
+  // en pantallas pequeñas (para que se necesite menos scroll en celular).
+  const [heroExpandido, setHeroExpandido] = useState(false);
+  // Controla si el bloque de "Quiénes Somos" se ve resumido (3 líneas) o
+  // completo, con su propio botón "Mostrar más".
+  const [quienesExpandido, setQuienesExpandido] = useState(false);
+  // Tarjetas "Nuestra Misión" y "Cómo Podemos Sumar" — mismo formato que
+  // Quiénes Somos (expandir/mostrar más), ya no son botones verdes.
+  const [misionExpandida, setMisionExpandida] = useState(false);
+  // Controla cuál de los 4 botones verdes desplegables (Nuestra Misión,
+  // Cómo Podemos Sumar, Preguntas Frecuentes, Aviso de Privacidad) está
+  // abierto junto al video. null = ninguno abierto; solo uno a la vez.
+  const [infoAbierta, setInfoAbierta] = useState(null);
+
+  // Filas "crudas" de la tabla ENLACES en Baserow — alimentan el video de
+  // portada, las recomendaciones y el botón de Música/Libros/Pelis.
+  const filasEnlaces = useFilasEnlaces();
+  // Miniaturas de video de portada — igual que Recomendaciones: cada video
+  // puede tener un nombre en la columna "NOMBRE VIDPORT"; si no lo tiene,
+  // se numera solo como "Video 1", "Video 2"... Reconoce YouTube y TikTok
+  // (ver detectarVideo más abajo en el archivo).
+  const videosPortada = paresBaserow(filasEnlaces, "NOMBRE VIDPORT", "VIDPORT", 20)
+    .map((v) => ({ video: detectarVideo(v.enlace), nombre: v.nombre }))
+    .filter((v) => v.video);
+  const videosPortadaFinal = videosPortada.length > 0 ? videosPortada : [{ video: { plataforma: "youtube", id: YOUTUBE_VIDEO_ID }, nombre: "Video de presentación DCUATES" }];
+  // Rotación automática de la barra de Historias y reflexiones (misma
+  // lógica que Patrocinadores): se pausa sola en cuanto alguien la toca.
+  const carruselHistorias = useCarruselAutomatico(videosPortadaFinal.length);
+
+  // Retos, Regalos y Reconocimientos — carrusel de fotos desde la columna
+  // "RETOSGALERIA" (Archivo/Adjunto, igual que "MUSICA") y videos
+  // relacionados desde "NOMBRE RETOSVID" / "RETOSVID" (mismo patrón que
+  // los videos de portada, también reconoce YouTube, TikTok y Facebook).
+  // Mientras no subas nada a esas columnas, estas listas simplemente salen
+  // vacías y la sección lo indica.
+  const galeriaRetos = galeriaDesdeColumna(filasEnlaces, "RETOSGALERIA", 10, "Retos");
+  const videosRetos = paresBaserow(filasEnlaces, "NOMBRE RETOSVID", "RETOSVID", 8)
+    .map((v) => ({ video: detectarVideo(v.enlace), nombre: v.nombre }))
+    .filter((v) => v.video);
+
+  // Carrusel de portada de cada pestaña (un cuadro cada 3 segundos). Para cada
+  // pestaña (NOSOTROS, BENEFICIOS, CAUSAS, VALORES, REGALOS, GRATITUD), en la
+  // tabla ENLACES de Baserow:
+  //  - "PORTADA <PESTAÑA>"  (columna Archivo): una imagen o un PDF por fila.
+  //    Opcional: "NOMBRE PORTADA <PESTAÑA>" como texto al pie del cuadro.
+  //  - "VIDEOS <PESTAÑA>" (texto/URL): un enlace de video por fila.
+  //    Opcional: "NOMBRE VIDEOS <PESTAÑA>" como texto al pie del cuadro.
+  //  Pestañas: NOSOTROS, BENEFICIOS, CAUSAS, VALORES, NEGOCIOS, REGALOS, GRATITUD.
+  // En CAUSAS se suman además los videos de RETOSVID (el carrusel que antes
+  // estaba arriba de todo). Si una pestaña no tiene nada, muestra su imagen de
+  // respaldo (ver PORTADAS_BASE en BloqueCentral.jsx).
+  const portadasItems = {};
+  ["nosotros", "beneficios", "causas", "valores", "negocios", "regalos", "gratitud"].forEach((id) => {
+    const K = id.toUpperCase();
+    const archivos = filasEnlaces
+      .flatMap((f, i) => {
+        if (!f) return [];
+        const celda = f[`PORTADA ${K}`];
+        // Una celda de Archivo puede traer varios archivos: se usan todos.
+        const lista = Array.isArray(celda)
+          ? celda
+              .map((x) => x && { url: x.url || (x.thumbnails && x.thumbnails.card && x.thumbnails.card.url), nombreArchivo: x.visible_name || "" })
+              .filter((x) => x && x.url)
+          : [urlDesdeCeldaBaserow(celda)].filter(Boolean).map((url) => ({ url, nombreArchivo: "" }));
+        const nombre = (f[`NOMBRE PORTADA ${K}`] && String(f[`NOMBRE PORTADA ${K}`]).trim()) || "";
+        return lista.map((x, j) => {
+          const esDoc = esPDF(x.url) || /\.pdf$/i.test(x.nombreArchivo);
+          return esDoc
+            ? { id: `${id}-arch-${i}-${j}`, tipo: "pdf", url: x.url, nombre: (j === 0 && nombre) || "Documento PDF" }
+            : { id: `${id}-arch-${i}-${j}`, tipo: "imagen", img: resolverSrcImagen(x.url), nombre: j === 0 ? nombre : "" };
+        });
+      })
+      .slice(0, 10);
+    const videos = filasEnlaces
+      .filter((f) => f && f[`VIDEOS ${K}`] && String(f[`VIDEOS ${K}`]).trim() !== "")
+      .slice(0, 10)
+      .map((f) => ({
+        video: detectarVideo(f[`VIDEOS ${K}`]),
+        nombre: (f[`NOMBRE VIDEOS ${K}`] && String(f[`NOMBRE VIDEOS ${K}`]).trim()) || ""
+      }))
+      .filter((v) => v.video)
+      .map((v, i) => ({
+        id: `${id}-vid-${i}`,
+        tipo: "video",
+        nombre: v.nombre,
+        media: <MiniaturaVideo video={v.video} nombre={v.nombre} />,
+        onClick: () => setVideoEnGrande(v.video)
+      }));
+    portadasItems[id] = [...archivos, ...videos];
+  });
+  portadasItems.causas = [
+    ...portadasItems.causas,
+    ...videosRetos.map((v, i) => ({
+      id: `causas-retos-${i}`,
+      tipo: "video",
+      nombre: v.nombre,
+      media: <MiniaturaVideo video={v.video} nombre={v.nombre} />,
+      onClick: () => setVideoEnGrande(v.video)
+    }))
+  ];
+
+  // Logros para la banda de impacto: los de Baserow ("NOMBRE LOGROS" /
+  // "ENLACE LOGROS") o, si no hay, los ejemplos LOGROS_ITEMS (los mismos de
+  // la barra de logros de arriba).
+  const logrosBaserow = paresBaserow(filasEnlaces, "NOMBRE LOGROS", "ENLACE LOGROS", 20);
+  const logrosBanda = logrosBaserow.length > 0
+    ? logrosBaserow.map((l) => ({ texto: l.nombre, enlace: l.enlace }))
+    : LOGROS_ITEMS;
+
+  // Negocios que aparecen en las fichas debajo del mapa. Se dan de alta en la
+  // tabla ENLACES de Baserow, una fila por negocio, con estas columnas (solo
+  // "NEGOCIO NOMBRE" es obligatoria):
+  //   NEGOCIO NOMBRE · NEGOCIO GIRO · NEGOCIO ZONA · NEGOCIO PROMO ·
+  //   NEGOCIO TEL (con lada, sin +) · NEGOCIO EMOJI · NEGOCIO LOGO (Archivo)
+  const PALETA_NEGOCIOS = ["#F07A1A", "#E5484D", "#C58A1B", "#3B82C4", "#2E9E5B", "#7A5AD8"];
+  const textoDe = (f, col) => (f[col] && String(f[col]).trim()) || "";
+  const negociosBaserow = filasEnlaces
+    .filter((f) => f && textoDe(f, "NEGOCIO NOMBRE"))
+    .slice(0, 20)
+    .map((f, i) => {
+      const logo = f["NEGOCIO LOGO"] ? urlDesdeCeldaBaserow(f["NEGOCIO LOGO"]) : "";
+      return {
+        nombre: textoDe(f, "NEGOCIO NOMBRE"),
+        giro: textoDe(f, "NEGOCIO GIRO") || "Negocio local",
+        zona: textoDe(f, "NEGOCIO ZONA") || "Jardines de Morelos",
+        promo: textoDe(f, "NEGOCIO PROMO"),
+        tel: textoDe(f, "NEGOCIO TEL").replace(/\D/g, ""),
+        emoji: textoDe(f, "NEGOCIO EMOJI") || "🏪",
+        logo: logo ? resolverSrcImagen(logo) : "",
+        color: PALETA_NEGOCIOS[i % PALETA_NEGOCIOS.length]
+      };
+    });
+
+  const recomendacionesDcuates = (() => {
+    const desdeBaserow = paresBaserow(filasEnlaces, "Nombre Recocasa", "RECASA", 5);
+    return desdeBaserow.length > 0 ? desdeBaserow : RECOMENDACIONES_ESTRELLA.dcuates;
+  })();
+  const recomendacionesComunidad = (() => {
+    const desdeBaserow = paresBaserow(filasEnlaces, "Nombre ReComun", "RECOMUN", 5);
+    return desdeBaserow.length > 0 ? desdeBaserow : RECOMENDACIONES_ESTRELLA.comunidad;
+  })();
+
+  const musicaLinks = primerosValores(filasEnlaces, "RECMUSIC", 5);
+  const librosLinks = primerosValores(filasEnlaces, "RECLIBROS", 5);
+  const videosLinks = primerosValores(filasEnlaces, "RECVIDEOSYMAS", 6);
+
+  // Enlaces de apoyo (columnas de Baserow con links de internet, de tipo
+  // texto plano). Se muestran los primeros 5 de cada una; para mostrar más
+  // basta con subir el número.
+  const apoyoCausaAnimalLinks = primerosValores(filasEnlaces, "APOYO CAUSA ANIMAL", 5);
+  const apoyoPersonasExtraviadasLinks = primerosValores(filasEnlaces, "APOYO PERSONAS EXTRAVIADAS", 5);
+  const apoyoCosasCasosLinks = primerosValores(filasEnlaces, "APOYO COSAS Y CASOS", 5);
+  // Apoyo 4 y Apoyo 5 — columnas todavía no creadas en Baserow; en cuanto
+  // se agreguen con estos nombres exactos, los botones las tomarán solas.
+  // Recomendaciones de Compra/Venta/Compra-Venta DCUATES — igual que el
+  // botón verde de Recomendaciones del inicio: cada liga puede tener un
+  // nombre en una columna "NOMBRE ..." de Baserow; si no lo tiene, se
+  // muestra "Recomendación 1", "2"... automáticamente.
+  const recomendacionesCompra = paresBaserow(filasEnlaces, "NOMBRE RECOMENDACIONES DE COMPRA", "RECOMENDACIONES DE COMPRA", 5);
+  const recomendacionesVenta = paresBaserow(filasEnlaces, "NOMBRE RECOMENDACIONES DE VENTA", "RECOMENDACIONES DE VENTA", 5);
+  const compraVentaDcuates = paresBaserow(filasEnlaces, "NOMBRE COMPRA-VENTA DCUATES", "COMPRA-VENTA DCUATES", 5);
+
+  return (
+    <div className="min-h-screen bg-[#17472d] font-sans antialiased text-slate-900 selection:bg-emerald-500/30 relative pb-28 sm:pb-24">
+
+      {/* Barra de progreso de lectura — línea delgada pegada arriba de todo */}
+      <div className="fixed top-0 left-0 right-0 z-[60] h-1 bg-black/10">
+        <div
+          className="h-full bg-[#e65100] transition-[width] duration-150"
+          style={{ width: `${progresoLectura}%` }}
+        />
+      </div>
+
+      {/* Barra Ticker Inferior Fija — combina negocios, mascotas, avisos y momentos */}
+      <BarraTicker />
+
+      {/* Botón Flotante Permanente de WhatsApp — efecto 3D + anillo parpadeante + etiqueta */}
+      <div className="fixed right-4 sm:right-6 z-50 flex flex-col items-end gap-1.5" style={{ bottom: "calc(var(--alto-ticker, 48px) + 6px)" }}>
+        {/* Flecha "Subir" — a la derecha, arriba de ¿Qué necesitas hoy?; aparece
+            solo después de bajar un poco. */}
+        {mostrarSubir && (
+          <button
+            type="button"
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            aria-label="Subir al inicio de la página"
+            title="Subir al menú"
+            className="h-12 w-12 flex items-center justify-center rounded-full bg-[#0f2d1e] text-white shadow-lg border-2 border-white/40 hover:bg-emerald-800 transition-colors"
+          >
+            <span className="text-2xl leading-none font-black" aria-hidden="true">↑</span>
+          </button>
+        )}
+        {/* ¿Qué necesitas hoy? — arriba del botón de WhatsApp */}
+        <BotonNecesidades
+          onAbrirProyecto={(id) => setModalProyecto(id)}
+          onAccionEspecial={(accion) => setModalFormulario(accion)}
+          onAbrirFAQ={() => setShowFAQ(true)}
+        />
+        <div className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={() => { registrar("dudas_abrir"); setShowDudas(true); }}
+          className="bg-[#25d366] text-white text-[11px] sm:text-sm font-black uppercase tracking-wide px-3 py-2 rounded-full shadow-lg border border-white/30 whitespace-nowrap animate-pulse"
+        >
+          Dudas y Atención
+        </button>
+        <button
+          type="button"
+          onClick={() => { registrar("dudas_abrir"); setShowDudas(true); }}
+          aria-label="Abrir ventana de dudas y atención"
+          className="relative flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[#34e372] to-[#128c7e] text-white shadow-[0_10px_20px_rgba(0,0,0,0.35),inset_0_-3px_6px_rgba(0,0,0,0.25),inset_0_3px_4px_rgba(255,255,255,0.4)] transition-all hover:scale-110 active:scale-95 border-2 border-white/40"
+          title="Dudas y Atención"
+        >
+          <span className="absolute inset-0 rounded-full bg-[#25d366] animate-ping opacity-60"></span>
+          <svg className="relative z-10 h-7 w-7 fill-current drop-shadow" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.503-5.729-1.458L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.965C16.428 1.978 13.96 1.951 12.01 1.951c-5.438 0-9.863 4.374-9.867 9.802 0 1.685.459 3.324 1.333 4.766L2.483 20.3l3.966-.995zM17.15 14.34c-.283-.141-1.674-.824-1.933-.917-.26-.093-.448-.14-.637.142-.188.282-.729.917-.894 1.105-.165.188-.33.212-.613.07a9.23 9.23 0 0 1-2.28-1.401 10.15 10.15 0 0 1-1.579-1.954c-.165-.282-.018-.434.124-.574.127-.127.283-.329.424-.494.141-.165.188-.282.283-.47.094-.188.047-.353-.024-.494-.071-.141-.637-1.53-.873-2.102-.229-.554-.46-.478-.637-.487-.164-.008-.353-.01-.542-.01-.189 0-.495.07-.755.353-.26.282-.99 1.011-.99 2.467 0 1.457 1.06 2.867 1.201 3.056.142.188 2.086 3.178 5.053 4.462.705.305 1.256.488 1.684.624.708.226 1.353.194 1.863.118.568-.085 1.674-.682 1.909-1.34.236-.658.236-1.223.165-1.34-.07-.117-.26-.188-.542-.329z"/>
+          </svg>
+        </button>
+              </div>
+      </div>
+
+      {/* Encabezado + ticker de frases, pegados juntos como una sola barra fija.
+          "relative" para poder anclar el botón de Necesidades justo debajo
+          (top-full), pegado al borde inferior, y que se mueva junto con todo
+          el bloque al hacer scroll (igual que el header, que es sticky). */}
+      <div id="encabezado-fijo" className="sticky top-0 z-40 relative">
+        <SiteHeader
+          onAbrirFAQ={() => setShowFAQ(true)}
+          onAbrirPrivacidad={() => setShowPrivacy(true)}
+          onAbrirTerminos={() => setShowTerminos(true)}
+          onAbrirSeguridad={() => setShowSeguridad(true)}
+          onAbrirEscudo={() => setShowEscudo(true)}
+          onAbrirProyecto={(id) => setModalProyecto(id)}
+          onAbrirSugerencias={() => setModalFormulario("sugerencias")}
+          onAbrirMapaSitio={() => setShowMapaSitio(true)}
+          onAbrirCategoria={(id) => setCategoriaAbierta(id)}
+          busquedaAbierta={busquedaAbierta}
+          setBusquedaAbierta={setBusquedaAbierta}
+        />
+        <TickerFrases />
+        <BarraLogros />
+
+      </div>
+
+      {/* SECCIÓN PORTADA / HERO — izquierda: título+texto+Quiénes Somos+Bibliobici a toda altura; derecha: cuadrícula de 12 botones (2 columnas en celular, 3 en escritorio = 3x4) */}
+      <section id="inicio" className="scroll-mt-48 md:scroll-mt-36 bg-[#e8f5e9] text-[#0f2d1e] py-4 px-4 sm:py-6">
+        <div className="mx-auto max-w-2xl md:max-w-4xl xl:max-w-6xl flex flex-col gap-4">
+
+          {/* Banner de avisos + bloque central de 7 pestañas (BloqueCentral).
+              Nosotros y Causas reciben aquí su contenido; lo que sigue
+              debajo (Retos, Historias, Solicitudes, etc.) se migrará a
+              su pestaña en la fase 2. */}
+          <div className="min-w-0">
+            <BloqueCentral
+              categorias={CATEGORIAS_PROYECTOS}
+              proyectos={BOTONES_PORTADA}
+              mapaUrl={MAPA_NEGOCIOS_EMBED_URL}
+              whatsappNumero={WHATSAPP_NUMERO}
+              portadasItems={portadasItems}
+              resumenes={RESUMEN_PROYECTO}
+              logros={logrosBanda}
+              cargando={!baserowListo}
+              negocios={negociosBaserow}
+              onAbrirCategoria={(id) => setCategoriaAbierta(id)}
+              onAbrirProyecto={(id) => setModalProyecto(id)}
+              beneficios={(
+                <div className="flex flex-col gap-4 min-w-0">
+                  <BotonesNaranjasSeccion modales={["cupones-promos"]} onAbrir={(id) => setModalProyecto(id)} />
+<div id="solicitudes" className="relative mt-3 scroll-mt-40 sm:scroll-mt-36 rounded-2xl overflow-hidden border-4 border-[#0f2d1e]/30 shadow-lg bg-white">
+<BotonCompartir variante="claro" className="absolute top-2 right-2 z-10" hash="solicitudes" titulo="Registra tu solicitud" texto="Cuéntanos qué necesitas y te contactamos por WhatsApp" />
+                <div className="bg-[#e65100] px-3 py-2">
+                  <p className="text-white font-black uppercase text-xs sm:text-sm tracking-wide text-center">
+                    📝 Registra tu Solicitud
+                  </p>
+                </div>
+                <div className="p-4 space-y-3">
+                  <p className="text-sm text-slate-600 font-medium leading-relaxed text-center">
+                    Cuéntanos qué necesitas con el siguiente formulario. En cuanto lo revisemos, te contactamos directo por WhatsApp para darle seguimiento.
+                  </p>
+
+                  {/* Accesos rápidos — para quien llega directo desde
+                      WhatsApp sin conocer el resto de la página, un vistazo
+                      rápido de qué más hay antes de llenar el formulario. */}
+                  <div className="flex flex-wrap justify-center gap-2">
+                    <button type="button" onClick={() => setModalProyecto("libros")} className="rounded-full bg-emerald-100 text-[#0f2d1e] text-[11px] font-black uppercase px-3 py-1.5 hover:bg-emerald-200 transition-colors">📚 Libros</button>
+                    <button type="button" onClick={() => setModalProyecto("ecatepets")} className="rounded-full bg-emerald-100 text-[#0f2d1e] text-[11px] font-black uppercase px-3 py-1.5 hover:bg-emerald-200 transition-colors">🐾 Mascotas</button>
+                    <button type="button" onClick={() => setModalProyecto("asesorias")} className="rounded-full bg-emerald-100 text-[#0f2d1e] text-[11px] font-black uppercase px-3 py-1.5 hover:bg-emerald-200 transition-colors">🎓 Asesorías</button>
+                    <button type="button" onClick={() => setModalProyecto("donaciones")} className="rounded-full bg-emerald-100 text-[#0f2d1e] text-[11px] font-black uppercase px-3 py-1.5 hover:bg-emerald-200 transition-colors">💚 Apoyo Voluntario</button>
+                    <button
+                      type="button"
+                      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                      className="rounded-full bg-amber-100 text-[#0f2d1e] text-[11px] font-black uppercase px-3 py-1.5 hover:bg-amber-200 transition-colors"
+                    >
+                      🏆 Ver Logros
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowFAQ(true)}
+                      className="rounded-full bg-emerald-100 text-[#0f2d1e] text-[11px] font-black uppercase px-3 py-1.5 hover:bg-emerald-200 transition-colors"
+                    >
+                      ❓ Preguntas Frecuentes
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setBusquedaAbierta(true)}
+                      className="rounded-full bg-emerald-100 text-[#0f2d1e] text-[11px] font-black uppercase px-3 py-1.5 hover:bg-emerald-200 transition-colors"
+                    >
+                      🔍 Buscar
+                    </button>
+                  </div>
+
+                  <div className="relative rounded-xl overflow-hidden border-2 border-emerald-100">
+                    <div
+                      className="overflow-hidden transition-[max-height] duration-300"
+                      style={{ maxHeight: solicitudExpandida ? 2000 : 210 }}
+                      onClick={() => { if (!solicitudExpandida) setSolicitudExpandida(true); }}
+                      onFocus={() => setSolicitudExpandida(true)}
+                    >
+                      <FormularioSolicitud />
+                    </div>
+                    {!solicitudExpandida && (
+                      <div className="absolute inset-x-0 bottom-0 flex items-end justify-center bg-gradient-to-t from-white/95 via-white/70 to-transparent pb-2 pt-8">
+                        <button
+                          type="button"
+                          onClick={() => setSolicitudExpandida(true)}
+                          className="rounded-full bg-[#e65100] hover:bg-[#bf360c] text-white font-black uppercase text-[10px] sm:text-[11px] tracking-wide px-4 py-1.5 shadow-md transition-colors"
+                        >
+                          ✍️ Toca para completar tu registro
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="text-center pt-1">
+                    <p className="text-xs text-slate-500 font-medium mb-2">¿Prefieres contarnos directo?</p>
+                    <a
+                      href={enlaceWhatsApp("¡Hola DCUATES! Quiero registrar una solicitud de apoyo.")}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block rounded-lg bg-[#25d366] hover:bg-[#1da851] text-white font-black uppercase text-xs px-4 py-2.5 transition-colors"
+                    >
+                      💬 Escríbenos por WhatsApp
+                    </a>
+                  </div>
+                </div>
+              </div>
+                </div>
+              )}
+              valores={(
+                <div className="flex flex-col gap-4 min-w-0">
+                  <BotonesNaranjasSeccion modales={["historias-dcuates"]} onAbrir={(id) => setModalProyecto(id)} />
+                  <div id="recursos" className="relative scroll-mt-48 md:scroll-mt-36 rounded-2xl bg-[#0f2d1e] p-4">
+<BotonCompartir variante="claro" className="absolute top-2 right-2 z-10" hash="recursos" titulo="Más recursos e información de valor" texto="Recomendaciones, música, libros, películas y preguntas frecuentes" />
+          <p className="text-white font-black uppercase text-sm sm:text-base tracking-wide text-center mb-3">
+            🔎 Más recursos e información de valor
+          </p>
+            {/* Recomendaciones / Música-Libros-Pelis / Preguntas Frecuentes,
+                en fila horizontal debajo del video (antes eran una columna
+                al lado del video). */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-3">
+              <BotonVerdeInfo
+                titulo="Recomendaciones ⭐⭐⭐⭐⭐"
+                abierto={infoAbierta === "recomendaciones"}
+                onClick={() => setInfoAbierta((v) => (v === "recomendaciones" ? null : "recomendaciones"))}
+              >
+                <p className="font-black uppercase text-emerald-300 text-[11px] tracking-wide">Recomendaciones DCUATES</p>
+                <ul className="space-y-1">
+                  {recomendacionesDcuates.map((r, i) => (
+                    <li key={i}>
+                      <a href={r.enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-300">
+                        {r.nombre}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+                <p className="font-black uppercase text-emerald-300 text-[11px] tracking-wide pt-2">Recomendaciones de la Comunidad</p>
+                <ul className="space-y-1">
+                  {recomendacionesComunidad.map((r, i) => (
+                    <li key={i}>
+                      <a href={r.enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-300">
+                        {r.nombre}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+                <p className="pt-2 font-black uppercase text-emerald-300">Si necesitas alguna recomendación en especial, contáctanos !!!</p>
+              </BotonVerdeInfo>
+
+              <BotonVerdeInfo
+                titulo="Música, Libros, Pelis y Más... 🎵📚🎬"
+                abierto={infoAbierta === "recursos"}
+                onClick={() => setInfoAbierta((v) => (v === "recursos" ? null : "recursos"))}
+              >
+                <p className="font-black uppercase text-emerald-300 text-[11px] tracking-wide">🎵 Música</p>
+                <ul className="space-y-1">
+                  {musicaLinks.map((enlace, i) => (
+                    <li key={i}>
+                      <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-300">
+                        Música {i + 1}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+                <p className="font-black uppercase text-emerald-300 text-[11px] tracking-wide pt-2">📚 Libros</p>
+                <ul className="space-y-1">
+                  {librosLinks.map((enlace, i) => (
+                    <li key={i}>
+                      <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-300">
+                        Libro {i + 1}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+                <p className="font-black uppercase text-emerald-300 text-[11px] tracking-wide pt-2">🎬 Películas y Más</p>
+                <ul className="space-y-1">
+                  {videosLinks.map((enlace, i) => (
+                    <li key={i}>
+                      <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-300">
+                        Recurso {i + 1}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </BotonVerdeInfo>
+
+              <BotonVerdeInfo
+                titulo="Preguntas Frecuentes ❓💬"
+                abierto={infoAbierta === "faq"}
+                onClick={() => setInfoAbierta((v) => (v === "faq" ? null : "faq"))}
+              >
+                <div className="space-y-2">
+                  {FAQ_ITEMS.map((f, i) => (
+                    <details open key={i} className="rounded-lg bg-emerald-900/40 px-3 py-2">
+                      <summary className="cursor-pointer text-xs sm:text-sm font-bold">{f.pregunta}</summary>
+                      <p className="mt-1 text-xs text-emerald-100/90 leading-relaxed">{f.respuesta}</p>
+                    </details>
+                  ))}
+                </div>
+              </BotonVerdeInfo>
+            </div>
+        
+                  </div>
+                </div>
+              )}
+              negociosSeccion={(
+                <div className="flex flex-col gap-6 min-w-0 text-[#0f2d1e]">
+                  <div id="ventas-con-causa" className="relative scroll-mt-48 md:scroll-mt-36">
+<BotonCompartir variante="circulo" className="absolute top-2 right-2 z-10" hash="ventas-con-causa" titulo="Ventas con Causa" texto="Compra y apoya una causa de tu comunidad" />
+          <div className="text-center max-w-2xl mx-auto mb-6 space-y-3">
+            <span className="inline-block rounded-full bg-emerald-200 px-5 py-2 text-lg sm:text-2xl font-black uppercase tracking-wider text-emerald-800 shadow-sm">
+              🛍️ Ventas con Causa
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-tight leading-none text-[#0f2d1e] font-heading">
+              Productos y servicios que también apoyan la comunidad
+            </h2>
+            <p className="text-sm sm:text-base text-slate-700 font-bold">
+              Artículos y servicios de vecinos y negocios locales. Explora, cuéntanos qué te interesa o qué estás buscando, y te contactamos directo por WhatsApp.
+            </p>
+          </div>
+
+          {/* Pasarela de Ventas con Causa — a la izquierda el carrusel, a la
+              derecha el registro (como botón desplegable) y el acceso al
+              catálogo/canal de WhatsApp. */}
+          <div className="max-w-3xl mx-auto mb-4">
+            <PasarelaVentasConCausa />
+          </div>
+          <div className="max-w-3xl mx-auto mb-8">
+            <BotonNaranjaDesplegable
+              titulo="🛍️ Regístrate, ve el catálogo completo y descubre recomendaciones de Compra y Venta"
+              abierto={ventasResumenAbierto}
+              onClick={() => setVentasResumenAbierto((v) => !v)}
+            >
+              <div className="space-y-4">
+                <div>
+                  <p className="font-black uppercase text-[#0f2d1e] text-[11px] tracking-wide mb-2">Si algo te gustó y deseas apartarlo o comprarlo, regístralo aquí</p>
+                  <FormularioVentasConCausa />
+                </div>
+
+                <a
+                  href="https://whatsapp.com/channel/0029Vb8gAjd1dAvyGu9Jmv1i"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full text-left rounded-xl border-2 border-[#0f2d1e] bg-[#e65100] hover:bg-[#bf360c] p-3 shadow-sm transition-colors flex items-center justify-between gap-3"
+                >
+                  <p className="text-sm sm:text-base font-black text-white uppercase tracking-tight leading-tight">
+                    Si quieres ver más productos y catálogos, da clic aquí !!!
+                  </p>
+                  <FlechaBlanca />
+                </a>
+
+                {/* Recomendaciones de Compra/Venta/Compra-Venta DCUATES —
+                    muestran el nombre de cada liga (columna "NOMBRE ...");
+                    si esa columna no existe o está vacía en una fila, se
+                    numeran solas como "Recomendación 1, 2...". */}
+                <div>
+                  <p className="font-black uppercase text-[#0f2d1e] text-[11px] tracking-wide mb-1">Recomendaciones de Compra</p>
+                  {recomendacionesCompra.length === 0 && <p>Muy pronto encontrarás aquí recomendaciones de compra.</p>}
+                  <ul className="space-y-1.5">
+                    {recomendacionesCompra.map((r, i) => (
+                      <li key={i}>
+                        <a href={r.enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100]">
+                          {r.nombre}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div>
+                  <p className="font-black uppercase text-[#0f2d1e] text-[11px] tracking-wide mb-1">Recomendaciones de Venta</p>
+                  {recomendacionesVenta.length === 0 && <p>Muy pronto encontrarás aquí recomendaciones de venta.</p>}
+                  <ul className="space-y-1.5">
+                    {recomendacionesVenta.map((r, i) => (
+                      <li key={i}>
+                        <a href={r.enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100]">
+                          {r.nombre}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div>
+                  <p className="font-black uppercase text-[#0f2d1e] text-[11px] tracking-wide mb-1">Compra-Venta DCUATES</p>
+                  {compraVentaDcuates.length === 0 && <p>Muy pronto encontrarás aquí más opciones de compra-venta DCUATES.</p>}
+                  <ul className="space-y-1.5">
+                    {compraVentaDcuates.map((r, i) => (
+                      <li key={i}>
+                        <a href={r.enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100]">
+                          {r.nombre}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </BotonNaranjaDesplegable>
+          </div>
+
+
+                  </div>
+                  <div id="publicidad" className="relative scroll-mt-48 md:scroll-mt-36 rounded-2xl bg-[#17472d] text-white p-4 sm:p-6">
+<BotonCompartir variante="claro" className="absolute top-2 right-2 z-10" hash="publicidad" titulo="Publicidad gratuita para tu negocio" texto="Registra tu negocio y aparece en el mapa de DCUATES" />
+          <div className="text-center space-y-2 mb-8">
+            <span className="inline-block rounded-full bg-emerald-900/60 px-5 py-2 text-lg sm:text-2xl font-black uppercase tracking-wider text-emerald-400">
+              📢 Publicidad Comunitaria
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-black text-center uppercase tracking-tight text-emerald-300">
+              Publica tu negocio gratis
+            </h2>
+            <p className="text-xs font-bold text-emerald-100/70 uppercase max-w-md mx-auto leading-relaxed">
+              Comparte la información de tu negocio, sube imágenes de tus promociones y publicidad, y agrega tu página o redes sociales. Tu aportación voluntaria es bienvenida.
+            </p>
+          </div>
+          <FormularioPublicidad />
+        
+                  </div>
+                </div>
+              )}
+              regalos={(
+                <div id="retos-regalos" className="relative scroll-mt-48 md:scroll-mt-36 rounded-2xl bg-[#0f2d1e] p-3 sm:p-4">
+<BotonCompartir variante="claro" className="absolute top-2 right-2 z-10" hash="retos-regalos" titulo="Retos, regalos y reconocimientos" texto="Porque todo lo bueno merece ser compartido y reconocido" />
+                  <p className="text-white font-black uppercase text-xs sm:text-sm tracking-wide mb-3 px-1 text-center">
+                    🔎 Retos, Regalos y Reconocimientos DCUATES
+                    <span className="block normal-case font-bold text-emerald-100">Porque todo lo bueno merece ser compartido y reconocido, envíanos tus propuestas.</span>
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <BotonesRetosRegalos indices={[0, 1]} />
+                    <div className="rounded-xl overflow-hidden bg-white/5 border border-white/10 flex items-center justify-center min-h-[180px]">
+                      {galeriaRetos.length > 0 ? (
+                        <Carrusel
+                          items={galeriaRetos}
+                          renderItem={(item) => (
+                            <img src={resolverSrcImagen(item.img)} alt={item.nombre} loading="lazy" className="w-full aspect-square object-cover" />
+                          )}
+                        />
+                      ) : (
+                        <p className="text-emerald-200/70 text-[10px] font-bold uppercase tracking-wide text-center px-4">
+                          Sube fotos a la columna "RETOSGALERIA" en Baserow para verlas aquí
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+              gratitud={(
+                <div className="flex flex-col gap-4 min-w-0">
+                  <div className="rounded-2xl bg-[#0f2d1e] p-3 sm:p-4">
+                    <BotonesRetosRegalos indices={[2]} />
+                  </div>
+                  <BotonesNaranjasSeccion modales={["patrocinadores-alianzas"]} onAbrir={(id) => setModalProyecto(id)} />
+                </div>
+              )}
+              nosotros={(
+                <div className="flex flex-col gap-4 min-w-0 lg:grid lg:grid-cols-2 lg:items-start">
+            <div>
+              <h1 className="sr-only">
+                Juntos hacemos una mejor comunidad ⭐ 😊
+              </h1>
+              <p className="text-sm sm:text-base text-slate-900 leading-relaxed text-justify font-bold mt-3">
+                <strong className="font-black">DCUATES</strong> impulsa proyectos, <strong className="font-black">PERSONAS, ORGANIZACIONES Y EMPRENDIMIENTOS</strong> que <strong className="font-black">BENEFICIAN a las FAMILIAS</strong>: <strong className="font-black">PUBLICIDAD GRATUITA</strong> para tu negocio, préstamo de <strong className="font-black">LIBROS</strong> y materiales <strong className="font-black">EDUCATIVOS</strong>, apoyo a <strong className="font-black">MASCOTAS Y GRUPOS VULNERABLES</strong>, y <strong className="font-black">ALIANZAS GANAR-GANAR</strong> que generan apoyos y beneficios mutuos y comunitarios. Suma con tu valiosa colaboración o con tu invaluable <strong className="font-black">APOYO VOLUNTARIO</strong> para lograr nuestros objetivos de forma más efectiva, y forjar <strong className="font-black">LA CADENA DE VALOR Y DE VALORES</strong> que nos liberará de nuestras limitaciones para ser mejores, Y ASÍ MEJORAR NUESTRO ENTORNO Y NUESTRO MUNDO !!!
+              </p>
+              <img
+                src="/images/bibliobici-movil.png"
+                alt="Bibliobici móvil DCUATES: la lectura que llega hasta tu colonia"
+                loading="lazy"
+                className="mt-4 w-full max-h-[560px] rounded-2xl object-cover shadow-lg border-4 border-white"
+                onError={(e) => { e.currentTarget.style.display = "none"; }}
+              />
+            </div>
+
+            {/* QUIÉNES SOMOS — justo debajo de JUNTOS, resumido con "Mostrar más" */}
+            <div id="quienes-somos" className="relative scroll-mt-48 md:scroll-mt-36 rounded-2xl bg-[#17472d] text-white p-4 sm:p-5">
+<BotonCompartir variante="claro" className="absolute top-2 right-2 z-10" hash="quienes-somos" titulo="Quiénes somos" texto="Conoce a DCUATES y su comunidad" />
+              <span className="flex items-center gap-2 text-xl sm:text-2xl font-black uppercase tracking-wider text-emerald-400 mb-2">
+                <span className="text-3xl sm:text-4xl">✅</span> Quiénes Somos
+              </span>
+              <div>
+                <p className="text-sm sm:text-base text-emerald-50 leading-relaxed font-medium">
+                  {QUIENES_SOMOS.idea}
+                </p>
+                <div className="grid gap-2 text-left pt-3">
+                  {QUIENES_SOMOS.objetivos.map((obj, i) => (
+                    <div key={i} className="flex items-start gap-2 bg-emerald-900/40 rounded-xl px-3 py-2">
+                      <span className="h-2 w-2 mt-1.5 rounded-full bg-[#00c853] flex-shrink-0" />
+                      <p className="text-xs sm:text-sm font-bold text-emerald-100 uppercase leading-snug">{obj}</p>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-xs sm:text-sm text-emerald-200/80 italic leading-relaxed pt-3">
+                  {QUIENES_SOMOS.filosofia}
+                </p>
+                <p className="text-sm sm:text-base font-black uppercase text-white bg-[#0f2d1e]/60 border-2 border-emerald-500/40 rounded-2xl py-4 px-4 mt-3 leading-snug">
+                  {QUIENES_SOMOS.colofon}
+                  <span className="block mt-2 text-emerald-300 tracking-wide">{QUIENES_SOMOS.firma}</span>
+                </p>
+              </div>
+            </div>
+
+            {/* NUESTRA MISIÓN — mismo formato que Quiénes Somos, justo debajo */}
+            <div className="rounded-2xl bg-[#17472d] text-white p-4 sm:p-5">
+              <span className="flex items-center gap-2 text-xl sm:text-2xl font-black uppercase tracking-wider text-emerald-400 mb-2">
+                <span className="text-3xl sm:text-4xl">🎯</span> Nuestra Misión
+              </span>
+              <div>
+                <p className="text-sm sm:text-base text-emerald-50 leading-relaxed font-medium">
+                  <strong>Misión:</strong> {MISION_VISION.mision}
+                </p>
+                <p className="text-sm sm:text-base text-emerald-50 leading-relaxed font-medium pt-2">
+                  <strong>Visión:</strong> {MISION_VISION.vision}
+                </p>
+                <p className="text-xs sm:text-sm text-emerald-200/80 italic leading-relaxed pt-3">
+                  <strong className="not-italic">Filosofía:</strong> {MISION_VISION.filosofia}
+                </p>
+                <p className="text-sm sm:text-base font-black uppercase text-white bg-[#0f2d1e]/60 border-2 border-emerald-500/40 rounded-2xl py-4 px-4 mt-3 leading-snug">
+                  Mucha gente pequeña, en lugares pequeños, haciendo cosas pequeñas, puede cambiar el mundo (Eduardo Galeano)
+                </p>
+              </div>
+            </div>
+
+            {/* CÓMO PODEMOS SUMAR — mismo formato, justo debajo de Misión.
+                Sin truncar: el texto se ve siempre completo. */}
+            <div className="rounded-2xl bg-[#17472d] text-white p-4 sm:p-5">
+              <span className="flex items-center gap-2 text-xl sm:text-2xl font-black uppercase tracking-wider text-emerald-400 mb-2">
+                <span className="text-3xl sm:text-4xl">🤝</span> Cómo Podemos Sumar
+              </span>
+              <div>
+                <p className="text-sm sm:text-base text-emerald-50 leading-relaxed font-medium">{COMO_SUMAR.intro}</p>
+                <p className="text-sm sm:text-base text-emerald-50 leading-relaxed font-medium pt-2">{COMO_SUMAR.ventajas}</p>
+                <p className="text-sm sm:text-base font-bold text-emerald-100 pt-2">{COMO_SUMAR.cierre}</p>
+              </div>
+              <div className="mt-4 flex justify-center">
+                <button
+                  type="button"
+                  onClick={() => setTimeout(() => irASeccion("donaciones"), 50)}
+                  className="rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3.5 px-6 sm:px-8 uppercase tracking-wide text-sm sm:text-lg shadow-lg transition-all hover:scale-105"
+                >
+                  Ir a Apoyo Voluntario 🙏
+                </button>
+              </div>
+            </div>
+
+                </div>
+              )}
+              causas={(
+              <>
+              <div id="donaciones" className="relative scroll-mt-48 md:scroll-mt-36 flex flex-col gap-y-6 lg:grid lg:grid-cols-2 lg:gap-x-8 lg:gap-y-6 lg:items-start text-[#0f2d1e]">
+<BotonCompartir variante="circulo" className="absolute top-2 right-2 z-10" hash="donaciones" titulo="Apoyo Voluntario" texto="Tu tiempo, tu talento o tus recursos cambian vidas" />
+                <div className="lg:order-1 min-w-0">
+{/* Bloque 1: intro + CTA — fila 1 en escritorio (col. izquierda) */}
+          <div className="space-y-6">
+            <span className="inline-block rounded-full bg-emerald-200 px-5 py-2 text-lg sm:text-2xl font-black uppercase tracking-wider text-emerald-800 shadow-sm">
+              🟢 Apoyo Voluntario
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-tight leading-none text-[#0f2d1e] font-heading">
+              TU APORTACIÓN IMPULSA A LA COMUNIDAD
+            </h2>
+            <p className="text-base sm:text-lg text-slate-700 leading-relaxed text-justify font-bold">
+              Cada donativo, del formato que decidas, nos ayuda a sostener y hacer crecer los proyectos que benefician a los negocios y familias latinas en conjunto con DCUATES Y CONEXIONES CON CAUSA ♥
+            </p>
+            <p className="text-lg sm:text-xl font-black uppercase text-center text-white bg-[#e65100] border-4 border-[#0f2d1e] rounded-2xl py-4 px-5 shadow-md leading-snug">
+              ¡Tu apoyo hoy es el cambio que nuestra comunidad necesita — súmate ahora! ♥
+            </p>
+          </div>
+
+                          </div>
+                <div className="lg:order-3 min-w-0">
+{/* Bloque 3: transparencia — fila 2 en escritorio (col. izquierda), justo antes del video en móvil */}
+          <div>
+            <div className="h-full rounded-2xl bg-emerald-200 border-2 border-emerald-500/40 p-5 sm:p-6 text-base sm:text-lg font-black text-emerald-900 leading-relaxed flex items-start gap-3 shadow-sm">
+              <span className="text-2xl">💡</span>
+              <p className="text-justify uppercase tracking-wide">
+                Rendimos cuentas de cómo se usa cada aportación con total transparencia. Parte de la utilidad de nuestros proyectos y de lo que los amigos y la comunidad suman se destina al apoyo de causas sociales como esta gran causa y ejemplo de vida y de lo que se puede lograr con la suma de voluntades, talentos y corazones solidarios ♥
+              </p>
+            </div>
+          </div>
+
+                          </div>
+                <div className="lg:order-4 min-w-0">
+{/* Bloque 4: flecha + video de Chuy — fila 2 en escritorio (col. derecha), justo después de la transparencia en móvil.
+              col-start-6 (en vez de 7) para que la flecha quede pegada al cuadro de transparencia, sin columna vacía de por medio;
+              col-span-7 (en vez de 6) le da más ancho al video, y por lo tanto también más alto. */}
+          <div id="chuy-video" className="scroll-mt-48 flex flex-col  items-center gap-2 ">
+            {/* Flecha con relleno naranja: apunta hacia abajo en móvil y hacia la derecha en escritorio */}
+            <div className="flex justify-center items-center shrink-0" aria-hidden="true">
+              <svg
+                viewBox="0 0 100 60"
+                preserveAspectRatio="none"
+                className="w-14 h-24 sm:w-16 sm:h-28 rotate-90  drop-shadow-md"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M4 22 H58 V4 L96 30 L58 56 V38 H4 Z"
+                  fill="#e65100"
+                  stroke="#0f2d1e"
+                  strokeWidth="5"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+
+            <div className="w-full relative">
+              <BotonCompartir variante="claro" className="absolute top-2 right-2 z-10" hash="chuy-video" titulo="Video de Chuy, el Sapo Soñador" texto="Conoce la vida y obra de nuestro amigo y maestro de vida" />
+              <div className="rounded-2xl overflow-hidden border-4 border-[#0f2d1e] shadow-lg bg-black aspect-[4/3] sm:aspect-[16/10]">
+                <iframe
+                  className="w-full h-full"
+                  src={`https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID}`}
+                  title="Video de Chuy — DCUATES"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                ></iframe>
+              </div>
+              <a
+                href="https://chuytrujillo.blogspot.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 block cursor-pointer rounded-2xl border-4 border-[#0f2d1e] bg-[#e65100] hover:bg-[#bf360c] text-white font-black uppercase text-sm sm:text-base px-4 py-3.5 shadow-md transition-all hover:scale-[1.01] text-justify leading-snug"
+              >
+                Conoce la vida y obra de nuestro amigo y maestro de vida, Chuy, el Sapo Soñador aquí: https://chuytrujillo.blogspot.com/
+              </a>
+            </div>
+          </div>
+
+                          </div>
+                <div className="lg:order-2 min-w-0">
+{/* Bloque 2: selecciona tu tipo de aportación + botones — fila 1 en escritorio (col. derecha) */}
+          <div className="space-y-3">
+            <p className="text-xl sm:text-2xl font-black uppercase tracking-wide text-[#0f2d1e] mb-4 block leading-tight">
+              Selecciona el tipo de aportación que te agrade más:
+            </p>
+            {[
+              { t: "Aportación Económica", d: "Solicita los datos bancarios de manera directa y segura.", m: "¡Hola DCUATES! Deseo realizar una Aportación Económica. ¿Me podrías proporcionar los datos seguros?" },
+              { t: "Aportación en Especie", d: "Apoya donando herramientas, materiales o insumos útiles.", m: "¡Hola DCUATES! Quiero realizar una Aportación en Especie. ¿Qué tipo de herramientas o insumos se requieren actualmente?" },
+              { t: "Trueque Solidario", d: "Intercambia productos o servicios de valor equivalente.", m: "¡Hola DCUATES! Me interesa el Trueque Solidario. Tengo productos/servicios para intercambiar a favor de la causa." },
+              { t: "Labor Voluntaria", d: "Dona tu valioso tiempo y conocimientos para crecer juntos.", m: "¡Hola DCUATES! Quiero sumarme con Labor Voluntaria aportando mi tiempo y conocimientos comunitarios." }
+            ].map((opc) => (
+              <a
+                key={opc.t}
+                href={enlaceWhatsApp(opc.m)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full text-left rounded-2xl border-4 border-[#0f2d1e] bg-[#e65100] hover:bg-[#bf360c] p-4 sm:p-5 shadow-md transition-all hover:scale-[1.01] group duration-200 block"
+              >
+                <div className="flex justify-between items-center gap-3">
+                  <div>
+                    <p className="text-xl sm:text-2xl font-black text-white uppercase tracking-tight leading-tight">{opc.t}</p>
+                    <p className="text-sm sm:text-base font-bold text-[#0f2d1e] uppercase tracking-wide leading-snug pt-1">{opc.d}</p>
+                  </div>
+                  <svg
+                    viewBox="0 0 100 60"
+                    preserveAspectRatio="none"
+                    className="w-8 h-8 sm:w-10 sm:h-10 shrink-0 opacity-90 group-hover:opacity-100 transition-all drop-shadow"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path d="M4 22 H58 V4 L96 30 L58 56 V38 H4 Z" fill="#ffffff" stroke="#0f2d1e" strokeWidth="6" strokeLinejoin="round" />
+                  </svg>
+                </div>
+              </a>
+            ))}
+          </div>
+
+                </div>
+              </div>
+              <div className="mt-8 text-[#0f2d1e]">
+          {/* Pasarela de mascotas, personas y cosas extraviadas */}
+          <div id="extraviados-registro" className="relative scroll-mt-48 md:scroll-mt-36 mt-8 max-w-5xl mx-auto">
+<BotonCompartir variante="circulo" className="absolute top-2 right-2 z-10" hash="extraviados-registro" titulo="Mascotas, personas y cosas extraviadas" texto="Ayúdanos a difundir y a encontrar" />
+            <div className="text-center mb-6 space-y-2">
+              <span className="inline-block rounded-full bg-emerald-200 px-5 py-2 text-base sm:text-xl font-black uppercase tracking-wider text-emerald-800 shadow-sm">
+                🔎 Mascotas, Personas y Cosas Extraviadas
+              </span>
+              <p className="text-sm sm:text-base text-slate-700 font-bold max-w-xl mx-auto">
+                Ayuda a la comunidad reconociendo estos casos, o repórtanos uno nuevo.
+              </p>
+            </div>
+
+            <div className="max-w-3xl mx-auto">
+              <PasarelaExtraviados />
+            </div>
+            <div className="max-w-3xl mx-auto mt-4">
+              <BotonNaranjaDesplegable
+                titulo="🔎 Reporta un caso, ve más casos y consulta apoyos para mascotas, personas y objetos"
+                abierto={extraviadosResumenAbierto}
+                onClick={() => setExtraviadosResumenAbierto((v) => !v)}
+              >
+                <div className="space-y-4">
+                  <p className="text-[11px] text-slate-500 font-medium italic">
+                    💡 Antes de reportar, revisa el carrusel de arriba — si tu caso ya aparece, evitamos duplicados y llegamos más rápido a quien lo necesita.
+                  </p>
+                  <a
+                    href="https://whatsapp.com/channel/0029Vb6OjCQGk1FkkmvSzP3S"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full text-left rounded-xl border-2 border-[#0f2d1e] bg-[#e65100] hover:bg-[#bf360c] p-3 shadow-sm transition-colors flex items-center justify-between gap-3"
+                  >
+                    <p className="text-sm sm:text-base font-black text-white uppercase tracking-tight leading-tight">
+                      Ver Más Casos e Información de Valor
+                    </p>
+                    <FlechaBlanca />
+                  </a>
+                  <a
+                    href={enlaceWhatsApp("¡Hola DCUATES! Quiero reportar un caso de mascota, persona o cosa extraviada.")}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full text-left rounded-xl border-2 border-[#0f2d1e] bg-[#e65100] hover:bg-[#bf360c] p-3 shadow-sm transition-colors flex items-center justify-between gap-3"
+                  >
+                    <p className="text-sm sm:text-base font-black text-white uppercase tracking-tight leading-tight">
+                      Reportar un Caso por WhatsApp
+                    </p>
+                    <FlechaBlanca />
+                  </a>
+
+                  {/* Apoyo a Causa Animal / Personas Extraviadas / Cosas y Casos. */}
+                  <div>
+                    <p className="font-black uppercase text-[#0f2d1e] text-[11px] tracking-wide">🐾 Apoyo a Causa Animal — la prevención es la mejor ayuda</p>
+                    <ul className="list-disc pl-4 space-y-1 mt-1">
+                      <li>Esteriliza a tu mascota: es la forma más efectiva de evitar camadas no deseadas y abandono.</li>
+                      <li>Coloca collar con placa o microchip, por si se extravía.</li>
+                      <li>Vacunas y desparasitación al día — previenen enfermedades que también afectan a otros animales.</li>
+                      <li>Si ves un animal en la calle, no lo alimentes con lo que comemos nosotros; ofrece agua y contacta a un refugio o veterinario cercano.</li>
+                      <li>Adoptar, en vez de comprar, ayuda a que menos animales terminen en situación de calle.</li>
+                    </ul>
+                    <p className="pt-2 font-black uppercase text-[#0f2d1e] text-[11px] tracking-wide">Más Información de Apoyo</p>
+                    {apoyoCausaAnimalLinks.length === 0 && <p>Muy pronto encontrarás aquí más recursos de apoyo a causa animal.</p>}
+                    <ul className="space-y-1.5">
+                      {apoyoCausaAnimalLinks.map((enlace, i) => (
+                        <li key={i}>
+                          <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100] break-words">
+                            Apoyo {i + 1}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div>
+                    <p className="font-black uppercase text-[#0f2d1e] text-[11px] tracking-wide">🧑‍🤝‍🧑 Apoyo a Personas Extraviadas</p>
+                    <p>Recursos, protocolos y contactos de apoyo para casos de personas extraviadas.</p>
+                    {apoyoPersonasExtraviadasLinks.length === 0 && <p>Muy pronto encontrarás aquí más recursos de apoyo.</p>}
+                    <ul className="space-y-1.5">
+                      {apoyoPersonasExtraviadasLinks.map((enlace, i) => (
+                        <li key={i}>
+                          <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100] break-words">
+                            Apoyo {i + 1}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div>
+                    <p className="font-black uppercase text-[#0f2d1e] text-[11px] tracking-wide">📦 Apoyo Cosas y Casos</p>
+                    <p>Recursos de apoyo para objetos extraviados y otros casos de la comunidad.</p>
+                    {apoyoCosasCasosLinks.length === 0 && <p>Muy pronto encontrarás aquí más recursos de apoyo.</p>}
+                    <ul className="space-y-1.5">
+                      {apoyoCosasCasosLinks.map((enlace, i) => (
+                        <li key={i}>
+                          <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-[#0f2d1e] hover:text-[#e65100] break-words">
+                            Apoyo {i + 1}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </BotonNaranjaDesplegable>
+            </div>
+          </div>
+        
+              </div>
+              </>
+              )}
+            />
+          </div>
+        </div>
+      </section>
+
+
+      {/* Accesos rápidos: Avisos y Beneficios · Compartir Más · Inicio */}
+      <BarraAccionesFinal onAbrirComparte={() => setModalFormulario("comparte")} />
+
+      <div className="mt-[1.5cm] mb-[0.5cm]">
+
+        <BarraPatrocinadores />
+      </div>
+
+      {/* HISTORIAS Y REFLEXIONES DCUATES — movida aquí (antes vivía dentro
+          del hero); ahora como barra horizontal de 1-2 videos de alto, con
+          scroll lateral para ver más. Sigue tomando sus videos de las
+          columnas "NOMBRE VIDPORT" / "VIDPORT" en Baserow. */}
+      <section id="historias-reflexiones" className="relative scroll-mt-48 md:scroll-mt-36 bg-[#0f2d1e] py-6 px-4 border-b-4 border-[#0f2d1e]">
+        <BotonCompartir variante="claro" className="absolute top-2 right-2 z-10" hash="historias-reflexiones" titulo="Historias y reflexiones que inspiran" texto="Videos y reflexiones de nuestra comunidad" />
+        <div className="mx-auto max-w-6xl">
+          <p className="text-white font-black uppercase text-xs sm:text-sm tracking-wide mb-2 px-1 text-center">
+            Historias y reflexiones DCUATES que INSPIRAN 💡
+            <br className="sm:hidden" />
+            <span className="block sm:inline sm:ml-1">Dales clic para ampliarlos y disfrutarlos 🎥 🍿 😊</span>
+          </p>
+          <div
+            ref={carruselHistorias.scrollRef}
+            onPointerDown={carruselHistorias.onPointerDown}
+            className="flex gap-2 sm:gap-3 overflow-x-auto pb-1"
+          >
+            {videosPortadaFinal.map((v, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => setVideoEnGrande(v.video)}
+                className="group relative rounded-xl overflow-hidden border-2 border-white/10 hover:border-[#e65100] transition-colors bg-black/30 text-left w-40 sm:w-56 shrink-0"
+              >
+                <div className="aspect-video w-full overflow-hidden">
+                  <MiniaturaVideo video={v.video} nombre={v.nombre} />
+                </div>
+                <span className="absolute inset-0 flex items-center justify-center">
+                  <span className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-[#e65100]/90 flex items-center justify-center text-white text-base sm:text-lg shadow-md group-hover:bg-[#e65100]">▶</span>
+                </span>
+                <p className="px-2 py-1.5 text-[10px] sm:text-xs font-black text-white uppercase tracking-tight leading-tight">
+                  {v.nombre}
+                </p>
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="bg-[#e8f5e9] text-[#0f2d1e] py-12 px-4 text-center space-y-8 border-t-4 border-[#0f2d1e]">
+
+        <div className="flex items-center justify-center gap-3">
+          <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#0f2d1e] font-black text-white text-lg shrink-0">DC</span>
+          <div className="flex flex-col items-start leading-none">
+            <span className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#0f2d1e]">DCUATES</span>
+            <span className="text-[10px] sm:text-xs font-black uppercase tracking-wide text-[#e65100] -mt-0.5">¡Comparte y Gana!</span>
+          </div>
+        </div>
+
+        <p className="max-w-xl mx-auto text-sm sm:text-base text-[#0f2d1e]/80 leading-relaxed font-medium">
+          Proyectos SOCIALES Y EMPRENDEDORES que IMPULSAN a NUESTRAS COMUNIDADES. Parte de la utilidad se destina al apoyo de causas sociales, con total transparencia.
+        </p>
+
+        <div className="flex items-center justify-center gap-3">
+          <a href={REDES_SOCIALES.facebook} target="_blank" rel="noreferrer" className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#0f2d1e] text-white transition-colors hover:bg-emerald-800" title="Facebook">
+            <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" />
+            </svg>
+          </a>
+          <a href={REDES_SOCIALES.youtube} target="_blank" rel="noreferrer" className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#0f2d1e] text-white transition-colors hover:bg-emerald-800" title="YouTube">
+            <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+            </svg>
+          </a>
+          <a href={REDES_SOCIALES.instagram} target="_blank" rel="noreferrer" className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#0f2d1e] text-white transition-colors hover:bg-emerald-800" title="Instagram">
+            <svg className="h-5 w-5 fill-none stroke-current stroke-2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+            </svg>
+          </a>
+          <a href={REDES_SOCIALES.tiktok} target="_blank" rel="noreferrer" className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#0f2d1e] text-white transition-colors hover:bg-emerald-800" title="TikTok">
+            <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.02 1.59 4.23.94 1.13 2.29 1.89 3.73 2.18l-.02 3.88c-1.63-.03-3.2-.55-4.51-1.52A7.83 7.83 0 0 1 16.43 7.5v8.32a7.83 7.83 0 0 1-3.32 6.42 7.91 7.91 0 0 1-8.73-.24 7.85 7.85 0 0 1-3.23-7.58 7.84 7.84 0 0 1 5.37-6.84V11.5a3.94 3.94 0 0 0-1.5 3.32 3.93 3.93 0 0 0 3.2 3.88 3.93 3.93 0 0 0 4.61-3.2c.04-.33.05-.66.05-.99V.02z" />
+            </svg>
+          </a>
+        </div>
+
+        <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm sm:text-base font-bold text-[#0f2d1e]/80">
+          <a href="#quienes-somos" className="hover:text-[#0f2d1e] transition-colors">👋 Quiénes Somos</a>
+          <a href="#inicio" className="hover:text-[#0f2d1e] transition-colors">🌱 Proyectos</a>
+          <a href="#publicidad" className="hover:text-[#0f2d1e] transition-colors">📣 Publicidad</a>
+          <a href="#donaciones" className="hover:text-[#0f2d1e] transition-colors">💚 Donaciones</a>
+          <button
+            onClick={() => setShowMapaSitio(true)}
+            className="underline underline-offset-4 hover:text-[#0f2d1e] bg-transparent border-none cursor-pointer font-bold transition-colors"
+          >
+            🗺️ Mapa del Sitio
+          </button>
+          <button
+            onClick={() => irASeccion("solicitudes")}
+            className="underline underline-offset-4 hover:text-[#0f2d1e] bg-transparent border-none cursor-pointer font-bold transition-colors"
+          >
+            📝 Registra tu Solicitud
+          </button>
+          <button
+            onClick={() => setShowFAQ(true)}
+            className="underline underline-offset-4 hover:text-[#0f2d1e] bg-transparent border-none cursor-pointer font-bold transition-colors"
+          >
+            ❓ Preguntas Frecuentes
+          </button>
+          <button
+            onClick={() => setModalFormulario("sugerencias")}
+            className="underline underline-offset-4 hover:text-[#0f2d1e] bg-transparent border-none cursor-pointer font-bold transition-colors"
+          >
+            💬 Sugerencias y Quejas
+          </button>
+          <button
+            onClick={() => setShowPrivacy(true)}
+            className="underline underline-offset-4 hover:text-[#0f2d1e] bg-transparent border-none cursor-pointer font-bold transition-colors"
+          >
+            🔒 Aviso de Privacidad
+          </button>
+          <button
+            onClick={() => setShowTerminos(true)}
+            className="underline underline-offset-4 hover:text-[#0f2d1e] bg-transparent border-none cursor-pointer font-bold transition-colors"
+          >
+            📜 Términos y Condiciones
+          </button>
+          <button
+            onClick={() => setShowSeguridad(true)}
+            className="underline underline-offset-4 text-[#b3261e] hover:text-[#7f1d17] bg-transparent border-none cursor-pointer font-black transition-colors"
+          >
+            ⚠️ Aviso de Seguridad
+          </button>
+          <button
+            onClick={() => setShowEscudo(true)}
+            className="underline underline-offset-4 text-[#0b6e5f] hover:text-[#074a40] bg-transparent border-none cursor-pointer font-black transition-colors"
+          >
+            🛡️ Escudo de Seguridad
+          </button>
+        </nav>
+
+        <p className="text-sm sm:text-base text-[#0f2d1e] pt-4 border-t border-[#0f2d1e]/30 max-w-md sm:max-w-lg mx-auto font-black">
+          © {new Date().getFullYear()} DCUATES, un programa de CONEXIONES CON CAUSA ♥<br />
+          Todos los derechos reservados
+        </p>
+      </footer>
+
+      {/* VISOR DE VIDEO EN GRANDE — global: lo usan el carrusel superior y el de Historias */}
+      {videoEnGrande && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 backdrop-blur-sm"
+          onClick={() => setVideoEnGrande(null)}
+        >
+          <div className="relative w-full max-w-3xl" onClick={(e) => e.stopPropagation()}>
+            <div className="rounded-2xl overflow-hidden border-4 border-white/20 shadow-2xl aspect-video bg-black">
+              <IframeVideo video={videoEnGrande} className="w-full h-full" />
+            </div>
+          
+            <div className="mt-3 flex justify-end">
+              <BotonCerrar claro onClick={() => setVideoEnGrande(null)} label="Cerrar video" />
+            </div>
+</div>
+        </div>
+      )}
+
+
+      {/* AVISO DE PRIVACIDAD INTEGRAL Y TÉRMINOS Y CONDICIONES */}
+      {showPrivacy && (
+        <ModalLegal documento={AVISO_PRIVACIDAD_INTEGRAL} emoji="🔒" degradado="linear-gradient(135deg,#17472d 0%,#1B6F8A 100%)" onCerrar={() => setShowPrivacy(false)} />
+      )}
+      {showTerminos && (
+        <ModalLegal documento={TERMINOS_CONDICIONES} emoji="📜" degradado="linear-gradient(135deg,#7A5AD8 0%,#1B6F8A 100%)" onCerrar={() => setShowTerminos(false)} />
+      )}
+      {showSeguridad && <ModalAvisoSeguridad onCerrar={() => setShowSeguridad(false)} />}
+      {showEscudo && <ModalEscudoSeguridad onCerrar={() => setShowEscudo(false)} />}
+
+      {/* MODAL ÚNICO DE PROYECTO — se abre al dar clic en cualquiera de los
+          12 botones naranjas de portada. Su contenido lo arma ContenidoModalProyecto. */}
+      {modalProyecto && (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm" onClick={() => setModalProyecto(null)}>
+          <div
+            className="bg-[#e8f5e9] text-slate-900 rounded-2xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl flex flex-col max-h-[90vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {categoriaAbierta && (
+            <div className="mb-2">
+              {(
+                <button
+                  type="button"
+                  onClick={() => setModalProyecto(null)}
+                  className="text-[11px] sm:text-xs font-black uppercase tracking-wide text-emerald-800 hover:text-[#0f2d1e] transition-colors flex items-center gap-1"
+                >
+                  <span aria-hidden="true">←</span> Volver a {(CATEGORIAS_PROYECTOS.find((c) => c.id === categoriaAbierta) || {}).titulo}
+                </button>
+              )}
+            </div>
+            )}
+            <div className="overflow-y-auto pr-1">
+              {/* Logo del proyecto, grande y visible al abrir su ventana.
+                  Usa la misma imagen del botón (BOTONES_PORTADA); para
+                  Historias, Cupones y Patrocinadores, LOGOS_EXTRA_MODAL. */}
+              {(() => {
+                const logo = (BOTONES_PORTADA.find((b) => b.modal === modalProyecto) || {}).img || LOGOS_EXTRA_MODAL[modalProyecto];
+                return logo ? (
+                  <div className="flex justify-center pb-3">
+                    <img
+                      src={logo}
+                      alt=""
+                      className="max-h-36 sm:max-h-44 w-auto object-contain drop-shadow-md"
+                      onError={(e) => { e.target.style.display = 'none'; }}
+                    />
+                  </div>
+                ) : null;
+              })()}
+              <ContenidoModalProyecto id={modalProyecto} onCerrar={() => setModalProyecto(null)} />
+            </div>
+            <div className="pt-3 flex items-center justify-between gap-3 shrink-0">
+              <BotonCompartir
+                variante="pastilla"
+                hash={`proyecto-${modalProyecto}`}
+                titulo={tituloProyecto(modalProyecto)}
+                texto={RESUMEN_PROYECTO[modalProyecto] || ""}
+              />
+              <BotonCerrar onClick={() => setModalProyecto(null)} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL DE PREGUNTAS FRECUENTES */}
+      {showFAQ && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm" onClick={() => setShowFAQ(false)}>
+          <div
+            className="bg-white text-slate-900 rounded-2xl max-w-xl w-full p-6 shadow-2xl flex flex-col max-h-[85vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-xl font-bold uppercase tracking-tight border-b pb-3 mb-4 text-emerald-800 font-heading">
+              Preguntas Frecuentes ❓💬
+            </h3>
+            <div className="overflow-y-auto space-y-3 pr-2">
+              {FAQ_ITEMS.map((f, i) => (
+                <details key={i} className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 group">
+                  <summary className="cursor-pointer list-none font-bold text-sm sm:text-base text-[#0f2d1e] flex items-center justify-between gap-3">
+                    {f.pregunta}
+                    <span className="text-emerald-700 group-open:rotate-45 transition-transform text-xl leading-none shrink-0">+</span>
+                  </summary>
+                  <p className="mt-2 text-sm text-slate-600 leading-relaxed font-medium">{f.respuesta}</p>
+                </details>
+              ))}
+            </div>
+            <button
+              onClick={() => setShowFAQ(false)}
+              className="mt-6 w-full rounded-xl bg-emerald-700 text-white font-black py-3.5 text-center transition-colors hover:bg-emerald-800 uppercase text-xs tracking-wider font-heading"
+            >
+              Cerrar
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL DEL MAPA DE SITIO */}
+      {showMapaSitio && (
+        <ModalMapaSitio
+          onCerrar={() => setShowMapaSitio(false)}
+          onAbrirProyecto={(id) => setModalProyecto(id)}
+          onAbrirFAQ={() => setShowFAQ(true)}
+          onAbrirSugerencias={() => setModalFormulario("sugerencias")}
+        />
+      )}
+
+      {/* MODAL DE CATEGORÍA — portada simplificada de 4 botones */}
+      {categoriaAbierta && (
+        <ModalCategoria
+          categoria={CATEGORIAS_PROYECTOS.find((c) => c.id === categoriaAbierta)}
+          onCerrar={() => setCategoriaAbierta(null)}
+          onAbrirProyecto={(id) => setModalProyecto(id)}
+        />
+      )}
+
+      {/* MODAL DE FORMULARIO REUTILIZABLE — Sugerencias y Quejas / Conocer y
+          Compartir Más. Ambos arman un mensaje de WhatsApp, sin backend. */}
+      {modalFormulario === "sugerencias" && (
+        <ModalFormularioWhatsApp
+          titulo="Sugerencias y Quejas"
+          emoji="💬"
+          degradado={DEGRADADO_SUGERENCIAS}
+          suave="#e3f3f8"
+          invitacion="Tu voz mejora esta comunidad. Cuéntanos qué te gustó, qué falló o qué podríamos hacer mejor; cada mensaje lo leemos con atención."
+          cierre="Gracias por ayudarnos a mejorar. ¡Juntos lo hacemos mejor! 💬"
+          opciones={["Sugerencia", "Queja", "Reporte de error en la página", "Otro"]}
+          placeholder="Escribe aquí tu mensaje..."
+          etiquetaBoton="Enviar por WhatsApp"
+          onCerrar={() => setModalFormulario(null)}
+        />
+      )}
+      {modalFormulario === "comparte" && (
+        <ModalCompartirMas onCerrar={() => setModalFormulario(null)} />
+      )}
+
+      {/* VENTANA DE DUDAS — la abre el botón flotante de WhatsApp */}
+      {showDudas && (
+        <ModalDudas
+          onCerrar={() => setShowDudas(false)}
+          onBuscarEnPagina={() => { setBusquedaAbierta(true); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+        />
+      )}
+
+    </div>
+  );
+}
+
+// =========================================================================
+// 3. SUBCOMPONENTE: SITE HEADER
+// =========================================================================
+// Barra de búsqueda del encabezado (con lupa): busca por palabras en los
+// proyectos, categorías, preguntas frecuentes y secciones de la página, y al
+// elegir un resultado abre su ventana o baja hasta esa sección. Ignora
+// acentos y mayúsculas ("asesoria" encuentra "Asesorías").
+const normalizarBusqueda = (t) => String(t || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
+const SECCIONES_BUSCABLES = [
+  { t: "Registra tu Solicitud (formulario)", kw: "solicitud formulario pedir apoyo ayuda registro necesito whatsapp", id: "solicitudes" },
+  { t: "Mapa de Negocios Locales", kw: "mapa negocios locales aliados ubicacion donde direccion", id: "mapa-negocios" },
+  { t: "Video de Chuy, el Sapo Soñador", kw: "chuy sapo soñador video ejemplo donativos vida", id: "chuy-video" },
+  { t: "Historias y reflexiones DCUATES (videos)", kw: "historias reflexiones videos testimonios inspiracion", id: "historias-reflexiones" },
+  { t: "Publicidad Comunitaria (publica tu negocio)", kw: "publicidad publicar negocio servicio anunciar formulario gratis", id: "publicidad" },
+  { t: "Ventas con Causa (catálogo)", kw: "ventas causa catalogo productos comprar apartar", id: "ventas-con-causa" },
+  { t: "Mascotas, personas y cosas extraviadas", kw: "extraviados extraviado perdido mascota persona cosa registro adopcion", id: "extraviados-registro" },
+  { t: "Aviso de Seguridad de la Comunidad", kw: "aviso seguridad fraude estafa suplantacion cuenta clabe pagos reglas encuentros baneo", id: "seguridad" },
+  { t: "Escudo de Seguridad (cómo identificar el espacio seguro)", kw: "escudo seguridad fraude estafa seguro oficial whatsapp identificar proteccion", id: "escudo" }
+];
+
+function BarraBusqueda({ onAbrirProyecto, onAbrirCategoria, onAbrirFAQ, abierta, setAbierta }) {
+  const [texto, setTexto] = useState("");
+  const inputRef = React.useRef(null);
+
+  const indice = React.useMemo(() => {
+    const lista = [];
+    CATEGORIAS_PROYECTOS.forEach((c) => lista.push({
+      t: c.titulo, tipo: "Categoría", emoji: c.emoji,
+      kw: `${c.slogan} ${c.descripcion}`, accion: () => onAbrirCategoria && onAbrirCategoria(c.id)
+    }));
+    BOTONES_PORTADA.forEach((b) => {
+      const p = TODOS_LOS_PROYECTOS.find((x) => x.id === b.modal);
+      lista.push({
+        t: b.t, tipo: "Proyecto", emoji: "📌",
+        kw: p ? `${p.titulo} ${p.descripcion} ${(p.puntos || []).join(" ")}` : "",
+        accion: () => onAbrirProyecto && onAbrirProyecto(b.modal)
+      });
+    });
+    FAQ_ITEMS.forEach((f) => lista.push({
+      t: f.pregunta, tipo: "Pregunta frecuente", emoji: "❓",
+      kw: f.respuesta, accion: () => onAbrirFAQ && onAbrirFAQ()
+    }));
+    SECCIONES_BUSCABLES.forEach((x) => lista.push({
+      t: x.t, tipo: "Sección", emoji: "📍", kw: x.kw,
+      accion: () => (x.id === "seguridad" || x.id === "escudo") ? abrirLegal(x.id) : setTimeout(() => irASeccion(x.id), 60)
+    }));
+    return lista.map((it) => ({ ...it, _n: normalizarBusqueda(`${it.t} ${it.kw}`) }));
+  }, []);
+
+  const palabras = normalizarBusqueda(texto).split(/\s+/).filter(Boolean);
+  const resultados = palabras.length && normalizarBusqueda(texto).length >= 2
+    ? indice.filter((it) => palabras.every((w) => it._n.includes(w))).slice(0, 8)
+    : [];
+
+  const elegir = (it) => { setTexto(""); setAbierta(false); it.accion(); };
+  const abrirBusqueda = () => {
+    setAbierta(true);
+    setTimeout(() => inputRef.current && inputRef.current.focus(), 50);
+  };
+
+  // Botón pequeño (mismo tamaño y estilo que Inicio/Apoyo Voluntario/Más):
+  // solo despliega la ventana de búsqueda al tocarlo, en vez de ocupar su
+  // propio renglón todo el tiempo.
+  if (!abierta) {
+    return (
+      <button
+        type="button"
+        onClick={abrirBusqueda}
+        aria-label="Buscar en DCUATES"
+        title="Buscar"
+        className="flex h-7 w-7 sm:h-9 sm:w-9 md:h-10 md:w-10 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-[#0f2d1e] transition-colors hover:bg-emerald-50"
+      >
+        <svg viewBox="0 0 24 24" className="h-4 w-4 sm:h-5 sm:w-5 shrink-0 fill-none stroke-current stroke-[2.5]" aria-hidden="true">
+          <circle cx="11" cy="11" r="7" />
+          <line x1="16.5" y1="16.5" x2="21" y2="21" strokeLinecap="round" />
+        </svg>
+      </button>
+    );
+  }
+
+  return (
+    <div className="fixed inset-0 z-[65] flex items-start justify-center bg-black/50 p-4 pt-24 sm:pt-28" onClick={() => setAbierta(false)}>
+      <div className="w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center gap-2 rounded-full border-2 border-[#0f2d1e]/30 bg-white pl-3.5 pr-3.5 py-2 shadow-2xl focus-within:border-[#e65100]">
+          <svg viewBox="0 0 24 24" className="h-4 w-4 sm:h-5 sm:w-5 shrink-0 fill-none stroke-[#0f2d1e] stroke-[2.5]" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" />
+            <line x1="16.5" y1="16.5" x2="21" y2="21" strokeLinecap="round" />
+          </svg>
+          <input
+            ref={inputRef}
+            type="search"
+            value={texto}
+            onChange={(e) => setTexto(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Escape") setAbierta(false); if (e.key === "Enter" && resultados[0]) elegir(resultados[0]); }}
+            placeholder="Buscar proyectos, apoyos, preguntas…"
+            aria-label="Buscar en DCUATES"
+            className="w-full min-w-0 bg-transparent text-sm font-bold text-[#0f2d1e] placeholder:text-slate-400 focus:outline-none"
+          />
+        </div>
+        {palabras.length > 0 && (
+          <div className="mt-1 rounded-2xl bg-white shadow-xl border border-emerald-800/10 py-1 max-h-[60vh] overflow-y-auto">
+            {resultados.length === 0 ? (
+              <p className="px-4 py-3 text-xs font-bold text-slate-500">Sin resultados para “{texto}”. Prueba con otra palabra.</p>
+            ) : (
+              resultados.map((it, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => elegir(it)}
+                  className="w-full text-left px-4 py-2.5 hover:bg-emerald-50 transition-colors flex items-start gap-2"
+                >
+                  <span aria-hidden="true">{it.emoji}</span>
+                  <span className="flex-1 min-w-0">
+                    <span className="block text-xs sm:text-sm font-black text-[#0f2d1e] leading-tight">{it.t}</span>
+                    <span className="block text-[10px] font-bold uppercase tracking-wide text-[#e65100]">{it.tipo}</span>
+                  </span>
+                </button>
+              ))
+            )}
+          </div>
+        )}
+        <div className="mt-3 flex justify-end">
+          <BotonCerrar claro onClick={() => setAbierta(false)} label="Cerrar búsqueda" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Botón de cierre (×) redondo. Todas las ventanas lo llevan ABAJO A LA DERECHA.
+function BotonCerrar({ onClick, label = "Cerrar", claro = false }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={label}
+      title={label}
+      className={`shrink-0 h-11 w-11 flex items-center justify-center rounded-full text-2xl leading-none font-black shadow-lg transition-colors ${claro ? "bg-white text-[#0f2d1e] hover:bg-emerald-100" : "bg-[#0f2d1e] text-white hover:bg-emerald-800"}`}
+    >
+      ×
+    </button>
+  );
+}
+
+function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirTerminos, onAbrirSeguridad, onAbrirEscudo, onAbrirProyecto, onAbrirSugerencias, onAbrirMapaSitio, onAbrirCategoria, busquedaAbierta, setBusquedaAbierta }) {
+  const [menuAbierto, setMenuAbierto] = useState(false);
+  // Colores alternados del menú (combinan con el verde, el naranja y el azul
+  // turquesa que ya usa la página).
+  const COLORES_MENU = ["#17472d", "#bf360c", "#1B6F8A"];
+  const cerrar = () => setMenuAbierto(false);
+  const claseFila = "w-full flex items-center gap-3 px-4 py-2.5 text-left uppercase tracking-wide text-[11px] sm:text-xs font-black hover:bg-emerald-50 transition-colors";
+  const claseIcono = "flex h-7 w-7 sm:h-9 sm:w-9 md:h-10 md:w-10 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-[#0f2d1e] transition-colors hover:bg-emerald-50";
+  return (
+    <header className="border-b border-emerald-800/20 bg-white/95 py-2 px-4 shadow-sm text-slate-900 relative">
+      <div className="mx-auto flex items-center gap-3 max-w-6xl">
+
+        {/* Logo + nombre — siempre primero, en la misma fila que las redes en móvil */}
+        <div className="order-1 flex items-center gap-2 sm:gap-3 min-w-0 flex-1 md:flex-none">
+        <a href="#inicio" className="flex items-center gap-2 sm:gap-3 shrink-0">
+          <span className="flex h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 items-center justify-center rounded-full overflow-hidden bg-[#0f2d1e] border-2 border-[#0f2d1e]/20 shadow-sm shrink-0">
+            <img
+              src="/images/logo-circular.png"
+              alt="Logo DCUATES"
+              className="w-full h-full object-contain"
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.parentElement.innerHTML = '<span class="font-black text-white text-2xl">DC</span>';
+              }}
+            />
+          </span>
+          <div className="flex flex-col leading-none">
+            <span className="text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-tight text-[#0f2d1e]">DCUATES</span>
+            <span className="text-xs sm:text-sm md:text-base font-black uppercase tracking-wide text-[#e65100] -mt-0.5">¡Comparte y Gana!</span>
+          </div>
+        </a>
+        </div>
+
+        {/* Íconos a la derecha, en dos filas: arriba las redes; abajo la lupa
+            (bajo YouTube) y el menú de tres rayas (bajo TikTok). */}
+        <div className="order-2 ml-auto flex flex-col items-end gap-1.5 sm:gap-2 shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-3">
+          <a href={REDES_SOCIALES.facebook} target="_blank" rel="noreferrer" className="flex h-7 w-7 sm:h-9 sm:w-9 md:h-10 md:w-10 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="Facebook">
+            <svg className="h-4 w-4 sm:h-5 sm:w-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" />
+            </svg>
+          </a>
+          <a href={REDES_SOCIALES.instagram} target="_blank" rel="noreferrer" className="flex h-7 w-7 sm:h-9 sm:w-9 md:h-10 md:w-10 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="Instagram">
+            <svg className="h-4 w-4 sm:h-5 sm:w-5 fill-none stroke-current stroke-2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+            </svg>
+          </a>
+          <a href={REDES_SOCIALES.youtube} target="_blank" rel="noreferrer" className="flex h-7 w-7 sm:h-9 sm:w-9 md:h-10 md:w-10 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="YouTube">
+            <svg className="h-4 w-4 sm:h-5 sm:w-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+            </svg>
+          </a>
+          <a href={REDES_SOCIALES.tiktok} target="_blank" rel="noreferrer" className="flex h-7 w-7 sm:h-9 sm:w-9 md:h-10 md:w-10 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="TikTok">
+            <svg className="h-4 w-4 sm:h-5 sm:w-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.02 1.59 4.23.94 1.13 2.29 1.89 3.73 2.18l-.02 3.88c-1.63-.03-3.2-.55-4.51-1.52A7.83 7.83 0 0 1 16.43 7.5v8.32a7.83 7.83 0 0 1-3.32 6.42 7.91 7.91 0 0 1-8.73-.24 7.85 7.85 0 0 1-3.23-7.58 7.84 7.84 0 0 1 5.37-6.84V11.5a3.94 3.94 0 0 0-1.5 3.32 3.93 3.93 0 0 0 3.2 3.88 3.93 3.93 0 0 0 4.61-3.2c.04-.33.05-.66.05-.99V.02z" />
+            </svg>
+          </a>
+          </div>
+
+          <div className="flex items-center gap-1.5 sm:gap-3">
+            {/* Búsqueda: ícono de lupa; abre una ventana de búsqueda al tocarlo. */}
+            <BarraBusqueda onAbrirProyecto={onAbrirProyecto} onAbrirCategoria={onAbrirCategoria} onAbrirFAQ={onAbrirFAQ} abierta={busquedaAbierta} setAbierta={setBusquedaAbierta} />
+
+            {/* Menú de tres rayas — antes botón "Más". */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setMenuAbierto((v) => !v)}
+                aria-label="Abrir menú"
+                aria-expanded={menuAbierto}
+                title="Menú"
+                className={claseIcono}
+              >
+                <svg viewBox="0 0 24 24" className="h-4 w-4 sm:h-5 sm:w-5 fill-none stroke-current stroke-[2.5]" aria-hidden="true">
+                  <line x1="4" y1="6" x2="20" y2="6" strokeLinecap="round" />
+                  <line x1="4" y1="12" x2="20" y2="12" strokeLinecap="round" />
+                  <line x1="4" y1="18" x2="20" y2="18" strokeLinecap="round" />
+                </svg>
+              </button>
+
+              {menuAbierto && (
+                <>
+                  {/* Fondo invisible para cerrar el menú al tocar fuera */}
+                  <div className="fixed inset-0 z-30" onClick={cerrar} />
+                  <div className="absolute right-0 top-full mt-2 z-40 w-72 max-w-[calc(100vw-2rem)] rounded-2xl bg-white shadow-2xl border border-emerald-800/10 py-2 flex flex-col max-h-[70vh] overflow-y-auto">
+                    {NAV_LINKS_MAS.map((link, i) => {
+                      const color = COLORES_MENU[i % COLORES_MENU.length];
+                      const contenido = (
+                        <>
+                          <span className="text-lg leading-none w-6 text-center shrink-0" aria-hidden="true">{link.emoji}</span>
+                          <span style={{ color }}>{link.label}</span>
+                        </>
+                      );
+                      return link.href ? (
+                        <a key={link.label} href={link.href} onClick={cerrar} className={claseFila}>{contenido}</a>
+                      ) : (
+                        <button
+                          type="button"
+                          key={link.label}
+                          onClick={() => {
+                            cerrar();
+                            if (link.action === "faq") onAbrirFAQ && onAbrirFAQ();
+                            else if (link.action === "sugerencias") onAbrirSugerencias && onAbrirSugerencias();
+                            else if (link.action === "mapa-sitio") onAbrirMapaSitio && onAbrirMapaSitio();
+                            else if (link.modal) onAbrirProyecto && onAbrirProyecto(link.modal);
+                          }}
+                          className={claseFila}
+                        >
+                          {contenido}
+                        </button>
+                      );
+                    })}
+                    <div className="border-t border-emerald-800/10 my-1" />
+                    <button
+                      type="button"
+                      onClick={() => { cerrar(); onAbrirPrivacidad && onAbrirPrivacidad(); }}
+                      className={claseFila}
+                    >
+                      <span className="text-lg leading-none w-6 text-center shrink-0" aria-hidden="true">🔒</span>
+                      <span style={{ color: COLORES_MENU[NAV_LINKS_MAS.length % COLORES_MENU.length] }}>Aviso de Privacidad</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { cerrar(); onAbrirTerminos && onAbrirTerminos(); }}
+                      className={claseFila}
+                    >
+                      <span className="text-lg leading-none w-6 text-center shrink-0" aria-hidden="true">📜</span>
+                      <span style={{ color: COLORES_MENU[(NAV_LINKS_MAS.length + 1) % COLORES_MENU.length] }}>Términos y Condiciones</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { cerrar(); onAbrirSeguridad && onAbrirSeguridad(); }}
+                      className={claseFila}
+                    >
+                      <span className="text-lg leading-none w-6 text-center shrink-0" aria-hidden="true">⚠️</span>
+                      <span style={{ color: "#b3261e" }}>Aviso de Seguridad</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { cerrar(); onAbrirEscudo && onAbrirEscudo(); }}
+                      className={claseFila}
+                    >
+                      <span className="text-lg leading-none w-6 text-center shrink-0" aria-hidden="true">🛡️</span>
+                      <span style={{ color: "#0b6e5f" }}>Escudo de Seguridad</span>
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+// =========================================================================
+// 3B. SUBCOMPONENTE: BOTÓN FLOTANTE DE NAVEGACIÓN POR NECESIDADES
+// =========================================================================
+// Botón naranja parpadeante, pegado justo debajo de la barra de frases (ver
+// dónde se renderiza en App(), dentro del contenedor "sticky" del
+// encabezado) con menú de 2 niveles: toca el botón para ver las 4
+// categorías, toca una categoría para ver sus preguntas, toca una pregunta
+// para ir directo al modal/sección/WhatsApp correspondiente (ver
+// NECESIDADES_GRUPOS arriba). Se autogestiona su propio estado — solo
+// necesita los 2 callbacks para abrir el modal de proyecto o una acción
+// especial (por ahora, solo "comparte").
+function BotonNecesidades({ onAbrirProyecto, onAccionEspecial, onAbrirFAQ }) {
+  const ac = useAceptacion();
+  const [abierto, setAbierto] = useState(false);
+  const [grupoAbierto, setGrupoAbierto] = useState(null);
+  // Texto libre para la opción "Otro(s)" — al final de la ventana, para lo
+  // que no encaje en ninguna categoría.
+  const [textoOtro, setTextoOtro] = useState("");
+
+  // Cómo se ve cada categoría (emoji y colores alternados terracota / verde).
+  const ESTILO_GRUPO = {
+    mascotas: { emoji: "🐾", fondo: "#d9856a" },
+    negocios: { emoji: "🤝", fondo: "#7fb08f" },
+    "apoyos-mutuos": { emoji: "🎁", fondo: "#7fb08f" },
+    "conocer-mas": { emoji: "⭐", fondo: "#d9856a" }
+  };
+
+  const cerrarTodo = () => {
+    setAbierto(false);
+    setGrupoAbierto(null);
+  };
+
+  const enviarOtro = () => {
+    if (!ac.validar()) return;
+    if (!textoOtro.trim()) return;
+    registrar("necesidad_otro");
+    window.open(enlaceWhatsApp(`¡Hola DCUATES! ${textoOtro.trim()}`), "_blank", "noopener,noreferrer");
+    setTextoOtro("");
+    ac.reiniciar();
+    cerrarTodo();
+  };
+
+  const alTocarPregunta = (p) => {
+    registrar("necesidad", { tema: String(p.texto).slice(0, 50) });
+    cerrarTodo();
+    if (p.modal) onAbrirProyecto && onAbrirProyecto(p.modal);
+    else if (p.action) onAccionEspecial && onAccionEspecial(p.action);
+    else if (p.enlace) window.open(p.enlace, "_blank", "noopener,noreferrer");
+  };
+
+  const irA = (id) => {
+    cerrarTodo();
+    setTimeout(() => irASeccion(id), 150);
+  };
+
+  const grupo = NECESIDADES_GRUPOS.find((g) => g.id === grupoAbierto);
+
+  return (
+    <>
+      <div className="flex items-center gap-2">
+        <span className="bg-yellow-400 text-[#0f2d1e] text-[10px] sm:text-xs font-black uppercase tracking-wide px-2.5 py-1.5 rounded-full shadow-lg border border-white/30 whitespace-nowrap animate-pulse">
+          ¿Qué necesitas hoy?
+        </span>
+        <button
+          type="button"
+          onClick={() => setAbierto((v) => !v)}
+          className="relative flex h-14 w-14 items-center justify-center rounded-full bg-yellow-400 text-[#0f2d1e] shadow-[0_10px_20px_rgba(0,0,0,0.35),inset_0_-3px_6px_rgba(0,0,0,0.25),inset_0_3px_4px_rgba(255,255,255,0.5)] transition-transform active:scale-95"
+          title="¿Qué necesitas hoy?"
+          aria-label="¿Qué necesitas hoy?"
+        >
+          <span className="absolute inset-0 rounded-full bg-yellow-400 animate-ping opacity-60"></span>
+          <span className="relative z-10 text-2xl font-black drop-shadow">?</span>
+        </button>
+      </div>
+
+      {abierto && (
+        <div
+          className="fixed inset-0 z-[55] flex items-end sm:items-center justify-center bg-black/55 p-3"
+          onClick={cerrarTodo}
+        >
+          <div
+            className="bg-white text-slate-900 rounded-3xl shadow-2xl w-full max-w-md max-h-[calc(100dvh-1.5rem)] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-label="¿Qué necesitas hoy?"
+          >
+            <div className="p-5 pb-3">
+              <p className="font-black uppercase text-[#0f2d1e] text-xl sm:text-2xl leading-tight">
+                ¿Qué necesitas hoy? <span aria-hidden="true">😊</span>
+              </p>
+            </div>
+
+            {!grupo ? (
+              <div className="px-5 pb-2 space-y-3">
+                {/* Las 4 categorías, como tarjetas grandes */}
+                <div className="grid grid-cols-2 gap-3">
+                  {NECESIDADES_GRUPOS.map((g) => {
+                    const est = ESTILO_GRUPO[g.id] || { emoji: "✨", fondo: "#7fb08f" };
+                    return (
+                      <button
+                        key={g.id}
+                        type="button"
+                        onClick={() => setGrupoAbierto(g.id)}
+                        style={{ backgroundColor: est.fondo }}
+                        className="flex flex-col items-center justify-center gap-2 rounded-2xl px-2 py-4 min-h-[118px] text-center text-white shadow-md border-b-4 border-black/20 active:translate-y-0.5 active:border-b-2 transition-all"
+                      >
+                        <span className="text-4xl leading-none drop-shadow" aria-hidden="true">{est.emoji}</span>
+                        <span className="font-black uppercase text-[13px] sm:text-sm leading-tight [text-shadow:0_1px_2px_rgba(0,0,0,0.35)]">{g.titulo}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => irA("extraviados-registro")}
+                  className="w-full flex items-center justify-center gap-3 rounded-2xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black uppercase text-[13px] sm:text-sm leading-tight px-4 py-4 shadow-md text-center transition-colors"
+                >
+                  <span className="text-2xl" aria-hidden="true">🐾</span>
+                  Reportar caso: mascotas, personas, cosas
+                </button>
+                <button
+                  type="button"
+                  onClick={() => irA("mapa-negocios")}
+                  className="w-full flex items-center justify-center gap-3 rounded-2xl bg-[#4f9d6a] hover:bg-[#3f8657] text-white font-black uppercase text-[13px] sm:text-sm leading-tight px-4 py-4 shadow-md text-center transition-colors"
+                >
+                  <span className="text-2xl" aria-hidden="true">🗺️</span>
+                  Ver mapa de negocios locales
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { cerrarTodo(); onAbrirFAQ && onAbrirFAQ(); }}
+                  className="w-full flex items-center justify-center gap-2 rounded-2xl bg-emerald-50 hover:bg-emerald-100 text-[#0f2d1e] font-black uppercase text-xs px-4 py-3 border-2 border-emerald-200 transition-colors"
+                >
+                  <span aria-hidden="true">❓</span> Preguntas frecuentes
+                </button>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => { cerrarTodo(); abrirLegal("seguridad"); }}
+                    className="flex items-center justify-center gap-1.5 rounded-2xl bg-red-50 hover:bg-red-100 text-[#b3261e] font-black uppercase text-[11px] leading-tight px-2 py-3 border-2 border-red-200 text-center transition-colors"
+                  >
+                    <span aria-hidden="true">⚠️</span> Aviso de Seguridad
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { cerrarTodo(); abrirLegal("escudo"); }}
+                    className="flex items-center justify-center gap-1.5 rounded-2xl bg-teal-50 hover:bg-teal-100 text-[#0b6e5f] font-black uppercase text-[11px] leading-tight px-2 py-3 border-2 border-teal-200 text-center transition-colors"
+                  >
+                    <span aria-hidden="true">🛡️</span> Escudo de Seguridad
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="px-5 pb-2">
+                {/* Preguntas de la categoría elegida */}
+                <button
+                  type="button"
+                  onClick={() => setGrupoAbierto(null)}
+                  className="mb-3 inline-flex items-center gap-1 rounded-full bg-slate-100 hover:bg-slate-200 px-3 py-1.5 text-xs font-black uppercase text-[#0f2d1e] transition-colors"
+                >
+                  ‹ Volver
+                </button>
+                <p
+                  className="mb-2 rounded-xl px-3 py-2 font-black uppercase text-sm"
+                  style={{ backgroundColor: grupo.colorFuerte, color: grupo.colorTexto }}
+                >
+                  {(ESTILO_GRUPO[grupo.id] || {}).emoji} {grupo.titulo}
+                </p>
+                <div className="overflow-hidden rounded-xl border border-slate-200">
+                  {grupo.preguntas.map((p, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => alTocarPregunta(p)}
+                      style={{ backgroundColor: i % 2 === 0 ? grupo.colorClaro : "#ffffff", color: grupo.colorTexto }}
+                      className="w-full text-left px-4 py-3 text-sm font-bold hover:brightness-95 transition-all leading-snug"
+                    >
+                      {p.texto}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="p-5 pt-3 space-y-2">
+              <p className="font-black uppercase text-[#0f2d1e] text-xs">Otro(s)</p>
+              <textarea
+                value={textoOtro}
+                onChange={(e) => setTextoOtro(e.target.value)}
+                onClick={(e) => e.stopPropagation()}
+                placeholder="Cuéntanos qué necesitas y te contactamos por WhatsApp..."
+                rows={2}
+                className="w-full rounded-xl border-2 border-emerald-200 px-3 py-2 text-sm font-medium focus:outline-none focus:border-[#0f2d1e]"
+              />
+              <CasillaAcepto ac={ac} id="acepta_terminos_privacidad_otro" />
+              <button
+                type="button"
+                onClick={enviarOtro}
+                className="w-full flex items-center justify-center gap-2 rounded-full bg-yellow-400 text-[#0f2d1e] font-black uppercase text-sm py-3 shadow-md hover:brightness-95 transition-all"
+              >
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#25d366] text-white text-sm" aria-hidden="true">💬</span>
+                Enviar por WhatsApp
+              </button>
+              <ErrorAcepto ac={ac} id="acepta_terminos_privacidad_otro" />
+            </div>
+
+            <div className="sticky bottom-0 flex justify-end border-t border-emerald-100 bg-white/95 p-3">
+              <BotonCerrar onClick={cerrarTodo} />
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+// Botón "Recibe Beneficios" del encabezado — abre un mini formulario de
+// intereses (ver INTERESES_BENEFICIOS arriba) y arma el mensaje de WhatsApp
+// con lo que la persona seleccionó.
+// Accesos rápidos al final de la página (arriba de la barra de videos):
+// Avisos y Beneficios, Compartir Más e Inicio — antes vivían en el menú superior.
+// Sello de versión + estado de Baserow (temporal, para pruebas). Se puede
+// borrar junto con VERSION_BUILD cuando ya no haga falta.
+function SelloVersion() {
+  const [estado, setEstado] = useState(() => (typeof window !== "undefined" && window.__dcuatesBaserow) || null);
+  useEffect(() => {
+    const alCambiar = (e) => setEstado(e.detail);
+    window.addEventListener("dcuates:baserow-estado", alCambiar);
+    return () => window.removeEventListener("dcuates:baserow-estado", alCambiar);
+  }, []);
+  const texto = !estado
+    ? "conectando…"
+    : estado.ok
+      ? `✓ ${estado.filas} filas`
+      : `✗ ${String(estado.mensaje).slice(0, 90)}`;
+  return (
+    <p className="mt-3 text-center text-[10px] font-bold text-emerald-900/60 break-words">
+      Versión {VERSION_BUILD} · Baserow: {texto}
+    </p>
+  );
+}
+
+function BarraAccionesFinal({ onAbrirComparte }) {
+  return (
+    <section aria-label="Accesos rápidos" className="bg-[#e8f5e9] px-4 py-5 sm:py-6 border-b-4 border-[#0f2d1e]">
+      <div className="mx-auto max-w-2xl md:max-w-4xl xl:max-w-6xl grid grid-cols-3 gap-2 sm:gap-4 items-stretch">
+        <BotonRecibeBeneficios grande />
+        <button
+          type="button"
+          onClick={() => onAbrirComparte && onAbrirComparte()}
+          className="w-full min-h-[56px] rounded-2xl bg-[#e65100] hover:bg-[#bf360c] text-white shadow-md px-2 py-3 text-[11px] sm:text-sm font-black uppercase tracking-wide transition-colors flex flex-col sm:flex-row items-center justify-center gap-1 text-center leading-tight"
+        >
+          <span>Compartir Más</span>
+          <span aria-hidden="true">🌟</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          className="w-full min-h-[56px] rounded-2xl bg-[#17472d] hover:bg-[#0f2d1e] text-white shadow-md px-2 py-3 text-[11px] sm:text-sm font-black uppercase tracking-wide transition-colors flex flex-col sm:flex-row items-center justify-center gap-1 text-center leading-tight"
+        >
+          <span>Inicio</span>
+          <span aria-hidden="true">🏠</span>
+        </button>
+      </div>
+      {/* Enlace directo a la barra de videos del final de la página */}
+      <div className="mx-auto max-w-2xl md:max-w-4xl xl:max-w-6xl mt-3">
+        <button
+          type="button"
+          onClick={() => irASeccion("historias-reflexiones")}
+          className="w-full min-h-[48px] rounded-2xl border-2 border-[#0f2d1e] bg-white hover:bg-emerald-50 text-[#0f2d1e] shadow-sm px-3 py-2.5 text-[11px] sm:text-sm font-black uppercase tracking-wide transition-colors flex items-center justify-center gap-2 text-center leading-tight"
+        >
+          <span aria-hidden="true">🎥</span>
+          <span>Mira las historias que inspiran</span>
+          <span aria-hidden="true">↓</span>
+        </button>
+      </div>
+      <SelloVersion />
+    </section>
+  );
+}
+
+// Logo circular de DCUATES para encabezar las ventanas (si la imagen no
+// carga, se muestra "DC" en su lugar).
+function LogoMarca({ tam = 64 }) {
+  const [fallo, setFallo] = useState(false);
+  return (
+    <span
+      style={{ width: tam, height: tam }}
+      className="flex items-center justify-center rounded-full overflow-hidden bg-[#0f2d1e] border-4 border-white shadow-lg shrink-0"
+    >
+      {fallo ? (
+        <span className="text-white font-black" style={{ fontSize: tam * 0.36 }}>DC</span>
+      ) : (
+        <img src="/images/logo-circular.png" alt="Logo DCUATES" className="w-full h-full object-contain" onError={() => setFallo(true)} />
+      )}
+    </span>
+  );
+}
+
+// Ventana con presencia de marca: encabezado de color con el logo, una
+// invitación que introduce el contenido, el contenido (children), una frase
+// de cierre y la cruz de cerrar abajo a la derecha. La usan Avisos y
+// Beneficios, Compartir Más, Sugerencias y Dudas.
+function VentanaMarca({ degradado, suave, emoji, titulo, invitacion, cierre, compartir, onCerrar, children, ancho = "max-w-md", capa = "z-50" }) {
+  return (
+    <div className={`fixed inset-0 ${capa} flex items-center justify-center bg-black/80 p-3 sm:p-4 backdrop-blur-sm`} onClick={onCerrar}>
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={titulo}
+        className={`bg-white text-slate-900 rounded-3xl ${ancho} w-full max-h-[92vh] overflow-y-auto shadow-2xl`}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="relative px-5 pt-5 pb-7 text-white text-center" style={{ background: degradado }}>
+          {compartir && (
+            <BotonCompartir
+              variante="claro"
+              className="absolute top-3 right-3 z-10"
+              hash={compartir.hash}
+              titulo={compartir.titulo}
+              texto={compartir.texto}
+            />
+          )}
+          <div className="flex justify-center"><LogoMarca tam={68} /></div>
+          <p className="mt-2 text-[11px] font-black uppercase tracking-widest text-white/90">DCUATES · ¡Comparte y Gana!</p>
+          <h3 className="mt-1 text-xl sm:text-2xl font-black leading-tight">
+            <span aria-hidden="true">{emoji} </span>{titulo}
+          </h3>
+        </div>
+        <div className="-mt-3 rounded-t-3xl bg-white px-5 pt-5 pb-5">
+          {invitacion && (
+            <p className="rounded-2xl px-4 py-3 text-sm sm:text-[15px] leading-relaxed font-semibold text-slate-800 mb-4" style={{ background: suave }}>
+              {invitacion}
+            </p>
+          )}
+          {children}
+          {cierre && (
+            <p className="mt-5 text-center text-sm font-black italic leading-snug text-[#0f2d1e]">
+              {cierre}
+            </p>
+          )}
+          <div className="mt-4 flex justify-end">
+            <BotonCerrar onClick={onCerrar} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ----- Aceptación del Aviso de Privacidad y los Términos (todos los formularios) -----
+// useAceptacion() lleva el estado de la casilla; CasillaAcepto la dibuja y
+// ErrorAcepto muestra el mensaje rojo DEBAJO del botón de enviar. Los enlaces
+// abren las ventanas legales del pie de página (las escucha App()).
+function useAceptacion() {
+  const [acepta, setAcepta] = useState(false);
+  const [error, setError] = useState(false);
+  return {
+    acepta,
+    error,
+    cambiar: (v) => { setAcepta(v); if (v) setError(false); },
+    // true = puede continuar; false = se bloquea todo el envío
+    validar: () => { if (!acepta) { setError(true); return false; } return true; },
+    reiniciar: () => { setAcepta(false); setError(false); }
+  };
+}
+
+function abrirLegal(cual) {
+  window.dispatchEvent(new CustomEvent("dcuates:abrir-legal", { detail: cual }));
+}
+
+function CasillaAcepto({ ac, id = "acepta_terminos_privacidad" }) {
+  return (
+    <>
+    <div className={`flex items-start gap-3 rounded-xl border-2 px-3 py-2.5 text-left ${ac.error ? "border-red-500 bg-red-50" : "border-slate-200 bg-slate-50"}`}>
+      <input
+        type="checkbox"
+        id={id}
+        checked={ac.acepta}
+        onChange={(e) => ac.cambiar(e.target.checked)}
+        aria-describedby={ac.error ? `${id}_error` : undefined}
+        className="mt-0.5 h-5 w-5 shrink-0 accent-[#e65100]"
+      />
+      <label htmlFor={id} className="text-xs sm:text-[13px] leading-snug font-semibold text-slate-800">
+        He leído y acepto el{" "}
+        <button type="button" onClick={(ev) => { ev.preventDefault(); abrirLegal("privacidad"); }} className="font-black text-[#1B6F8A] underline underline-offset-2">Aviso de Privacidad</button>
+        {" "}y los{" "}
+        <button type="button" onClick={(ev) => { ev.preventDefault(); abrirLegal("terminos"); }} className="font-black text-[#1B6F8A] underline underline-offset-2">Términos y Condiciones</button>
+        {" "}de la Comunidad.
+      </label>
+    </div>
+    <button
+      type="button"
+      onClick={() => abrirLegal("escudo")}
+      className="mt-2 w-full flex items-center justify-center gap-2 rounded-xl border-2 border-teal-300 bg-teal-50 hover:bg-teal-100 px-3 py-2 text-[11px] sm:text-xs font-black uppercase text-[#0b6e5f] leading-tight text-center transition-colors"
+    >
+      <span aria-hidden="true">🛡️</span> Escudo de Seguridad: así identificas el espacio seguro de DCUATES
+    </button>
+    </>
+  );
+}
+
+// ----- Aviso de Seguridad (Anexo 1) y Escudo de Seguridad -----
+const DEGRADADO_SEGURIDAD = "linear-gradient(135deg,#b3261e 0%,#e65100 100%)";
+const DEGRADADO_ESCUDO = "linear-gradient(135deg,#0b6e5f 0%,#1B6F8A 100%)";
+const WA_OFICIAL_TXT = "5520696627";
+const WA_OFICIAL_URL = `https://wa.me/${WHATSAPP_NUMERO}`;
+
+function EnlaceWAOficial() {
+  return (
+    <a href={WA_OFICIAL_URL} target="_blank" rel="noopener noreferrer" className="font-black text-[#0b6e5f] underline underline-offset-2">{WA_OFICIAL_TXT}</a>
+  );
+}
+
+function TarjetaSeguridad({ emoji, titulo, color, fondo, children }) {
+  return (
+    <section className="rounded-2xl border-2 p-4" style={{ borderColor: color, background: fondo }}>
+      <h4 className="flex items-start gap-2 text-[15px] sm:text-base font-black uppercase leading-tight mb-2" style={{ color }}>
+        <span className="text-xl leading-none" aria-hidden="true">{emoji}</span>
+        <span>{titulo}</span>
+      </h4>
+      <div className="text-sm text-slate-800 leading-relaxed font-medium space-y-2">{children}</div>
+    </section>
+  );
+}
+
+function ListaSeguridad({ items, color }) {
+  return (
+    <ul className="space-y-1.5">
+      {items.map((it, i) => (
+        <li key={i} className="flex items-start gap-2">
+          <span className="font-black shrink-0" style={{ color }} aria-hidden="true">✔</span>
+          <span>{it}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function ModalAvisoSeguridad({ onCerrar }) {
+  return (
+    <VentanaMarca
+      degradado={DEGRADADO_SEGURIDAD}
+      suave="#fff1ec"
+      emoji="⚠️"
+      titulo="Aviso de Seguridad de la Comunidad"
+      invitacion="En DCUATES la confianza mutua es nuestro activo más valioso. Como plataforma de vinculación independiente, operamos bajo un protocolo de seguridad estricto para blindar tanto la integridad de la plataforma como la seguridad física y económica de todos nuestros miembros. Al interactuar en dcuates.com o mediante nuestros canales, aceptas respetar los siguientes pilares de protección comunitaria:"
+      cierre="¡CUIDARNOS ENTRE TODOS FORTALECE NUESTRA CONFIANZA Y NUESTRO BIENESTAR! 💚"
+      compartir={{ hash: "seguridad", titulo: "Aviso de Seguridad de la Comunidad DCUATES", texto: "Cuidémonos entre todos: conoce los canales oficiales y las reglas de seguridad" }}
+      onCerrar={onCerrar}
+      ancho="max-w-2xl"
+      capa="z-[80]"
+    >
+      <div className="space-y-4 text-left">
+        <TarjetaSeguridad emoji="🔐" titulo="1. Canales oficiales únicos (prevención de suplantación de identidad)" color="#1B6F8A" fondo="#eef7fa">
+          <p>Para evitar fraudes o contacto por parte de terceras personas ajenas al proyecto, se establece que:</p>
+          <ListaSeguridad color="#1B6F8A" items={[
+            <>El único canal digital automatizado de recepción de solicitudes es el portal web <b className="font-black">dcuates.com</b>.</>,
+            <>El único medio de seguimiento y atención personalizada es nuestra línea oficial de WhatsApp: <EnlaceWAOficial />.</>
+          ]} />
+          <p className="font-black text-[#b3261e]">🚨 Cualquier comunicación recibida fuera de estos canales oficiales no pertenece a DCUATES y debe ser reportada inmediatamente por motivos de seguridad.</p>
+        </TarjetaSeguridad>
+
+        <TarjetaSeguridad emoji="💳" titulo="2. Protocolo de Ventas con Causa y aportaciones (cuenta única)" color="#1f7a4d" fondo="#eefaf3">
+          <p>Para garantizar el uso transparente de los recursos y la autosustentabilidad de la cooperativa, todas las transacciones comerciales o de apoyo financiero se rigen bajo las siguientes reglas:</p>
+          <ListaSeguridad color="#1f7a4d" items={[
+            "No manejamos cobradores, gestores ni voluntarios en la calle autorizados para recibir dinero en efectivo.",
+            <>Los pagos correspondientes a nuestras "Ventas con Causa" se realizarán única y exclusivamente mediante transferencia electrónica a la Cuenta CLABE oficial a nombre de: <b className="font-black">Abel Meraz Alvarado</b>.</>,
+            "Jamás solicitaremos números confidenciales de tarjetas de crédito o débito, contraseñas bancarias, ni códigos de verificación vía SMS. Si alguien te pide estos datos a nombre de DCUATES, se trata de un intento de fraude."
+          ]} />
+        </TarjetaSeguridad>
+
+        <TarjetaSeguridad emoji="🤝" titulo="3. Reglas de seguridad física para intercambios comunitarios" color="#c2410c" fondo="#fff4ec">
+          <p>Dado que DCUATES funge como un puente de vinculación vecinal para coordinar apoyos materiales, trueques o transacciones, cada usuario asume la responsabilidad de su propia seguridad física al interactuar con terceros. Es obligatorio seguir estas pautas en cada encuentro presencial:</p>
+          <ListaSeguridad color="#c2410c" items={[
+            "Queda estrictamente prohibido citar a personas desconocidas en domicilios particulares o lugares aislados.",
+            "Las entregas de apoyos materiales, ventas, trueques o reuniones de coordinación deben realizarse siempre en lugares públicos, concurridos y con vigilancia (como plazas comerciales, parques principales, estaciones de transporte público o fuera de oficinas de gobierno) a la luz del día.",
+            "Es requisito indispensable asistir acompañado o, en su defecto, avisar previamente a alguien de confianza sobre con quién te reunirás, la hora y compartir sus datos de localización."
+          ]} />
+        </TarjetaSeguridad>
+
+        <TarjetaSeguridad emoji="📵" titulo="4. Protección e interacciones digitales" color="#6d3fc8" fondo="#f5f0ff">
+          <p>No caigas en trampas ni comprometas tu privacidad. El equipo oficial nunca te solicitará contraseñas, claves bancarias ni códigos de verificación vía SMS, así como tampoco enviará enlaces extraños para validar tus datos o perfil. Los medios y contactos oficiales de comunicación serán estrictamente los citados en el punto 1 de este documento.</p>
+        </TarjetaSeguridad>
+
+        <TarjetaSeguridad emoji="🚫" titulo="5. Política de moderación y baneo definitivo" color="#b3261e" fondo="#fff0ee">
+          <p>Mantenemos una tolerancia cero frente a conductas maliciosas. DCUATES se reserva el derecho de eliminar de forma inmediata de su base de datos (Google Sheets) y bloquear de sus canales de atención a cualquier usuario que:</p>
+          <ListaSeguridad color="#b3261e" items={[
+            "Proporcione datos de contacto falsos, duplicados o inactivos.",
+            "Utilice el chat de vinculación para realizar acoso, amenazas, spam comercial o proselitismo político/religioso.",
+            "Intente utilizar la confianza comunitaria para esquemas de préstamos de dinero, fraudes o actividades ilícitas."
+          ]} />
+        </TarjetaSeguridad>
+
+        <p className="rounded-2xl bg-emerald-50 border-2 border-emerald-200 px-4 py-3 text-sm font-black text-[#0f2d1e] leading-snug text-center">
+          🤲 Ayúdanos a MANTENER SEGURA NUESTRA COMUNIDAD. Si notas algo raro, repórtalo en nuestros canales oficiales y en los medios de prevención y protección correspondientes.
+        </p>
+        <button
+          type="button"
+          onClick={() => { onCerrar(); abrirLegal("escudo"); }}
+          className="w-full flex items-center justify-center gap-2 rounded-2xl bg-teal-50 hover:bg-teal-100 border-2 border-teal-300 px-3 py-2.5 text-xs font-black uppercase text-[#0b6e5f] transition-colors"
+        >
+          <span aria-hidden="true">🛡️</span> Ver el Escudo de Seguridad (resumen rápido)
+        </button>
+        <p className="text-xs font-black text-slate-500">Fecha de última actualización: Octubre de 2026.</p>
+      </div>
+    </VentanaMarca>
+  );
+}
+
+function ModalEscudoSeguridad({ onCerrar }) {
+  return (
+    <VentanaMarca
+      degradado={DEGRADADO_ESCUDO}
+      suave="#e6f6f2"
+      emoji="🛡️"
+      titulo="Escudo de Seguridad"
+      invitacion="¿Cómo identificar el espacio seguro de DCUATES? Ante cualquier intento malintencionado o de fraude... recuerda que la identidad de nuestra comunidad está blindada:"
+      cierre="¡¡¡ CUIDARNOS ENTRE TODOS FORTALECE NUESTRA CONFIANZA Y NUESTRO BIENESTAR !!! 💚"
+      compartir={{ hash: "escudo", titulo: "Escudo de Seguridad DCUATES", texto: "Así identificas el espacio seguro de nuestra comunidad" }}
+      onCerrar={onCerrar}
+      ancho="max-w-xl"
+      capa="z-[80]"
+    >
+      <div className="space-y-4 text-left">
+        <TarjetaSeguridad emoji="1️⃣" titulo="Atención única y cuentas transparentes" color="#1B6F8A" fondo="#eef7fa">
+          <p>Las dudas, registros y solicitudes se atienden únicamente a través de la página oficial <b className="font-black">dcuates.com</b> o mediante nuestro canal único de WhatsApp <EnlaceWAOficial />. Asimismo, todas las aportaciones por ventas con causa se reciben de forma exclusiva a nombre del titular <b className="font-black">Abel Meraz Alvarado</b>.</p>
+        </TarjetaSeguridad>
+        <TarjetaSeguridad emoji="2️⃣" titulo="Ventas y apoyos seguros" color="#c2410c" fondo="#fff4ec">
+          <p>Si coordinas una venta, trueque o apoyo en físico con otro miembro, la regla de oro es reunirse únicamente en <b className="font-black">lugares públicos y concurridos a la luz del día</b>, acudiendo preferentemente acompañado o avisando a alguien de confianza con quién te reunirás y compartiendo sus datos de localización.</p>
+        </TarjetaSeguridad>
+        <TarjetaSeguridad emoji="3️⃣" titulo="Protección e interacciones digitales" color="#6d3fc8" fondo="#f5f0ff">
+          <p>No caigas en trampas ni comprometas tu privacidad. El equipo oficial nunca te solicitará contraseñas, claves bancarias ni códigos de verificación vía SMS, así como tampoco enviará enlaces extraños para validar tus datos o perfil. Los medios y contactos oficiales de comunicación serán los citados en el punto 1.</p>
+        </TarjetaSeguridad>
+        <p className="rounded-2xl bg-emerald-50 border-2 border-emerald-200 px-4 py-3 text-sm font-black text-[#0f2d1e] leading-snug text-center">
+          🤲 Ayúdanos a MANTENER SEGURA NUESTRA COMUNIDAD. Si notas algo raro, repórtalo en nuestros canales oficiales y en los medios de prevención y protección correspondientes.
+        </p>
+        <button
+          type="button"
+          onClick={() => { onCerrar(); abrirLegal("seguridad"); }}
+          className="w-full flex items-center justify-center gap-2 rounded-2xl bg-[#b3261e] hover:bg-[#8f1d17] text-white px-3 py-3 text-xs sm:text-sm font-black uppercase leading-tight text-center shadow-md transition-colors"
+        >
+          <span aria-hidden="true">⚠️</span> Te invitamos a revisar el Aviso de Seguridad completo, para NUESTRA PROTECCIÓN
+        </button>
+      </div>
+    </VentanaMarca>
+  );
+}
+
+function ErrorAcepto({ ac, id = "acepta_terminos_privacidad" }) {
+  if (!ac.error) return null;
+  return (
+    <p id={`${id}_error`} role="alert" className="mt-2 text-sm text-red-600 font-black text-center">
+      Debes aceptar el Aviso de Privacidad y los Términos y Condiciones para continuar
+    </p>
+  );
+}
+
+// Ventana con texto legal largo (Aviso de Privacidad / Términos y Condiciones).
+function ModalLegal({ documento, emoji, degradado, onCerrar }) {
+  return (
+    <VentanaMarca
+      degradado={degradado}
+      suave="#f1f5f9"
+      emoji={emoji}
+      titulo={documento.titulo}
+      invitacion={documento.intro}
+      onCerrar={onCerrar}
+      ancho="max-w-2xl"
+      capa="z-[80]"
+    >
+      <div className="space-y-5 text-sm text-slate-700 leading-relaxed text-left font-medium">
+        {documento.secciones.map((sec, i) => (
+          <section key={i}>
+            <h4 className="text-[15px] font-black text-[#0f2d1e] mb-1.5">{sec.titulo}</h4>
+            {(sec.parrafos || []).map((t, j) => <p key={j} className="mb-2">{t}</p>)}
+            {sec.lista && (
+              <ul className="list-disc pl-5 space-y-1.5 mb-2">
+                {sec.lista.map((it, j) => (
+                  <li key={j}>
+                    {typeof it === "string" ? it : (<><b className="font-black text-[#0f2d1e]">{it.b}</b> {it.t}</>)}
+                  </li>
+                ))}
+              </ul>
+            )}
+            {(sec.despues || []).map((t, j) => <p key={j} className="mb-2">{t}</p>)}
+          </section>
+        ))}
+        <p className="text-xs font-black text-slate-500 pt-1">{documento.fecha}</p>
+      </div>
+    </VentanaMarca>
+  );
+}
+
+const DEGRADADO_AVISOS = "linear-gradient(135deg,#e65100 0%,#ff8f00 100%)";
+const DEGRADADO_COMPARTIR = "linear-gradient(135deg,#17472d 0%,#1B6F8A 100%)";
+const DEGRADADO_SUGERENCIAS = "linear-gradient(135deg,#1B6F8A 0%,#7A5AD8 100%)";
+const DEGRADADO_DUDAS = "linear-gradient(135deg,#0b6e5f 0%,#25d366 100%)";
+const EMOJIS_INTERESES = ["🛍️", "🐾", "📰", "🧘", "🤝"];
+
+// Botón "Avisos y Beneficios" — abre una ventana de intereses y arma el
+// mensaje de WhatsApp con lo que la persona seleccionó.
+function BotonRecibeBeneficios({ grande = false }) {
+  const ac = useAceptacion();
+  const [abierto, setAbierto] = useState(false);
+  const [seleccion, setSeleccion] = useState([]);
+
+  const alternar = (interes) => {
+    setSeleccion((prev) => (prev.includes(interes) ? prev.filter((i) => i !== interes) : [...prev, interes]));
+  };
+
+  // Enlace compartido dcuates.com/#avisos: abre esta ventana.
+  useEffect(() => {
+    const abrirDesdeEnlace = () => setAbierto(true);
+    window.addEventListener("dcuates:abrir-avisos", abrirDesdeEnlace);
+    return () => window.removeEventListener("dcuates:abrir-avisos", abrirDesdeEnlace);
+  }, []);
+
+  const enviar = () => {
+    if (!ac.validar()) return;
+    const lista = seleccion.length > 0 ? seleccion.join(", ") : "todas las novedades";
+    registrar("formulario_enviado", { form: "avisos" });
+    window.open(enlaceWhatsApp(`¡Hola DCUATES! Quiero recibir información de valor sobre: ${lista}.`), "_blank", "noopener,noreferrer");
+    setAbierto(false);
+    setSeleccion([]);
+    ac.reiniciar();
+  };
+
+  return (
+    <div className={grande ? "relative h-full" : "relative"}>
+      <button
+        type="button"
+        onClick={() => setAbierto((v) => !v)}
+        className={grande
+          ? "w-full h-full min-h-[56px] rounded-2xl bg-[#e65100] hover:bg-[#bf360c] text-white shadow-md px-2 py-3 text-[11px] sm:text-sm font-black uppercase tracking-wide transition-colors flex flex-col sm:flex-row items-center justify-center gap-1 text-center leading-tight"
+          : "rounded-full bg-[#e65100] hover:bg-[#bf360c] text-white shadow-sm px-2.5 py-1.5 text-[10px] sm:text-[11px] font-black uppercase tracking-wide transition-colors flex items-center gap-1 min-h-[30px] sm:min-h-[34px]"}
+      >
+        <span className={grande ? "" : "hidden sm:inline"}>Avisos y Beneficios</span>
+        {!grande && <span className="sm:hidden">Avisos</span>}
+        <span aria-hidden="true">💌</span>
+      </button>
+
+      {abierto && (
+        <VentanaMarca
+          degradado={DEGRADADO_AVISOS}
+          suave="#fff3e0"
+          emoji="💌"
+          titulo="Avisos y Beneficios"
+          invitacion="Sé de los primeros en enterarte. Elige lo que te interesa y te escribimos por WhatsApp con promociones de negocios locales, mascotas que buscan hogar, eventos del barrio y oportunidades de apoyo."
+          cierre="Una comunidad bien informada es una comunidad más fuerte. ¡Qué gusto tenerte aquí! 💚"
+          compartir={{ hash: "avisos", titulo: "Avisos y Beneficios", texto: "Entérate de promociones, mascotas, eventos y apoyos de tu colonia" }}
+          onCerrar={() => setAbierto(false)}
+        >
+          <p className="text-xs font-black uppercase tracking-wide text-[#bf360c] mb-2">¿Qué te interesa recibir?</p>
+          <div className="space-y-2">
+            {INTERESES_BENEFICIOS.map((interes, i) => {
+              const marcado = seleccion.includes(interes);
+              return (
+                <label
+                  key={interes}
+                  className={`flex items-center gap-3 rounded-2xl border-2 px-3 py-2.5 text-sm font-bold cursor-pointer transition-colors ${marcado ? "border-[#e65100] bg-orange-50 text-[#7a2e00]" : "border-slate-200 bg-white text-slate-800 hover:border-orange-300"}`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={marcado}
+                    onChange={() => alternar(interes)}
+                    className="h-5 w-5 shrink-0 accent-[#e65100]"
+                  />
+                  <span aria-hidden="true" className="text-lg">{EMOJIS_INTERESES[i % EMOJIS_INTERESES.length]}</span>
+                  <span className="leading-snug">{interes}</span>
+                </label>
+              );
+            })}
+          </div>
+          <p className="mt-2 text-[11px] text-slate-500 font-medium italic">Si no eliges ninguno, te compartimos un poco de todo.</p>
+          <div className="mt-4"><CasillaAcepto ac={ac} id="acepta_terminos_privacidad_avisos" /></div>
+          <button
+            type="button"
+            onClick={enviar}
+            className="mt-3 w-full rounded-2xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3.5 text-xs sm:text-sm uppercase tracking-wide transition-colors shadow-md"
+          >
+            Quiero recibir avisos por WhatsApp
+          </button>
+          <ErrorAcepto ac={ac} id="acepta_terminos_privacidad_avisos" />
+        </VentanaMarca>
+      )}
+    </div>
+  );
+}
+
+// Modal de formulario reutilizable — mismo componente para "Sugerencias y
+// Quejas" y para "Compartir Más". Ambos arman un mensaje de WhatsApp con la
+// opción elegida + el texto libre.
+function ModalFormularioWhatsApp({ titulo, emoji = "💬", degradado = DEGRADADO_SUGERENCIAS, suave = "#e3f3f8", invitacion, cierre, descripcion, opciones, placeholder, etiquetaBoton = "Enviar por WhatsApp", onCerrar }) {
+  const ac = useAceptacion();
+  const [opcion, setOpcion] = useState(opciones[0]);
+  const [mensaje, setMensaje] = useState("");
+  const [error, setError] = useState("");
+
+  const enviar = () => {
+    if (!ac.validar()) return;
+    if (!mensaje.trim()) {
+      setError("Escribe un mensaje antes de enviar.");
+      return;
+    }
+    registrar("formulario_enviado", { form: String(titulo).slice(0, 40) });
+    window.open(enlaceWhatsApp(`¡Hola DCUATES! ${opcion}: ${mensaje.trim()}`), "_blank", "noopener,noreferrer");
+    onCerrar();
+  };
+
+  return (
+    <VentanaMarca degradado={degradado} suave={suave} emoji={emoji} titulo={titulo} invitacion={invitacion} cierre={cierre} onCerrar={onCerrar}>
+      {descripcion && <p className="text-sm text-slate-700 leading-relaxed font-bold mb-3">{descripcion}</p>}
+      <select
+        value={opcion}
+        onChange={(e) => setOpcion(e.target.value)}
+        className="w-full rounded-xl border-2 border-slate-200 bg-white px-3 py-2.5 text-sm font-bold mb-3 text-slate-800"
+      >
+        {opciones.map((o) => <option key={o} value={o}>{o}</option>)}
+      </select>
+      <textarea
+        value={mensaje}
+        onChange={(e) => { setMensaje(e.target.value); if (error) setError(""); }}
+        rows={4}
+        placeholder={placeholder}
+        className="w-full rounded-xl border-2 border-slate-200 px-3 py-2.5 text-sm mb-1 text-slate-800 focus:outline-none focus:border-emerald-600"
+      />
+      {error && <p className="text-xs text-red-600 font-bold mb-2">{error}</p>}
+      <div className="mt-3"><CasillaAcepto ac={ac} id="acepta_terminos_privacidad_mensaje" /></div>
+      <button
+        type="button"
+        onClick={enviar}
+        className="mt-3 w-full rounded-2xl text-white font-black py-3.5 text-center transition-opacity hover:opacity-90 uppercase text-xs sm:text-sm tracking-wide shadow-md"
+        style={{ background: degradado }}
+      >
+        {etiquetaBoton}
+      </button>
+      <ErrorAcepto ac={ac} id="acepta_terminos_privacidad_mensaje" />
+    </VentanaMarca>
+  );
+}
+
+// Compartir Más: la persona marca una o las dos opciones y escribe en cada una.
+function ModalCompartirMas({ onCerrar }) {
+  const ac = useAceptacion();
+  const [quiereVer, setQuiereVer] = useState(false);
+  const [textoVer, setTextoVer] = useState("");
+  const [quiereCompartir, setQuiereCompartir] = useState(false);
+  const [textoComp, setTextoComp] = useState("");
+  const [error, setError] = useState("");
+
+  const enviar = () => {
+    if (!ac.validar()) return;
+    if (!quiereVer && !quiereCompartir) {
+      setError("Marca al menos una de las dos opciones.");
+      return;
+    }
+    if ((quiereVer && !textoVer.trim()) || (quiereCompartir && !textoComp.trim())) {
+      setError("Cuéntanos un poco en cada opción que marcaste.");
+      return;
+    }
+    const partes = [];
+    if (quiereVer) partes.push(`Quiero que compartan más o también sobre: ${textoVer.trim()}`);
+    if (quiereCompartir) partes.push(`Quiero compartir algo: ${textoComp.trim()}`);
+    registrar("formulario_enviado", { form: "compartir", opciones: quiereVer && quiereCompartir ? "ambas" : quiereVer ? "ver" : "compartir" });
+    window.open(enlaceWhatsApp(`¡Hola DCUATES!\n\n${partes.join("\n\n")}`), "_blank", "noopener,noreferrer");
+    onCerrar();
+  };
+
+  const tarjeta = (activa) => `rounded-2xl border-2 px-3 py-3 transition-colors ${activa ? "border-[#1B6F8A] bg-sky-50" : "border-slate-200 bg-white"}`;
+
+  return (
+    <VentanaMarca
+      degradado={DEGRADADO_COMPARTIR}
+      suave="#e3f3f8"
+      emoji="🌟"
+      titulo="Compartir Más"
+      invitacion="DCUATES se construye con lo que cada quien aporta. Dinos qué te gustaría ver en la página, qué quieres compartir tú (una historia, un negocio, un talento, una causa o una buena noticia), o las dos cosas."
+      cierre="Lo que TÚ COMPARTES hoy puede ser la ayuda que alguien necesita mañana; y lo que OTROS COMPARTEN puede ser de AYUDA TAMBIÉN PARA TI ;) !!! ¡GRACIAS POR COMPARTIR, TODOS SUMAMOS MÁS Y MEJOR !!! 🌟"
+      compartir={{ hash: "compartir", titulo: "Compartir Más", texto: "Cuéntanos qué quieres ver y qué quieres compartir en DCUATES" }}
+      onCerrar={onCerrar}
+    >
+      <p className="text-xs font-black uppercase tracking-wide text-[#1B6F8A] mb-2">Marca una o las dos:</p>
+      <div className="space-y-2.5">
+        <div className={tarjeta(quiereVer)}>
+          <label className="flex items-start gap-3 cursor-pointer">
+            <input type="checkbox" checked={quiereVer} onChange={(e) => { setQuiereVer(e.target.checked); if (error) setError(""); }} className="mt-0.5 h-5 w-5 shrink-0 accent-[#1B6F8A]" />
+            <span className="text-sm font-black text-[#0f2d1e] leading-snug">🙋 Quiero que compartan más (o también) sobre…</span>
+          </label>
+          {quiereVer && (
+            <textarea
+              value={textoVer}
+              onChange={(e) => { setTextoVer(e.target.value); if (error) setError(""); }}
+              rows={3}
+              placeholder="Ej. ofertas de empleo, eventos de salud, recetas…"
+              className="mt-2 w-full rounded-xl border-2 border-slate-200 px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-[#1B6F8A]"
+            />
+          )}
+        </div>
+        <div className={tarjeta(quiereCompartir)}>
+          <label className="flex items-start gap-3 cursor-pointer">
+            <input type="checkbox" checked={quiereCompartir} onChange={(e) => { setQuiereCompartir(e.target.checked); if (error) setError(""); }} className="mt-0.5 h-5 w-5 shrink-0 accent-[#1B6F8A]" />
+            <span className="text-sm font-black text-[#0f2d1e] leading-snug">🎁 Quiero compartir algo…</span>
+          </label>
+          {quiereCompartir && (
+            <textarea
+              value={textoComp}
+              onChange={(e) => { setTextoComp(e.target.value); if (error) setError(""); }}
+              rows={3}
+              placeholder="Ej. mi negocio, una historia, un talento, una causa…"
+              className="mt-2 w-full rounded-xl border-2 border-slate-200 px-3 py-2 text-sm text-slate-800 focus:outline-none focus:border-[#1B6F8A]"
+            />
+          )}
+        </div>
+      </div>
+      {error && <p className="text-xs text-red-600 font-bold mt-2">{error}</p>}
+      <div className="mt-4"><CasillaAcepto ac={ac} id="acepta_terminos_privacidad_compartir" /></div>
+      <button
+        type="button"
+        onClick={enviar}
+        className="mt-3 w-full rounded-2xl text-white font-black py-3.5 uppercase text-xs sm:text-sm tracking-wide shadow-md hover:opacity-90 transition-opacity"
+        style={{ background: DEGRADADO_COMPARTIR }}
+      >
+        Compartir por WhatsApp
+      </button>
+      <ErrorAcepto ac={ac} id="acepta_terminos_privacidad_compartir" />
+    </VentanaMarca>
+  );
+}
+
+// Ventana de dudas (botón flotante de WhatsApp): primero preguntas
+// frecuentes y buscador; si no alcanzan, una caja para escribir la duda que
+// se envía por WhatsApp y una pantalla de agradecimiento con el logo.
+function ModalDudas({ onCerrar, onBuscarEnPagina }) {
+  const ac = useAceptacion();
+  const [consulta, setConsulta] = useState("");
+  const [abierta, setAbierta] = useState(null);
+  const [mensaje, setMensaje] = useState("");
+  const [error, setError] = useState("");
+  const [enviado, setEnviado] = useState(false);
+
+  const q = normalizarBusqueda(consulta).trim();
+  const lista = FAQ_ITEMS
+    .map((f, i) => ({ ...f, i }))
+    .filter((f) => !q || normalizarBusqueda(f.pregunta + " " + f.respuesta).includes(q));
+
+  const textoWa = () => `¡Hola DCUATES! Tengo una duda o solicitud:\n\n${mensaje.trim()}`;
+
+  const enviar = () => {
+    if (!ac.validar()) return;
+    if (!mensaje.trim()) {
+      setError("Escribe tu duda o comentario antes de enviar.");
+      return;
+    }
+    registrar("dudas_enviada");
+    window.open(enlaceWhatsApp(textoWa()), "_blank", "noopener,noreferrer");
+    setEnviado(true);
+  };
+
+  if (enviado) {
+    return (
+      <VentanaMarca degradado={DEGRADADO_DUDAS} suave="#e7f9ee" emoji="✅" titulo="¡Mensaje enviado!" onCerrar={onCerrar}>
+        <div className="text-center py-2">
+          <div className="flex justify-center"><LogoMarca tam={96} /></div>
+          <p className="mt-4 text-base sm:text-lg font-black text-[#0f2d1e] leading-snug">
+            En la primera oportunidad atenderemos tu solicitud…
+          </p>
+          <p className="mt-3 text-xl font-black text-[#128c7e] uppercase tracking-wide">¡Gracias y saludos!</p>
+          <p className="mt-4 text-[11px] text-slate-500 font-medium">
+            ¿No se abrió WhatsApp?{" "}
+            <a href={enlaceWhatsApp(textoWa())} target="_blank" rel="noopener noreferrer" className="font-black text-[#128c7e] underline">Tócalo aquí</a>
+          </p>
+        </div>
+      </VentanaMarca>
+    );
+  }
+
+  return (
+    <VentanaMarca
+      degradado={DEGRADADO_DUDAS}
+      suave="#e7f9ee"
+      emoji="💬"
+      titulo="¿En qué podemos ayudarte?"
+      invitacion="Quizá tu duda ya tiene respuesta. Busca una palabra o toca una pregunta frecuente."
+      onCerrar={onCerrar}
+    >
+      <label className="relative block">
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-base" aria-hidden="true">🔍</span>
+        <input
+          type="search"
+          value={consulta}
+          onChange={(e) => { setConsulta(e.target.value); setAbierta(null); }}
+          placeholder="Ej. libros, mascota, negocio, donar…"
+          className="w-full rounded-2xl border-2 border-slate-200 pl-10 pr-3 py-2.5 text-sm font-semibold text-slate-800 focus:outline-none focus:border-[#128c7e]"
+          aria-label="Buscar en las preguntas frecuentes"
+        />
+      </label>
+
+      <div className="mt-3 space-y-2">
+        {lista.length === 0 && (
+          <p className="rounded-xl bg-slate-50 px-3 py-3 text-sm font-semibold text-slate-600 text-center">
+            No encontramos esa palabra en las preguntas. Cuéntanos tu duda abajo 👇
+          </p>
+        )}
+        {lista.map((f) => {
+          const activa = abierta === f.i;
+          return (
+            <div key={f.i} className={`rounded-2xl border-2 transition-colors ${activa ? "border-[#128c7e] bg-emerald-50" : "border-slate-200 bg-white"}`}>
+              <button
+                type="button"
+                onClick={() => setAbierta(activa ? null : f.i)}
+                aria-expanded={activa}
+                className="w-full flex items-center gap-2 px-3 py-2.5 text-left text-sm font-black text-[#0f2d1e]"
+              >
+                <span aria-hidden="true">❓</span>
+                <span className="flex-1 leading-snug">{f.pregunta}</span>
+                <span aria-hidden="true" className="text-[#128c7e]">{activa ? "−" : "+"}</span>
+              </button>
+              {activa && <p className="px-3 pb-3 text-sm text-slate-700 font-medium leading-relaxed">{f.respuesta}</p>}
+            </div>
+          );
+        })}
+      </div>
+
+      <button
+        type="button"
+        onClick={() => { onCerrar(); onBuscarEnPagina && onBuscarEnPagina(); }}
+        className="mt-3 w-full rounded-2xl border-2 border-[#128c7e] text-[#0b6e5f] hover:bg-emerald-50 font-black py-2.5 text-xs uppercase tracking-wide transition-colors"
+      >
+        🔍 Buscar en toda la página
+      </button>
+
+      <div className="mt-5 border-t-2 border-dashed border-slate-200 pt-4">
+        <p className="text-sm font-black text-[#0f2d1e] leading-snug">
+          Si no encontraste lo que buscabas, o tienes alguna duda o cuestión que podamos resolver o apoyar, coméntanos a detalle a continuación:
+        </p>
+        <textarea
+          value={mensaje}
+          onChange={(e) => { setMensaje(e.target.value); if (error) setError(""); }}
+          rows={4}
+          placeholder="Escribe aquí tu duda, solicitud o comentario…"
+          className="mt-3 w-full rounded-xl border-2 border-slate-200 px-3 py-2.5 text-sm text-slate-800 focus:outline-none focus:border-[#128c7e]"
+        />
+        {error && <p className="text-xs text-red-600 font-bold mt-1">{error}</p>}
+        <div className="mt-3"><CasillaAcepto ac={ac} id="acepta_terminos_privacidad_dudas" /></div>
+        <button
+          type="button"
+          onClick={enviar}
+          className="mt-3 w-full rounded-2xl text-white font-black py-3.5 uppercase text-xs sm:text-sm tracking-wide shadow-md hover:opacity-90 transition-opacity flex items-center justify-center gap-2"
+          style={{ background: DEGRADADO_DUDAS }}
+        >
+          <span aria-hidden="true">📲</span> Enviar por WhatsApp
+        </button>
+        <ErrorAcepto ac={ac} id="acepta_terminos_privacidad_dudas" />
+      </div>
+    </VentanaMarca>
+  );
+}
+
+// =========================================================================
+// 4. SUBCOMPONENTE: FORMULARIO DE PUBLICIDAD
+// =========================================================================
+function FormularioPublicidad() {
+  const ac = useAceptacion();
+  const [expandido, setExpandido] = useState(true);
+  const [nombre, setNombre] = useState("");
+  const [categoria, setCategoria] = useState("");
+  const [contacto, setContacto] = useState("");
+  const [telefono, setTelefono] = useState("");
+  const [canal1, setCanal1] = useState("");
+  const [canal2, setCanal2] = useState("");
+  const [canal3, setCanal3] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!ac.validar()) return;
+    registrar("formulario_enviado", { form: "publicidad" });
+    const fecha = new Date().toLocaleString();
+
+    // Apps Script (doPost) lee e.parameter.X, así que se envía como
+    // application/x-www-form-urlencoded — NO como JSON.
+    const datosFormulario = new URLSearchParams({
+      Nombre: contacto,
+      Negocio: nombre,
+      Giro: categoria,
+      Telefono: telefono,
+      Fecha: fecha
+    });
+
+    try {
+      await fetch(GOOGLE_SHEETS_URL, {
+        method: "POST",
+        mode: "no-cors",
+        body: datosFormulario
+      });
+    } catch (err) {
+      console.error("Error guardando respaldo en Sheets:", err);
+    }
+
+    const mensaje = `¡Hola DCUATES!\n\nSolicito el registro de publicidad para mi negocio:\n• Contacto: ${contacto}\n• Negocio: ${nombre}\n• Categoría: ${categoria}\n• Teléfono: ${telefono}\n• Enlace 1: ${canal1 || "No especificado"}\n• Enlace 2: ${canal2 || "No especificado"}\n• Canal 3: ${canal3 || "No especificado"}\n\nA continuación adjunto mis imágenes promocionales.`;
+    window.open(enlaceWhatsApp(mensaje), '_blank', 'noopener,noreferrer');
+
+    // Limpiar el formulario para dejarlo listo para un nuevo registro
+    setContacto("");
+    setTelefono("");
+    setNombre("");
+    setCategoria("");
+    setCanal1("");
+    setCanal2("");
+    setCanal3("");
+    ac.reiniciar();
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="bg-white text-slate-800 border-4 border-[#0f2d1e] p-6 rounded-3xl space-y-4 shadow-xl">
+      {/* Se ve solo el nombre de contacto; el resto se despliega en cuanto
+          se toca este campo o cualquier parte del formulario. */}
+      <div>
+        <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-slate-700 mb-1">Nombre de contacto</label>
+        <input
+          type="text"
+          value={contacto}
+          onChange={e => setContacto(e.target.value)}
+          onFocus={() => setExpandido(true)}
+          className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium"
+          placeholder="Ej. Juan Pérez"
+        />
+      </div>
+
+      {!expandido && (
+        <button
+          type="button"
+          onClick={() => setExpandido(true)}
+          className="w-full rounded-xl border-2 border-dashed border-[#e65100] text-[#e65100] hover:bg-orange-50 font-black uppercase tracking-wide text-[11px] sm:text-xs py-3 transition-colors"
+        >
+          ✍️ Toca para continuar con tu registro
+        </button>
+      )}
+
+      <div
+        className="overflow-hidden transition-[max-height] duration-300 space-y-4"
+        style={{ maxHeight: expandido ? 2000 : 0 }}
+      >
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-slate-700 mb-1">Teléfono</label>
+            <input type="text" value={telefono} onChange={e => setTelefono(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="Ej. 5512345678" />
+          </div>
+          <div>
+            <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-slate-700 mb-1">Nombre del negocio</label>
+            <input type="text" value={nombre} onChange={e => setNombre(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="Ej. Taquería El Sol" />
+          </div>
+          <div>
+            <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-slate-700 mb-1">Giro / Categoría</label>
+            <input type="text" value={categoria} onChange={e => setCategoria(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="Ej. Restaurante, Salón, Tienda" />
+          </div>
+        </div>
+        <div className="space-y-2 pt-2">
+          <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-emerald-800">ENLACES Y REDES DIGITALES</label>
+          {/* Ayuda contextual: por qué pedimos esto y qué pasa si no se tiene. */}
+          <p className="text-[11px] text-slate-500 font-medium italic">
+            💡 No es necesario tener los tres — con uno solo (o ninguno) también puedes registrarte; solo ayuda a que te encuentren más rápido.
+          </p>
+          <input type="text" value={canal1} onChange={e => setCanal1(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="1. Página principal o Correo Electrónico" />
+          <input type="text" value={canal2} onChange={e => setCanal2(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="2. Perfil o Página de Facebook (Opcional)" />
+          <input type="text" value={canal3} onChange={e => setCanal3(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="3. Cualquier otra Red Social (Opcional)" />
+        </div>
+        <CasillaAcepto ac={ac} id="acepta_terminos_privacidad_publicidad" />
+        <button type="submit" className="w-full rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3.5 uppercase tracking-wider text-xs transition-all mt-2 shadow-md font-heading">
+          Enviar registro
+        </button>
+        <ErrorAcepto ac={ac} id="acepta_terminos_privacidad_publicidad" />
+      </div>
+    </form>
+  );
+}
+
+// =========================================================================
+// 4B. SUBCOMPONENTE: FORMULARIO DE VENTAS CON CAUSA
+// =========================================================================
+function FormularioVentasConCausa() {
+  const ac = useAceptacion();
+  const [contacto, setContacto] = useState("");
+  const [telefono, setTelefono] = useState("");
+  const [meInteresa, setMeInteresa] = useState("");
+  const [estoyBuscando, setEstoyBuscando] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!ac.validar()) return;
+    const fecha = new Date().toLocaleString();
+
+    // Mismo patrón que FormularioPublicidad: se envía como
+    // application/x-www-form-urlencoded al Apps Script (doPost).
+    // Nota: el Apps Script necesita distinguir estos registros de los de
+    // Publicidad — por eso se agrega el campo "Tipo". Si el Sheet actual
+    // no lo contempla, conviene sumar una columna "Tipo" (o una pestaña
+    // aparte) en la hoja de cálculo para que no se mezclen los datos.
+    const datosFormulario = new URLSearchParams({
+      Tipo: "VentasConCausa",
+      Nombre: contacto,
+      Telefono: telefono,
+      MeInteresa: meInteresa,
+      EstoyBuscando: estoyBuscando,
+      Fecha: fecha
+    });
+
+    try {
+      await fetch(GOOGLE_SHEETS_URL, {
+        method: "POST",
+        mode: "no-cors",
+        body: datosFormulario
+      });
+    } catch (err) {
+      console.error("Error guardando respaldo en Sheets:", err);
+    }
+
+    const mensaje = `¡Hola DCUATES!\n\nEsto es lo que me interesa de Ventas con Causa:\n• Contacto: ${contacto}\n• Teléfono: ${telefono}\n• Me interesa: ${meInteresa || "No especificado"}\n• Estoy buscando: ${estoyBuscando || "No especificado"}`;
+    window.open(enlaceWhatsApp(mensaje), '_blank', 'noopener,noreferrer');
+
+    setContacto("");
+    setTelefono("");
+    setMeInteresa("");
+    setEstoyBuscando("");
+    ac.reiniciar();
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="bg-white text-slate-800 border-4 border-[#0f2d1e] p-6 rounded-3xl space-y-4 shadow-xl">
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-slate-700 mb-1">Nombre de contacto</label>
+          <input type="text" value={contacto} onChange={e => setContacto(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="Ej. María López" />
+        </div>
+        <div>
+          <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-slate-700 mb-1">Teléfono</label>
+          <input type="text" value={telefono} onChange={e => setTelefono(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="Ej. 5512345678" />
+        </div>
+      </div>
+      <div>
+        <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-emerald-800 mb-1">¿Qué artículo o servicio te interesa? (nombre y/o clave)</label>
+        <textarea value={meInteresa} onChange={e => setMeInteresa(e.target.value)} rows={2} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium resize-none" placeholder="Ej. Me interesan las artesanías bordadas" />
+      </div>
+      <div>
+        <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-emerald-800 mb-1">¿Qué estás buscando?</label>
+        <textarea value={estoyBuscando} onChange={e => setEstoyBuscando(e.target.value)} rows={2} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium resize-none" placeholder="Ej. Busco quién pueda hacer reparaciones de bicicletas" />
+      </div>
+      <CasillaAcepto ac={ac} id="acepta_terminos_privacidad_ventas" />
+      <button type="submit" className="w-full rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3.5 uppercase tracking-wider text-xs transition-all mt-2 shadow-md font-heading">
+        Enviar registro
+      </button>
+      <ErrorAcepto ac={ac} id="acepta_terminos_privacidad_ventas" />
+    </form>
+  );
+}
+
+// =========================================================================
+// 4C. SUBCOMPONENTE GENÉRICO: CARRUSEL AUTOMÁTICO (con pausa y flechas manuales)
+// =========================================================================
+// Reutilizable: gira solo de derecha a izquierda cada "intervaloMs", se
+// puede pausar/reanudar, y se puede navegar manualmente con las flechas o
+// los puntos (al usar cualquier control manual, se pausa solo, para no
+// pelear con quien lo está viendo). "renderItem" decide cómo se ve cada
+// tarjeta — así el mismo carrusel sirve para Extraviados, Ventas con
+// Causa, o cualquier otra pasarela futura.
+// Flecha blanca reutilizable — el mismo diseño usado en los botones
+// naranjas de "Apoyo Voluntario", ahora reutilizado en otros botones que
+// invitan a dar clic (Ver Más Actividades, catálogos, Ecatepets, etc.).
+function FlechaBlanca() {
+  return (
+    <svg
+      viewBox="0 0 100 60"
+      preserveAspectRatio="none"
+      className="w-6 h-6 sm:w-8 sm:h-8 shrink-0 opacity-90 drop-shadow"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="M4 22 H58 V4 L96 30 L58 56 V38 H4 Z" fill="#ffffff" stroke="#0f2d1e" strokeWidth="6" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+// Botón naranja desplegable reutilizable: el título siempre se ve, y al
+// dar clic se abre suavemente el contenido de abajo (misma animación tipo
+// "pergamino" que los botones verdes). Se usa en Ventas con Causa y en
+// Apoyo a Causas.
+// Antes era un acordeón (se abría al tocar). Ahora el contenido se ve
+// siempre completo, para evitar clics: solo queda el título como encabezado.
+function BotonNaranjaDesplegable({ titulo, children }) {
+  return (
+    <div className="rounded-xl border-2 border-[#0f2d1e] overflow-hidden shadow-sm">
+      <div className="w-full text-left bg-[#e65100] p-3">
+        <p className="text-sm sm:text-base font-black text-white uppercase tracking-tight leading-tight">{titulo}</p>
+      </div>
+      <div className="p-3 bg-white text-xs sm:text-sm text-slate-700 leading-relaxed space-y-2">
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function Carrusel({ items, renderItem, intervaloMs = 4000 }) {
+  const [index, setIndex] = useState(0);
+  const [pausado, setPausado] = useState(false);
+
+  useEffect(() => {
+    if (pausado) return;
+    const id = setInterval(() => {
+      setIndex((i) => (i + 1) % items.length);
+    }, intervaloMs);
+    return () => clearInterval(id);
+  }, [pausado, items.length, intervaloMs]);
+
+  // Precarga en segundo plano todas las fotos del carrusel apenas
+  // llegan (o cambian) los items, para que ya estén en caché del
+  // navegador cuando el carrusel las quiera mostrar (evita el
+  // parpadeo/foto en blanco en la primera visita al sitio).
+  useEffect(() => {
+    items.forEach((item) => {
+      if (item.img) {
+        const imgPrecarga = new Image();
+        imgPrecarga.src = resolverSrcImagen(item.img);
+      }
+    });
+  }, [items]);
+
+  const anterior = () => { setIndex((i) => (i - 1 + items.length) % items.length); setPausado(true); };
+  const siguiente = () => { setIndex((i) => (i + 1) % items.length); setPausado(true); };
+
+  const item = items[index];
+
+  return (
+    <div className="rounded-2xl border-4 border-[#0f2d1e] bg-white overflow-hidden shadow-md">
+      <div className="relative flex items-center">
+
+        <button
+          onClick={anterior}
+          aria-label="Anterior"
+          className="absolute left-2 z-10 h-9 w-9 sm:h-10 sm:w-10 flex items-center justify-center rounded-full bg-white/90 border-2 border-[#0f2d1e] text-[#0f2d1e] font-black shadow-md hover:bg-emerald-50 transition-colors"
+        >
+          ‹
+        </button>
+
+        {renderItem(item)}
+
+        <button
+          onClick={siguiente}
+          aria-label="Siguiente"
+          className="absolute right-2 z-10 h-9 w-9 sm:h-10 sm:w-10 flex items-center justify-center rounded-full bg-white/90 border-2 border-[#0f2d1e] text-[#0f2d1e] font-black shadow-md hover:bg-emerald-50 transition-colors"
+        >
+          ›
+        </button>
+      </div>
+
+      <div className="flex items-center justify-center gap-2 py-3 border-t border-[#0f2d1e]/10 bg-emerald-50/60">
+        {items.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => { setIndex(i); setPausado(true); }}
+            aria-label={`Ir al elemento ${i + 1}`}
+            className={`h-2 w-2 rounded-full transition-colors ${i === index ? "bg-emerald-700" : "bg-emerald-700/30"}`}
+          />
+        ))}
+        <button
+          onClick={() => setPausado((p) => !p)}
+          className="ml-3 text-[10px] sm:text-xs font-black uppercase tracking-wider text-emerald-800 hover:text-emerald-900 underline underline-offset-2"
+        >
+          {pausado ? "▶ Reanudar" : "❚❚ Pausar"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// Tarjeta compartida por ambas pasarelas (extraviados y ventas con causa) —
+// misma estructura visual, cambia solo la etiqueta y el pie de foto.
+// Las fotos que vienen de Baserow (URLs de S3) pasan por nuestro propio
+// "puente" (/api/imagen-proxy) para evitar bloqueos del navegador del
+// visitante. Las rutas locales de marcador de posición (/images/...) se
+// usan tal cual, sin pasar por el puente. La usan tanto la tarjeta como
+// la precarga del carrusel, para no repetir la misma lógica dos veces.
+function resolverSrcImagen(img) {
+  if (!img) return img;
+  return img.startsWith("http") ? `/api/imagen-proxy?url=${encodeURIComponent(img)}` : img;
+}
+
+function TarjetaCarrusel({ item, etiqueta, mostrarDetallesVenta = false }) {
+  const srcImagen = resolverSrcImagen(item.img);
+
+  return (
+    <div className="w-full grid sm:grid-cols-2">
+      <div className="aspect-video sm:aspect-square bg-emerald-100">
+        <img
+          key={item.id || srcImagen}
+          src={srcImagen}
+          alt={item.nombre}
+          loading="lazy"
+          className="w-full h-full object-contain"
+          onError={(e) => { e.target.style.display = 'none'; }}
+        />
+      </div>
+      <div className="p-5 flex flex-col justify-center gap-2">
+        <span className="inline-block w-fit rounded-full bg-emerald-200 px-3 py-1 text-[10px] sm:text-xs font-black uppercase tracking-wider text-emerald-800">
+          {etiqueta}
+        </span>
+        <p className="text-lg sm:text-xl font-black text-[#0f2d1e] uppercase leading-tight">{item.nombre}</p>
+        {item.codigo && (
+          <p className="text-xs font-bold text-emerald-700 uppercase tracking-wide">Código: {item.codigo}</p>
+        )}
+        <p className="text-sm text-slate-700 font-medium leading-relaxed">{item.descripcion}</p>
+        {mostrarDetallesVenta && (
+          <div className="mt-1 space-y-1">
+            {item.precio && (
+              <p className="text-base font-black text-[#0f2d1e]">
+                ${item.precio} <span className="font-medium text-xs text-slate-600">MXN</span>
+              </p>
+            )}
+            {item.proveedor && (
+              <p className="text-xs font-bold text-slate-600">Proveedor: {item.proveedor}</p>
+            )}
+            {item.notas && (
+              <p className="text-xs text-slate-500 italic">{item.notas}</p>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// Trae los renglones reales de una tabla de Baserow a través de nuestra
+// función serverless (/api/baserow-rows) — nunca habla con Baserow
+// directamente desde el navegador. Si "tableId" está vacío, o la petición
+// falla, o Baserow todavía no tiene filas, se queda con "itemsRespaldo"
+// (los datos de ejemplo) sin romper nada.
+// Trae los renglones "crudos" de la tabla ENLACES (uno por fila, con las
+// columnas tal cual las nombraste en Baserow: VIDPORT, RECASA, RECOMUN,
+// RECMUSIC, RECLIBROS, RECVIDEOSYMAS, GALCULTURA, GALSALUD, etc.). Si la tabla
+// aún no responde o está vacía, regresa un arreglo vacío y quien la usa
+// se queda con su propio respaldo — nunca rompe la página.
+// Caché simple en memoria + sessionStorage (5 minutos) para no repetir la
+// misma llamada a Baserow — este hook se usa más de una vez en la página
+// (el video/recomendaciones arriba, y los botones de Apoyo/Recomendación
+// más abajo), así que sin caché se disparaban 2 peticiones idénticas.
+const CACHE_ENLACES_MS = 5 * 60 * 1000;
+let cacheEnlacesMemoria = null; // { datos, momento }
+
+// Avisa a la página qué pasó con la lectura de Baserow (lo muestra el sello de
+// versión al final de los accesos rápidos): sirve para detectar fallas sin
+// abrir la consola del navegador.
+function reportarBaserow(estado) {
+  if (typeof window === "undefined") return;
+  window.__dcuatesBaserow = estado;
+  window.dispatchEvent(new CustomEvent("dcuates:baserow-estado", { detail: estado }));
+}
+
+function useFilasEnlaces() {
+  const [filas, setFilas] = useState(() => cacheEnlacesMemoria ? cacheEnlacesMemoria.datos : []);
+
+  useEffect(() => {
+    if (!BASEROW_TABLE_ID_ENLACES) return;
+
+    const ahora = Date.now();
+    if (cacheEnlacesMemoria && ahora - cacheEnlacesMemoria.momento < CACHE_ENLACES_MS) {
+      setFilas(cacheEnlacesMemoria.datos);
+      reportarBaserow({ ok: true, filas: cacheEnlacesMemoria.datos.length });
+      return;
+    }
+    try {
+      const guardado = sessionStorage.getItem("dcuates_enlaces_cache");
+      if (guardado) {
+        const parseado = JSON.parse(guardado);
+        if (parseado && ahora - parseado.momento < CACHE_ENLACES_MS) {
+          cacheEnlacesMemoria = parseado;
+          setFilas(parseado.datos);
+          reportarBaserow({ ok: true, filas: parseado.datos.length });
+          return;
+        }
+      }
+    } catch (e) {
+      // sessionStorage no disponible o dato corrupto — se sigue al fetch normal
+    }
+
+    let cancelado = false;
+    fetch(`/api/baserow-rows?table=${encodeURIComponent(BASEROW_TABLE_ID_ENLACES)}&crudo=1`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (!Array.isArray(data.items)) {
+          // Ayuda para detectar fallas: abre la consola del navegador (F12).
+          console.warn("[DCUATES] /api/baserow-rows no regresó filas. Respuesta:", data);
+          reportarBaserow({ ok: false, mensaje: (data && (data.error || data.message)) ? String(data.error || data.message) : "respuesta sin filas" });
+        }
+        if (!cancelado && Array.isArray(data.items)) {
+          const entrada = { datos: data.items, momento: Date.now() };
+          cacheEnlacesMemoria = entrada;
+          try { sessionStorage.setItem("dcuates_enlaces_cache", JSON.stringify(entrada)); } catch (e) {}
+          setFilas(data.items);
+          reportarBaserow({ ok: true, filas: data.items.length });
+        }
+      })
+      .catch((e) => {
+        // Sin conexión, tabla vacía, etc. — nos quedamos con los respaldos.
+        console.warn("[DCUATES] No se pudo leer Baserow (/api/baserow-rows):", e);
+        reportarBaserow({ ok: false, mensaje: String((e && e.message) || e) });
+      });
+
+    return () => { cancelado = true; };
+  }, []);
+
+  return filas;
+}
+
+// Toma hasta "max" valores no vacíos de una columna a lo largo de todas
+// las filas (ej. las primeras 5 URLs de la columna RECMUSIC).
+function primerosValores(filas, columna, max) {
+  return filas
+    .map((f) => f && f[columna])
+    .filter((v) => v && String(v).trim() !== "")
+    .slice(0, max);
+}
+
+// Arma pares {nombre, enlace} tomando 2 columnas de la misma fila (ej.
+// "Nombre Recocasa" + "RECASA"). Solo cuenta una fila si tiene enlace; si le
+// falta el nombre, usa un nombre genérico numerado para no dejarlo vacío.
+function paresBaserow(filas, colNombre, colEnlace, max) {
+  return filas
+    .filter((f) => f && f[colEnlace] && String(f[colEnlace]).trim() !== "")
+    .slice(0, max)
+    .map((f, i) => ({
+      nombre: (f[colNombre] && String(f[colNombre]).trim()) || `Recomendación ${i + 1}`,
+      enlace: f[colEnlace]
+    }));
+}
+
+// Saca la URL de una celda de Baserow sin importar si la columna es de
+// texto/URL plano (un string) o de tipo Archivo/Adjunto (Baserow entrega un
+// arreglo de objetos [{url, name, thumbnails...}] para ese tipo de columna,
+// como es el caso de GALCULTURA y GALSALUD).
+function urlDesdeCeldaBaserow(valor) {
+  if (!valor) return null;
+  if (Array.isArray(valor)) {
+    const primero = valor[0];
+    if (!primero) return null;
+    return primero.url || (primero.thumbnails && primero.thumbnails.card && primero.thumbnails.card.url) || null;
+  }
+  const texto = String(valor).trim();
+  return texto === "" ? null : texto;
+}
+
+// Arma items de galería {img, tipo, nombre} a partir de una columna que
+// trae fotos — ya sea de tipo Archivo/Adjunto (GALCULTURA, GALSALUD) o de
+// texto plano con URLs.
+function galeriaDesdeColumna(filas, columna, max, etiqueta) {
+  return filas
+    .map((f) => f && urlDesdeCeldaBaserow(f[columna]))
+    .filter(Boolean)
+    .slice(0, max)
+    .map((url, i) => ({
+      img: url,
+      tipo: etiqueta,
+      nombre: `${etiqueta} ${i + 1}`
+    }));
+}
+
+// Saca el ID de video de un enlace normal de YouTube (watch?v=, youtu.be/,
+// o ya en formato /embed/), para poder armar el src del iframe.
+function idYoutubeDesdeUrl(url) {
+  if (!url) return null;
+  const m = String(url).match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([a-zA-Z0-9_-]{6,})/);
+  return m ? m[1] : null;
+}
+
+// Detecta si un enlace apunta a un PDF (por su extensión), para mostrarlo
+// en el visor interno (VisorPDF/BarraPatrocinadores) en vez de abrirlo en
+// una pestaña nueva. Funciona con links que terminan en ".pdf" o que
+// llevan ".pdf" seguido de parámetros (ej. "...archivo.pdf?dl=1").
+function esPDF(url) {
+  if (!url) return false;
+  return /\.pdf(\?|#|$)/i.test(String(url));
+}
+
+// Detecta de qué plataforma es un link de video normal (el mismo que
+// copiarías para compartir por WhatsApp — NO el código de incrustación) y
+// saca su id, para poder armar el reproductor correcto de cada una.
+// Reconoce YouTube (incluye Shorts) y TikTok. Ojo: los links cortos de
+// TikTok (vm.tiktok.com/XXXX) no funcionan aquí porque no traen el id en
+// la URL — hay que usar el link largo (tiktok.com/@usuario/video/123...).
+// Devuelve null si no reconoce ninguna plataforma.
+function detectarVideo(url) {
+  if (!url) return null;
+  const idYt = idYoutubeDesdeUrl(url);
+  if (idYt) return { plataforma: "youtube", id: idYt };
+  const tt = String(url).match(/tiktok\.com\/(?:@[\w.-]+\/video\/|embed\/(?:v2\/)?)(\d+)/);
+  if (tt) return { plataforma: "tiktok", id: tt[1] };
+  const vm = String(url).match(/vimeo\.com\/(?:video\/)?(\d+)/);
+  if (vm) return { plataforma: "vimeo", id: vm[1] };
+  // Facebook no trabaja con un "id" simple como YouTube/TikTok — su
+  // reproductor incrustado necesita el link completo tal cual. Ojo: los
+  // links cortos "fb.watch/XXXX" sí funcionan aquí (a diferencia de los
+  // cortos de TikTok), porque el reproductor de Facebook los resuelve solo.
+  if (/facebook\.com|fb\.watch/.test(String(url))) {
+    return { plataforma: "facebook", url: String(url) };
+  }
+  return null;
+}
+
+// Arma el iframe correcto según la plataforma detectada por detectarVideo().
+function IframeVideo({ video, className }) {
+  if (video.plataforma === "tiktok") {
+    return (
+      <iframe
+        className={className}
+        src={`https://www.tiktok.com/embed/v2/${video.id}`}
+        title="Video de TikTok"
+        allow="autoplay; encrypted-media; picture-in-picture"
+        allowFullScreen
+      />
+    );
+  }
+  if (video.plataforma === "facebook") {
+    return (
+      <iframe
+        className={className}
+        src={`https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(video.url)}&show_text=false&autoplay=true`}
+        title="Video de Facebook"
+        allow="autoplay; encrypted-media; picture-in-picture; web-share"
+        allowFullScreen
+      />
+    );
+  }
+  if (video.plataforma === "vimeo") {
+    return (
+      <iframe
+        className={className}
+        src={`https://player.vimeo.com/video/${video.id}?autoplay=1`}
+        title="Video de Vimeo"
+        allow="autoplay; fullscreen; picture-in-picture"
+        allowFullScreen
+      />
+    );
+  }
+  return (
+    <iframe
+      className={className}
+      src={`https://www.youtube.com/embed/${video.id}?autoplay=1`}
+      title="Video"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      allowFullScreen
+    />
+  );
+}
+
+// Miniatura de un video: para YouTube usamos su miniatura pública real; para
+// TikTok, Facebook y Vimeo no hay una URL de miniatura simple sin hacer una
+// petición aparte, así que mostramos una tarjeta con su logo — igual de
+// clicable.
+function MiniaturaVideo({ video, nombre }) {
+  if (video.plataforma === "tiktok") {
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-center gap-1.5 bg-gradient-to-br from-[#111] to-[#000]">
+        <svg viewBox="0 0 24 24" className="h-8 w-8 fill-white" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.02 1.59 4.23.94 1.13 2.29 1.89 3.73 2.18l-.02 3.88c-1.63-.03-3.2-.55-4.51-1.52A7.83 7.83 0 0 1 16.43 7.5v8.32a7.83 7.83 0 0 1-3.32 6.42 7.91 7.91 0 0 1-8.73-.24 7.85 7.85 0 0 1-3.23-7.58 7.84 7.84 0 0 1 5.37-6.84V11.5a3.94 3.94 0 0 0-1.5 3.32 3.93 3.93 0 0 0 3.2 3.88 3.93 3.93 0 0 0 4.61-3.2c.04-.33.05-.66.05-.99V.02z" />
+        </svg>
+        <span className="text-white text-[9px] font-black uppercase tracking-wide">Ver en TikTok</span>
+      </div>
+    );
+  }
+  if (video.plataforma === "facebook") {
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-center gap-1.5 bg-gradient-to-br from-[#1a3a6e] to-[#0d1f3d]">
+        <svg viewBox="0 0 24 24" className="h-8 w-8 fill-white" xmlns="http://www.w3.org/2000/svg">
+          <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" />
+        </svg>
+        <span className="text-white text-[9px] font-black uppercase tracking-wide">Ver en Facebook</span>
+      </div>
+    );
+  }
+  if (video.plataforma === "vimeo") {
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-center gap-1.5 bg-gradient-to-br from-[#0a1e26] to-[#062832]">
+        <svg viewBox="0 0 24 24" className="h-8 w-8 fill-white" xmlns="http://www.w3.org/2000/svg">
+          <path d="M23.977 6.416c-.105 2.338-1.739 5.543-4.894 9.609-3.268 4.247-6.026 6.37-8.29 6.37-1.409 0-2.578-1.294-3.553-3.881-.646-2.361-1.291-4.729-1.937-7.089-.717-2.588-1.488-3.881-2.309-3.881-.178 0-.806.378-1.878 1.132l-1.116-1.436c1.191-1.049 2.371-2.089 3.554-3.131 1.601-1.379 2.798-2.101 3.598-2.174 1.884-.183 3.044 1.11 3.479 3.881.472 2.994.798 4.858.977 5.593.539 2.442 1.132 3.667 1.777 3.667.502 0 1.256-.796 2.257-2.394 1.005-1.596 1.545-2.807 1.622-3.639.147-1.379-.401-2.077-1.625-2.077-.578 0-1.174.132-1.786.396 1.191-3.9 3.462-5.79 6.809-5.687 2.478.074 3.65 1.677 3.517 4.788z" />
+        </svg>
+        <span className="text-white text-[9px] font-black uppercase tracking-wide">Ver en Vimeo</span>
+      </div>
+    );
+  }
+  return (
+    <img
+      src={`https://img.youtube.com/vi/${video.id}/hqdefault.jpg`}
+      alt={nombre}
+      loading="lazy"
+      className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+    />
+  );
+}
+
+// Carrusel automático genérico y reutilizable — cada "intervaloMs" avanza
+// solo al siguiente elemento (moviendo el "scrollLeft" del contenedor
+// directamente, nunca scrollIntoView, para no arrastrar el scroll de la
+// página). Se pausa en cuanto la persona toca/desliza a mano. Lo usan
+// Patrocinadores, Historias y reflexiones, y los videos de Retos.
+function useCarruselAutomatico(cantidad, intervaloMs = 2500) {
+  const scrollRef = useRef(null);
+  const [indiceAuto, setIndiceAuto] = useState(0);
+  const [pausado, setPausado] = useState(false);
+  const temporizadorReanudar = useRef(null);
+  useEffect(() => () => clearTimeout(temporizadorReanudar.current), []);
+  useEffect(() => {
+    if (pausado || cantidad <= 1) return;
+    const id = setInterval(() => {
+      setIndiceAuto((i) => (i + 1) % cantidad);
+    }, intervaloMs);
+    return () => clearInterval(id);
+  }, [pausado, cantidad, intervaloMs]);
+  useEffect(() => {
+    const contenedor = scrollRef.current;
+    const hijo = contenedor && contenedor.children[indiceAuto];
+    if (!contenedor || !hijo) return;
+    // Posición del elemento DENTRO del contenedor (con getBoundingClientRect,
+    // porque offsetLeft se medía contra otro ancestro y en la columna de
+    // Retos daba un número enorme: la pasarela saltaba al final y se
+    // quedaba ahí).
+    const izqHijo = hijo.getBoundingClientRect().left - contenedor.getBoundingClientRect().left + contenedor.scrollLeft;
+    const objetivo = izqHijo - (contenedor.clientWidth - hijo.clientWidth) / 2;
+    contenedor.scrollTo({ left: Math.max(0, objetivo), behavior: "smooth" });
+  }, [indiceAuto]);
+  // Al tocar/deslizar a mano se pausa, pero ya NO para siempre: 6 segundos
+  // después de la última interacción la pasarela se reanuda sola (antes
+  // se quedaba parada en el último elemento tocado).
+  const alTocar = () => {
+    setPausado(true);
+    clearTimeout(temporizadorReanudar.current);
+    temporizadorReanudar.current = setTimeout(() => setPausado(false), 6000);
+  };
+  return { scrollRef, onPointerDown: alTocar };
+}
+
+function useCatalogoBaserow(tableId, itemsRespaldo) {
+  const [items, setItems] = useState(itemsRespaldo);
+
+  useEffect(() => {
+    if (!tableId) return; // sin Table ID configurado: nos quedamos con el respaldo
+    let cancelado = false;
+
+    fetch(`/api/baserow-rows?table=${encodeURIComponent(tableId)}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (!cancelado && Array.isArray(data.items) && data.items.length > 0) {
+          setItems(data.items);
+        }
+      })
+      .catch(() => {
+        // Sin conexión, token aún no configurado, etc. — nos quedamos con el respaldo.
+      });
+
+    return () => { cancelado = true; };
+  }, [tableId]);
+
+  return items;
+}
+
+function PasarelaExtraviados() {
+  const items = useCatalogoBaserow(BASEROW_TABLE_ID_EXTRAVIADOS, EXTRAVIADOS_ITEMS);
+  return (
+    <Carrusel
+      items={items}
+      renderItem={(item) => (
+        <TarjetaCarrusel item={item} etiqueta={item.tipo ? `${item.tipo} extraviad${item.tipo === "Persona" ? "a" : "o"}` : ""} />
+      )}
+    />
+  );
+}
+
+function PasarelaVentasConCausa() {
+  const items = useCatalogoBaserow(BASEROW_TABLE_ID_VENTAS_CON_CAUSA, VENTAS_CON_CAUSA_ITEMS);
+  return (
+    <Carrusel
+      items={items}
+      renderItem={(item) => (
+        <TarjetaCarrusel item={item} etiqueta={item.tipo} mostrarDetallesVenta />
+      )}
+    />
+  );
+}
+
+// =========================================================================
+// 4B. CONTENIDO DE LA VENTANA EMERGENTE ÚNICA DE PROYECTO
+// =========================================================================
+// Botón naranja de acción reutilizable dentro de los modales (WhatsApp, etc).
+function BotonModal({ href, children, variante = "principal", onClick }) {
+  const base = "w-full text-center rounded-xl font-black py-3 px-4 shadow-md transition-colors uppercase tracking-wide text-xs sm:text-sm font-heading block";
+  const estilos = variante === "principal"
+    ? "bg-[#e65100] hover:bg-[#bf360c] text-white"
+    : "border-2 border-[#0f2d1e] text-[#0f2d1e] hover:bg-[#0f2d1e] hover:text-white";
+  if (href) {
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer" className={`${base} ${estilos}`}>
+        {children}
+      </a>
+    );
+  }
+  return (
+    <button type="button" onClick={onClick} className={`${base} ${estilos}`}>
+      {children}
+    </button>
+  );
+}
+
+// Versión "con candado" de BotonModal — se usa para cualquier botón que
+// necesite una clave de acceso antes de mostrarse (hoy: "Únete a Nuestra
+// Red de Confianza" en Círculo de Confianza). Mientras no se escriba la
+// clave correcta, en vez del botón real se ve un candado con un campo de
+// texto. AVISO: esto NO es seguridad real, solo filtra visitas casuales —
+// la clave queda visible en el código fuente de la página.
+function BotonModalProtegido({ href, children, clave }) {
+  const [desbloqueado, setDesbloqueado] = useState(false);
+  const [intento, setIntento] = useState("");
+  const [error, setError] = useState(false);
+
+  if (desbloqueado) {
+    return <BotonModal href={href}>{children}</BotonModal>;
+  }
+
+  const verificar = () => {
+    if (intento.trim().toLowerCase() === String(clave).toLowerCase()) {
+      setDesbloqueado(true);
+      setError(false);
+    } else {
+      setError(true);
+    }
+  };
+
+  return (
+    <div className="w-full rounded-xl border-2 border-dashed border-[#0f2d1e]/40 bg-[#0f2d1e]/5 p-3 space-y-2">
+      <p className="text-xs sm:text-sm font-black uppercase text-[#0f2d1e] flex items-center gap-1.5 leading-tight">
+        🔒 {children}
+      </p>
+      <div className="flex gap-2">
+        <input
+          type="password"
+          value={intento}
+          onChange={(e) => { setIntento(e.target.value); setError(false); }}
+          onKeyDown={(e) => e.key === "Enter" && verificar()}
+          placeholder="Clave de acceso"
+          className="flex-1 rounded-lg border-2 border-[#0f2d1e]/30 px-3 py-2 text-sm focus:outline-none focus:border-[#0f2d1e]"
+        />
+        <button
+          type="button"
+          onClick={verificar}
+          className="shrink-0 rounded-lg bg-[#0f2d1e] hover:bg-emerald-800 text-white px-4 text-xs font-black uppercase tracking-wide transition-colors"
+        >
+          Entrar
+        </button>
+      </div>
+      {error && (
+        <p className="text-xs font-bold text-red-600">Clave incorrecta, intenta de nuevo.</p>
+      )}
+    </div>
+  );
+}
+
+// Modal del Mapa de Sitio — tarjetas pequeñas con acceso directo a TODO lo
+// que hay en la página (los 12 proyectos + FAQ + Sugerencias). Reutiliza
+// BOTONES_PORTADA y MAPA_SITIO_EXTRA (ver arriba, cerca de
+// TODOS_LOS_PROYECTOS) para no duplicar información.
+function ModalMapaSitio({ onCerrar, onAbrirProyecto, onAbrirFAQ, onAbrirSugerencias }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm" onClick={onCerrar}>
+      <div
+        className="bg-[#e8f5e9] text-slate-900 rounded-2xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl flex flex-col max-h-[90vh]"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h3 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-[#0f2d1e] font-heading mb-3">
+          🗺️ Mapa del Sitio
+        </h3>
+        <p className="text-xs sm:text-sm text-[#0f2d1e]/70 font-medium mb-3">
+          Toca cualquier tarjeta para ir directo a esa sección, sin tener que buscarla.
+        </p>
+        <div className="overflow-y-auto pr-1 grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+          {BOTONES_PORTADA.map((btn, idx) => (
+            <button
+              key={idx}
+              type="button"
+              onClick={() => { onCerrar(); onAbrirProyecto(btn.modal); }}
+              className="flex flex-col items-center gap-1.5 rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white shadow-sm transition-colors p-3 text-center font-heading"
+            >
+              {btn.img && (
+                <img
+                  src={btn.img}
+                  alt=""
+                  loading="lazy"
+                  className="max-h-10 w-auto object-contain drop-shadow"
+                  onError={(e) => { e.target.style.display = 'none'; }}
+                />
+              )}
+              <span className="uppercase font-black leading-tight text-[11px] sm:text-xs">{btn.t}</span>
+            </button>
+          ))}
+          {MAPA_SITIO_EXTRA.map((btn, idx) => (
+            <button
+              key={`extra-${idx}`}
+              type="button"
+              onClick={() => {
+                onCerrar();
+                if (btn.accion === "faq") onAbrirFAQ();
+                else if (btn.accion === "sugerencias") onAbrirSugerencias();
+                else if (btn.accion === "seguridad" || btn.accion === "escudo") abrirLegal(btn.accion);
+              }}
+              className="flex flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-[#0f2d1e] text-[#0f2d1e] hover:bg-[#0f2d1e] hover:text-white shadow-sm transition-colors p-3 text-center font-heading"
+            >
+              <span className="text-2xl">{btn.emoji}</span>
+              <span className="uppercase font-black leading-tight text-[11px] sm:text-xs">{btn.t}</span>
+            </button>
+          ))}
+        </div>
+              <div className="pt-3 flex justify-end shrink-0">
+          <BotonCerrar onClick={onCerrar} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Modal de categoría — presentación "ad hoc" de una de las 4 categorías de
+// la portada simplificada (ver CATEGORIAS_PROYECTOS arriba), con acceso
+// directo a cada proyecto que agrupa. Reutiliza los mismos datos (img,
+// título) de BOTONES_PORTADA para no duplicar información.
+function ModalCategoria({ categoria, onCerrar, onAbrirProyecto }) {
+  if (!categoria) return null;
+  const proyectosDeLaCategoria = BOTONES_PORTADA.filter((b) => categoria.proyectos.includes(b.modal));
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm" onClick={onCerrar}>
+      <div
+        className="bg-white text-slate-900 rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl flex flex-col max-h-[90vh]"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="mb-2">
+          <span className="inline-flex items-center gap-2 rounded-full bg-emerald-200 px-4 py-1.5 text-xs sm:text-sm font-black uppercase tracking-wider text-emerald-800">
+            <span aria-hidden="true">{categoria.emoji}</span> {categoria.titulo}
+          </span>
+        </div>
+        <p className="text-xs sm:text-sm italic font-black text-[#e65100] mb-2">{categoria.slogan}</p>
+        <p className="text-sm text-slate-600 font-medium leading-relaxed mb-4">{categoria.descripcion}</p>
+        <div className="overflow-y-auto pr-1 grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+          {proyectosDeLaCategoria.map((btn, idx) => (
+            <button
+              key={idx}
+              type="button"
+              onClick={() => onAbrirProyecto(btn.modal)}
+              className="flex flex-col items-center gap-1.5 rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white shadow-sm transition-colors p-3 text-center font-heading"
+            >
+              {btn.img && (
+                <img
+                  src={btn.img}
+                  alt=""
+                  loading="lazy"
+                  className="max-h-10 w-auto object-contain drop-shadow"
+                  onError={(e) => { e.target.style.display = 'none'; }}
+                />
+              )}
+              <span className="uppercase font-black leading-tight text-[11px] sm:text-xs">{btn.t}</span>
+            </button>
+          ))}
+        </div>
+              <div className="pt-3 flex justify-end shrink-0">
+          <BotonCerrar onClick={onCerrar} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Botón verde desplegable — usado en la fila de "resumen rápido" junto al
+// video (Nuestra Misión, Cómo Podemos Sumar, Preguntas Frecuentes, Aviso
+// de Privacidad). Al dar clic se expande hacia abajo mostrando su contenido.
+// Igual que el naranja: contenido siempre visible, sin acordeón.
+function BotonVerdeInfo({ titulo, children }) {
+  return (
+    <div className="rounded-xl bg-[#17472d] text-white shadow-md overflow-hidden">
+      <div className="px-4 py-3.5">
+        <span className="text-xs sm:text-sm font-black uppercase tracking-wide">{titulo}</span>
+      </div>
+      <div className="px-4 pb-4 pt-2 text-xs sm:text-sm text-emerald-50 leading-relaxed space-y-2 border-t border-emerald-700/40">
+        {children}
+      </div>
+    </div>
+  );
+}
+
+// Decide qué mostrar dentro del modal según el id recibido: los 10 proyectos
+// "normales" (con tarjeta propia), o los 2 casos especiales sin tarjeta
+// (Ventas con Causa y Apoyo Voluntario/donaciones).
+// Formulario de "Registra tu Solicitud": guarda el registro en Google Sheets
+// (mismo Apps Script de Publicidad, con Tipo "Solicitud") y, en paralelo,
+// abre WhatsApp con el mensaje ya escrito. Al terminar muestra el logo y un
+// mensaje de agradecimiento.
+const TIPOS_DE_APOYO = [
+  "Libros o materiales educativos",
+  "Asesoría gratuita",
+  "Mascotas (adopción, extravío o rescate)",
+  "Apoyo en especie o económico",
+  "Publicidad para mi negocio",
+  "Apoyo voluntario",
+  "Otro"
+];
+
+function FormularioSolicitud() {
+  const [nombre, setNombre] = useState("");
+  const [telefono, setTelefono] = useState("");
+  const [colonia, setColonia] = useState("");
+  const [tipo, setTipo] = useState(TIPOS_DE_APOYO[0]);
+  const [detalle, setDetalle] = useState("");
+  const [error, setError] = useState("");
+  const [enviado, setEnviado] = useState(false);
+  const [enlaceRespaldo, setEnlaceRespaldo] = useState("");
+  const ac = useAceptacion();
+
+  const claseCampo = "w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium";
+  const claseEtiqueta = "block text-xs sm:text-sm font-black uppercase tracking-wider text-slate-700 mb-1";
+
+  const enviar = (e) => {
+    e.preventDefault();
+    // Sin aceptar el Aviso de Privacidad y los Términos: se detiene TODO (no se
+    // guarda en Google Sheets ni se abre WhatsApp).
+    if (!ac.validar()) return;
+    const tel = telefono.replace(/\D/g, "");
+    if (!nombre.trim()) return setError("Escribe tu nombre.");
+    if (tel.length < 10) return setError("Escribe tu número de WhatsApp a 10 dígitos.");
+    if (!detalle.trim()) return setError("Cuéntanos brevemente qué necesitas.");
+    setError("");
+
+    registrar("formulario_enviado", { form: "solicitud" });
+
+    // 1) Registro en Google Sheets (sin esperar respuesta, para no perder el
+    //    permiso del navegador de abrir WhatsApp).
+    try {
+      fetch(GOOGLE_SHEETS_URL, {
+        method: "POST",
+        mode: "no-cors",
+        keepalive: true,
+        body: new URLSearchParams({
+          Tipo: "Solicitud",
+          Nombre: nombre.trim(),
+          Telefono: tel,
+          Colonia: colonia.trim(),
+          TipoApoyo: tipo,
+          Detalle: detalle.trim(),
+          AceptaTerminos: "Sí (Aviso y Términos, oct-2026)",
+          Fecha: new Date().toLocaleString()
+        })
+      }).catch(() => {});
+    } catch (err) {
+      console.error("Error guardando la solicitud en Sheets:", err);
+    }
+
+    // 2) Aviso por WhatsApp, en paralelo.
+    const mensaje = `¡Hola DCUATES!\n\nRegistré una solicitud en la página:\n• Nombre: ${nombre.trim()}\n• WhatsApp: ${tel}\n• Colonia: ${colonia.trim() || "No especificada"}\n• Tipo de apoyo: ${tipo}\n• Detalle: ${detalle.trim()}`;
+    const enlace = enlaceWhatsApp(mensaje);
+    setEnlaceRespaldo(enlace);
+    window.open(enlace, "_blank", "noopener,noreferrer");
+
+    setEnviado(true);
+    setTimeout(() => irASeccion("solicitudes"), 150);
+  };
+
+  if (enviado) {
+    return (
+      <div className="text-center py-6 px-4">
+        <div className="flex justify-center"><LogoMarca tam={88} /></div>
+        <p className="mt-4 text-lg font-black text-[#0f2d1e] leading-snug">¡Tu solicitud quedó registrada!</p>
+        <p className="mt-2 text-base font-bold text-slate-700">En la primera oportunidad atenderemos tu solicitud…</p>
+        <p className="mt-3 text-xl font-black text-[#e65100] uppercase tracking-wide">¡Gracias y saludos!</p>
+        <p className="mt-4 text-[11px] text-slate-500 font-medium">
+          ¿No se abrió WhatsApp?{" "}
+          <a href={enlaceRespaldo} target="_blank" rel="noopener noreferrer" className="font-black text-[#128c7e] underline">Tócalo aquí</a>
+        </p>
+        <button
+          type="button"
+          onClick={() => { setEnviado(false); setNombre(""); setTelefono(""); setColonia(""); setDetalle(""); setTipo(TIPOS_DE_APOYO[0]); ac.reiniciar(); }}
+          className="mt-4 rounded-full border-2 border-[#0f2d1e] px-4 py-1.5 text-[11px] font-black uppercase tracking-wide text-[#0f2d1e] hover:bg-emerald-50 transition-colors"
+        >
+          Registrar otra solicitud
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={enviar} className="space-y-3 p-4" noValidate>
+      <div>
+        <label className={claseEtiqueta} htmlFor="sol-nombre">Nombre</label>
+        <input id="sol-nombre" type="text" value={nombre} onChange={(e) => { setNombre(e.target.value); if (error) setError(""); }} className={claseCampo} placeholder="Ej. María López" autoComplete="name" />
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div>
+          <label className={claseEtiqueta} htmlFor="sol-tel">WhatsApp</label>
+          <input id="sol-tel" type="tel" inputMode="tel" value={telefono} onChange={(e) => { setTelefono(e.target.value); if (error) setError(""); }} className={claseCampo} placeholder="Ej. 5512345678" autoComplete="tel" />
+        </div>
+        <div>
+          <label className={claseEtiqueta} htmlFor="sol-colonia">Colonia</label>
+          <input id="sol-colonia" type="text" value={colonia} onChange={(e) => setColonia(e.target.value)} className={claseCampo} placeholder="Ej. Jardines de Morelos" />
+        </div>
+      </div>
+      <div>
+        <label className={claseEtiqueta} htmlFor="sol-tipo">Tipo de apoyo</label>
+        <select id="sol-tipo" value={tipo} onChange={(e) => setTipo(e.target.value)} className={claseCampo}>
+          {TIPOS_DE_APOYO.map((t) => <option key={t} value={t}>{t}</option>)}
+        </select>
+      </div>
+      <div>
+        <label className={claseEtiqueta} htmlFor="sol-detalle">¿Qué necesitas?</label>
+        <textarea id="sol-detalle" rows={4} value={detalle} onChange={(e) => { setDetalle(e.target.value); if (error) setError(""); }} className={claseCampo} placeholder="Cuéntanos con detalle cómo podemos apoyarte…" />
+      </div>
+      {error && <p className="text-xs text-red-600 font-bold">{error}</p>}
+      <CasillaAcepto ac={ac} />
+      <button type="submit" className="w-full rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3.5 uppercase tracking-wider text-xs sm:text-sm transition-colors shadow-md">
+        Enviar mi solicitud
+      </button>
+      <ErrorAcepto ac={ac} />
+    </form>
+  );
+}
+
+// Botón naranja alargado que lleva al video de Chuy (ejemplo de cómo un
+// donativo cambia vidas). Se usa en Apoyo Voluntario y en Historias DCUATES.
+function BotonEjemploChuy({ onCerrar, color = "naranja" }) {
+  // "verde" = verde oscuro con letras amarillas (resalta junto a los
+  // botones naranja); "naranja" = el naranja de siempre.
+  const estilo = color === "verde"
+    ? "bg-[#0f2d1e] hover:bg-emerald-900 border-yellow-400"
+    : "bg-[#e65100] hover:bg-[#bf360c] border-[#0f2d1e]";
+  const letra = color === "verde" ? "text-yellow-300" : "text-white";
+  return (
+    <button
+      type="button"
+      onClick={() => { onCerrar(); setTimeout(() => irASeccion("chuy-video"), 80); }}
+      className={`w-full text-left rounded-xl border-2 ${estilo} p-3 shadow-md transition-colors flex items-center justify-between gap-3`}
+    >
+      <p className={`text-sm sm:text-base font-black ${letra} uppercase tracking-tight leading-tight`}>
+        Donativos y apoyos que cambian vidas: un gran ejemplo
+      </p>
+      <FlechaBlanca />
+    </button>
+  );
+}
+
+function ContenidoModalProyecto({ id, onCerrar }) {
+  // Se llama siempre, sin importar el "id", para respetar las reglas de
+  // React sobre hooks. Las galerías de Noticias y Bienestar ahora se
+  // alimentan de las columnas GALCULTURA y GALSALUD de la tabla ENLACES;
+  // si vienen vacías, cada una usa su arreglo de ejemplo como respaldo.
+  const filasEnlaces = useFilasEnlaces();
+  const itemsNoticias = (() => {
+    const desdeBaserow = galeriaDesdeColumna(filasEnlaces, "GALCULTURA", 12, "Actividad");
+    return desdeBaserow.length > 0 ? desdeBaserow : NOTICIAS_GALERIA_ITEMS;
+  })();
+  const itemsBienestar = (() => {
+    const desdeBaserow = galeriaDesdeColumna(filasEnlaces, "GALSALUD", 12, "Actividad");
+    return desdeBaserow.length > 0 ? desdeBaserow : BIENESTAR_GALERIA_ITEMS;
+  })();
+
+  // Caso especial 1: Ventas con Causa — muestra el catálogo en vivo.
+  if (id === "ventas-con-causa") {
+    return (
+      <div className="space-y-4">
+        <span className="inline-block rounded-full bg-emerald-200 px-4 py-1.5 text-sm font-black uppercase tracking-wider text-emerald-800">
+          🛍️ Ventas con Causa
+        </span>
+        <h3 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#0f2d1e]">
+          Productos y servicios que apoyan a la comunidad
+        </h3>
+        <p className="text-sm text-slate-600 font-medium leading-relaxed">
+          Explora el catálogo, cuéntanos qué te interesa o qué buscas, y te contactamos directo por WhatsApp.
+        </p>
+        <ul className="space-y-2">
+          {["Productos y servicios locales", "Catálogo siempre actualizado", "Contacto directo por WhatsApp"].map((punto, i) => (
+            <li key={i} className="flex items-center gap-2 text-sm font-bold text-slate-700 uppercase">
+              <span className="h-2 w-2 rounded-full bg-[#00c853] flex-shrink-0" />
+              {punto}
+            </li>
+          ))}
+        </ul>
+        <PasarelaVentasConCausa />
+        <p className="text-center text-xs font-bold text-emerald-800">
+          <a href={BASEROW_GALLERY_URL} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-900">
+            Ver catálogo completo
+          </a>
+        </p>
+        <div className="space-y-2 pt-1">
+          <button
+            type="button"
+            onClick={() => {
+              onCerrar();
+              irASeccion("publicidad");
+            }}
+            className="w-full text-left rounded-xl border-2 border-[#0f2d1e] bg-[#e65100] hover:bg-[#bf360c] p-3 shadow-sm transition-colors flex items-center justify-between gap-3"
+          >
+            <p className="text-sm sm:text-base font-black text-white uppercase tracking-tight leading-tight">
+              Publicar mi Producto o Servicio
+            </p>
+            <FlechaBlanca />
+          </button>
+          <a
+            href={enlaceWhatsApp("¡Hola DCUATES! Me interesa un producto o servicio de Ventas con Causa, su código es: ")}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full text-left rounded-xl border-2 border-[#0f2d1e] bg-[#e65100] hover:bg-[#bf360c] p-3 shadow-sm transition-colors flex items-center justify-between gap-3"
+          >
+            <p className="text-sm sm:text-base font-black text-white uppercase tracking-tight leading-tight">
+              Si Te Interesa Algo, Envía su Código Aquí
+            </p>
+            <FlechaBlanca />
+          </a>
+        </div>
+      </div>
+    );
+  }
+
+  // Caso especial 2: Apoyo Voluntario / donaciones — muestra las 4 formas de aportar.
+  if (id === "donaciones") {
+    return (
+      <div className="space-y-4">
+        <span className="inline-block rounded-full bg-emerald-200 px-4 py-1.5 text-sm font-black uppercase tracking-wider text-emerald-800">
+          🟢 Apoyo Voluntario
+        </span>
+        <h3 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#0f2d1e]">
+          Tu aportación impulsa a la comunidad
+        </h3>
+        <p className="text-sm text-slate-600 font-medium leading-relaxed">
+          Elige la forma de aportación que prefieras — todas te conectan directo por WhatsApp.
+        </p>
+        <ul className="space-y-2">
+          {["Económica, en especie o trueque", "Labor voluntaria", "Total transparencia"].map((punto, i) => (
+            <li key={i} className="flex items-center gap-2 text-sm font-bold text-slate-700 uppercase">
+              <span className="h-2 w-2 rounded-full bg-[#00c853] flex-shrink-0" />
+              {punto}
+            </li>
+          ))}
+        </ul>
+        <div className="space-y-2">
+          {OPCIONES_APORTACION.map((opc) => (
+            <a
+              key={opc.t}
+              href={enlaceWhatsApp(opc.m)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full text-left rounded-xl border-2 border-[#0f2d1e] bg-[#e65100] hover:bg-[#bf360c] p-3 shadow-sm transition-colors block"
+            >
+              <div className="flex justify-between items-center gap-3">
+                <div>
+                  <p className="text-sm sm:text-base font-black text-white uppercase tracking-tight leading-tight">{opc.t}</p>
+                  <p className="text-xs font-bold text-[#0f2d1e]/90 leading-snug pt-0.5">{opc.d}</p>
+                </div>
+                <svg
+                  viewBox="0 0 100 60"
+                  preserveAspectRatio="none"
+                  className="w-6 h-6 sm:w-8 sm:h-8 shrink-0 opacity-90 drop-shadow"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path d="M4 22 H58 V4 L96 30 L58 56 V38 H4 Z" fill="#ffffff" stroke="#0f2d1e" strokeWidth="6" strokeLinejoin="round" />
+                </svg>
+              </div>
+            </a>
+          ))}
+        </div>
+        <BotonEjemploChuy onCerrar={onCerrar} color="verde" />
+      </div>
+    );
+  }
+
+  // Caso especial 3: los 3 botones nuevos (Historias, Cupones/Promos,
+  // Patrocinadores/Alianzas) — mismo formato: título, puntos y su carrusel.
+  const CAJAS_NARANJAS_NUEVAS = {
+    "historias-dcuates": { titulo: "Historias DCUATES", puntos: ["Testimonios reales", "Historias con causa", "Inspiración comunitaria"], items: HISTORIAS_DCUATES_ITEMS },
+    "cupones-promos": { titulo: "Cupones, Promos y Más", puntos: ["Descuentos exclusivos", "Promociones locales", "Se actualiza cada mes"], items: CUPONES_PROMOS_ITEMS },
+    "patrocinadores-alianzas": { titulo: "Patrocinadores y Alianzas DCUATES", puntos: ["Negocios aliados", "Organizaciones que apoyan", "¡Gracias por sumar!"], items: PATROCINADORES_ALIANZAS_ITEMS }
+  };
+  if (CAJAS_NARANJAS_NUEVAS[id]) {
+    const caja = CAJAS_NARANJAS_NUEVAS[id];
+    return (
+      <div className="space-y-4">
+        <h3 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#0f2d1e]">
+          {caja.titulo}
+        </h3>
+        <ul className="space-y-2">
+          {caja.puntos.map((punto, i) => (
+            <li key={i} className="flex items-center gap-2 text-sm font-bold text-slate-700 uppercase">
+              <span className="h-2 w-2 rounded-full bg-[#00c853] flex-shrink-0" />
+              {punto}
+            </li>
+          ))}
+        </ul>
+        <Carrusel
+          items={caja.items}
+          renderItem={(item) => <TarjetaCarrusel item={item} etiqueta={item.tipo} />}
+        />
+        {id === "historias-dcuates" && <BotonEjemploChuy onCerrar={onCerrar} />}
+      </div>
+    );
+  }
+
+  // Casos normales: busca el proyecto entre los 10 que ya tienen tarjeta.
+  const proyecto = TODOS_LOS_PROYECTOS.find((p) => p.id === id);
+  if (!proyecto) return null;
+  const galeria = id === "noticias"
+    ? { titulo: GALERIAS_PROYECTOS.noticias.titulo, items: itemsNoticias }
+    : id === "bienestar"
+    ? { titulo: GALERIAS_PROYECTOS.bienestar.titulo, items: itemsBienestar }
+    : null;
+
+  return (
+    <div className="space-y-4">
+      <p className="text-xs sm:text-sm font-black uppercase text-amber-700 tracking-wider">
+        {proyecto.categoria}
+      </p>
+      <h3 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#0f2d1e] -mt-2">
+        {proyecto.titulo}
+      </h3>
+      <p className="text-sm text-slate-600 leading-relaxed font-medium">
+        {proyecto.descripcion}
+      </p>
+      <ul className="space-y-2">
+        {proyecto.puntos.map((punto, i) => (
+          <li key={i} className="flex items-center gap-2 text-sm font-bold text-slate-700 uppercase">
+            <span className="h-2 w-2 rounded-full bg-[#00c853] flex-shrink-0" />
+            {punto}
+          </li>
+        ))}
+      </ul>
+
+      {galeria && (
+        <div className="pt-1 space-y-3">
+          <Carrusel
+            items={galeria.items}
+            renderItem={(item) => <TarjetaCarrusel item={item} etiqueta={item.tipo} />}
+          />
+          <a
+            href="https://whatsapp.com/channel/0029VbDaZp0HltYE5xSajU36"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full text-left rounded-xl border-2 border-[#0f2d1e] bg-[#e65100] hover:bg-[#bf360c] p-3 shadow-sm transition-colors flex items-center justify-between gap-3"
+          >
+            <p className="text-sm sm:text-base font-black text-white uppercase tracking-tight leading-tight">
+              Ver Más Actividades
+            </p>
+            <FlechaBlanca />
+          </a>
+          <a
+            href={proyecto.enlaceDirectoWA}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full text-left rounded-xl border-2 border-[#0f2d1e] bg-[#e65100] hover:bg-[#bf360c] p-3 shadow-sm transition-colors flex items-center justify-between gap-3"
+          >
+            <p className="text-sm sm:text-base font-black text-white uppercase tracking-tight leading-tight">
+              Envíanos tus Recomendaciones
+            </p>
+            <FlechaBlanca />
+          </a>
+        </div>
+      )}
+
+      {!galeria && (
+        <div className="pt-1 space-y-2">
+          {proyecto.scrollDestino ? (
+            <BotonModal
+              onClick={() => {
+                onCerrar();
+                irASeccion(proyecto.scrollDestino);
+              }}
+            >
+              {proyecto.textoBoton}
+            </BotonModal>
+          ) : (
+            <BotonModal href={proyecto.enlaceDirectoWA}>{proyecto.textoBoton}</BotonModal>
+          )}
+          {proyecto.segundoBoton && (
+            proyecto.segundoBoton.claveAcceso ? (
+              <BotonModalProtegido href={proyecto.segundoBoton.enlace} clave={proyecto.segundoBoton.claveAcceso}>
+                {proyecto.segundoBoton.titulo}
+              </BotonModalProtegido>
+            ) : (
+              <BotonModal href={proyecto.segundoBoton.enlace}>{proyecto.segundoBoton.titulo}</BotonModal>
+            )
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// =========================================================================
+// 5. SUBCOMPONENTE: BARRA TICKER INFERIOR (negocios / mascotas / avisos / momentos)
+// =========================================================================
+// Una sola fila del ticker — recibe el arreglo de items a mostrar y su
+// propio índice (así el mismo componente sirve tanto para el ticker
+// superior de frases, como para el/los ticker(s) inferior(es) de negocios).
+function FilaTicker({ items, index, onClose, mostrarCerrar }) {
+  const item = items[index];
+  const etiqueta = TICKER_ETIQUETAS[item.tipo];
+  const esExterno = item.enlace && item.enlace.startsWith("http");
+
+  return (
+    <div className="mx-auto max-w-6xl flex items-center gap-2 sm:gap-4 px-3 sm:px-4 py-1.5">
+
+      <span className="hidden sm:flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-emerald-300 shrink-0 border-r border-emerald-700/50 pr-3">
+        <span>{etiqueta.emoji}</span> {etiqueta.label}
+      </span>
+
+      <a
+        key={index}
+        href={item.enlace || "#"}
+        target={esExterno ? "_blank" : undefined}
+        rel={esExterno ? "noopener noreferrer" : undefined}
+        className="flex-1 flex items-center gap-3 text-white overflow-hidden min-w-0"
+      >
+        <span className="sm:hidden text-lg shrink-0">{etiqueta.emoji}</span>
+        {item.img && (
+          <img
+            src={item.img}
+            alt=""
+            loading="lazy"
+            className="h-8 w-8 sm:h-9 sm:w-9 rounded-lg object-cover shrink-0 border border-white/20"
+            onError={(e) => { e.target.style.display = 'none'; }}
+          />
+        )}
+        <span className="text-xs sm:text-sm font-bold truncate">
+          {item.texto || item.nombre}
+        </span>
+      </a>
+
+      <div className="hidden sm:flex items-center gap-1 shrink-0">
+        {items.map((_, i) => (
+          <span
+            key={i}
+            className={`h-1.5 w-1.5 rounded-full transition-colors ${i === index ? "bg-emerald-300" : "bg-emerald-700/60"}`}
+          />
+        ))}
+      </div>
+
+      {mostrarCerrar && (
+        <button
+          onClick={onClose}
+          className="text-white/50 hover:text-white text-xl leading-none shrink-0 pl-1"
+          title="Cerrar barra"
+        >
+          ×
+        </button>
+      )}
+    </div>
+  );
+}
+
+// Barra de Logros y Resultados — se coloca en el encabezado, debajo de la
+// barra de frases motivacionales (TickerFrases). Casi el doble de alta que
+// un renglón normal de ticker, para que los resultados/impacto de los
+// proyectos (transparencia y utilidad del programa) resalten más. Antes
+// esta información vivía como la "segunda fila" de la barra inferior fija
+// (BarraTicker) — se movió aquí y se le cambió el contenido a logros.
+function BarraLogros() {
+  const [index, setIndex] = useState(0);
+
+  const filasEnlaces = useFilasEnlaces();
+  const logrosBaserow = paresBaserow(filasEnlaces, "NOMBRE LOGROS", "ENLACE LOGROS", 20);
+  const itemsLogros = logrosBaserow.length > 0 ? logrosBaserow : LOGROS_ITEMS;
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setIndex((i) => (i + 1) % itemsLogros.length);
+    }, 5000);
+    return () => clearInterval(id);
+  }, [itemsLogros.length]);
+
+  const item = itemsLogros[index];
+  const esExterno = item.enlace && item.enlace.startsWith("http");
+
+  return (
+    <div className="bg-[#0f2d1e] border-b-2 border-emerald-700/50">
+      <a
+        key={index}
+        href={item.enlace || "#"}
+        target={esExterno ? "_blank" : undefined}
+        rel={esExterno ? "noopener noreferrer" : undefined}
+        className="mx-auto max-w-6xl flex items-center gap-3 sm:gap-4 px-3 sm:px-4 py-3 sm:py-4"
+      >
+        <span className="hidden sm:flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-amber-300 shrink-0 border-r border-emerald-700/50 pr-4">
+          🏆 Logros DCUATES
+        </span>
+        <span className="text-sm sm:text-base font-bold text-white flex-1 min-w-0 truncate">
+          {item.texto || item.nombre}
+        </span>
+        <div className="hidden sm:flex items-center gap-1 shrink-0">
+          {itemsLogros.map((_, i) => (
+            <span
+              key={i}
+              className={`h-1.5 w-1.5 rounded-full transition-colors ${i === index ? "bg-amber-300" : "bg-emerald-700/60"}`}
+            />
+          ))}
+        </div>
+      </a>
+    </div>
+  );
+}
+
+// Ticker SUPERIOR — frases de solidaridad y llamados a sumarse. No es fijo
+// (queda fijo junto con el encabezado, dentro del mismo contenedor "sticky"
+// en el render principal): vive pegado debajo de él, visible siempre.
+function TickerFrases() {
+  const [index, setIndex] = useState(0);
+  const [visible, setVisible] = useState(true);
+
+  // Frases desde Baserow (sin tocar código): crea en la tabla ENLACES 2
+  // columnas de texto — "FRASE TICKER" y "ENLACE FRASE TICKER" — una fila
+  // por frase. En cuanto haya al menos una fila con esas 2 columnas
+  // llenas, sustituyen a las frases de ejemplo de abajo.
+  const filasEnlaces = useFilasEnlaces();
+  const frasesBaserow = paresBaserow(filasEnlaces, "FRASE TICKER", "ENLACE FRASE TICKER", 20).map((f) => ({
+    tipo: "frase",
+    texto: f.nombre,
+    enlace: f.enlace
+  }));
+  const itemsFrases = frasesBaserow.length > 0 ? frasesBaserow : TICKER_FRASES;
+
+  useEffect(() => {
+    if (!visible) return;
+    const id = setInterval(() => {
+      setIndex((i) => (i + 1) % itemsFrases.length);
+    }, 5000);
+    return () => clearInterval(id);
+  }, [visible, itemsFrases.length]);
+
+  if (!visible) return null;
+
+  return (
+    <div className="bg-[#0f2d1e] border-b-2 border-emerald-700/50">
+      <FilaTicker items={itemsFrases} index={index} onClose={() => setVisible(false)} mostrarCerrar={true} />
+    </div>
+  );
+}
+
+// Ticker INFERIOR fijo — anuncios de negocios, productos y servicios,
+// mascotas y avisos comunitarios. Dos filas simultáneas que rotan de forma
+// independiente (desfasadas a la mitad del arreglo) para mostrar el doble
+// de contenido sin esperar tanto tiempo entre anuncios.
+// Barra de patrocinadores/aliados — una tira ancha y deslizable de
+// imágenes reducidas; al tocar una se amplía en una ventana flotante
+// (mismo patrón que la barra de videos). Se alimenta de 3 columnas en la
+// tabla ENLACES de Baserow: "PATROCINADORES" (Archivo/Adjunto — la
+// imagen), "NOMBRE PATROCINADORES" (texto) y "ENLACE PATROCINADORES"
+// (texto, opcional). Si "ENLACE PATROCINADORES" es una liga de YouTube, al
+// tocar la miniatura se abre el video en grande (igual que en la barra de
+// videos); si es cualquier otra liga (una web, un PDF, un documento), se
+// abre en una pestaña nueva; si no hay ninguna liga, solo se amplía la
+// imagen. No aparece nada en la página si todavía no hay ninguna fila con
+// imagen en "PATROCINADORES".
+function BarraPatrocinadores() {
+  const filasEnlaces = useFilasEnlaces();
+  const [imagenEnGrande, setImagenEnGrande] = useState(null);
+  const [videoEnGrande, setVideoEnGrande] = useState(null);
+  const [pdfEnGrande, setPdfEnGrande] = useState(null);
+
+  const items = filasEnlaces
+    .map((f) => ({
+      img: f && urlDesdeCeldaBaserow(f["PATROCINADORES"]),
+      nombre: (f && f["NOMBRE PATROCINADORES"]) || "",
+      enlace: (f && f["ENLACE PATROCINADORES"]) || ""
+    }))
+    .filter((it) => it.img)
+    .slice(0, 20);
+
+  const { scrollRef, onPointerDown } = useCarruselAutomatico(items.length);
+
+  if (items.length === 0) return null;
+
+  const alTocar = (item) => {
+    const video = item.enlace ? detectarVideo(item.enlace) : null;
+    if (video) {
+      setVideoEnGrande(video);
+    } else if (item.enlace && esPDF(item.enlace)) {
+      setPdfEnGrande(item.enlace);
+    } else if (item.enlace && item.enlace.startsWith("http")) {
+      window.open(item.enlace, "_blank", "noopener,noreferrer");
+    } else {
+      setImagenEnGrande(item.img);
+    }
+  };
+
+  return (
+    <div className="bg-[#17472d] py-5 px-4 border-t-4 border-b-4 border-[#0f2d1e]">
+      <div className="mx-auto max-w-6xl">
+        <p className="text-emerald-300 font-black uppercase text-lg sm:text-2xl tracking-wide text-center mb-3 px-2 leading-snug">
+          Muchas gracias a nuestros Patrocinadores y Amigos por su valiosa confianza y apoyo ⭐⭐⭐⭐⭐
+        </p>
+        <div
+          ref={scrollRef}
+          onPointerDown={onPointerDown}
+          className="flex items-center gap-3 overflow-x-auto pb-2 px-1 snap-x snap-mandatory"
+        >
+          {items.map((item, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => alTocar(item)}
+              className="shrink-0 snap-start w-32 sm:w-40 group"
+              title={item.nombre || "Ver más grande"}
+            >
+              <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-xl overflow-hidden border-2 border-white/10 group-hover:border-[#e65100] transition-colors bg-black/20">
+                <img
+                  src={item.img}
+                  alt={item.nombre}
+                  loading="lazy"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                  onError={(e) => { e.target.style.display = 'none'; }}
+                />
+              </div>
+              {item.nombre && (
+                <p className="text-white text-[10px] font-bold text-center mt-1 truncate">{item.nombre}</p>
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {imagenEnGrande && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 backdrop-blur-sm"
+          onClick={() => setImagenEnGrande(null)}
+        >
+          <div className="relative max-w-3xl w-full" onClick={(e) => e.stopPropagation()}>
+            <img src={imagenEnGrande} alt="" className="w-full h-auto rounded-2xl border-4 border-white/20 shadow-2xl" />
+          
+            <div className="mt-3 flex justify-end">
+              <BotonCerrar claro onClick={() => setImagenEnGrande(null)} label="Cerrar imagen" />
+            </div>
+</div>
+        </div>
+      )}
+
+      {videoEnGrande && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 backdrop-blur-sm"
+          onClick={() => setVideoEnGrande(null)}
+        >
+          <div className="relative w-full max-w-3xl" onClick={(e) => e.stopPropagation()}>
+            <div className="rounded-2xl overflow-hidden border-4 border-white/20 shadow-2xl aspect-video bg-black">
+              <IframeVideo video={videoEnGrande} className="w-full h-full" />
+            </div>
+          
+            <div className="mt-3 flex justify-end">
+              <BotonCerrar claro onClick={() => setVideoEnGrande(null)} label="Cerrar video" />
+            </div>
+</div>
+        </div>
+      )}
+
+      {pdfEnGrande && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 backdrop-blur-sm"
+          onClick={() => setPdfEnGrande(null)}
+        >
+          <div className="relative w-full max-w-3xl h-[80vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+            <div className="w-full flex-1 min-h-0 rounded-2xl overflow-hidden border-4 border-white/20 shadow-2xl bg-white">
+              <iframe src={pdfEnGrande} title="Documento PDF" className="w-full h-full" />
+            </div>
+            <a
+              href={pdfEnGrande}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="absolute -bottom-8 left-0 text-white text-xs font-bold underline underline-offset-2 hover:text-[#e65100]"
+            >
+              Abrir en pestaña nueva
+            </a>
+          
+            <div className="mt-3 flex justify-end">
+              <BotonCerrar claro onClick={() => setPdfEnGrande(null)} label="Cerrar documento" />
+            </div>
+</div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function BarraTicker() {
+  const [index, setIndex] = useState(0);
+  const [visible, setVisible] = useState(true);
+
+  // Anuncios desde Baserow (sin tocar código): crea en la tabla ENLACES 2
+  // columnas de texto — "NOMBRE TICKER" y "ENLACE TICKER" — una fila por
+  // anuncio. En cuanto haya al menos una fila con esas 2 columnas llenas,
+  // sustituyen automáticamente a los anuncios de ejemplo de abajo.
+  const filasEnlaces = useFilasEnlaces();
+  const tickerBaserow = paresBaserow(filasEnlaces, "NOMBRE TICKER", "ENLACE TICKER", 20).map((t) => ({
+    tipo: "aviso",
+    texto: t.nombre,
+    enlace: t.enlace
+  }));
+  const itemsTicker = tickerBaserow.length > 0 ? tickerBaserow : TICKER_ITEMS;
+
+  useEffect(() => {
+    if (!visible) return;
+    const id = setInterval(() => {
+      setIndex((i) => (i + 1) % itemsTicker.length);
+    }, 4500);
+    return () => clearInterval(id);
+  }, [visible, itemsTicker.length]);
+
+  // Publica el alto real de esta barra (--alto-ticker) para que los botones
+  // flotantes queden justo encima, sin importar el dispositivo.
+  const barraRef = useRef(null);
+  useLayoutEffect(() => {
+    const raiz = document.documentElement;
+    if (!visible || !barraRef.current) { raiz.style.setProperty("--alto-ticker", "0px"); return; }
+    const medir = () => raiz.style.setProperty("--alto-ticker", `${Math.round(barraRef.current.getBoundingClientRect().height)}px`);
+    medir();
+    let ro;
+    if (typeof ResizeObserver !== "undefined") { ro = new ResizeObserver(medir); ro.observe(barraRef.current); }
+    window.addEventListener("resize", medir);
+    return () => { ro?.disconnect(); window.removeEventListener("resize", medir); };
+  }, [visible, itemsTicker.length]);
+
+  if (!visible) return null;
+
+  return (
+    <div ref={barraRef} className="fixed bottom-0 inset-x-0 z-40 bg-[#17472d] border-t-2 border-emerald-700/50 shadow-[0_-4px_12px_rgba(0,0,0,0.25)]">
+      <FilaTicker items={itemsTicker} index={index} onClose={() => setVisible(false)} mostrarCerrar={true} />
+    </div>
+  );
+}
