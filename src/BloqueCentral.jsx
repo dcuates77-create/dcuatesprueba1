@@ -128,7 +128,7 @@ function MapaLocal({ url, color }) {
   }, [activo]);
 
   return (
-    <div className="bc-map">
+    <div className="bc-map" id="mapa-local">
       <iframe src={url} title="Mapa de negocios locales DCUATES" loading="lazy" referrerPolicy="strict-origin-when-cross-origin" />
       <BotonCompartir variante="flotante" className="bc-map-share" hash="mapa-negocios" titulo="Mapa de negocios locales" texto="Descubre los comercios aliados de Jardines de Morelos" />
       {tactil && !activo && (
@@ -593,7 +593,7 @@ export default function BloqueCentral({
 
           <div className="bc-nav">
             <button type="button" disabled={idx === 0} onClick={() => cambiar(idx - 1)}>‹ {idx > 0 ? TABS[idx - 1].label : "Anterior"}</button>
-            <button type="button" disabled={idx === TABS.length - 1} onClick={() => cambiar(idx + 1)}>{idx < TABS.length - 1 ? TABS[idx + 1].label : "Siguiente"} ›</button>
+            <button type="button" onClick={() => cambiar(idx < TABS.length - 1 ? idx + 1 : 0)}>{idx < TABS.length - 1 ? TABS[idx + 1].label : "Volver a " + TABS[0].label + " (inicio)"} {idx < TABS.length - 1 ? "›" : "↺"}</button>
           </div>
         </div>
       </div>

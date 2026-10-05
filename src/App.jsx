@@ -5,7 +5,7 @@ import { iniciarAnalitica, registrar } from "./analitica";
 import { iniciarPWA } from "./pwa";
 
 // =========================================================================
-// 1. CONFIGURACIÓN CENTRALIZADA DE VARIABLES, REDES Y HOJA DE CÁLCULO y BORRADO DE TODOS LOS ANTERIORES JSX CAMBIOS VIDEOS  test 3 actualizacion página
+// 1. CONFIGURACIÓN CENTRALIZADA DE VARIABLES, REDES Y HOJA DE CÁLCULO y BORRADO DE TODOS LOS ANTERIORES JSX CAMBIOS VIDEOS
 // =========================================================================
 const GOOGLE_SHEETS_URL = "https://script.google.com/macros/s/AKfycbxngMxuH03w0rI7AyJHRap9QCVf_Xs5roypGXnnkSGr_22SyfxWAVAiH614r1eGC2DW2g/exec";
 
@@ -29,7 +29,7 @@ const CLAVE_CIRCULO_CONFIANZA = "confianza2026";
 // iframe); no hace falta tocar nada más en el código.
 // Sello de versión: se ve en pequeño al final de los accesos rápidos y en la
 // consola del navegador. Sirve para comprobar que el celular ya cargó lo último.
-const VERSION_BUILD = "CLON8 · f13";
+const VERSION_BUILD = "CLON8 · f15";
 if (typeof console !== "undefined") console.info("[DCUATES] versión", VERSION_BUILD);
 
 const MAPA_NEGOCIOS_EMBED_URL = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15034.541076557625!2d-99.00223799999999!3d19.600120500000003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1ee234c038987%3A0x4b578513910d8103!2sJardines%20de%20Morelos%2C%20Ecatepec%20de%20Morelos%2C%20M%C3%A9x.!5e0!3m2!1ses!2smx!4v1790129394750!5m2!1ses!2smx";
@@ -112,6 +112,13 @@ function enlaceWhatsApp(mensaje) {
 // misma página (usada por los botones que en vez de abrir WhatsApp llevan
 // directo a un formulario, ej. "Publicar mi negocio" o "Extraviados y Adopciones").
 function irASeccion(id) {
+  // El mapa vive dentro de la pestaña NEGOCIOS: aunque el contenedor exista
+  // siempre, hay que abrir esa pestaña primero y luego bajar hasta el mapa.
+  if (id === "mapa-negocios") {
+    window.dispatchEvent(new CustomEvent("dcuates:abrir-seccion", { detail: id }));
+    setTimeout(() => (document.getElementById("mapa-local") || document.getElementById(id))?.scrollIntoView({ behavior: "smooth", block: "start" }), 350);
+    return;
+  }
   const el = document.getElementById(id);
   if (el) {
     el.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -188,8 +195,8 @@ const INICIATIVAS_PRINCIPALES = [
     titulo: "LA BIBLIOBICI Y AMIGOS",
     descripcion: "Préstamo gratuito de libros y materiales educativos para el desarrollo personal y social. La lectura que llega hasta tu colonia para fortalecer a la COMUNIDAD.",
     puntos: ["Préstamo sin costo", "Materiales para todas las edades", "Recibimos y hacemos donaciones"],
-    textoBoton: "Quiero participar",
-    enlaceDirectoWA: enlaceWhatsApp("¡Hola DCUATES! Me interesa participar en el proyecto de La Bibliobici y Amigos."),
+    textoBoton: "NECESITO UN MATERIAL / QUIERO COLABORAR",
+    enlaceDirectoWA: enlaceWhatsApp("¡Hola DCUATES! Necesito un material o quiero colaborar con el proyecto de La Bibliobici y Amigos."),
     segundoBoton: {
       titulo: "Ver Libros y Materiales en Préstamo, Trueque, Donación y Más...",
       enlace: "https://whatsapp.com/channel/0029VbE8Mri4Crfe0r8cuj2n"
@@ -477,7 +484,9 @@ const LOGOS_EXTRA_MODAL = {
 // una acción especial (igual que en NAV_LINKS_MAS): FAQ y Sugerencias.
 const MAPA_SITIO_EXTRA = [
   { t: "PREGUNTAS FRECUENTES", accion: "faq", emoji: "❓" },
-  { t: "SUGERENCIAS Y QUEJAS", accion: "sugerencias", emoji: "💬" }
+  { t: "SUGERENCIAS Y QUEJAS", accion: "sugerencias", emoji: "💬" },
+  { t: "AVISO DE SEGURIDAD", accion: "seguridad", emoji: "⚠️" },
+  { t: "ESCUDO DE SEGURIDAD", accion: "escudo", emoji: "🛡️" }
 ];
 
 // Portada simplificada: en vez de los 12 botones de proyecto, se muestran
@@ -967,10 +976,14 @@ function BotonesRetosRegalos({ indices }) {
 export default function App() {
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [showTerminos, setShowTerminos] = useState(false);
+  const [showSeguridad, setShowSeguridad] = useState(false);
+  const [showEscudo, setShowEscudo] = useState(false);
   useEffect(() => {
     const alPedir = (e) => {
       if (e.detail === "privacidad") setShowPrivacy(true);
       else if (e.detail === "terminos") setShowTerminos(true);
+      else if (e.detail === "seguridad") setShowSeguridad(true);
+      else if (e.detail === "escudo") setShowEscudo(true);
     };
     window.addEventListener("dcuates:abrir-legal", alPedir);
     return () => window.removeEventListener("dcuates:abrir-legal", alPedir);
@@ -1009,6 +1022,8 @@ export default function App() {
       let id = h.slice(1);
       if (id === "avisos") { window.dispatchEvent(new Event("dcuates:abrir-avisos")); return; }
       if (id === "compartir") { setModalFormulario("comparte"); return; }
+      if (id === "seguridad") { setShowSeguridad(true); return; }
+      if (id === "escudo") { setShowEscudo(true); return; }
       if (id.startsWith("proyecto-")) id = id.slice("proyecto-".length);
       else if (IDS_DE_SECCION.has(id)) return;
       if (BOTONES_PORTADA.some((b) => b.modal === id) || TODOS_LOS_PROYECTOS.some((x) => x.id === id)) setModalProyecto(id);
@@ -1306,6 +1321,8 @@ export default function App() {
           onAbrirFAQ={() => setShowFAQ(true)}
           onAbrirPrivacidad={() => setShowPrivacy(true)}
           onAbrirTerminos={() => setShowTerminos(true)}
+          onAbrirSeguridad={() => setShowSeguridad(true)}
+          onAbrirEscudo={() => setShowEscudo(true)}
           onAbrirProyecto={(id) => setModalProyecto(id)}
           onAbrirSugerencias={() => setModalFormulario("sugerencias")}
           onAbrirMapaSitio={() => setShowMapaSitio(true)}
@@ -1815,7 +1832,8 @@ export default function App() {
               </svg>
             </div>
 
-            <div className="w-full">
+            <div className="w-full relative">
+              <BotonCompartir variante="claro" className="absolute top-2 right-2 z-10" hash="chuy-video" titulo="Video de Chuy, el Sapo Soñador" texto="Conoce la vida y obra de nuestro amigo y maestro de vida" />
               <div className="rounded-2xl overflow-hidden border-4 border-[#0f2d1e] shadow-lg bg-black aspect-[4/3] sm:aspect-[16/10]">
                 <iframe
                   className="w-full h-full"
@@ -2004,7 +2022,8 @@ export default function App() {
           del hero); ahora como barra horizontal de 1-2 videos de alto, con
           scroll lateral para ver más. Sigue tomando sus videos de las
           columnas "NOMBRE VIDPORT" / "VIDPORT" en Baserow. */}
-      <section id="historias-reflexiones" className="scroll-mt-48 md:scroll-mt-36 bg-[#0f2d1e] py-6 px-4 border-b-4 border-[#0f2d1e]">
+      <section id="historias-reflexiones" className="relative scroll-mt-48 md:scroll-mt-36 bg-[#0f2d1e] py-6 px-4 border-b-4 border-[#0f2d1e]">
+        <BotonCompartir variante="claro" className="absolute top-2 right-2 z-10" hash="historias-reflexiones" titulo="Historias y reflexiones que inspiran" texto="Videos y reflexiones de nuestra comunidad" />
         <div className="mx-auto max-w-6xl">
           <p className="text-white font-black uppercase text-xs sm:text-sm tracking-wide mb-2 px-1 text-center">
             Historias y reflexiones DCUATES que INSPIRAN 💡
@@ -2119,6 +2138,18 @@ export default function App() {
           >
             Términos y Condiciones
           </button>
+          <button
+            onClick={() => setShowSeguridad(true)}
+            className="underline underline-offset-4 text-[#b3261e] hover:text-[#7f1d17] bg-transparent border-none cursor-pointer font-black transition-colors"
+          >
+            ⚠️ Aviso de Seguridad
+          </button>
+          <button
+            onClick={() => setShowEscudo(true)}
+            className="underline underline-offset-4 text-[#0b6e5f] hover:text-[#074a40] bg-transparent border-none cursor-pointer font-black transition-colors"
+          >
+            🛡️ Escudo de Seguridad
+          </button>
         </nav>
 
         <p className="text-sm sm:text-base text-[#0f2d1e] pt-4 border-t border-[#0f2d1e]/30 max-w-md sm:max-w-lg mx-auto font-black">
@@ -2153,6 +2184,8 @@ export default function App() {
       {showTerminos && (
         <ModalLegal documento={TERMINOS_CONDICIONES} emoji="📜" degradado="linear-gradient(135deg,#7A5AD8 0%,#1B6F8A 100%)" onCerrar={() => setShowTerminos(false)} />
       )}
+      {showSeguridad && <ModalAvisoSeguridad onCerrar={() => setShowSeguridad(false)} />}
+      {showEscudo && <ModalEscudoSeguridad onCerrar={() => setShowEscudo(false)} />}
 
       {/* MODAL ÚNICO DE PROYECTO — se abre al dar clic en cualquiera de los
           12 botones naranjas de portada. Su contenido lo arma ContenidoModalProyecto. */}
@@ -2305,7 +2338,9 @@ const SECCIONES_BUSCABLES = [
   { t: "Historias y reflexiones DCUATES (videos)", kw: "historias reflexiones videos testimonios inspiracion", id: "historias-reflexiones" },
   { t: "Publicidad Comunitaria (publica tu negocio)", kw: "publicidad publicar negocio servicio anunciar formulario gratis", id: "publicidad" },
   { t: "Ventas con Causa (catálogo)", kw: "ventas causa catalogo productos comprar apartar", id: "ventas-con-causa" },
-  { t: "Mascotas, personas y cosas extraviadas", kw: "extraviados extraviado perdido mascota persona cosa registro adopcion", id: "extraviados-registro" }
+  { t: "Mascotas, personas y cosas extraviadas", kw: "extraviados extraviado perdido mascota persona cosa registro adopcion", id: "extraviados-registro" },
+  { t: "Aviso de Seguridad de la Comunidad", kw: "aviso seguridad fraude estafa suplantacion cuenta clabe pagos reglas encuentros baneo", id: "seguridad" },
+  { t: "Escudo de Seguridad (cómo identificar el espacio seguro)", kw: "escudo seguridad fraude estafa seguro oficial whatsapp identificar proteccion", id: "escudo" }
 ];
 
 function BarraBusqueda({ onAbrirProyecto, onAbrirCategoria, onAbrirFAQ, abierta, setAbierta }) {
@@ -2332,7 +2367,7 @@ function BarraBusqueda({ onAbrirProyecto, onAbrirCategoria, onAbrirFAQ, abierta,
     }));
     SECCIONES_BUSCABLES.forEach((x) => lista.push({
       t: x.t, tipo: "Sección", emoji: "📍", kw: x.kw,
-      accion: () => setTimeout(() => irASeccion(x.id), 60)
+      accion: () => (x.id === "seguridad" || x.id === "escudo") ? abrirLegal(x.id) : setTimeout(() => irASeccion(x.id), 60)
     }));
     return lista.map((it) => ({ ...it, _n: normalizarBusqueda(`${it.t} ${it.kw}`) }));
   }, []);
@@ -2432,7 +2467,7 @@ function BotonCerrar({ onClick, label = "Cerrar", claro = false }) {
   );
 }
 
-function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirTerminos, onAbrirProyecto, onAbrirSugerencias, onAbrirMapaSitio, onAbrirCategoria, busquedaAbierta, setBusquedaAbierta }) {
+function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirTerminos, onAbrirSeguridad, onAbrirEscudo, onAbrirProyecto, onAbrirSugerencias, onAbrirMapaSitio, onAbrirCategoria, busquedaAbierta, setBusquedaAbierta }) {
   const [menuAbierto, setMenuAbierto] = useState(false);
   // Colores alternados del menú (combinan con el verde, el naranja y el azul
   // turquesa que ya usa la página).
@@ -2562,6 +2597,22 @@ function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirTerminos, onAbrirPro
                     >
                       <span className="text-lg leading-none w-6 text-center shrink-0" aria-hidden="true">📜</span>
                       <span style={{ color: COLORES_MENU[(NAV_LINKS_MAS.length + 1) % COLORES_MENU.length] }}>Términos y Condiciones</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { cerrar(); onAbrirSeguridad && onAbrirSeguridad(); }}
+                      className={claseFila}
+                    >
+                      <span className="text-lg leading-none w-6 text-center shrink-0" aria-hidden="true">⚠️</span>
+                      <span style={{ color: "#b3261e" }}>Aviso de Seguridad</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { cerrar(); onAbrirEscudo && onAbrirEscudo(); }}
+                      className={claseFila}
+                    >
+                      <span className="text-lg leading-none w-6 text-center shrink-0" aria-hidden="true">🛡️</span>
+                      <span style={{ color: "#0b6e5f" }}>Escudo de Seguridad</span>
                     </button>
                   </div>
                 </>
@@ -2711,6 +2762,22 @@ function BotonNecesidades({ onAbrirProyecto, onAccionEspecial, onAbrirFAQ }) {
                 >
                   <span aria-hidden="true">❓</span> Preguntas frecuentes
                 </button>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => { cerrarTodo(); abrirLegal("seguridad"); }}
+                    className="flex items-center justify-center gap-1.5 rounded-2xl bg-red-50 hover:bg-red-100 text-[#b3261e] font-black uppercase text-[11px] leading-tight px-2 py-3 border-2 border-red-200 text-center transition-colors"
+                  >
+                    <span aria-hidden="true">⚠️</span> Aviso de Seguridad
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { cerrarTodo(); abrirLegal("escudo"); }}
+                    className="flex items-center justify-center gap-1.5 rounded-2xl bg-teal-50 hover:bg-teal-100 text-[#0b6e5f] font-black uppercase text-[11px] leading-tight px-2 py-3 border-2 border-teal-200 text-center transition-colors"
+                  >
+                    <span aria-hidden="true">🛡️</span> Escudo de Seguridad
+                  </button>
+                </div>
               </div>
             ) : (
               <div className="px-5 pb-2">
@@ -2933,6 +3000,7 @@ function abrirLegal(cual) {
 
 function CasillaAcepto({ ac, id = "acepta_terminos_privacidad" }) {
   return (
+    <>
     <div className={`flex items-start gap-3 rounded-xl border-2 px-3 py-2.5 text-left ${ac.error ? "border-red-500 bg-red-50" : "border-slate-200 bg-slate-50"}`}>
       <input
         type="checkbox"
@@ -2950,6 +3018,161 @@ function CasillaAcepto({ ac, id = "acepta_terminos_privacidad" }) {
         {" "}de la Comunidad.
       </label>
     </div>
+    <button
+      type="button"
+      onClick={() => abrirLegal("escudo")}
+      className="mt-2 w-full flex items-center justify-center gap-2 rounded-xl border-2 border-teal-300 bg-teal-50 hover:bg-teal-100 px-3 py-2 text-[11px] sm:text-xs font-black uppercase text-[#0b6e5f] leading-tight text-center transition-colors"
+    >
+      <span aria-hidden="true">🛡️</span> Escudo de Seguridad: así identificas el espacio seguro de DCUATES
+    </button>
+    </>
+  );
+}
+
+// ----- Aviso de Seguridad (Anexo 1) y Escudo de Seguridad -----
+const DEGRADADO_SEGURIDAD = "linear-gradient(135deg,#b3261e 0%,#e65100 100%)";
+const DEGRADADO_ESCUDO = "linear-gradient(135deg,#0b6e5f 0%,#1B6F8A 100%)";
+const WA_OFICIAL_TXT = "5520696627";
+const WA_OFICIAL_URL = `https://wa.me/${WHATSAPP_NUMERO}`;
+
+function EnlaceWAOficial() {
+  return (
+    <a href={WA_OFICIAL_URL} target="_blank" rel="noopener noreferrer" className="font-black text-[#0b6e5f] underline underline-offset-2">{WA_OFICIAL_TXT}</a>
+  );
+}
+
+function TarjetaSeguridad({ emoji, titulo, color, fondo, children }) {
+  return (
+    <section className="rounded-2xl border-2 p-4" style={{ borderColor: color, background: fondo }}>
+      <h4 className="flex items-start gap-2 text-[15px] sm:text-base font-black uppercase leading-tight mb-2" style={{ color }}>
+        <span className="text-xl leading-none" aria-hidden="true">{emoji}</span>
+        <span>{titulo}</span>
+      </h4>
+      <div className="text-sm text-slate-800 leading-relaxed font-medium space-y-2">{children}</div>
+    </section>
+  );
+}
+
+function ListaSeguridad({ items, color }) {
+  return (
+    <ul className="space-y-1.5">
+      {items.map((it, i) => (
+        <li key={i} className="flex items-start gap-2">
+          <span className="font-black shrink-0" style={{ color }} aria-hidden="true">✔</span>
+          <span>{it}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function ModalAvisoSeguridad({ onCerrar }) {
+  return (
+    <VentanaMarca
+      degradado={DEGRADADO_SEGURIDAD}
+      suave="#fff1ec"
+      emoji="⚠️"
+      titulo="Aviso de Seguridad de la Comunidad"
+      invitacion="En DCUATES la confianza mutua es nuestro activo más valioso. Como plataforma de vinculación independiente, operamos bajo un protocolo de seguridad estricto para blindar tanto la integridad de la plataforma como la seguridad física y económica de todos nuestros miembros. Al interactuar en dcuates.com o mediante nuestros canales, aceptas respetar los siguientes pilares de protección comunitaria:"
+      cierre="¡CUIDARNOS ENTRE TODOS FORTALECE NUESTRA CONFIANZA Y NUESTRO BIENESTAR! 💚"
+      compartir={{ hash: "seguridad", titulo: "Aviso de Seguridad de la Comunidad DCUATES", texto: "Cuidémonos entre todos: conoce los canales oficiales y las reglas de seguridad" }}
+      onCerrar={onCerrar}
+      ancho="max-w-2xl"
+      capa="z-[80]"
+    >
+      <div className="space-y-4 text-left">
+        <TarjetaSeguridad emoji="🔐" titulo="1. Canales oficiales únicos (prevención de suplantación de identidad)" color="#1B6F8A" fondo="#eef7fa">
+          <p>Para evitar fraudes o contacto por parte de terceras personas ajenas al proyecto, se establece que:</p>
+          <ListaSeguridad color="#1B6F8A" items={[
+            <>El único canal digital automatizado de recepción de solicitudes es el portal web <b className="font-black">dcuates.com</b>.</>,
+            <>El único medio de seguimiento y atención personalizada es nuestra línea oficial de WhatsApp: <EnlaceWAOficial />.</>
+          ]} />
+          <p className="font-black text-[#b3261e]">🚨 Cualquier comunicación recibida fuera de estos canales oficiales no pertenece a DCUATES y debe ser reportada inmediatamente por motivos de seguridad.</p>
+        </TarjetaSeguridad>
+
+        <TarjetaSeguridad emoji="💳" titulo="2. Protocolo de Ventas con Causa y aportaciones (cuenta única)" color="#1f7a4d" fondo="#eefaf3">
+          <p>Para garantizar el uso transparente de los recursos y la autosustentabilidad de la cooperativa, todas las transacciones comerciales o de apoyo financiero se rigen bajo las siguientes reglas:</p>
+          <ListaSeguridad color="#1f7a4d" items={[
+            "No manejamos cobradores, gestores ni voluntarios en la calle autorizados para recibir dinero en efectivo.",
+            <>Los pagos correspondientes a nuestras "Ventas con Causa" se realizarán única y exclusivamente mediante transferencia electrónica a la Cuenta CLABE oficial a nombre de: <b className="font-black">Abel Meraz Alvarado</b>.</>,
+            "Jamás solicitaremos números confidenciales de tarjetas de crédito o débito, contraseñas bancarias, ni códigos de verificación vía SMS. Si alguien te pide estos datos a nombre de DCUATES, se trata de un intento de fraude."
+          ]} />
+        </TarjetaSeguridad>
+
+        <TarjetaSeguridad emoji="🤝" titulo="3. Reglas de seguridad física para intercambios comunitarios" color="#c2410c" fondo="#fff4ec">
+          <p>Dado que DCUATES funge como un puente de vinculación vecinal para coordinar apoyos materiales, trueques o transacciones, cada usuario asume la responsabilidad de su propia seguridad física al interactuar con terceros. Es obligatorio seguir estas pautas en cada encuentro presencial:</p>
+          <ListaSeguridad color="#c2410c" items={[
+            "Queda estrictamente prohibido citar a personas desconocidas en domicilios particulares o lugares aislados.",
+            "Las entregas de apoyos materiales, ventas, trueques o reuniones de coordinación deben realizarse siempre en lugares públicos, concurridos y con vigilancia (como plazas comerciales, parques principales, estaciones de transporte público o fuera de oficinas de gobierno) a la luz del día.",
+            "Es requisito indispensable asistir acompañado o, en su defecto, avisar previamente a alguien de confianza sobre con quién te reunirás, la hora y compartir sus datos de localización."
+          ]} />
+        </TarjetaSeguridad>
+
+        <TarjetaSeguridad emoji="📵" titulo="4. Protección e interacciones digitales" color="#6d3fc8" fondo="#f5f0ff">
+          <p>No caigas en trampas ni comprometas tu privacidad. El equipo oficial nunca te solicitará contraseñas, claves bancarias ni códigos de verificación vía SMS, así como tampoco enviará enlaces extraños para validar tus datos o perfil. Los medios y contactos oficiales de comunicación serán estrictamente los citados en el punto 1 de este documento.</p>
+        </TarjetaSeguridad>
+
+        <TarjetaSeguridad emoji="🚫" titulo="5. Política de moderación y baneo definitivo" color="#b3261e" fondo="#fff0ee">
+          <p>Mantenemos una tolerancia cero frente a conductas maliciosas. DCUATES se reserva el derecho de eliminar de forma inmediata de su base de datos (Google Sheets) y bloquear de sus canales de atención a cualquier usuario que:</p>
+          <ListaSeguridad color="#b3261e" items={[
+            "Proporcione datos de contacto falsos, duplicados o inactivos.",
+            "Utilice el chat de vinculación para realizar acoso, amenazas, spam comercial o proselitismo político/religioso.",
+            "Intente utilizar la confianza comunitaria para esquemas de préstamos de dinero, fraudes o actividades ilícitas."
+          ]} />
+        </TarjetaSeguridad>
+
+        <p className="rounded-2xl bg-emerald-50 border-2 border-emerald-200 px-4 py-3 text-sm font-black text-[#0f2d1e] leading-snug text-center">
+          🤲 Ayúdanos a MANTENER SEGURA NUESTRA COMUNIDAD. Si notas algo raro, repórtalo en nuestros canales oficiales y en los medios de prevención y protección correspondientes.
+        </p>
+        <button
+          type="button"
+          onClick={() => { onCerrar(); abrirLegal("escudo"); }}
+          className="w-full flex items-center justify-center gap-2 rounded-2xl bg-teal-50 hover:bg-teal-100 border-2 border-teal-300 px-3 py-2.5 text-xs font-black uppercase text-[#0b6e5f] transition-colors"
+        >
+          <span aria-hidden="true">🛡️</span> Ver el Escudo de Seguridad (resumen rápido)
+        </button>
+        <p className="text-xs font-black text-slate-500">Fecha de última actualización: Octubre de 2026.</p>
+      </div>
+    </VentanaMarca>
+  );
+}
+
+function ModalEscudoSeguridad({ onCerrar }) {
+  return (
+    <VentanaMarca
+      degradado={DEGRADADO_ESCUDO}
+      suave="#e6f6f2"
+      emoji="🛡️"
+      titulo="Escudo de Seguridad"
+      invitacion="¿Cómo identificar el espacio seguro de DCUATES? Ante cualquier intento malintencionado o de fraude... recuerda que la identidad de nuestra comunidad está blindada:"
+      cierre="¡¡¡ CUIDARNOS ENTRE TODOS FORTALECE NUESTRA CONFIANZA Y NUESTRO BIENESTAR !!! 💚"
+      compartir={{ hash: "escudo", titulo: "Escudo de Seguridad DCUATES", texto: "Así identificas el espacio seguro de nuestra comunidad" }}
+      onCerrar={onCerrar}
+      ancho="max-w-xl"
+      capa="z-[80]"
+    >
+      <div className="space-y-4 text-left">
+        <TarjetaSeguridad emoji="1️⃣" titulo="Atención única y cuentas transparentes" color="#1B6F8A" fondo="#eef7fa">
+          <p>Las dudas, registros y solicitudes se atienden únicamente a través de la página oficial <b className="font-black">dcuates.com</b> o mediante nuestro canal único de WhatsApp <EnlaceWAOficial />. Asimismo, todas las aportaciones por ventas con causa se reciben de forma exclusiva a nombre del titular <b className="font-black">Abel Meraz Alvarado</b>.</p>
+        </TarjetaSeguridad>
+        <TarjetaSeguridad emoji="2️⃣" titulo="Ventas y apoyos seguros" color="#c2410c" fondo="#fff4ec">
+          <p>Si coordinas una venta, trueque o apoyo en físico con otro miembro, la regla de oro es reunirse únicamente en <b className="font-black">lugares públicos y concurridos a la luz del día</b>, acudiendo preferentemente acompañado o avisando a alguien de confianza con quién te reunirás y compartiendo sus datos de localización.</p>
+        </TarjetaSeguridad>
+        <TarjetaSeguridad emoji="3️⃣" titulo="Protección e interacciones digitales" color="#6d3fc8" fondo="#f5f0ff">
+          <p>No caigas en trampas ni comprometas tu privacidad. El equipo oficial nunca te solicitará contraseñas, claves bancarias ni códigos de verificación vía SMS, así como tampoco enviará enlaces extraños para validar tus datos o perfil. Los medios y contactos oficiales de comunicación serán los citados en el punto 1.</p>
+        </TarjetaSeguridad>
+        <p className="rounded-2xl bg-emerald-50 border-2 border-emerald-200 px-4 py-3 text-sm font-black text-[#0f2d1e] leading-snug text-center">
+          🤲 Ayúdanos a MANTENER SEGURA NUESTRA COMUNIDAD. Si notas algo raro, repórtalo en nuestros canales oficiales y en los medios de prevención y protección correspondientes.
+        </p>
+        <button
+          type="button"
+          onClick={() => { onCerrar(); abrirLegal("seguridad"); }}
+          className="w-full flex items-center justify-center gap-2 rounded-2xl bg-[#b3261e] hover:bg-[#8f1d17] text-white px-3 py-3 text-xs sm:text-sm font-black uppercase leading-tight text-center shadow-md transition-colors"
+        >
+          <span aria-hidden="true">⚠️</span> Te invitamos a revisar el Aviso de Seguridad completo, para NUESTRA PROTECCIÓN
+        </button>
+      </div>
+    </VentanaMarca>
   );
 }
 
@@ -4210,6 +4433,7 @@ function ModalMapaSitio({ onCerrar, onAbrirProyecto, onAbrirFAQ, onAbrirSugerenc
                 onCerrar();
                 if (btn.accion === "faq") onAbrirFAQ();
                 else if (btn.accion === "sugerencias") onAbrirSugerencias();
+                else if (btn.accion === "seguridad" || btn.accion === "escudo") abrirLegal(btn.accion);
               }}
               className="flex flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-[#0f2d1e] text-[#0f2d1e] hover:bg-[#0f2d1e] hover:text-white shadow-sm transition-colors p-3 text-center font-heading"
             >
