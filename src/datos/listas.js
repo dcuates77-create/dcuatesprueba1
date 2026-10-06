@@ -1,11 +1,7 @@
-// =========================================================================
-// src/datos/listas.js — Listas de proyectos y necesidades que usan componentes
-// =========================================================================
 import React from "react";
 import { CLAVE_CIRCULO_CONFIANZA } from "./proyectos.js";
 import { enlaceWhatsApp } from "../utilidades/baserow.js";
 
-// Arreglo de los 4 Proyectos Iniciales con Enlaces Directos de WhatsApp
 export const INICIATIVAS_PRINCIPALES = [
   {
     id: "libros",
