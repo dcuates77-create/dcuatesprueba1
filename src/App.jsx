@@ -3,105 +3,12 @@ import BloqueCentral from "./BloqueCentral";
 import BotonCompartir from "./BotonCompartir";
 import { iniciarAnalitica, registrar } from "./analitica";
 import { iniciarPWA } from "./pwa";
-
-// =========================================================================
-// 1. CONFIGURACIÓN CENTRALIZADA DE VARIABLES, REDES Y HOJA DE CÁLCULO y BORRADO DE TODOS LOS ANTERIORES JSX CAMBIOS VIDEOS
-// =========================================================================
-const GOOGLE_SHEETS_URL = "https://script.google.com/macros/s/AKfycbxngMxuH03w0rI7AyJHRap9QCVf_Xs5roypGXnnkSGr_22SyfxWAVAiH614r1eGC2DW2g/exec";
-
-// Número de WhatsApp centralizado — cámbialo aquí una sola vez si cambia el teléfono
-const WHATSAPP_NUMERO = "525520696627";
-
-// ID del video de portada en YouTube — reemplaza esto por el ID real de "Chuy el Sapo Soñador"
-// (el ID es lo que va después de "v=" en la URL normal de YouTube)
-const YOUTUBE_VIDEO_ID = "SUnE27QnnyI";
-
-// Clave de acceso del candado que protege el botón "Únete a Nuestra Red de
-// Confianza" dentro de Círculo de Confianza — cámbiala aquí cuando quieras.
-// AVISO: esto NO es seguridad real (cualquiera puede verla si revisa el
-// código fuente de la página), solo filtra visitas casuales.
-const CLAVE_CIRCULO_CONFIANZA = "confianza2026";
-
-// Mapa de negocios locales — embed de Google Maps / My Maps, se muestra
-// debajo de los botones de Historias, Cupones y Patrocinadores. Para
-// agregar, quitar o mover un negocio, edita el mapa directamente en Google
-// Maps/My Maps y pega aquí el nuevo link de "Insertar un mapa" (src del
-// iframe); no hace falta tocar nada más en el código.
-// Sello de versión: se ve en pequeño al final de los accesos rápidos y en la
-// consola del navegador. Sirve para comprobar que el celular ya cargó lo último.
-const VERSION_BUILD = "CLON8 · f16";
+import { GOOGLE_SHEETS_URL, WHATSAPP_NUMERO, YOUTUBE_VIDEO_ID, VERSION_BUILD, MAPA_NEGOCIOS_EMBED_URL, REDES_SOCIALES, NAV_LINKS_MAS, MAPA_SITIO_EXTRA, SECCIONES_BUSCABLES } from "./datos/config.js";
+import { CLAVE_CIRCULO_CONFIANZA, MUSICA_DCUATES_URL, BASEROW_GALLERY_URL, VENTAS_CON_CAUSA_ITEMS, EXTRAVIADOS_ITEMS, BASEROW_TABLE_ID_VENTAS_CON_CAUSA, BASEROW_TABLE_ID_EXTRAVIADOS, BASEROW_TABLE_ID_ENLACES, NOTICIAS_GALERIA_ITEMS, BIENESTAR_GALERIA_ITEMS, HISTORIAS_DCUATES_ITEMS, CUPONES_PROMOS_ITEMS, GALERIAS_PROYECTOS, BOTONES_PORTADA, RESUMEN_PROYECTO, LOGOS_EXTRA_MODAL, CATEGORIAS_PROYECTOS, OPCIONES_APORTACION, QUIENES_SOMOS, MISION_VISION, COMO_SUMAR, INTERESES_BENEFICIOS, normalizarBusqueda, WA_OFICIAL_TXT, WA_OFICIAL_URL, DEGRADADO_AVISOS, DEGRADADO_COMPARTIR, DEGRADADO_SUGERENCIAS, DEGRADADO_DUDAS, EMOJIS_INTERESES, CACHE_ENLACES_MS, TIPOS_DE_APOYO } from "./datos/proyectos.js";
+import { RECOMENDACIONES_ESTRELLA, TICKER_ETIQUETAS, LOGROS_ITEMS, TICKER_FRASES, PATROCINADORES_ALIANZAS_ITEMS } from "./datos/cintas.js";
+import { DATOS_LEGALES, AVISO_PRIVACIDAD_INTEGRAL, TERMINOS_CONDICIONES, AVISO_PRIVACIDAD_PARRAFOS, FAQ_ITEMS } from "./datos/legal.js";
+import { DEGRADADO_SEGURIDAD, DEGRADADO_ESCUDO } from "./datos/seguridad.js";
 if (typeof console !== "undefined") console.info("[DCUATES] versión", VERSION_BUILD);
-
-const MAPA_NEGOCIOS_EMBED_URL = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15034.541076557625!2d-99.00223799999999!3d19.600120500000003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1ee234c038987%3A0x4b578513910d8103!2sJardines%20de%20Morelos%2C%20Ecatepec%20de%20Morelos%2C%20M%C3%A9x.!5e0!3m2!1ses!2smx!4v1790129394750!5m2!1ses!2smx";
-
-// Ventana de Solicitudes — formulario visible directo en la página (no es
-// modal), debajo del mapa de negocios (busca id="solicitudes" más abajo en
-// el archivo). Para dirigir tráfico desde WhatsApp Business a esta sección
-// exacta, comparte el link "dcuates.com/#solicitudes" (o el dominio que
-// uses en cada rama/proyecto) — el navegador baja solo hasta ahí, sin
-// necesitar nada de código extra.
-//
-// CÓMO CONFIGURARLO (nada de esto se toca en código, solo en Google):
-// El formulario es propio (ver FormularioSolicitud más abajo): guarda cada
-// solicitud en Google Sheets (el mismo Apps Script de GOOGLE_SHEETS_URL,
-// con Tipo "Solicitud") y abre WhatsApp con el mensaje ya escrito.
-
-const REDES_SOCIALES = {
-  facebook: "https://www.facebook.com/abelzarem/",
-  instagram: "https://www.instagram.com/conexionesconcausa/",
-  youtube: "http://www.youtube.com/@abelmeraz",
-  tiktok: "https://www.tiktok.com/@dcuates"
-};
-
-// Enlaces del botón "⭐ Recomendaciones" — separados en 2 grupos. Los de
-// "comunidad" son EJEMPLOS, edítalos con los negocios/personas reales que
-// quieras recomendar (de 5 a 10 en total entre los dos grupos).
-const RECOMENDACIONES_ESTRELLA = {
-  dcuates: [
-    { nombre: "Facebook DCUATES", enlace: REDES_SOCIALES.facebook },
-    { nombre: "Instagram DCUATES", enlace: REDES_SOCIALES.instagram },
-    { nombre: "YouTube DCUATES", enlace: REDES_SOCIALES.youtube },
-    { nombre: "TikTok DCUATES", enlace: REDES_SOCIALES.tiktok }
-  ],
-  comunidad: [
-    { nombre: "Panadería Café Sol", enlace: "#" },
-    { nombre: "Taquería El Sol", enlace: "#" },
-    { nombre: "Refugio Animal Ecatepec", enlace: "#" }
-  ]
-};
-
-// Botón "🎵 Escucha Música DCUATES" — pega aquí la ruta de tu archivo de
-// audio (colócalo en /public/audio/, ej. /public/audio/musica-dcuates.mp3).
-// Mientras esté vacío, el botón se muestra pero no reproduce nada.
-const MUSICA_DCUATES_URL = "/audio/musica-dcuates.mp3";
-
-// Barra fija de navegación: una sola fila de accesos directos + un menú
-// "MÁS" con todo lo demás (se despliega hacia abajo). Para agregar/quitar
-// algo del menú "MÁS", edita NAV_LINKS_MAS — no se necesita tocar el
-// componente SiteHeader. Cada elemento de NAV_LINKS_MAS puede ser:
-// - { label, href }   -> enlace normal a una sección de la página
-// - { label, action: "faq" } -> abre la ventana de Preguntas Frecuentes
-// - { label, modal }  -> abre la ventana emergente de ese proyecto (mismo
-//   id que en TODOS_LOS_PROYECTOS)
-const NAV_LINKS_MAS = [
-  { label: "Publicidad Gratuita", emoji: "📣", href: "#publicidad" },
-  { label: "Ventas con Causa", emoji: "🛍️", href: "#ventas-con-causa" },
-  { label: "Alianzas Solidarias", emoji: "🤝", modal: "alianzas-tarjeta" },
-  { label: "Apoyo a Causas", emoji: "❤️", href: "#extraviados-registro" },
-  { label: "Historias que inspiran (videos)", emoji: "🎥", href: "#historias-reflexiones" },
-  { label: "Mapa del Sitio", emoji: "🗺️", action: "mapa-sitio" },
-  { label: "Registra tu Solicitud", emoji: "📝", href: "#solicitudes" },
-  { label: "Préstamo Gratuito de Libros", emoji: "📚", modal: "libros" },
-  { label: "Ecatepets Mascotas", emoji: "🐾", modal: "ecatepets" },
-  { label: "Círculo de Confianza", emoji: "👥", modal: "circulo-confianza" },
-  { label: "Recomienda, Evalúa y Gana", emoji: "⭐", modal: "recomienda-evalua-gana" },
-  { label: "Asesorías Gratuitas", emoji: "🎓", modal: "asesorias" },
-  { label: "Bazar y Comercio", emoji: "🏪", modal: "bazares" },
-  { label: "Noticias de Barrio", emoji: "📰", modal: "noticias" },
-  { label: "Bienestar y Recreación", emoji: "🧘", modal: "bienestar" },
-  { label: "Sugerencias y Quejas", emoji: "💬", action: "sugerencias" },
-  { label: "Preguntas Frecuentes", emoji: "❓", action: "faq" }
-];
 
 // Función helper para armar enlaces directos de WhatsApp de forma consistente
 function enlaceWhatsApp(mensaje) {
@@ -142,49 +49,6 @@ const TICKER_ITEMS = [
   { tipo: "mascota", nombre: "Michi — en adopción, ya vacunada y esterilizada", img: "/images/ticker-mascota-2.png", enlace: "#ecatepets" },
   { tipo: "aviso", texto: "📚 Nueva alianza con la papelería del barrio: 10% para vecinos DCUATES" },
   { tipo: "momento", nombre: "Taller de bienestar comunitario, julio 2026", img: "/images/ticker-momento-2.png", enlace: "#bienestar" }
-];
-
-const TICKER_ETIQUETAS = {
-  negocio: { emoji: "🏪", label: "Negocio Local" },
-  mascota: { emoji: "🐾", label: "Ecatepets" },
-  aviso: { emoji: "📢", label: "Aviso" },
-  momento: { emoji: "📸", label: "Momento DCUATES" },
-  frase: { emoji: "💚", label: "DCUATES" }
-};
-
-// Barra de Logros y Resultados — ejemplos FICTICIOS mientras no haya datos
-// reales; reemplázalos o (mejor) aliméntalos desde Baserow sin tocar
-// código: crea en la tabla ENLACES 2 columnas de texto — "NOMBRE LOGROS" y
-// "ENLACE LOGROS" — una fila por logro. En cuanto haya al menos una fila
-// con esas 2 columnas llenas, sustituyen automáticamente a estos ejemplos
-// (ver BarraLogros más abajo).
-const LOGROS_ITEMS = [
-  { texto: "🤝 Más de 2,000 recomendaciones y conexiones de apoyo", enlace: "#circulo-confianza" },
-  { texto: "📚 Más de 1,000 libros y materiales educativos prestados", enlace: "#libros" },
-  { texto: "🎁 Más de 500 libros y materiales DONADOS POR NUESTRA COMUNIDAD (MUCHAS GRACIAS POR SU VALIOSO APOYO Y CONFIANZA)", enlace: "#donaciones" },
-  { texto: "📘 Más de 200 libros FÍSICOS DONADOS a quienes más los NECESITAN, y más de 2500 COMPARTIDOS EN FORMATO DIGITAL", enlace: "#libros" },
-  { texto: "🎓 Más de 300 asesorías y orientación educativa y laboral gratuitas", enlace: "#asesorias" },
-  { texto: "🐾 Más de 200 adopciones y apoyo a rescate de peluditos", enlace: "#ecatepets" },
-  { texto: "💰 Gestión y fondeo de más de un millón de pesos en apoyos para personas y grupos vulnerables", enlace: "#donaciones" },
-  { texto: "🌱 Formación y desarrollo de talento que genera cadena de valor y de valores", enlace: "#asesorias" },
-  { texto: "🌟 Apoyos y sinergia con quienes también se preocupan por apoyar a nuestra comunidad", enlace: "#iniciativas" },
-  { texto: "📖 Más de 100 reuniones de negocios y tertulias literarias y de sana convivencia", enlace: "#bazares" },
-  { texto: "💻 Más de 500 cursos y talleres digitales para nuestro desarrollo personal y social", enlace: "#bienestar" }
-];
-
-// Ticker SUPERIOR (debajo de la barra fija de menú): frases sobre
-// solidaridad y causas afines, más llamados a la acción para sumarse.
-// Edítalas o agrégalas aquí — cada una puede enlazar a cualquier sección
-// de la página. Si más adelante quieres alimentarlas desde Baserow, se
-// puede conectar igual que las demás pasarelas (crea una tabla con
-// columnas "texto" y "enlace", y pide que se conecte con useCatalogoBaserow).
-const TICKER_FRASES = [
-  { tipo: "frase", texto: "“Nadie es tan rico que no necesite ayuda, ni tan pobre que no pueda ofrecerla.”", enlace: "#quienes-somos" },
-  { tipo: "frase", texto: "“Solos avanzamos más rápido; juntos llegamos más lejos.” — Proverbio africano", enlace: "#donaciones" },
-  { tipo: "frase", texto: "💚 ¿Ya eres parte de la RED DCUATES? Súmate hoy mismo", enlace: "#donaciones" },
-  { tipo: "frase", texto: "“La solidaridad no es un acto de caridad, es un acto de justicia.” — E. Galeano", enlace: "#quienes-somos" },
-  { tipo: "frase", texto: "🤝 Comparte tu talento, tiempo o recursos — cada aportación suma", enlace: "#donaciones" },
-  { tipo: "frase", texto: "“El bien que haces hoy será olvidado mañana. Haz el bien de todos modos.” — Madre Teresa de Calcuta", enlace: "#quienes-somos" }
 ];
 
 // Arreglo de los 4 Proyectos Iniciales con Enlaces Directos de WhatsApp
@@ -310,107 +174,6 @@ const NUEVOS_PROYECTOS_DATA = [
   }
 ];
 
-// Catálogo de "Ventas con Causa". Mientras no esté conectado a Baserow
-// (ver BASEROW_TABLE_ID_VENTAS_CON_CAUSA abajo), el carrusel usa esta
-// lista de EJEMPLO como respaldo. BASEROW_GALLERY_URL se deja como
-// enlace — "ver catálogo completo" — apuntando a tu galería pública real.
-const BASEROW_GALLERY_URL = "https://baserow.io/public/gallery/xCYm1NOc3A5wuJC1NeYlVYyVeY_w7O2tQdNRKcDsiyE";
-
-const VENTAS_CON_CAUSA_ITEMS = [
-  { id: "vc1", tipo: "Artesanías", nombre: "Bordados hechos a mano", descripcion: "Piezas únicas bordadas por manos locales. Pregunta por diseños personalizados.", img: "/images/ventas-causa-1.png" },
-  { id: "vc2", tipo: "Alimentos", nombre: "Pan casero y repostería", descripcion: "Pedidos con un día de anticipación. Ideal para eventos y reuniones.", img: "/images/ventas-causa-2.png" },
-  { id: "vc3", tipo: "Servicios", nombre: "Jardinería a domicilio", descripcion: "Poda, mantenimiento y diseño de jardines. Cotización sin costo.", img: "/images/ventas-causa-3.png" },
-  { id: "vc4", tipo: "Segunda mano", nombre: "Ropa y accesorios", descripcion: "Prendas en buen estado a precios accesibles. Nuevo inventario cada semana.", img: "/images/ventas-causa-4.png" }
-];
-
-const EXTRAVIADOS_ITEMS = [
-  { id: "ex1", tipo: "Mascota", nombre: "Firulais", descripcion: "Perrito café, orejas caídas, visto por última vez cerca de la colonia centro.", img: "/images/extraviado-1.png" },
-  { id: "ex2", tipo: "Persona", nombre: "Sr. Ramírez", descripcion: "Adulto mayor, salió de casa el martes por la tarde y no ha regresado.", img: "/images/extraviado-2.png" },
-  { id: "ex3", tipo: "Cosa", nombre: "Mochila escolar azul", descripcion: "Olvidada en la parada del camión sobre la avenida principal.", img: "/images/extraviado-3.png" },
-  { id: "ex4", tipo: "Mascota", nombre: "Michi", descripcion: "Gata blanca con manchas grises, muy asustadiza, extraviada desde el fin de semana.", img: "/images/extraviado-4.png" }
-];
-
-// =========================================================================
-// CONEXIÓN REAL A BASEROW (segura: el token vive en el servidor, ver
-// /api/baserow-rows.js, nunca en este archivo). Mientras el ID de una
-// tabla esté vacío ("") o la función /api/baserow-rows todavía no
-// responda datos, el carrusel correspondiente sigue mostrando su lista de
-// EJEMPLO de arriba — nada se rompe entretanto.
-//
-// Para activar el catálogo REAL de Ventas con Causa, pega aquí el Table ID
-// de tu tabla en Baserow (instrucciones de cómo encontrarlo, y cómo
-// configurar el token, están en /api/baserow-rows.js).
-const BASEROW_TABLE_ID_VENTAS_CON_CAUSA = "1164149"; // tabla "Productos"
-const BASEROW_TABLE_ID_EXTRAVIADOS = "1165684";      // tabla "Servicios DC"
-
-// Pega aquí el ID de tabla en cuanto crees las tablas nuevas en Baserow
-// (mismo procedimiento que las 2 de arriba). Mientras estén vacías (""),
-// las pasarelas de Noticias/Comunicación y Bienestar/Salud siguen usando
-// los datos de ejemplo (NOTICIAS_GALERIA_ITEMS / BIENESTAR_GALERIA_ITEMS)
-// sin romper nada.
-// Nota: las galerías de Noticias y Bienestar ya NO usan tablas propias —
-// ahora se alimentan de las columnas GALCULTURA y GALSALUD dentro de la
-// misma tabla ENLACES (ver BASEROW_TABLE_ID_ENLACES más abajo).
-
-// Tabla "ENLACES" en Baserow (la que ya armaste con columnas VIDPORT,
-// RECASA, RECOMUN, RECMUSIC, RECLIBROS, RECVIDEOSYMAS, GALCULTURA, GALSALUD,
-// etc.). Un solo ID de tabla alimenta el video de portada, las
-// recomendaciones, la música y las 2 galerías — cada quien lee su propia
-// columna. IMPORTANTE: esto asume que /api/baserow-rows.js devuelve las
-// filas "crudas" (con el nombre exacto de cada columna de Baserow como
-// llave). Si aún no lo hace así para esta tabla, compárteme ese archivo
-// para ajustarlo — mientras tanto, todo sigue funcionando con los datos
-// de respaldo, sin romper nada.
-const BASEROW_TABLE_ID_ENLACES = "1178299";
-// =========================================================================
-
-// Galerías de EJEMPLO para la prueba de "pasarela en ventana emergente"
-// (ver GALERIAS_PROYECTOS y el modal correspondiente más abajo). Por ahora
-// solo Noticias y Bienestar la tienen, a modo de prueba — si el resultado
-// gusta, se puede replicar para cualquier otro proyecto agregando su propio
-// arreglo aquí y una entrada en GALERIAS_PROYECTOS.
-const NOTICIAS_GALERIA_ITEMS = [
-  { id: "not1", tipo: "Evento", nombre: "Feria cultural de agosto", descripcion: "Música en vivo, gastronomía local y actividades para toda la familia en la plaza principal.", img: "/images/noticias-1.png" },
-  { id: "not2", tipo: "Convocatoria", nombre: "Taller de muralismo vecinal", descripcion: "Convocatoria abierta para pintar un mural comunitario. Se proporcionan materiales.", img: "/images/noticias-2.png" },
-  { id: "not3", tipo: "Aviso", nombre: "Jornada de limpieza del parque", descripcion: "Súmate el próximo sábado a la jornada de limpieza y reforestación del parque de la colonia.", img: "/images/noticias-3.png" }
-];
-
-const BIENESTAR_GALERIA_ITEMS = [
-  { id: "bien1", tipo: "Taller", nombre: "Yoga al aire libre", descripcion: "Sesiones gratuitas los domingos por la mañana, para todos los niveles.", img: "/images/bienestar-1.png" },
-  { id: "bien2", tipo: "Actividad", nombre: "Grupo de caminata vecinal", descripcion: "Caminatas ligeras entre semana para fomentar la actividad física y la convivencia.", img: "/images/bienestar-2.png" },
-  { id: "bien3", tipo: "Charla", nombre: "Salud mental y comunidad", descripcion: "Plática abierta sobre bienestar emocional, con espacio para preguntas.", img: "/images/bienestar-3.png" }
-];
-
-// 3 secciones naranjas nuevas, debajo de los botones verdes (Historias,
-// Cupones/Promos y Patrocinadores/Alianzas). Cada arreglo alimenta su
-// propio carrusel — reemplaza estas fotos/textos de EJEMPLO por las reales
-// cuando las tengas. Misma estructura que las galerías de arriba, así que
-// también se pueden conectar a Baserow más adelante si se desea.
-const HISTORIAS_DCUATES_ITEMS = [
-  { id: "hist1", tipo: "Historia", nombre: "El renacer de la Panadería Café Sol", descripcion: "Cómo una alianza vecinal ayudó a reabrir sus puertas después de un momento difícil.", img: "/images/historias-1.png" },
-  { id: "hist2", tipo: "Historia", nombre: "De la calle a un hogar: la adopción de Firulais", descripcion: "Una historia de Ecatepets con final feliz gracias a la red de vecinos.", img: "/images/historias-2.png" },
-  { id: "hist3", tipo: "Historia", nombre: "Voluntarios que cambian vidas", descripcion: "El testimonio de una familia apoyada por la comunidad DCUATES.", img: "/images/historias-3.png" }
-];
-
-const CUPONES_PROMOS_ITEMS = [
-  { id: "cup1", tipo: "Cupón", nombre: "20% en tu primera visita — Taquería El Sol", descripcion: "Válido presentando este cupón digital directo desde tu celular.", img: "/images/cupones-1.png" },
-  { id: "cup2", tipo: "Promo", nombre: "2x1 en tu primera consulta de asesoría", descripcion: "Cupo limitado — agenda tu lugar directo por WhatsApp.", img: "/images/cupones-2.png" },
-  { id: "cup3", tipo: "Promo", nombre: "Descuento en Ventas con Causa", descripcion: "Pregunta por la promoción vigente del mes en el catálogo.", img: "/images/cupones-3.png" }
-];
-
-const PATROCINADORES_ALIANZAS_ITEMS = [
-  { id: "aliado1", tipo: "Aliado", nombre: "Panadería Café Sol", descripcion: "Aliado fundador de la Bibliobici Móvil DCUATES.", img: "/images/aliados-1.png" },
-  { id: "aliado2", tipo: "Patrocinador", nombre: "Refugio Animal Ecatepec", descripcion: "Apoya activamente la difusión de Ecatepets.", img: "/images/aliados-2.png" },
-  { id: "aliado3", tipo: "Aliado", nombre: "Conexiones con Causa", descripcion: "Organización impulsora del programa DCUATES.", img: "/images/aliados-3.png" }
-];
-
-// Mapa que conecta cada id de proyecto con su galería y título de modal —
-// así el botón "Ver galería" sabe qué mostrar sin más configuración.
-const GALERIAS_PROYECTOS = {
-  noticias: { titulo: "Agenda Cultural — Noticias de Barrio", items: NOTICIAS_GALERIA_ITEMS },
-  bienestar: { titulo: "Actividades de Bienestar, Salud y Recreación", items: BIENESTAR_GALERIA_ITEMS }
-};
-
 // =========================================================================
 // 1B. VENTANA EMERGENTE ÚNICA DE PROYECTO (reemplaza el "solo scroll" de
 // los 12 botones naranjas de portada). Junta la info de los 10 proyectos
@@ -420,328 +183,12 @@ const GALERIAS_PROYECTOS = {
 // =========================================================================
 const TODOS_LOS_PROYECTOS = [...INICIATIVAS_PRINCIPALES, ...NUEVOS_PROYECTOS_DATA];
 
-// Los mismos 12 botones naranjas de la cuadrícula de portada — se sacó a
-// nivel de archivo (antes vivía solo dentro del JSX de la portada) para
-// poder reutilizarlo también en el Mapa de Sitio. "modal" = id que se
-// busca en TODOS_LOS_PROYECTOS (o los 2 casos especiales
-// "ventas-con-causa" / "donaciones") para llenar la ventana emergente.
-// "h" se conserva solo como respaldo por si JavaScript llegara a fallar
-// (accesibilidad).
-// Orden A→L pedido explícitamente (de izquierda a derecha / de arriba hacia
-// abajo): Ecatepets, Publicidad, Apoyo Voluntario, Recomienda, Alianzas,
-// Círculo, Asesorías, Bazar, Ventas, Noticias, Bienestar, Libros.
-// Ya NO se muestra directo en la portada (que ahora usa las 4 categorías
-// de CATEGORIAS_PROYECTOS, más abajo) — este arreglo sigue vivo porque lo
-// usan el Mapa de Sitio (ModalMapaSitio) y las tarjetas de cada categoría
-// (ModalCategoria), así que reordenarlo aquí los reordena a ambos.
-const BOTONES_PORTADA = [
-  { t: "ECATEPETS MASCOTAS", h: "#ecatepets", modal: "ecatepets", img: "/images/Ecatepets.png" },
-  { t: "PUBLICIDAD GRATUITA", h: "#publicidad", modal: "publicidad-tarjeta", img: "/images/Publicidad2.png" },
-  { t: "APOYO VOLUNTARIO", h: "#donaciones", modal: "donaciones", img: "/images/ApoyoVoluntario.png" },
-  { t: "RECOMIENDA, EVALÚA Y GANA", h: "#recomienda-evalua-gana", modal: "recomienda-evalua-gana", img: "/images/Recomienda.png" },
-  { t: "ALIANZAS SOLIDARIAS", h: "#iniciativas", modal: "alianzas-tarjeta", img: "/images/Alianzas.png" },
-  { t: "CÍRCULO DE CONFIANZA", h: "#circulo-confianza", modal: "circulo-confianza", img: "/images/Círculo.png" },
-  { t: "ASESORÍAS GRATUITAS", h: "#asesorias", modal: "asesorias", img: "/images/Asesorías.png" },
-  { t: "BAZAR Y COMERCIO", h: "#bazares", modal: "bazares", img: "/images/Bazar.png" },
-  { t: "VENTAS CON CAUSA", h: "#ventas-con-causa", modal: "ventas-con-causa", img: "/images/VentasConCausa.png" },
-  { t: "NOTICIAS DE BARRIO", h: "#noticias", modal: "noticias", img: "/images/Noticias.png" },
-  { t: "BIENESTAR Y RECREACIÓN", h: "#bienestar", modal: "bienestar", img: "/images/Bienestar.png" },
-  { t: "PRÉSTAMO GRATUITO DE LIBROS", h: "#libros", modal: "libros", img: "/images/bb.png" }
-];
-
-// Una línea que explica cada proyecto: aparece en su tarjeta y en el mensaje
-// que se envía al compartirlo. Edítalas aquí cuando quieras.
-const RESUMEN_PROYECTO = {
-  libros: "Préstamo gratuito de libros",
-  bienestar: "Talleres, cursos y recreación",
-  asesorias: "Orientación gratuita",
-  ecatepets: "Adopción y ayuda a peluditos",
-  "circulo-confianza": "Red de confianza vecinal",
-  "publicidad-tarjeta": "Promociona tu negocio gratis",
-  "recomienda-evalua-gana": "Recomienda, evalúa y gana",
-  "alianzas-tarjeta": "Alianzas ganar-ganar",
-  bazares: "Comercio y bazar local",
-  "ventas-con-causa": "Compra y apoya una causa",
-  donaciones: "Tu tiempo, talento o recursos",
-  noticias: "Lo que pasa en tu barrio"
-};
-
 // Nombre "bonito" de un proyecto (para los mensajes al compartir).
 function tituloProyecto(id) {
   const base = BOTONES_PORTADA.find((b) => b.modal === id);
   if (!base) return "Un proyecto de la comunidad";
   return base.t.toLowerCase().split(" ").map((w, i) => (i && /^(de|del|y|con|a|el|la|los|las|en)$/.test(w) ? w : w.charAt(0).toUpperCase() + w.slice(1))).join(" ");
 }
-
-// Logos para las ventanas que no salen de BOTONES_PORTADA (los 3 botones
-// de abajo: Historias, Cupones, Patrocinadores). Ajusta las rutas si tus
-// archivos se llaman distinto.
-const LOGOS_EXTRA_MODAL = {
-  "historias-dcuates": "/images/HistoriasDCUATES.png"
-};
-
-// Items extra del Mapa de Sitio que NO abren un modal de proyecto, sino
-// una acción especial (igual que en NAV_LINKS_MAS): FAQ y Sugerencias.
-const MAPA_SITIO_EXTRA = [
-  { t: "PREGUNTAS FRECUENTES", accion: "faq", emoji: "❓" },
-  { t: "SUGERENCIAS Y QUEJAS", accion: "sugerencias", emoji: "💬" },
-  { t: "AVISO DE SEGURIDAD", accion: "seguridad", emoji: "⚠️" },
-  { t: "ESCUDO DE SEGURIDAD", accion: "escudo", emoji: "🛡️" }
-];
-
-// Portada simplificada: en vez de los 12 botones de proyecto, se muestran
-// solo estas 4 categorías (más grandes). Cada una agrupa varios proyectos
-// — al tocarla se abre un modal de presentación con acceso directo a cada
-// proyecto incluido (ver ModalCategoria). Los 12 proyectos originales
-// siguen totalmente accesibles uno por uno desde el Mapa de Sitio (usa
-// BOTONES_PORTADA arriba, sin tocar).
-// "emoji" es el respaldo mientras no exista un logo propio: en cuanto
-// tengas la imagen, solo agrega "img: '/images/NombreDelArchivo.png'" y se
-// usará automáticamente en su lugar (mismo patrón que los botones de
-// proyecto). Slogans son provisionales — cámbialos cuando quieras.
-// Nota: "Bazar y Comercio" no estaba en ninguna de las 4 categorías que
-// diste, así que se agregó a "Alianzas y Negocios" por ser lo más afín
-// (comercio local) — muévelo si lo quieres en otra.
-const CATEGORIAS_PROYECTOS = [
-  {
-    id: "beneficios-comunitarios",
-    titulo: "BENEFICIOS COMUNITARIOS",
-    slogan: "Todo lo que la comunidad te regala",
-    emoji: "🎁",
-    img: null,
-    descripcion: "Recursos pensados para tu bienestar y el de tu familia, sin costo: préstamo de libros, actividades de bienestar, asesorías, apoyo para tus mascotas y una red de confianza vecinal.",
-    proyectos: ["libros", "bienestar", "asesorias", "ecatepets", "circulo-confianza"]
-  },
-  {
-    id: "alianzas-y-negocios",
-    titulo: "ALIANZAS Y NEGOCIOS",
-    slogan: "Creciendo juntos, ganamos más",
-    emoji: "🤝",
-    img: null,
-    descripcion: "Todo lo que impulsa tu negocio o emprendimiento: publicidad gratuita, recomendaciones que valen, alianzas ganar-ganar, asesoría profesional, comercio local y ventas con causa, y una red de confianza para crecer sin miedo.",
-    proyectos: ["publicidad-tarjeta", "recomienda-evalua-gana", "alianzas-tarjeta", "asesorias", "bazares", "ventas-con-causa", "circulo-confianza"]
-  },
-  {
-    id: "apoya-causas",
-    titulo: "APOYANDO CAUSAS",
-    slogan: "Tu ayuda, su bienestar",
-    emoji: "💚",
-    img: null,
-    descripcion: "Formas de aportar tu tiempo, dinero o talento para causas que transforman: apoyo voluntario, asesoría a quien la necesita, bienestar comunitario, préstamo de libros y apoyo a mascotas.",
-    proyectos: ["donaciones", "asesorias", "bienestar", "libros", "ecatepets"]
-  },
-  {
-    id: "sumando-valores",
-    titulo: "SUMANDO VALORES",
-    slogan: "Valores que se multiplican",
-    emoji: "✨",
-    img: null,
-    descripcion: "Proyectos que fortalecen el tejido comunitario desde distintos frentes: asesoría, alianzas, noticias de barrio, bienestar, mascotas y una red basada en la confianza.",
-    proyectos: ["asesorias", "alianzas-tarjeta", "noticias", "bienestar", "ecatepets", "circulo-confianza"]
-  }
-];
-
-// Las 4 formas de aportación — se reutilizan aquí y en la sección de Apoyo
-// Voluntario más abajo, para no tener el mismo texto escrito dos veces.
-const OPCIONES_APORTACION = [
-  { t: "Aportación Económica", d: "Solicita los datos bancarios de manera directa y segura.", m: "¡Hola DCUATES! Deseo realizar una Aportación Económica. ¿Me podrías proporcionar los datos seguros?" },
-  { t: "Aportación en Especie", d: "Apoya donando herramientas, materiales o insumos útiles.", m: "¡Hola DCUATES! Quiero realizar una Aportación en Especie. ¿Qué tipo de herramientas o insumos se requieren actualmente?" },
-  { t: "Trueque Solidario", d: "Intercambia productos o servicios de valor equivalente.", m: "¡Hola DCUATES! Me interesa el Trueque Solidario. Tengo productos/servicios para intercambiar a favor de la causa." },
-  { t: "Labor Voluntaria", d: "Dona tu valioso tiempo y conocimientos para crecer juntos.", m: "¡Hola DCUATES! Quiero sumarme con Labor Voluntaria aportando mi tiempo y conocimientos comunitarios." }
-];
-
-// Contenido de "Quiénes Somos" — edítalo aquí, se usa en la nueva sección
-// justo después de la portada.
-const QUIENES_SOMOS = {
-  idea: "DCUATES nace como un programa de CONEXIONES CON CAUSA ♥ para conectar a vecinos, negocios y organizaciones de la comunidad, y así generar apoyos y beneficios mutuos reales, todos los días.",
-  objetivos: ["Difundir de forma gratuita a negocios, personas y causas de la zona", "Facilitar el acceso a libros, asesorías y bienestar para todas las familias", "Conectar a quien necesita ayuda con quien puede darla, sin barreras", "Fortalecer el tejido social a través de alianzas ganar-ganar", "Apoyar a quienes AYUDAN a AYUDAR MÁS Y MEJOR !!!"],
-  filosofia: "Creemos en la CADENA DE VALOR Y DE VALORES: cuando una persona o negocio suma su talento, tiempo o recursos, se multiplica el beneficio para todos. Ninguna aportación es demasiado pequeña.",
-  colofon: "AYUDAR A QUIEN LO NECESITA ES UN GUSTO, UN PRIVILEGIO Y UNA BENDICIÓN; AYUDAR A QUIENES AYUDAN ES UNA GRAN BENDICIÓN, Y GENERAR APOYOS MUTUOS ES UNA LLUVIA DE BENDICIONES PARA TODOS !!!",
-  firma: "ATTE: CONEXIONES CON CAUSA ♥"
-};
-
-// Contenido de los 4 botones verdes desplegables que van junto al video
-// (entre la portada y la sección de Proyectos Base). Edítalo aquí.
-const MISION_VISION = {
-  mision: "Conectar personas, negocios, causas y organizaciones de la comunidad para generar apoyos y beneficios mutuos reales, todos los días, sin costo y sin barreras.",
-  vision: "Ser la red comunitaria de referencia donde cualquier persona o negocio de la zona encuentre, en un solo lugar, difusión gratuita, alianzas confiables y oportunidades de ayudar y ser ayudado.",
-  filosofia: "Creemos en LA CADENA DE VALOR Y DE VALORES: cada aportación, por pequeña que parezca, se multiplica cuando se comparte con la comunidad."
-};
-const COMO_SUMAR = {
-  intro: "Si hay algo en lo que podamos APOYAR O SUMAR a tus proyectos, negocios o causas, escríbenos — con gusto vemos cómo conectar esfuerzos.",
-  ventajas: "Sumarte a una RED CONFIABLE Y DE VALOR como DCUATES multiplica tu alcance: más ojos ven tu negocio o causa, más manos pueden ayudarte, y toda la comunidad sale ganando.",
-  cierre: "Te invitamos a colaborar si hay algún proyecto DCUATES en el que te interese SUMARTE — dinos cuál y platicamos los siguientes pasos."
-};
-
-// =========================================================================
-// TEXTOS LEGALES — Aviso de Privacidad Integral y Términos y Condiciones.
-// IMPORTANTE: llena los datos del responsable en DATOS_LEGALES (nombre,
-// domicilio y correo). Edita solo lo que está entre comillas. El resto del texto es el de tus documentos oficiales.
-// =========================================================================
-const DATOS_LEGALES = {
-  nombre: "ABEL MERAZ ALVARADO",
-  colonia: "Jardines de Morelos, Sección Ríos",
-  municipio: "Ecatepec de Morelos",
-  cp: "55070", // si lo dejas vacío ("") el Aviso omite el código postal
-  estado: "México",
-  correo: "dcuates77@gmail.com"
-};
-
-// Cada sección: titulo, parrafos (antes), lista (viñetas; texto o {b, t}),
-// despues (párrafos después de la lista).
-const AVISO_PRIVACIDAD_INTEGRAL = {
-  titulo: "Aviso de Privacidad Integral (Fase de Lanzamiento)",
-  secciones: [
-    {
-      titulo: "1. Responsable del tratamiento de sus datos personales",
-      parrafos: [
-        `El Responsable del tratamiento de sus datos personales es ${DATOS_LEGALES.nombre}, operando bajo el nombre comercial DCUATES y a través del sitio web dcuates.com. Para efectos del presente aviso y la protección de los datos de nuestros usuarios, se señala como domicilio general de atención, correspondencia y solicitudes relativas a la privacidad el ubicado en la Colonia ${DATOS_LEGALES.colonia}, Municipio o Alcaldía ${DATOS_LEGALES.municipio}${DATOS_LEGALES.cp ? `, C.P. ${DATOS_LEGALES.cp}` : ""}, en el Estado de ${DATOS_LEGALES.estado}, México. Usted puede ponerse en contacto directo con el responsable a través del correo electrónico exclusivo: ${DATOS_LEGALES.correo}.`
-      ]
-    },
-    {
-      titulo: "2. Datos personales que se recabarán",
-      parrafos: [
-        "Para permitir su interacción, el uso de las ventanas de registro y el alta de iniciativas en nuestra plataforma, recabaremos únicamente los siguientes datos de identificación y contacto a través de nuestros formularios web:"
-      ],
-      lista: [
-        "Nombre completo (o alias del usuario).",
-        "Número de teléfono celular (WhatsApp).",
-        "Colonia de residencia.",
-        "Tipo de apoyo solicitado o requerido.",
-        "Descripción detallada de la necesidad o aportación."
-      ],
-      despues: [
-        "DCUATES no recaba, almacena ni trata bajo ninguna circunstancia datos personales sensibles (como ideología, religión, política, estado de salud o datos financieros)."
-      ]
-    },
-    {
-      titulo: "3. Finalidades del tratamiento",
-      parrafos: [
-        "Los datos personales recabados serán utilizados exclusivamente para las siguientes finalidades primarias, las cuales son estrictamente necesarias para el servicio solicitado dentro de la plataforma:"
-      ],
-      lista: [
-        "Gestionar su registro, cuenta y participación dentro de la plataforma de proyectos comunitarios.",
-        "Almacenar de forma segura su solicitud en nuestra base de datos interna (alojada en Google Sheets) para dar seguimiento a su caso.",
-        "Establecer comunicación directa con usted a través de la aplicación WhatsApp para validar, confirmar o coordinar el apoyo solicitado.",
-        "Brindar soporte técnico y atender reportes de la comunidad."
-      ],
-      despues: [
-        "Finalidades secundarias: No utilizaremos sus datos para fines publicitarios masivos ajenos a la comunidad, ni los venderemos o cederemos a terceros. Cualquier boletín informativo interno de la plataforma requerirá su autorización previa."
-      ]
-    },
-    {
-      titulo: "4. Transferencia de datos personales",
-      parrafos: [
-        "Le informamos que sus datos personales no serán compartidos, transferidos ni tratados por personas, empresas o entidades terceras, salvo por las excepciones estrictas previstas en el artículo 37 de la Ley Federal de Protección de Datos Personales en Posesión de los Particulares (LFPDPPP) o por requerimientos judiciales de las autoridades competentes."
-      ]
-    },
-    {
-      titulo: "5. Derechos ARCO y Revocación del Consentimiento",
-      parrafos: [
-        "Usted tiene en todo momento el derecho de Acceder a sus datos, Rectificarlos si son incorrectos o están desactualizados, Cancelar su registro para que sean borrados por completo de nuestra base de datos de Google Sheets, u Oponerse al uso de los mismos para fines específicos (Derechos ARCO).",
-        `Para ejercer estos derechos o revocar el consentimiento que nos ha otorgado, deberá enviar una solicitud por escrito al correo electrónico: ${DATOS_LEGALES.correo}. Su solicitud deberá contener su nombre completo, el número de WhatsApp con el que se registró y la descripción clara del derecho que desea ejercer. Le responderemos y ejecutaremos la acción en un plazo máximo de 20 días hábiles.`
-      ]
-    },
-    {
-      titulo: "6. Tecnologías de Análisis y Rendimiento (Vercel Analytics)",
-      parrafos: [
-        "Le informamos que este sitio web utiliza la herramienta de medición integrada de nuestro proveedor de alojamiento (Vercel Analytics). Esta tecnología recopila exclusivamente datos estadísticos y de rendimiento de forma totalmente anónima (tales como el país de origen del visitante, tipo de navegador, sistema operativo y velocidad de carga de la página). Esta herramienta no utiliza cookies de rastreo, no recopila datos que permitan identificar personalmente al usuario ni realiza un seguimiento de sus hábitos de navegación fuera de este sitio web. Debido a su naturaleza puramente técnica y estadística, no genera archivos de rastreo en su dispositivo."
-      ]
-    },
-    {
-      titulo: "7. Modificaciones por formalización legal",
-      parrafos: [
-        "Este aviso de privacidad es de carácter temporal y sufrirá modificaciones y actualizaciones una vez que el proyecto DCUATES culmine su proceso de transición hacia una figura jurídica colectiva (Sociedad Cooperativa). Las actualizaciones estarán siempre disponibles para su consulta en esta misma sección del sitio web."
-      ]
-    }
-  ],
-  fecha: "Fecha de última actualización: Octubre de 2026."
-};
-
-const TERMINOS_CONDICIONES = {
-  titulo: "Términos y Condiciones de la Comunidad (DCUATES)",
-  intro: "Bienvenido a DCUATES (dcuates.com). Al utilizar nuestra plataforma, registrar tus datos o publicar una solicitud de apoyo, aceptas cumplir de manera íntegra con las siguientes reglas, normas de convivencia y condiciones de servicio. Si no estás de acuerdo con alguna de ellas, te pedimos amablemente que te abstengas de utilizar el sitio.",
-  secciones: [
-    {
-      titulo: "1. Naturaleza de la Plataforma",
-      parrafos: [
-        "DCUATES es una iniciativa de carácter social e independiente. Nuestro único objetivo es servir como un puente de vinculación directa entre personas que necesitan un apoyo comunitario y personas o colectivos dispuestos a brindarlo de forma voluntaria. DCUATES no es una empresa de servicios, no es una casa de beneficencia con fondos propios, ni actúa como intermediario legal en los acuerdos alcanzados entre los usuarios."
-      ]
-    },
-    {
-      titulo: "2. Proyectos e Iniciativas Permitidas",
-      parrafos: [
-        "La plataforma está diseñada exclusivamente para albergar solicitudes y proyectos que generen un impacto positivo, colaborativo o solidario en la comunidad. Los tipos de proyectos bienvenidos incluyen:"
-      ],
-      lista: [
-        { b: "Educación y Cultura:", t: "Solicitudes o donaciones de libros, materiales didácticos, asesorías escolares y talleres gratuitos." },
-        { b: "Apoyo Social y Comunitario:", t: "Iniciativas de mejora barrial, recolección de víveres, ropa en buen estado o voluntariados locales." },
-        { b: "Cuidado Animal y Ambiental:", t: "Proyectos de rescate de mascotas, campañas de esterilización comunitaria, reforestación o reciclaje local." },
-        { b: "Herramientas de Trabajo:", t: "Solicitudes de colaboración mutua para proyectos de emprendimiento social o solidario." }
-      ]
-    },
-    {
-      titulo: "3. Contenido y Proyectos Estrictamente Prohibidos",
-      parrafos: [
-        "Para garantizar un espacio seguro y confiable, queda estrictamente prohibida la publicación de cualquier solicitud o contenido que involucre:"
-      ],
-      lista: [
-        { b: "Fines de Lucro Exclusivos:", t: "Venta directa de productos comerciales, publicidad de empresas privadas que no tengan un esquema de donación o beneficio social claro, o esquemas de negocio multinivel." },
-        { b: "Proselitismo Político o Religioso:", t: "Campañas de partidos políticos, promoción de candidatos, propaganda ideológica o religiosa de cualquier índole." },
-        { b: "Contenido Ilícito o Peligroso:", t: "Solicitud o intercambio de armas, sustancias prohibidas, medicamentos controlados o actividades penadas por las leyes mexicanas." },
-        { b: "Conductas de Odio o Discriminación:", t: "Mensajes que promuevan la violencia, el racismo, el sexismo, la intolerancia o que vulneren la dignidad de las personas." },
-        { b: "Fraudes y Préstamos:", t: "Solicitudes de dinero en efectivo directo de procedencia dudosa, esquemas de tandas, pirámides financieras o solicitud de datos bancarios confidenciales." }
-      ],
-      despues: [
-        "Cualquier registro que infrinja estas normas será eliminado inmediatamente de la base de datos de Google Sheets sin previo aviso y no se le dará seguimiento por WhatsApp."
-      ]
-    },
-    {
-      titulo: "4. Responsabilidad de los Usuarios",
-      lista: [
-        { b: "Veracidad de la Información:", t: "Al registrarte, garantizas que los datos proporcionados (Nombre, WhatsApp, Colonia) son reales y te pertenecen." },
-        { b: "Uso del Canal de WhatsApp:", t: "Entiendes que al presionar el botón de confirmación, inicias un chat de WhatsApp de forma voluntaria. Te comprometes a mantener una comunicación respetuosa, clara y cordial con el administrador y con otros miembros de la comunidad con los que te vincules." },
-        { b: "Seguridad Física:", t: "Dado que la plataforma facilita que personas de la misma zona se apoyen (por ejemplo, para entregar libros o materiales), cada usuario es enteramente responsable de su propia seguridad física. Recomendamos realizar cualquier entrega o encuentro exclusivamente en lugares públicos, concurridos y de preferencia a la luz del día." }
-      ]
-    },
-    {
-      titulo: "5. Deslinde de Responsabilidad de la Plataforma (Límites Legales)",
-      lista: [
-        "DCUATES no se hace responsable por la calidad, entrega, veracidad o resultado de los apoyos coordinados entre los usuarios.",
-        "No garantizamos que todas las solicitudes registradas reciban apoyo, ya que esto depende enteramente de la participación voluntaria de la comunidad.",
-        "El administrador de la página no se hace responsable de los daños, pérdidas, malentendidos o conflictos derivados de las interacciones generadas fuera del sitio web (chats privados de WhatsApp, llamadas o reuniones físicas)."
-      ]
-    },
-    {
-      titulo: "6. Modificaciones",
-      parrafos: [
-        "Nos reservamos el derecho de actualizar estas normas en cualquier momento para adaptarlas al crecimiento de la comunidad o a futuras regulaciones legales. Al continuar usando la página tras una actualización, aceptas los nuevos términos establecidos."
-      ]
-    }
-  ],
-  fecha: "Fecha de actualización: Octubre de 2026."
-};
-
-// (Texto anterior, simplificado — ya no se usa) Aviso de Privacidad — se usaba en el
-// botón verde desplegable "Aviso de Privacidad" de la portada, para no
-// tener el mismo texto escrito dos veces.
-const AVISO_PRIVACIDAD_PARRAFOS = [
-  "En cumplimiento con la normativa de protección de datos, DCUATES le informa que los datos recabados en este formulario (Nombre de Negocio, Categoría y Enlaces Digitales) tienen la única y exclusiva finalidad de promover de forma comunitaria y gratuita sus actividades comerciales.",
-  "Sus datos no serán vendidos, transferidos ni compartidos con terceros con fines de lucro. Al enviar la información y continuar la interacción en WhatsApp, usted acepta el tratamiento de los mismos para los fines de difusión colectiva estipulados en nuestras iniciativas de Apoyo al Emprendimiento.",
-  "Usted puede solicitar la baja, rectificación o eliminación de los datos publicitados en cualquier momento poniéndose en contacto directo mediante nuestros canales oficiales de atención."
-];
-
-// Preguntas frecuentes — cada una se despliega al dar clic (como un
-// acordeón). Para agregar una nueva, solo copia un bloque { pregunta, respuesta } más.
-const FAQ_ITEMS = [
-  { pregunta: "¿DCUATES tiene algún costo para participar?", respuesta: "No. Todos los proyectos (libros, publicidad, Ecatepets, asesorías, etc.) son gratuitos. Las aportaciones voluntarias solo ayudan a que la plataforma llegue a más familias." },
-  { pregunta: "¿Cómo publico mi negocio o servicio?", respuesta: "Usa el botón \"Publicidad Gratuita\" en la portada, o baja hasta la sección de Publicidad Comunitaria y llena el formulario. También puedes escribirnos directo por WhatsApp." },
-  { pregunta: "¿Cómo reporto una mascota, persona o cosa extraviada?", respuesta: "Entra al botón \"Ecatepets\" o a la sección \"Ventas con Causa\" y da clic en \"Reportar un caso por WhatsApp\"; te contactamos directo." },
-  { pregunta: "¿Qué pasa con mis datos si lleno un formulario?", respuesta: "Solo se usan para la difusión comunitaria del proyecto que elegiste. Puedes ver el detalle completo en nuestro Aviso de Privacidad, en el pie de página." },
-  { pregunta: "¿Cómo puedo apoyar como voluntario o con una donación?", respuesta: "En el botón \"Apoyo Voluntario\" puedes elegir entre aportación económica, en especie, trueque solidario o labor voluntaria — cada opción te conecta directo por WhatsApp." },
-  { pregunta: "¿Necesito ser un negocio formal para participar?", respuesta: "No. DCUATES está abierto a negocios formales, informales, personas y organizaciones de la comunidad; lo importante es la intención de sumar y beneficiar a la zona." },
-  { pregunta: "¿Cómo me entero de las noticias y actividades nuevas?", respuesta: "Sigue nuestras redes sociales (Facebook, Instagram, YouTube y TikTok) y revisa el botón de \"Noticias de Barrio\" en la portada; ahí publicamos convocatorias y eventos." }
-];
 
 // Navegación por Necesidades — botón flotante naranja (arriba a la derecha)
 // que agrupa TODAS las preguntas por necesidad del visitante en 4 categorías,
@@ -817,18 +264,6 @@ const NECESIDADES_GRUPOS = [
       { texto: "Quiero organizarme o sumarme a una actividad recreativa comunitaria", modal: "bienestar" }
     ]
   }
-];
-
-// Botón "Recibe Beneficios" del encabezado — abre un mini formulario de
-// intereses y arma un mensaje de WhatsApp con lo seleccionado (sin backend:
-// tú decides después si lo que envías es un boletín periódico o avisos
-// puntuales). Para agregar/quitar un interés, solo edita este arreglo.
-const INTERESES_BENEFICIOS = [
-  "Promociones y negocios locales",
-  "Mascotas (adopciones y extravíos)",
-  "Noticias y eventos del barrio",
-  "Bienestar y actividades comunitarias",
-  "Otros Beneficios y Apoyos/Voluntariado"
 ];
 
 // Retos, Regalos y Reconocimientos DCUATES — 3 botones naranjas que arman
@@ -2322,27 +1757,6 @@ export default function App() {
   );
 }
 
-// =========================================================================
-// 3. SUBCOMPONENTE: SITE HEADER
-// =========================================================================
-// Barra de búsqueda del encabezado (con lupa): busca por palabras en los
-// proyectos, categorías, preguntas frecuentes y secciones de la página, y al
-// elegir un resultado abre su ventana o baja hasta esa sección. Ignora
-// acentos y mayúsculas ("asesoria" encuentra "Asesorías").
-const normalizarBusqueda = (t) => String(t || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-
-const SECCIONES_BUSCABLES = [
-  { t: "Registra tu Solicitud (formulario)", kw: "solicitud formulario pedir apoyo ayuda registro necesito whatsapp", id: "solicitudes" },
-  { t: "Mapa de Negocios Locales", kw: "mapa negocios locales aliados ubicacion donde direccion", id: "mapa-negocios" },
-  { t: "Video de Chuy, el Sapo Soñador", kw: "chuy sapo soñador video ejemplo donativos vida", id: "chuy-video" },
-  { t: "Historias y reflexiones DCUATES (videos)", kw: "historias reflexiones videos testimonios inspiracion", id: "historias-reflexiones" },
-  { t: "Publicidad Comunitaria (publica tu negocio)", kw: "publicidad publicar negocio servicio anunciar formulario gratis", id: "publicidad" },
-  { t: "Ventas con Causa (catálogo)", kw: "ventas causa catalogo productos comprar apartar", id: "ventas-con-causa" },
-  { t: "Mascotas, personas y cosas extraviadas", kw: "extraviados extraviado perdido mascota persona cosa registro adopcion", id: "extraviados-registro" },
-  { t: "Aviso de Seguridad de la Comunidad", kw: "aviso seguridad fraude estafa suplantacion cuenta clabe pagos reglas encuentros baneo", id: "seguridad" },
-  { t: "Escudo de Seguridad (cómo identificar el espacio seguro)", kw: "escudo seguridad fraude estafa seguro oficial whatsapp identificar proteccion", id: "escudo" }
-];
-
 function BarraBusqueda({ onAbrirProyecto, onAbrirCategoria, onAbrirFAQ, abierta, setAbierta }) {
   const [texto, setTexto] = useState("");
   const inputRef = React.useRef(null);
@@ -3029,12 +2443,6 @@ function CasillaAcepto({ ac, id = "acepta_terminos_privacidad" }) {
   );
 }
 
-// ----- Aviso de Seguridad (Anexo 1) y Escudo de Seguridad -----
-const DEGRADADO_SEGURIDAD = "linear-gradient(135deg,#b3261e 0%,#e65100 100%)";
-const DEGRADADO_ESCUDO = "linear-gradient(135deg,#0b6e5f 0%,#1B6F8A 100%)";
-const WA_OFICIAL_TXT = "5520696627";
-const WA_OFICIAL_URL = `https://wa.me/${WHATSAPP_NUMERO}`;
-
 function EnlaceWAOficial() {
   return (
     <a href={WA_OFICIAL_URL} target="_blank" rel="noopener noreferrer" className="font-black text-[#0b6e5f] underline underline-offset-2">{WA_OFICIAL_TXT}</a>
@@ -3220,12 +2628,6 @@ function ModalLegal({ documento, emoji, degradado, onCerrar }) {
     </VentanaMarca>
   );
 }
-
-const DEGRADADO_AVISOS = "linear-gradient(135deg,#e65100 0%,#ff8f00 100%)";
-const DEGRADADO_COMPARTIR = "linear-gradient(135deg,#17472d 0%,#1B6F8A 100%)";
-const DEGRADADO_SUGERENCIAS = "linear-gradient(135deg,#1B6F8A 0%,#7A5AD8 100%)";
-const DEGRADADO_DUDAS = "linear-gradient(135deg,#0b6e5f 0%,#25d366 100%)";
-const EMOJIS_INTERESES = ["🛍️", "🐾", "📰", "🧘", "🤝"];
 
 // Botón "Avisos y Beneficios" — abre una ventana de intereses y arma el
 // mensaje de WhatsApp con lo que la persona seleccionó.
@@ -3955,22 +3357,6 @@ function TarjetaCarrusel({ item, etiqueta, mostrarDetallesVenta = false }) {
     </div>
   );
 }
-
-// Trae los renglones reales de una tabla de Baserow a través de nuestra
-// función serverless (/api/baserow-rows) — nunca habla con Baserow
-// directamente desde el navegador. Si "tableId" está vacío, o la petición
-// falla, o Baserow todavía no tiene filas, se queda con "itemsRespaldo"
-// (los datos de ejemplo) sin romper nada.
-// Trae los renglones "crudos" de la tabla ENLACES (uno por fila, con las
-// columnas tal cual las nombraste en Baserow: VIDPORT, RECASA, RECOMUN,
-// RECMUSIC, RECLIBROS, RECVIDEOSYMAS, GALCULTURA, GALSALUD, etc.). Si la tabla
-// aún no responde o está vacía, regresa un arreglo vacío y quien la usa
-// se queda con su propio respaldo — nunca rompe la página.
-// Caché simple en memoria + sessionStorage (5 minutos) para no repetir la
-// misma llamada a Baserow — este hook se usa más de una vez en la página
-// (el video/recomendaciones arriba, y los botones de Apoyo/Recomendación
-// más abajo), así que sin caché se disparaban 2 peticiones idénticas.
-const CACHE_ENLACES_MS = 5 * 60 * 1000;
 let cacheEnlacesMemoria = null; // { datos, momento }
 
 // Avisa a la página qué pasó con la lectura de Baserow (lo muestra el sello de
@@ -4516,23 +3902,6 @@ function BotonVerdeInfo({ titulo, children }) {
     </div>
   );
 }
-
-// Decide qué mostrar dentro del modal según el id recibido: los 10 proyectos
-// "normales" (con tarjeta propia), o los 2 casos especiales sin tarjeta
-// (Ventas con Causa y Apoyo Voluntario/donaciones).
-// Formulario de "Registra tu Solicitud": guarda el registro en Google Sheets
-// (mismo Apps Script de Publicidad, con Tipo "Solicitud") y, en paralelo,
-// abre WhatsApp con el mensaje ya escrito. Al terminar muestra el logo y un
-// mensaje de agradecimiento.
-const TIPOS_DE_APOYO = [
-  "Libros o materiales educativos",
-  "Asesoría gratuita",
-  "Mascotas (adopción, extravío o rescate)",
-  "Apoyo en especie o económico",
-  "Publicidad para mi negocio",
-  "Apoyo voluntario",
-  "Otro"
-];
 
 function FormularioSolicitud() {
   const [nombre, setNombre] = useState("");
