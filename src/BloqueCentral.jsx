@@ -298,7 +298,8 @@ export default function BloqueCentral({
   logros = [],              // [{ texto, enlace }] para la banda de impacto
   cargando = false,         // true mientras Baserow aún no responde (muestra esqueletos)
   onAbrirCategoria = () => {},
-  onAbrirProyecto = () => {}
+  onAbrirProyecto = () => {},
+  onAcceso = () => {}
 }) {
   const [idx, setIdx] = useState(0);
   const rootRef = useRef(null);
@@ -508,6 +509,18 @@ export default function BloqueCentral({
             <CarruselPortada items={portadasItems[tab.id] || []} tab={tab} slogan={textoPortada} fallback={imgs[tab.id]} cargando={cargando} />
           )}
 
+          <nav className="bc-accesos" aria-label="Accesos rápidos">
+            <button type="button" className="bc-acc bc-acc-ben" onClick={() => onAcceso("beneficios")}>
+              <span className="bc-acc-e" aria-hidden="true">🎁</span><span className="bc-acc-t">Beneficios</span>
+            </button>
+            <button type="button" className="bc-acc bc-acc-reg" onClick={() => onAcceso("registros")}>
+              <span className="bc-acc-e" aria-hidden="true">📝</span><span className="bc-acc-t">Registros</span>
+            </button>
+            <button type="button" className="bc-acc bc-acc-pro" onClick={() => onAcceso("proyectos")}>
+              <span className="bc-acc-e" aria-hidden="true">🧭</span><span className="bc-acc-t">Proyectos</span>
+            </button>
+          </nav>
+
           {tab.mapa && <MapaLocal url={mapaUrl} color={tab.color} />}
 
           {tab.texto && <p className="bc-text">{tab.texto}</p>}
@@ -638,6 +651,14 @@ const CSS = `
 .bc-head b{font-size:20px;font-weight:900}
 .bc-head small{font-size:13px;font-weight:800;color:#5b6675}
 .bc-text{margin:0 2px 4px;font-size:16px;line-height:1.5;font-weight:600;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.bc-accesos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0 4px}
+.bc-acc{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:62px;padding:8px 4px;border:0;border-radius:16px;color:#fff;font-family:inherit;cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.22);transition:transform .12s,box-shadow .12s;-webkit-tap-highlight-color:transparent}
+.bc-acc:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.22)}
+.bc-acc-e{font-size:22px;line-height:1}
+.bc-acc-t{font-size:12px;font-weight:900;letter-spacing:.02em;text-transform:uppercase;line-height:1.1;text-align:center}
+.bc-acc-ben{background:#e65100}
+.bc-acc-reg{background:#2E9E5B}
+.bc-acc-pro{background:#1B6F8A}
 .bc-sub{margin:10px 2px 6px;font-size:15px;font-weight:900}
 .bc-slot{margin-top:14px;min-width:0}
 .bc-snap{display:flex;gap:12px;margin:8px calc(var(--pad) * -1) 0;padding:4px var(--pad) 12px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:var(--pad);-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;scrollbar-width:none}

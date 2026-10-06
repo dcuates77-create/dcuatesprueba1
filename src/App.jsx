@@ -24,6 +24,7 @@ import { iniciarPWA } from "./pwa";
 // Ventanas poco usadas: se descargan solo la primera vez que alguien las abre.
 const cargarVentanas = () => import("./componentes/ventanasPesadas.jsx");
 const ContenidoModalProyecto = lazy(() => cargarVentanas().then((m) => ({ default: m.ContenidoModalProyecto })));
+const ModalAccesoRapido = lazy(() => cargarVentanas().then((m) => ({ default: m.ModalAccesoRapido })));
 const ModalAvisoSeguridad = lazy(() => cargarVentanas().then((m) => ({ default: m.ModalAvisoSeguridad })));
 const ModalCategoria = lazy(() => cargarVentanas().then((m) => ({ default: m.ModalCategoria })));
 const ModalCompartirMas = lazy(() => cargarVentanas().then((m) => ({ default: m.ModalCompartirMas })));
@@ -58,6 +59,8 @@ export default function App() {
   // Modal del Mapa de Sitio — tarjetas con acceso directo a todo lo que
   // hay en la página (accesible desde el pie de página y el menú "Más").
   const [showMapaSitio, setShowMapaSitio] = useState(false);
+  // Ventana de los botones Beneficios / Registros (null = cerrada)
+  const [accesoAbierto, setAccesoAbierto] = useState(null);
   // Categoría abierta (portada simplificada de 4 botones) — null = cerrada.
   const [categoriaAbierta, setCategoriaAbierta] = useState(null);
   // Ventana emergente única para los 12 botones naranjas de portada.
@@ -421,6 +424,7 @@ export default function App() {
               negocios={negociosBaserow}
               onAbrirCategoria={(id) => setCategoriaAbierta(id)}
               onAbrirProyecto={(id) => setModalProyecto(id)}
+              onAcceso={(t) => (t === "proyectos" ? setShowMapaSitio(true) : setAccesoAbierto(t))}
               beneficios={<PestanaBeneficios setBusquedaAbierta={setBusquedaAbierta} setModalProyecto={setModalProyecto} setShowFAQ={setShowFAQ} setSolicitudExpandida={setSolicitudExpandida} solicitudExpandida={solicitudExpandida} />}
               valores={<PestanaValores infoAbierta={infoAbierta} librosLinks={librosLinks} musicaLinks={musicaLinks} recomendacionesComunidad={recomendacionesComunidad} recomendacionesDcuates={recomendacionesDcuates} setInfoAbierta={setInfoAbierta} setModalProyecto={setModalProyecto} videosLinks={videosLinks} />}
               negociosSeccion={<PestanaNegocios compraVentaDcuates={compraVentaDcuates} recomendacionesCompra={recomendacionesCompra} recomendacionesVenta={recomendacionesVenta} setVentasResumenAbierto={setVentasResumenAbierto} ventasResumenAbierto={ventasResumenAbierto} />}
@@ -693,6 +697,18 @@ export default function App() {
             </button>
           </div>
         </div>
+      )}
+
+      {/* VENTANA DE LOS BOTONES BENEFICIOS / REGISTROS */}
+      {accesoAbierto && (
+        <Suspense fallback={null}>
+          <ModalAccesoRapido
+            tipo={accesoAbierto}
+            onCerrar={() => setAccesoAbierto(null)}
+            onAbrirProyecto={(id) => setModalProyecto(id)}
+            onAccion={(a) => setModalFormulario(a)}
+          />
+        </Suspense>
       )}
 
       {/* MODAL DEL MAPA DE SITIO */}
