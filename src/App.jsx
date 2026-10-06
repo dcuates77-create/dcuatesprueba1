@@ -29,7 +29,7 @@ const CLAVE_CIRCULO_CONFIANZA = "confianza2026";
 // iframe); no hace falta tocar nada más en el código.
 // Sello de versión: se ve en pequeño al final de los accesos rápidos y en la
 // consola del navegador. Sirve para comprobar que el celular ya cargó lo último.
-const VERSION_BUILD = "DCUATES MINI · m1";
+const VERSION_BUILD = "DCUATES MINI · m2";
 if (typeof console !== "undefined") console.info("[DCUATES] versión", VERSION_BUILD);
 
 const MAPA_NEGOCIOS_EMBED_URL = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15034.541076557625!2d-99.00223799999999!3d19.600120500000003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1ee234c038987%3A0x4b578513910d8103!2sJardines%20de%20Morelos%2C%20Ecatepec%20de%20Morelos%2C%20M%C3%A9x.!5e0!3m2!1ses!2smx!4v1790129394750!5m2!1ses!2smx";
@@ -66,7 +66,6 @@ const NAV_LINKS_MAS = [
   { label: "Ventas con Causa", emoji: "🛍️", href: "#ventas-con-causa" },
   { label: "Alianzas Solidarias", emoji: "🤝", modal: "alianzas-tarjeta" },
   { label: "Apoyo a Causas", emoji: "❤️", href: "#extraviados-registro" },
-  { label: "Historias que inspiran (videos)", emoji: "🎥", href: "#historias-reflexiones" },
   { label: "Mapa del Sitio", emoji: "🗺️", action: "mapa-sitio" },
   { label: "Registra tu Solicitud", emoji: "📝", href: "#solicitudes" },
   { label: "Préstamo Gratuito de Libros", emoji: "📚", modal: "libros" },
@@ -1993,7 +1992,6 @@ const SECCIONES_BUSCABLES = [
   { t: "Registra tu Solicitud (formulario)", kw: "solicitud formulario pedir apoyo ayuda registro necesito whatsapp", id: "solicitudes" },
   { t: "Mapa de Negocios Locales", kw: "mapa negocios locales aliados ubicacion donde direccion", id: "mapa-negocios" },
   { t: "Video de Chuy, el Sapo Soñador", kw: "chuy sapo soñador video ejemplo donativos vida", id: "chuy-video" },
-  { t: "Historias y reflexiones DCUATES (videos)", kw: "historias reflexiones videos testimonios inspiracion", id: "historias-reflexiones" },
   { t: "Publicidad Comunitaria (publica tu negocio)", kw: "publicidad publicar negocio servicio anunciar formulario gratis", id: "publicidad" },
   { t: "Ventas con Causa (catálogo)", kw: "ventas causa catalogo productos comprar apartar", id: "ventas-con-causa" },
   { t: "Mascotas, personas y cosas extraviadas", kw: "extraviados extraviado perdido mascota persona cosa registro adopcion", id: "extraviados-registro" },
@@ -2547,18 +2545,6 @@ function BarraAccionesFinal({ onAbrirComparte }) {
         >
           <span>Inicio</span>
           <span aria-hidden="true">🏠</span>
-        </button>
-      </div>
-      {/* Enlace directo a la barra de videos del final de la página */}
-      <div className="mx-auto max-w-2xl md:max-w-4xl xl:max-w-6xl mt-3">
-        <button
-          type="button"
-          onClick={() => irASeccion("historias-reflexiones")}
-          className="w-full min-h-[48px] rounded-2xl border-2 border-[#0f2d1e] bg-white hover:bg-emerald-50 text-[#0f2d1e] shadow-sm px-3 py-2.5 text-[11px] sm:text-sm font-black uppercase tracking-wide transition-colors flex items-center justify-center gap-2 text-center leading-tight"
-        >
-          <span aria-hidden="true">🎥</span>
-          <span>Mira las historias que inspiran</span>
-          <span aria-hidden="true">↓</span>
         </button>
       </div>
       <SelloVersion />
