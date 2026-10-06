@@ -1,11 +1,7 @@
-// =========================================================================
-// src/utilidades/baserow.js — Lectura de Baserow y funciones de apoyo (enlaces, video, WhatsApp)
-// =========================================================================
 import React, { useState, useEffect, useRef } from "react";
 import { WHATSAPP_NUMERO } from "../datos/config.js";
 import { BASEROW_TABLE_ID_ENLACES, BOTONES_PORTADA, CACHE_ENLACES_MS } from "../datos/proyectos.js";
 
-// Función helper para armar enlaces directos de WhatsApp de forma consistente
 export function enlaceWhatsApp(mensaje) {
   return `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(mensaje)}`;
 }
