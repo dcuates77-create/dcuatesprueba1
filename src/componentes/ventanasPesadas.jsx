@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { LogoMarca } from "./encabezado.jsx";
 import { BotonCerrar, CasillaAcepto, ErrorAcepto, VentanaMarca, abrirLegal, useAceptacion } from "./legal.jsx";
 import { Carrusel, FlechaBlanca, PasarelaVentasConCausa, TarjetaCarrusel } from "./media.jsx";
+import { ACCESOS_BENEFICIOS, ACCESOS_REGISTROS } from "../datos/accesos.js";
 import { PATROCINADORES_ALIANZAS_ITEMS } from "../datos/cintas.js";
 import { MAPA_SITIO_EXTRA } from "../datos/config.js";
 import { FAQ_ITEMS } from "../datos/legal.js";
@@ -908,6 +909,61 @@ export function ContenidoModalProyecto({ id, onCerrar }) {
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+// Ventana de los botones "Beneficios" y "Registros" (debajo del carrusel de cada pestaña).
+export function ModalAccesoRapido({ tipo, onCerrar, onAbrirProyecto, onAccion }) {
+  const esBen = tipo === "beneficios";
+  const lista = esBen ? ACCESOS_BENEFICIOS : ACCESOS_REGISTROS;
+  const color = esBen ? "#e65100" : "#2E9E5B";
+  const titulo = esBen ? "Beneficios para ti 🎁" : "Regístrate o participa 📝";
+  const invitacion = esBen
+    ? "Toca el que te interese y conoce cómo usarlo, sin costo."
+    : "Elige qué quieres registrar o a qué quieres sumarte.";
+  const elegir = (it) => {
+    registrar("acceso_rapido", { tipo, elemento: String(it.t).slice(0, 40) });
+    onCerrar();
+    if (it.modal) onAbrirProyecto && onAbrirProyecto(it.modal);
+    else if (it.seccion) setTimeout(() => irASeccion(it.seccion), 150);
+    else if (it.accion) onAccion && onAccion(it.accion);
+  };
+  return (
+    <div className="fixed inset-0 z-[55] flex items-end sm:items-center justify-center bg-black/55 p-3" onClick={onCerrar}>
+      <div
+        className="bg-white text-slate-900 rounded-3xl shadow-2xl w-full max-w-md max-h-[calc(100dvh-1.5rem)] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-label={titulo}
+      >
+        <div className="p-5 pb-2">
+          <p className="font-black uppercase text-[#0f2d1e] text-xl leading-tight">{titulo}</p>
+          <p className="mt-1 text-sm font-semibold text-slate-600">{invitacion}</p>
+        </div>
+        <div className="px-5 pb-3 grid grid-cols-2 gap-3">
+          {lista.map((it, i) => {
+            const logo = it.modal ? (BOTONES_PORTADA.find((b) => b.modal === it.modal) || {}).img : null;
+            return (
+              <button
+                key={i}
+                type="button"
+                onClick={() => elegir(it)}
+                style={{ backgroundColor: color }}
+                className="flex flex-col items-center justify-start gap-1.5 rounded-2xl px-2 py-3 min-h-[112px] text-center text-white shadow-md border-b-4 border-black/25 active:translate-y-0.5 transition-transform"
+              >
+                <span className="text-3xl leading-none drop-shadow" aria-hidden="true">{it.emoji}</span>
+                <span className="font-black uppercase text-[12px] leading-tight [text-shadow:0_1px_2px_rgba(0,0,0,0.35)]">{it.t}</span>
+                <span className="text-[11px] font-bold leading-tight opacity-90">{it.d}</span>
+              </button>
+            );
+          })}
+        </div>
+        <div className="px-5 pb-5 flex justify-end">
+          <BotonCerrar onClick={onCerrar} />
+        </div>
+      </div>
     </div>
   );
 }
