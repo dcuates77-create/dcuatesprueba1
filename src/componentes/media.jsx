@@ -1,16 +1,8 @@
-// =========================================================================
-// src/componentes/media.jsx — Carruseles, videos y botones desplegables
-// =========================================================================
 import React, { useState, useEffect } from "react";
 import { RETOS_REGALOS_ITEMS } from "../datos/listas.js";
 import { BASEROW_TABLE_ID_EXTRAVIADOS, BASEROW_TABLE_ID_VENTAS_CON_CAUSA, EXTRAVIADOS_ITEMS, VENTAS_CON_CAUSA_ITEMS } from "../datos/proyectos.js";
 import { resolverSrcImagen, useCatalogoBaserow } from "../utilidades/baserow.js";
 
-// Los 3 botones naranjas de Retos/Regalos/Reconocimiento se despliegan
-// (uno a la vez) mostrando ejemplos y un botón inferior para que el público
-// mande su propia propuesta por WhatsApp. Edita "ejemplos" en el arreglo de arriba.
-// Botones naranjas de portada (Historias, Cupones, Patrocinadores): cada
-// uno vive ahora dentro de su pestaña. "modales" elige cuáles mostrar.
 export function BotonesNaranjasSeccion({ modales, onAbrir }) {
   const todos = [
                     { t: "HISTORIAS DCUATES", modal: "historias-dcuates", img: "/images/HistoriasDCUATES.png", puntos: ["TESTIMONIOS REALES", "HISTORIAS CON CAUSA", "INSPIRACIÓN COMUNITARIA"] },

@@ -1,14 +1,9 @@
-// =========================================================================
-// src/componentes/barras.jsx — Barras de anuncios, logros, frases, patrocinadores y ticker
-// =========================================================================
 import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { BotonCerrar } from "./legal.jsx";
 import { IframeVideo } from "./media.jsx";
 import { LOGROS_ITEMS, TICKER_ETIQUETAS, TICKER_FRASES } from "../datos/cintas.js";
 import { detectarVideo, enlaceWhatsApp, esPDF, paresBaserow, urlDesdeCeldaBaserow, useCarruselAutomatico, useFilasEnlaces } from "../utilidades/baserow.js";
 
-// Datos de EJEMPLO para la barra ticker inferior — reemplázalos por contenido real
-// cuando tengas fotos/avisos definitivos. Los 4 tipos rotan automáticamente.
 export const TICKER_ITEMS = [
   { tipo: "negocio", nombre: "Taquería El Sol — 20% en tu primera visita", img: "/images/ticker-negocio-1.png", enlace: enlaceWhatsApp("¡Hola! Vi la promoción de Taquería El Sol en DCUATES.") },
   { tipo: "mascota", nombre: "Firulais — en búsqueda por la colonia centro", img: "/images/ticker-mascota-1.png", enlace: "#ecatepets" },

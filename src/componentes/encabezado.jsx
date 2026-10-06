@@ -1,6 +1,3 @@
-// =========================================================================
-// src/componentes/encabezado.jsx — Encabezado, buscador, menú y accesos rápidos
-// =========================================================================
 import React, { useState, useEffect } from "react";
 import { BotonCerrar, CasillaAcepto, ErrorAcepto, abrirLegal, useAceptacion } from "./legal.jsx";
 import { BotonRecibeBeneficios } from "./ventanas.jsx";

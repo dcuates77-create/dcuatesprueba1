@@ -1,6 +1,3 @@
-// =========================================================================
-// src/componentes/formularios.jsx — Formularios de Publicidad, Ventas con Causa y Solicitudes
-// =========================================================================
 import React, { useState } from "react";
 import { LogoMarca } from "./encabezado.jsx";
 import { CasillaAcepto, ErrorAcepto, useAceptacion } from "./legal.jsx";
@@ -9,9 +6,6 @@ import { TIPOS_DE_APOYO } from "../datos/proyectos.js";
 import { enlaceWhatsApp, irASeccion } from "../utilidades/baserow.js";
 import { registrar } from "../analitica";
 
-// =========================================================================
-// 4. SUBCOMPONENTE: FORMULARIO DE PUBLICIDAD
-// =========================================================================
 export function FormularioPublicidad() {
   const ac = useAceptacion();
   const [expandido, setExpandido] = useState(true);
