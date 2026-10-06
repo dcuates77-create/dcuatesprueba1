@@ -29,7 +29,7 @@ const CLAVE_CIRCULO_CONFIANZA = "confianza2026";
 // iframe); no hace falta tocar nada más en el código.
 // Sello de versión: se ve en pequeño al final de los accesos rápidos y en la
 // consola del navegador. Sirve para comprobar que el celular ya cargó lo último.
-const VERSION_BUILD = "CLON8 · f16";
+const VERSION_BUILD = "DCUATES MINI · m1";
 if (typeof console !== "undefined") console.info("[DCUATES] versión", VERSION_BUILD);
 
 const MAPA_NEGOCIOS_EMBED_URL = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15034.541076557625!2d-99.00223799999999!3d19.600120500000003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1ee234c038987%3A0x4b578513910d8103!2sJardines%20de%20Morelos%2C%20Ecatepec%20de%20Morelos%2C%20M%C3%A9x.!5e0!3m2!1ses!2smx!4v1790129394750!5m2!1ses!2smx";
@@ -52,28 +52,6 @@ const REDES_SOCIALES = {
   youtube: "http://www.youtube.com/@abelmeraz",
   tiktok: "https://www.tiktok.com/@dcuates"
 };
-
-// Enlaces del botón "⭐ Recomendaciones" — separados en 2 grupos. Los de
-// "comunidad" son EJEMPLOS, edítalos con los negocios/personas reales que
-// quieras recomendar (de 5 a 10 en total entre los dos grupos).
-const RECOMENDACIONES_ESTRELLA = {
-  dcuates: [
-    { nombre: "Facebook DCUATES", enlace: REDES_SOCIALES.facebook },
-    { nombre: "Instagram DCUATES", enlace: REDES_SOCIALES.instagram },
-    { nombre: "YouTube DCUATES", enlace: REDES_SOCIALES.youtube },
-    { nombre: "TikTok DCUATES", enlace: REDES_SOCIALES.tiktok }
-  ],
-  comunidad: [
-    { nombre: "Panadería Café Sol", enlace: "#" },
-    { nombre: "Taquería El Sol", enlace: "#" },
-    { nombre: "Refugio Animal Ecatepec", enlace: "#" }
-  ]
-};
-
-// Botón "🎵 Escucha Música DCUATES" — pega aquí la ruta de tu archivo de
-// audio (colócalo en /public/audio/, ej. /public/audio/musica-dcuates.mp3).
-// Mientras esté vacío, el botón se muestra pero no reproduce nada.
-const MUSICA_DCUATES_URL = "/audio/musica-dcuates.mp3";
 
 // Barra fija de navegación: una sola fila de accesos directos + un menú
 // "MÁS" con todo lo demás (se despliega hacia abajo). Para agregar/quitar
@@ -722,15 +700,6 @@ const TERMINOS_CONDICIONES = {
   fecha: "Fecha de actualización: Octubre de 2026."
 };
 
-// (Texto anterior, simplificado — ya no se usa) Aviso de Privacidad — se usaba en el
-// botón verde desplegable "Aviso de Privacidad" de la portada, para no
-// tener el mismo texto escrito dos veces.
-const AVISO_PRIVACIDAD_PARRAFOS = [
-  "En cumplimiento con la normativa de protección de datos, DCUATES le informa que los datos recabados en este formulario (Nombre de Negocio, Categoría y Enlaces Digitales) tienen la única y exclusiva finalidad de promover de forma comunitaria y gratuita sus actividades comerciales.",
-  "Sus datos no serán vendidos, transferidos ni compartidos con terceros con fines de lucro. Al enviar la información y continuar la interacción en WhatsApp, usted acepta el tratamiento de los mismos para los fines de difusión colectiva estipulados en nuestras iniciativas de Apoyo al Emprendimiento.",
-  "Usted puede solicitar la baja, rectificación o eliminación de los datos publicitados en cualquier momento poniéndose en contacto directo mediante nuestros canales oficiales de atención."
-];
-
 // Preguntas frecuentes — cada una se despliega al dar clic (como un
 // acordeón). Para agregar una nueva, solo copia un bloque { pregunta, respuesta } más.
 const FAQ_ITEMS = [
@@ -831,54 +800,6 @@ const INTERESES_BENEFICIOS = [
   "Otros Beneficios y Apoyos/Voluntariado"
 ];
 
-// Retos, Regalos y Reconocimientos DCUATES — 3 botones naranjas que arman
-// un mensaje de WhatsApp distinto cada uno. Para cambiar el texto o el
-// ícono de alguno, solo edita este arreglo (mismo patrón que los demás).
-const RETOS_REGALOS_ITEMS = [
-  {
-    titulo: "RETOS que nos hacen MEJORES !!!",
-    icono: "🎯",
-    intro: "Ejemplos de retos que podríamos lanzar entre vecinos, familias y negocios:",
-    ejemplos: [
-      "🧹 Reto Cuadra Limpia: 30 días dejando tu banqueta y tu cuadra más limpias; sube foto de antes y después.",
-      "📚 Reto Un Libro al Mes: lee un libro (de nuestro préstamo gratuito) y comparte tu reseña en una frase.",
-      "🛍️ Reto Compra Local: una semana comprando en negocios de la colonia y recomendando tu favorito.",
-      "💚 Reto Un Acto de Bondad al Día: ayuda a alguien sin esperar nada y cuéntanos la historia.",
-      "🌱 Reto Cuadra Verde: siembra una planta o adopta un árbol y cuídalo durante 3 meses."
-    ],
-    cta: "💡 Propón tu propio RETO",
-    enlace: enlaceWhatsApp("¡Hola DCUATES! Quiero proponer o participar en un Reto que nos haga mejores.")
-  },
-  {
-    titulo: "REGALOS que motivan",
-    icono: "🎁",
-    intro: "Ejemplos de regalos que pueden motivar la participación (donados por vecinos y negocios aliados):",
-    ejemplos: [
-      "🎟️ Sorteo mensual de una canasta de productos de negocios aliados entre quienes cumplan los retos.",
-      "📖 Un libro nuevo para quien complete el Reto Un Libro al Mes.",
-      "🏷️ Cupones y descuentos exclusivos en negocios de la comunidad.",
-      "✂️ Un servicio gratis donado por un negocio: corte de cabello, asesoría, clase de prueba, etc.",
-      "🐶 Un kit para mascota (croquetas, collar o placa) para quien adopte o cuide a un peludito en apuros."
-    ],
-    cta: "🎁 Propón tu propio REGALO",
-    enlace: enlaceWhatsApp("¡Hola DCUATES! Tengo una propuesta de Regalo que motive a la comunidad.")
-  },
-  {
-    titulo: "RECONOCIMIENTO a quienes nos INSPIRAN",
-    icono: "🏅",
-    intro: "Ejemplos de reconocimientos que podríamos entregar y difundir en nuestras redes:",
-    ejemplos: [
-      "🏆 Vecino/a del Mes: por su ayuda constante a la comunidad.",
-      "🏪 Negocio con Causa del Mes: por apoyar a familias y causas sociales.",
-      "🤝 Voluntario/a Constante: por sumar tiempo y talento sin descanso.",
-      "🐾 Héroe/Heroína de Ecatepets: por rescatar, cuidar o dar hogar a una mascota.",
-      "👩‍🏫 Promotor/a de la Lectura: por acercar libros y educación a niñas y niños."
-    ],
-    cta: "🏅 Propón a quien merece un RECONOCIMIENTO",
-    enlace: enlaceWhatsApp("¡Hola DCUATES! Quiero proponer a alguien para un Reconocimiento que inspira.")
-  }
-];
-
 // Los 3 botones naranjas de Retos/Regalos/Reconocimiento se despliegan
 // (uno a la vez) mostrando ejemplos y un botón inferior para que el público
 // mande su propia propuesta por WhatsApp. Edita "ejemplos" en el arreglo de arriba.
@@ -922,50 +843,6 @@ function BotonesNaranjasSeccion({ modales, onAbrir }) {
                     </button>
         </div>
       ))}
-    </div>
-  );
-}
-
-function BotonesRetosRegalos({ indices }) {
-  const [abierto, setAbierto] = useState(null);
-  return (
-    <div className="flex flex-col gap-2">
-      {RETOS_REGALOS_ITEMS.map((item, i) => {
-        if (indices && !indices.includes(i)) return null;
-        const activo = true;
-        return (
-          <div key={i} className="rounded-xl overflow-hidden">
-            <div
-              className="w-full flex items-center justify-between gap-2 bg-[#e65100] text-white font-black uppercase text-xs sm:text-sm leading-tight px-4 py-3.5 transition-colors text-left"
-            >
-              <span>{item.titulo}</span>
-              <span className="flex items-center gap-2 shrink-0">
-                <span className="text-xl" aria-hidden="true">{item.icono}</span>
-              </span>
-            </div>
-            {activo && (
-              <div className="bg-[#fff8f1] border-2 border-t-0 border-[#e65100] rounded-b-xl p-3 space-y-2">
-                <p className="text-[#0f2d1e] text-[11px] sm:text-xs font-black leading-snug">{item.intro}</p>
-                <ul className="space-y-1.5">
-                  {item.ejemplos.map((ej, j) => (
-                    <li key={j} className="text-[#0f2d1e] text-[11px] sm:text-xs font-semibold leading-snug bg-white rounded-lg border border-[#e65100]/20 px-2.5 py-1.5">
-                      {ej}
-                    </li>
-                  ))}
-                </ul>
-                <a
-                  href={item.enlace}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block w-full text-center rounded-full bg-[#17472d] hover:bg-[#0f2d1e] text-white font-black uppercase text-[11px] sm:text-xs tracking-wide px-4 py-2.5 transition-colors"
-                >
-                  {item.cta}
-                </a>
-              </div>
-            )}
-          </div>
-        );
-      })}
     </div>
   );
 }
@@ -1092,42 +969,10 @@ export default function App() {
   // Id de YouTube del video que se está viendo en grande (ventana flotante),
   // al tocar una miniatura de la barra de videos de portada.
   const [videoEnGrande, setVideoEnGrande] = useState(null);
-  // Controla si el párrafo largo de la portada se ve completo o resumido
-  // en pantallas pequeñas (para que se necesite menos scroll en celular).
-  const [heroExpandido, setHeroExpandido] = useState(false);
-  // Controla si el bloque de "Quiénes Somos" se ve resumido (3 líneas) o
-  // completo, con su propio botón "Mostrar más".
-  const [quienesExpandido, setQuienesExpandido] = useState(false);
-  // Tarjetas "Nuestra Misión" y "Cómo Podemos Sumar" — mismo formato que
-  // Quiénes Somos (expandir/mostrar más), ya no son botones verdes.
-  const [misionExpandida, setMisionExpandida] = useState(false);
-  // Controla cuál de los 4 botones verdes desplegables (Nuestra Misión,
-  // Cómo Podemos Sumar, Preguntas Frecuentes, Aviso de Privacidad) está
-  // abierto junto al video. null = ninguno abierto; solo uno a la vez.
-  const [infoAbierta, setInfoAbierta] = useState(null);
 
   // Filas "crudas" de la tabla ENLACES en Baserow — alimentan el video de
   // portada, las recomendaciones y el botón de Música/Libros/Pelis.
   const filasEnlaces = useFilasEnlaces();
-  // Miniaturas de video de portada — igual que Recomendaciones: cada video
-  // puede tener un nombre en la columna "NOMBRE VIDPORT"; si no lo tiene,
-  // se numera solo como "Video 1", "Video 2"... Reconoce YouTube y TikTok
-  // (ver detectarVideo más abajo en el archivo).
-  const videosPortada = paresBaserow(filasEnlaces, "NOMBRE VIDPORT", "VIDPORT", 20)
-    .map((v) => ({ video: detectarVideo(v.enlace), nombre: v.nombre }))
-    .filter((v) => v.video);
-  const videosPortadaFinal = videosPortada.length > 0 ? videosPortada : [{ video: { plataforma: "youtube", id: YOUTUBE_VIDEO_ID }, nombre: "Video de presentación DCUATES" }];
-  // Rotación automática de la barra de Historias y reflexiones (misma
-  // lógica que Patrocinadores): se pausa sola en cuanto alguien la toca.
-  const carruselHistorias = useCarruselAutomatico(videosPortadaFinal.length);
-
-  // Retos, Regalos y Reconocimientos — carrusel de fotos desde la columna
-  // "RETOSGALERIA" (Archivo/Adjunto, igual que "MUSICA") y videos
-  // relacionados desde "NOMBRE RETOSVID" / "RETOSVID" (mismo patrón que
-  // los videos de portada, también reconoce YouTube, TikTok y Facebook).
-  // Mientras no subas nada a esas columnas, estas listas simplemente salen
-  // vacías y la sección lo indica.
-  const galeriaRetos = galeriaDesdeColumna(filasEnlaces, "RETOSGALERIA", 10, "Retos");
   const videosRetos = paresBaserow(filasEnlaces, "NOMBRE RETOSVID", "RETOSVID", 8)
     .map((v) => ({ video: detectarVideo(v.enlace), nombre: v.nombre }))
     .filter((v) => v.video);
@@ -1144,7 +989,7 @@ export default function App() {
   // estaba arriba de todo). Si una pestaña no tiene nada, muestra su imagen de
   // respaldo (ver PORTADAS_BASE en BloqueCentral.jsx).
   const portadasItems = {};
-  ["nosotros", "beneficios", "causas", "valores", "negocios", "regalos", "gratitud"].forEach((id) => {
+  ["nosotros", "beneficios", "causas", "negocios"].forEach((id) => {
     const K = id.toUpperCase();
     const archivos = filasEnlaces
       .flatMap((f, i) => {
@@ -1224,19 +1069,6 @@ export default function App() {
         color: PALETA_NEGOCIOS[i % PALETA_NEGOCIOS.length]
       };
     });
-
-  const recomendacionesDcuates = (() => {
-    const desdeBaserow = paresBaserow(filasEnlaces, "Nombre Recocasa", "RECASA", 5);
-    return desdeBaserow.length > 0 ? desdeBaserow : RECOMENDACIONES_ESTRELLA.dcuates;
-  })();
-  const recomendacionesComunidad = (() => {
-    const desdeBaserow = paresBaserow(filasEnlaces, "Nombre ReComun", "RECOMUN", 5);
-    return desdeBaserow.length > 0 ? desdeBaserow : RECOMENDACIONES_ESTRELLA.comunidad;
-  })();
-
-  const musicaLinks = primerosValores(filasEnlaces, "RECMUSIC", 5);
-  const librosLinks = primerosValores(filasEnlaces, "RECLIBROS", 5);
-  const videosLinks = primerosValores(filasEnlaces, "RECVIDEOSYMAS", 6);
 
   // Enlaces de apoyo (columnas de Baserow con links de internet, de tipo
   // texto plano). Se muestran los primeros 5 de cada una; para mostrar más
@@ -1439,102 +1271,6 @@ export default function App() {
               </div>
                 </div>
               )}
-              valores={(
-                <div className="flex flex-col gap-4 min-w-0">
-                  <BotonesNaranjasSeccion modales={["historias-dcuates"]} onAbrir={(id) => setModalProyecto(id)} />
-                  <div id="recursos" className="relative scroll-mt-48 md:scroll-mt-36 rounded-2xl bg-[#0f2d1e] p-4">
-<BotonCompartir variante="claro" className="absolute top-2 right-2 z-10" hash="recursos" titulo="Más recursos e información de valor" texto="Recomendaciones, música, libros, películas y preguntas frecuentes" />
-          <p className="text-white font-black uppercase text-sm sm:text-base tracking-wide text-center mb-3">
-            🔎 Más recursos e información de valor
-          </p>
-            {/* Recomendaciones / Música-Libros-Pelis / Preguntas Frecuentes,
-                en fila horizontal debajo del video (antes eran una columna
-                al lado del video). */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-3">
-              <BotonVerdeInfo
-                titulo="Recomendaciones ⭐⭐⭐⭐⭐"
-                abierto={infoAbierta === "recomendaciones"}
-                onClick={() => setInfoAbierta((v) => (v === "recomendaciones" ? null : "recomendaciones"))}
-              >
-                <p className="font-black uppercase text-emerald-300 text-[11px] tracking-wide">Recomendaciones DCUATES</p>
-                <ul className="space-y-1">
-                  {recomendacionesDcuates.map((r, i) => (
-                    <li key={i}>
-                      <a href={r.enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-300">
-                        {r.nombre}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-                <p className="font-black uppercase text-emerald-300 text-[11px] tracking-wide pt-2">Recomendaciones de la Comunidad</p>
-                <ul className="space-y-1">
-                  {recomendacionesComunidad.map((r, i) => (
-                    <li key={i}>
-                      <a href={r.enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-300">
-                        {r.nombre}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-                <p className="pt-2 font-black uppercase text-emerald-300">Si necesitas alguna recomendación en especial, contáctanos !!!</p>
-              </BotonVerdeInfo>
-
-              <BotonVerdeInfo
-                titulo="Música, Libros, Pelis y Más... 🎵📚🎬"
-                abierto={infoAbierta === "recursos"}
-                onClick={() => setInfoAbierta((v) => (v === "recursos" ? null : "recursos"))}
-              >
-                <p className="font-black uppercase text-emerald-300 text-[11px] tracking-wide">🎵 Música</p>
-                <ul className="space-y-1">
-                  {musicaLinks.map((enlace, i) => (
-                    <li key={i}>
-                      <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-300">
-                        Música {i + 1}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-                <p className="font-black uppercase text-emerald-300 text-[11px] tracking-wide pt-2">📚 Libros</p>
-                <ul className="space-y-1">
-                  {librosLinks.map((enlace, i) => (
-                    <li key={i}>
-                      <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-300">
-                        Libro {i + 1}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-                <p className="font-black uppercase text-emerald-300 text-[11px] tracking-wide pt-2">🎬 Películas y Más</p>
-                <ul className="space-y-1">
-                  {videosLinks.map((enlace, i) => (
-                    <li key={i}>
-                      <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-300">
-                        Recurso {i + 1}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </BotonVerdeInfo>
-
-              <BotonVerdeInfo
-                titulo="Preguntas Frecuentes ❓💬"
-                abierto={infoAbierta === "faq"}
-                onClick={() => setInfoAbierta((v) => (v === "faq" ? null : "faq"))}
-              >
-                <div className="space-y-2">
-                  {FAQ_ITEMS.map((f, i) => (
-                    <details open key={i} className="rounded-lg bg-emerald-900/40 px-3 py-2">
-                      <summary className="cursor-pointer text-xs sm:text-sm font-bold">{f.pregunta}</summary>
-                      <p className="mt-1 text-xs text-emerald-100/90 leading-relaxed">{f.respuesta}</p>
-                    </details>
-                  ))}
-                </div>
-              </BotonVerdeInfo>
-            </div>
-        
-                  </div>
-                </div>
-              )}
               negociosSeccion={(
                 <div className="flex flex-col gap-6 min-w-0 text-[#0f2d1e]">
                   <div id="ventas-con-causa" className="relative scroll-mt-48 md:scroll-mt-36">
@@ -1648,40 +1384,6 @@ export default function App() {
           <FormularioPublicidad />
         
                   </div>
-                </div>
-              )}
-              regalos={(
-                <div id="retos-regalos" className="relative scroll-mt-48 md:scroll-mt-36 rounded-2xl bg-[#0f2d1e] p-3 sm:p-4">
-<BotonCompartir variante="claro" className="absolute top-2 right-2 z-10" hash="retos-regalos" titulo="Retos, regalos y reconocimientos" texto="Porque todo lo bueno merece ser compartido y reconocido" />
-                  <p className="text-white font-black uppercase text-xs sm:text-sm tracking-wide mb-3 px-1 text-center">
-                    🔎 Retos, Regalos y Reconocimientos DCUATES
-                    <span className="block normal-case font-bold text-emerald-100">Porque todo lo bueno merece ser compartido y reconocido, envíanos tus propuestas.</span>
-                  </p>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <BotonesRetosRegalos indices={[0, 1]} />
-                    <div className="rounded-xl overflow-hidden bg-white/5 border border-white/10 flex items-center justify-center min-h-[180px]">
-                      {galeriaRetos.length > 0 ? (
-                        <Carrusel
-                          items={galeriaRetos}
-                          renderItem={(item) => (
-                            <img src={resolverSrcImagen(item.img)} alt={item.nombre} loading="lazy" className="w-full aspect-square object-cover" />
-                          )}
-                        />
-                      ) : (
-                        <p className="text-emerald-200/70 text-[10px] font-bold uppercase tracking-wide text-center px-4">
-                          Sube fotos a la columna "RETOSGALERIA" en Baserow para verlas aquí
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
-              gratitud={(
-                <div className="flex flex-col gap-4 min-w-0">
-                  <div className="rounded-2xl bg-[#0f2d1e] p-3 sm:p-4">
-                    <BotonesRetosRegalos indices={[2]} />
-                  </div>
-                  <BotonesNaranjasSeccion modales={["patrocinadores-alianzas"]} onAbrir={(id) => setModalProyecto(id)} />
                 </div>
               )}
               nosotros={(
@@ -2012,50 +1714,6 @@ export default function App() {
 
       {/* Accesos rápidos: Avisos y Beneficios · Compartir Más · Inicio */}
       <BarraAccionesFinal onAbrirComparte={() => setModalFormulario("comparte")} />
-
-      <div className="mt-[1.5cm] mb-[0.5cm]">
-
-        <BarraPatrocinadores />
-      </div>
-
-      {/* HISTORIAS Y REFLEXIONES DCUATES — movida aquí (antes vivía dentro
-          del hero); ahora como barra horizontal de 1-2 videos de alto, con
-          scroll lateral para ver más. Sigue tomando sus videos de las
-          columnas "NOMBRE VIDPORT" / "VIDPORT" en Baserow. */}
-      <section id="historias-reflexiones" className="relative scroll-mt-48 md:scroll-mt-36 bg-[#0f2d1e] py-6 px-4 border-b-4 border-[#0f2d1e]">
-        <BotonCompartir variante="claro" className="absolute top-2 right-2 z-10" hash="historias-reflexiones" titulo="Historias y reflexiones que inspiran" texto="Videos y reflexiones de nuestra comunidad" />
-        <div className="mx-auto max-w-6xl">
-          <p className="text-white font-black uppercase text-xs sm:text-sm tracking-wide mb-2 px-1 text-center">
-            Historias y reflexiones DCUATES que INSPIRAN 💡
-            <br className="sm:hidden" />
-            <span className="block sm:inline sm:ml-1">Dales clic para ampliarlos y disfrutarlos 🎥 🍿 😊</span>
-          </p>
-          <div
-            ref={carruselHistorias.scrollRef}
-            onPointerDown={carruselHistorias.onPointerDown}
-            className="flex gap-2 sm:gap-3 overflow-x-auto pb-1"
-          >
-            {videosPortadaFinal.map((v, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => setVideoEnGrande(v.video)}
-                className="group relative rounded-xl overflow-hidden border-2 border-white/10 hover:border-[#e65100] transition-colors bg-black/30 text-left w-40 sm:w-56 shrink-0"
-              >
-                <div className="aspect-video w-full overflow-hidden">
-                  <MiniaturaVideo video={v.video} nombre={v.nombre} />
-                </div>
-                <span className="absolute inset-0 flex items-center justify-center">
-                  <span className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-[#e65100]/90 flex items-center justify-center text-white text-base sm:text-lg shadow-md group-hover:bg-[#e65100]">▶</span>
-                </span>
-                <p className="px-2 py-1.5 text-[10px] sm:text-xs font-black text-white uppercase tracking-tight leading-tight">
-                  {v.nombre}
-                </p>
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* FOOTER */}
       <footer className="bg-[#e8f5e9] text-[#0f2d1e] py-12 px-4 text-center space-y-8 border-t-4 border-[#0f2d1e]">
@@ -4223,47 +3881,6 @@ function MiniaturaVideo({ video, nombre }) {
   );
 }
 
-// Carrusel automático genérico y reutilizable — cada "intervaloMs" avanza
-// solo al siguiente elemento (moviendo el "scrollLeft" del contenedor
-// directamente, nunca scrollIntoView, para no arrastrar el scroll de la
-// página). Se pausa en cuanto la persona toca/desliza a mano. Lo usan
-// Patrocinadores, Historias y reflexiones, y los videos de Retos.
-function useCarruselAutomatico(cantidad, intervaloMs = 2500) {
-  const scrollRef = useRef(null);
-  const [indiceAuto, setIndiceAuto] = useState(0);
-  const [pausado, setPausado] = useState(false);
-  const temporizadorReanudar = useRef(null);
-  useEffect(() => () => clearTimeout(temporizadorReanudar.current), []);
-  useEffect(() => {
-    if (pausado || cantidad <= 1) return;
-    const id = setInterval(() => {
-      setIndiceAuto((i) => (i + 1) % cantidad);
-    }, intervaloMs);
-    return () => clearInterval(id);
-  }, [pausado, cantidad, intervaloMs]);
-  useEffect(() => {
-    const contenedor = scrollRef.current;
-    const hijo = contenedor && contenedor.children[indiceAuto];
-    if (!contenedor || !hijo) return;
-    // Posición del elemento DENTRO del contenedor (con getBoundingClientRect,
-    // porque offsetLeft se medía contra otro ancestro y en la columna de
-    // Retos daba un número enorme: la pasarela saltaba al final y se
-    // quedaba ahí).
-    const izqHijo = hijo.getBoundingClientRect().left - contenedor.getBoundingClientRect().left + contenedor.scrollLeft;
-    const objetivo = izqHijo - (contenedor.clientWidth - hijo.clientWidth) / 2;
-    contenedor.scrollTo({ left: Math.max(0, objetivo), behavior: "smooth" });
-  }, [indiceAuto]);
-  // Al tocar/deslizar a mano se pausa, pero ya NO para siempre: 6 segundos
-  // después de la última interacción la pasarela se reanuda sola (antes
-  // se quedaba parada en el último elemento tocado).
-  const alTocar = () => {
-    setPausado(true);
-    clearTimeout(temporizadorReanudar.current);
-    temporizadorReanudar.current = setTimeout(() => setPausado(false), 6000);
-  };
-  return { scrollRef, onPointerDown: alTocar };
-}
-
 function useCatalogoBaserow(tableId, itemsRespaldo) {
   const [items, setItems] = useState(itemsRespaldo);
 
@@ -4495,23 +4112,6 @@ function ModalCategoria({ categoria, onCerrar, onAbrirProyecto }) {
               <div className="pt-3 flex justify-end shrink-0">
           <BotonCerrar onClick={onCerrar} />
         </div>
-      </div>
-    </div>
-  );
-}
-
-// Botón verde desplegable — usado en la fila de "resumen rápido" junto al
-// video (Nuestra Misión, Cómo Podemos Sumar, Preguntas Frecuentes, Aviso
-// de Privacidad). Al dar clic se expande hacia abajo mostrando su contenido.
-// Igual que el naranja: contenido siempre visible, sin acordeón.
-function BotonVerdeInfo({ titulo, children }) {
-  return (
-    <div className="rounded-xl bg-[#17472d] text-white shadow-md overflow-hidden">
-      <div className="px-4 py-3.5">
-        <span className="text-xs sm:text-sm font-black uppercase tracking-wide">{titulo}</span>
-      </div>
-      <div className="px-4 pb-4 pt-2 text-xs sm:text-sm text-emerald-50 leading-relaxed space-y-2 border-t border-emerald-700/40">
-        {children}
       </div>
     </div>
   );
@@ -5063,149 +4663,6 @@ function TickerFrases() {
   return (
     <div className="bg-[#0f2d1e] border-b-2 border-emerald-700/50">
       <FilaTicker items={itemsFrases} index={index} onClose={() => setVisible(false)} mostrarCerrar={true} />
-    </div>
-  );
-}
-
-// Ticker INFERIOR fijo — anuncios de negocios, productos y servicios,
-// mascotas y avisos comunitarios. Dos filas simultáneas que rotan de forma
-// independiente (desfasadas a la mitad del arreglo) para mostrar el doble
-// de contenido sin esperar tanto tiempo entre anuncios.
-// Barra de patrocinadores/aliados — una tira ancha y deslizable de
-// imágenes reducidas; al tocar una se amplía en una ventana flotante
-// (mismo patrón que la barra de videos). Se alimenta de 3 columnas en la
-// tabla ENLACES de Baserow: "PATROCINADORES" (Archivo/Adjunto — la
-// imagen), "NOMBRE PATROCINADORES" (texto) y "ENLACE PATROCINADORES"
-// (texto, opcional). Si "ENLACE PATROCINADORES" es una liga de YouTube, al
-// tocar la miniatura se abre el video en grande (igual que en la barra de
-// videos); si es cualquier otra liga (una web, un PDF, un documento), se
-// abre en una pestaña nueva; si no hay ninguna liga, solo se amplía la
-// imagen. No aparece nada en la página si todavía no hay ninguna fila con
-// imagen en "PATROCINADORES".
-function BarraPatrocinadores() {
-  const filasEnlaces = useFilasEnlaces();
-  const [imagenEnGrande, setImagenEnGrande] = useState(null);
-  const [videoEnGrande, setVideoEnGrande] = useState(null);
-  const [pdfEnGrande, setPdfEnGrande] = useState(null);
-
-  const items = filasEnlaces
-    .map((f) => ({
-      img: f && urlDesdeCeldaBaserow(f["PATROCINADORES"]),
-      nombre: (f && f["NOMBRE PATROCINADORES"]) || "",
-      enlace: (f && f["ENLACE PATROCINADORES"]) || ""
-    }))
-    .filter((it) => it.img)
-    .slice(0, 20);
-
-  const { scrollRef, onPointerDown } = useCarruselAutomatico(items.length);
-
-  if (items.length === 0) return null;
-
-  const alTocar = (item) => {
-    const video = item.enlace ? detectarVideo(item.enlace) : null;
-    if (video) {
-      setVideoEnGrande(video);
-    } else if (item.enlace && esPDF(item.enlace)) {
-      setPdfEnGrande(item.enlace);
-    } else if (item.enlace && item.enlace.startsWith("http")) {
-      window.open(item.enlace, "_blank", "noopener,noreferrer");
-    } else {
-      setImagenEnGrande(item.img);
-    }
-  };
-
-  return (
-    <div className="bg-[#17472d] py-5 px-4 border-t-4 border-b-4 border-[#0f2d1e]">
-      <div className="mx-auto max-w-6xl">
-        <p className="text-emerald-300 font-black uppercase text-lg sm:text-2xl tracking-wide text-center mb-3 px-2 leading-snug">
-          Muchas gracias a nuestros Patrocinadores y Amigos por su valiosa confianza y apoyo ⭐⭐⭐⭐⭐
-        </p>
-        <div
-          ref={scrollRef}
-          onPointerDown={onPointerDown}
-          className="flex items-center gap-3 overflow-x-auto pb-2 px-1 snap-x snap-mandatory"
-        >
-          {items.map((item, i) => (
-            <button
-              key={i}
-              type="button"
-              onClick={() => alTocar(item)}
-              className="shrink-0 snap-start w-32 sm:w-40 group"
-              title={item.nombre || "Ver más grande"}
-            >
-              <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-xl overflow-hidden border-2 border-white/10 group-hover:border-[#e65100] transition-colors bg-black/20">
-                <img
-                  src={item.img}
-                  alt={item.nombre}
-                  loading="lazy"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                  onError={(e) => { e.target.style.display = 'none'; }}
-                />
-              </div>
-              {item.nombre && (
-                <p className="text-white text-[10px] font-bold text-center mt-1 truncate">{item.nombre}</p>
-              )}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {imagenEnGrande && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 backdrop-blur-sm"
-          onClick={() => setImagenEnGrande(null)}
-        >
-          <div className="relative max-w-3xl w-full" onClick={(e) => e.stopPropagation()}>
-            <img src={imagenEnGrande} alt="" className="w-full h-auto rounded-2xl border-4 border-white/20 shadow-2xl" />
-          
-            <div className="mt-3 flex justify-end">
-              <BotonCerrar claro onClick={() => setImagenEnGrande(null)} label="Cerrar imagen" />
-            </div>
-</div>
-        </div>
-      )}
-
-      {videoEnGrande && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 backdrop-blur-sm"
-          onClick={() => setVideoEnGrande(null)}
-        >
-          <div className="relative w-full max-w-3xl" onClick={(e) => e.stopPropagation()}>
-            <div className="rounded-2xl overflow-hidden border-4 border-white/20 shadow-2xl aspect-video bg-black">
-              <IframeVideo video={videoEnGrande} className="w-full h-full" />
-            </div>
-          
-            <div className="mt-3 flex justify-end">
-              <BotonCerrar claro onClick={() => setVideoEnGrande(null)} label="Cerrar video" />
-            </div>
-</div>
-        </div>
-      )}
-
-      {pdfEnGrande && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 backdrop-blur-sm"
-          onClick={() => setPdfEnGrande(null)}
-        >
-          <div className="relative w-full max-w-3xl h-[80vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
-            <div className="w-full flex-1 min-h-0 rounded-2xl overflow-hidden border-4 border-white/20 shadow-2xl bg-white">
-              <iframe src={pdfEnGrande} title="Documento PDF" className="w-full h-full" />
-            </div>
-            <a
-              href={pdfEnGrande}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="absolute -bottom-8 left-0 text-white text-xs font-bold underline underline-offset-2 hover:text-[#e65100]"
-            >
-              Abrir en pestaña nueva
-            </a>
-          
-            <div className="mt-3 flex justify-end">
-              <BotonCerrar claro onClick={() => setPdfEnGrande(null)} label="Cerrar documento" />
-            </div>
-</div>
-        </div>
-      )}
     </div>
   );
 }

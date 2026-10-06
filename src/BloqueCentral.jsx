@@ -48,24 +48,6 @@ const TABS = [
     banda: { titulo: "Comunidad que mueve el barrio" },
     invitacion: { titulo: "Compra local, crece en comunidad", texto: "Alianzas que mueven la economía del barrio. Descubre cómo participar." },
     wa: "¡Hola DCUATES! Quiero registrar mi negocio."
-  },
-  {
-    id: "valores", label: "Valores", emoji: "✨", color: "#7A5AD8", pastel: "#EFEAFE",
-    boton: "#6A47C9",
-    cat: "sumando-valores", cover: {}, ver: true, slot: "valores",
-    banda: { titulo: "Valores que se multiplican" },
-    invitacion: { titulo: "Los valores que nos unen", texto: "Confianza, alianzas y buenas noticias del barrio. Entra y mira cómo los vivimos." },
-    wa: "¡Hola DCUATES! Quiero saber más sobre sus valores y alianzas."
-  },
-  {
-    id: "regalos", label: "Regalos", emoji: "🎉", color: "#D6336C", pastel: "#FDE8F1", boton: "#C2255C",
-    cover: { slogan: "Retos y regalos que nos motivan" }, slot: "regalos",
-    texto: "Porque todo lo bueno merece ser compartido. Envíanos tus propuestas de retos y regalos."
-  },
-  {
-    id: "gratitud", label: "Gratitud", emoji: "🙏", color: "#B7791F", pastel: "#FFF4D6", boton: "#92610F",
-    cover: { slogan: "Gracias por hacer el bien" }, slot: "gratitud",
-    texto: "Reconocemos a quienes hacen el bien en nuestra comunidad. Cuéntanos a quién quieres agradecer."
   }
 ];
 
@@ -77,11 +59,9 @@ const ID_A_TAB = {
   "extraviados-registro": "causas",
   "quienes-somos": "nosotros",
   solicitudes: "beneficios",
-  recursos: "valores",
   "mapa-negocios": "negocios",
   "ventas-con-causa": "negocios",
-  publicidad: "negocios",
-  "retos-regalos": "regalos"
+  publicidad: "negocios"
 };
 
 
@@ -92,10 +72,7 @@ const ID_A_TAB = {
 const PORTADAS_BASE = {
   nosotros: "/images/bibliobici-movil.png",
   beneficios: "/images/bibliobici-movil.png",
-  causas: "/images/portada-causas.png",
-  valores: "/images/portada-valores.png",
-  regalos: "/images/portada-regalos.png",
-  gratitud: "/images/portada-gratitud.png"
+  causas: "/images/portada-causas.png"
 };
 
 const MENORES = /^(de|del|y|con|a|el|la|los|las|en)$/i;
@@ -210,7 +187,6 @@ function parsearLogros(item) {
 const LOGROS_PREFERIDOS = {
   beneficios: ["#libros", "#libros", "#libros", "#asesorias"],
   causas: ["#donaciones", "#donaciones", "#ecatepets", "#circulo-confianza"],
-  valores: ["#circulo-confianza", "#bazares", "#asesorias", "#bienestar"],
   negocios: ["#bazares", "#circulo-confianza", "#iniciativas", "#donaciones"]
 };
 
@@ -312,7 +288,7 @@ export default function BloqueCentral({
   const cat = categorias.find((c) => c.id === tab.cat) || {};
   const pct = Math.round(((idx + 1) / TABS.length) * 100);
   const wa = (m) => `https://wa.me/${whatsappNumero}?text=${encodeURIComponent(m)}`;
-  const slots = { nosotros, beneficios, causas, valores, negocios: negociosSeccion, regalos, gratitud };
+  const slots = { nosotros, beneficios, causas, negocios: negociosSeccion };
   const imgs = { ...PORTADAS_BASE, ...portadas };
 
   // Fuente redondeada (Nunito), una sola vez.
