@@ -918,7 +918,7 @@ export function ModalAccesoRapido({ tipo, onCerrar, onAbrirProyecto, onAccion })
   const esBen = tipo === "beneficios";
   const lista = esBen ? ACCESOS_BENEFICIOS : ACCESOS_REGISTROS;
   const color = esBen ? "#e65100" : "#2E9E5B";
-  const titulo = esBen ? "Beneficios para ti 🎁" : "Regístrate o participa 📝";
+  const titulo = esBen ? "Para ti 🤲" : "Regístrate o participa 📝";
   const invitacion = esBen
     ? "Toca el que te interese y conoce cómo usarlo, sin costo."
     : "Elige qué quieres registrar o a qué quieres sumarte.";
@@ -954,7 +954,7 @@ export function ModalAccesoRapido({ tipo, onCerrar, onAbrirProyecto, onAccion })
                 style={{ backgroundColor: color }}
                 className="flex flex-col items-center justify-start gap-1.5 rounded-2xl px-2 py-3 min-h-[112px] text-center text-white shadow-md border-b-4 border-black/25 active:translate-y-0.5 transition-transform"
               >
-                <span className="text-3xl leading-none drop-shadow" aria-hidden="true">{it.emoji}</span>
+                <span className="text-3xl leading-none drop-shadow" aria-hidden="true" style={it.blanco ? { filter: "brightness(0) invert(1)" } : undefined}>{it.emoji}</span>
                 <span className="font-black uppercase text-[12px] leading-tight [text-shadow:0_1px_2px_rgba(0,0,0,0.35)]">{it.t}</span>
                 <span className="text-[11px] font-bold leading-tight opacity-90">{it.d}</span>
               </button>
