@@ -925,8 +925,9 @@ export function ModalAccesoRapido({ tipo, onCerrar, onAbrirProyecto, onAccion })
   const elegir = (it) => {
     registrar("acceso_rapido", { tipo, elemento: String(it.t).slice(0, 40) });
     onCerrar();
+    if (it.abre) window.dispatchEvent(new CustomEvent("dcuates:abrir-registro", { detail: it.abre }));
     if (it.modal) onAbrirProyecto && onAbrirProyecto(it.modal);
-    else if (it.seccion) setTimeout(() => irASeccion(it.seccion), 150);
+    else if (it.seccion) setTimeout(() => irASeccion(it.seccion), it.abre ? 400 : 150);
     else if (it.accion) onAccion && onAccion(it.accion);
   };
   return (
