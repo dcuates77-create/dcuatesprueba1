@@ -5,6 +5,7 @@
 //   modal:   abre la ventana de un proyecto (ids de BOTONES_PORTADA)
 //   seccion: baja hasta una sección de la página (abre su pestaña sola)
 //   accion:  "comparte" o "sugerencias" (abren su formulario)
+//   blanco:  true -> el emoji se ve en blanco (silueta)
 //   abre:    "ventas" o "extraviados": además despliega ese registro
 // "logo" es opcional: si no se pone, se usa el emoji.
 // =========================================================================
@@ -24,7 +25,7 @@ export const ACCESOS_REGISTROS = [
   { emoji: "📝", t: "Registra tu solicitud", d: "Cuéntanos qué apoyo necesitas", seccion: "solicitudes" },
   { emoji: "🏪", t: "Registra tu negocio gratis", d: "Publicidad y mapa de negocios", seccion: "publicidad" },
   { emoji: "🛍️", t: "Ventas con causa", d: "Ofrece tu producto o servicio", seccion: "registro-ventas", abre: "ventas" },
-  { emoji: "🐾👣", t: "Reporta un caso", d: "Mascotas, personas o cosas extraviadas", seccion: "registro-extraviados", abre: "extraviados" },
+  { emoji: "🐾👣", blanco: true, t: "Reporta un caso", d: "Mascotas, personas o cosas extraviadas", seccion: "registro-extraviados", abre: "extraviados" },
   { emoji: "💚", t: "Quiero ser voluntario", d: "Aporta tiempo, talento o recursos", seccion: "donaciones" },
   { emoji: "🎓", t: "Ser asesor voluntario", d: "Comparte tus conocimientos", modal: "asesorias" },
   { emoji: "🌟", t: "Conocer y compartir más", d: "Invita a tus contactos", accion: "comparte" },
