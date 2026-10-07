@@ -515,13 +515,16 @@ export default function BloqueCentral({
         <div className="bc-panel" id="bc-panel" role="tabpanel" aria-labelledby={`bc-tab-${tab.id}`} key={tab.id} style={{ background: tab.pastel }}>
           {/* La portada (imágenes, videos, PDF) va arriba solo en CAUSAS; en las demás
               pestañas se muestra al final de la página (ver CarruselFinal). */}
+          {/* La frase de portada de cada pestaña va arriba de todo, en mayúsculas. */}
+          {textoPortada && <p className="bc-frase" style={{ color: tab.color }}>{textoPortada}</p>}
+
           {tab.id === "causas" && tab.cover && (cargando || !tab.ocultarSinItems || (portadasItems[tab.id] || []).length > 0 || imgs[tab.id]) && (
-            <CarruselPortada items={portadasItems[tab.id] || []} tab={tab} slogan={textoPortada} fallback={imgs[tab.id]} cargando={cargando} />
+            <CarruselPortada items={portadasItems[tab.id] || []} tab={tab} fallback={imgs[tab.id]} cargando={cargando} />
           )}
 
           <nav className="bc-accesos" aria-label="Accesos rápidos">
             <button type="button" className="bc-acc bc-acc-ben" onClick={() => onAcceso("beneficios")}>
-              <span className="bc-acc-e" aria-hidden="true">🎁</span><span className="bc-acc-t">Beneficios</span>
+              <span className="bc-acc-e" aria-hidden="true">🤲</span><span className="bc-acc-t">Para ti</span>
             </button>
             <button type="button" className="bc-acc bc-acc-reg" onClick={() => onAcceso("registros")}>
               <span className="bc-acc-e" aria-hidden="true">📝</span><span className="bc-acc-t">Registros</span>
@@ -534,13 +537,12 @@ export default function BloqueCentral({
               className="bc-acc bc-acc-largo"
               onClick={() => document.getElementById("bc-detalle")?.scrollIntoView({ behavior: "smooth", block: "start" })}
             >
+              <span className="bc-mano bc-mano-2" aria-hidden="true">👇</span>
               <span className="bc-acc-t">Lo que somos y lo que hacemos</span>
               <span className="bc-mano" aria-hidden="true">👇</span>
             </button>
           </nav>
           <div id="bc-detalle" className="bc-ancla" aria-hidden="true" />
-
-          {tab.mapa && <MapaLocal url={mapaUrl} color={tab.color} />}
 
           {tab.texto && <p className="bc-text">{tab.texto}</p>}
 
@@ -565,7 +567,7 @@ export default function BloqueCentral({
               ))}
               <article className="bc-ficha bc-ficha-cta" style={{ borderColor: tab.color }}>
                 <span className="bc-ficha-ico" style={{ background: tab.boton || tab.color }} aria-hidden="true">💼</span>
-                <h3>Registra tu negocio gratis</h3>
+                <h3>REGISTRA TU NEGOCIO GRATIS</h3>
                 <p>Aparece en el mapa y en esta lista.</p>
                 <div className="bc-ficha-btns">
                   <button type="button" onClick={() => document.getElementById("publicidad")?.scrollIntoView({ behavior: "smooth", block: "start" })} style={{ background: "#D1530A" }}>Empezar ›</button>
@@ -573,6 +575,8 @@ export default function BloqueCentral({
               </article>
             </div>
           )}
+
+          {tab.mapa && <MapaLocal url={mapaUrl} color={tab.color} />}
 
           {chips.length > 0 && (
             <section className="bc-proyectos" style={{ "--c": tab.boton || tab.color }} aria-label="Proyectos de esta sección">
@@ -683,6 +687,8 @@ const CSS = `
 .bc-mano{font-size:26px;line-height:1;display:inline-block;animation:bc-mano 1.1s ease-in-out infinite}
 @keyframes bc-mano{0%,100%{transform:translateY(-4px)}50%{transform:translateY(6px)}}
 .bc-ancla{height:0;scroll-margin-top:190px}
+.bc-frase{margin:2px 2px 12px;font-size:18px;font-weight:900;line-height:1.2;text-transform:uppercase;letter-spacing:.01em}
+.bc-mano-2{animation-delay:.55s}
 .bc-sub{margin:10px 2px 6px;font-size:15px;font-weight:900}
 .bc-slot{margin-top:14px;min-width:0}
 .bc-snap{display:flex;gap:12px;margin:8px calc(var(--pad) * -1) 0;padding:4px var(--pad) 12px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:var(--pad);-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;scrollbar-width:none}

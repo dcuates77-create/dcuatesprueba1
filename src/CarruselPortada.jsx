@@ -45,7 +45,7 @@ function animarScroll(el, destino, ms, alTerminar) {
   return id;
 }
 
-export default function CarruselPortada({ items = [], tab, slogan, fallback, cargando = false, inverso = false }) {
+export default function CarruselPortada({ items = [], tab, slogan, fallback, cargando = false, inverso = false, mayusculas = false }) {
   const pistaRef = useRef(null);
   const indiceRef = useRef(0);
   const animRef = useRef(null);
@@ -186,7 +186,7 @@ export default function CarruselPortada({ items = [], tab, slogan, fallback, car
   return (
     <section className="cp-root" aria-roledescription={desborda ? "carrusel" : undefined} aria-label={`Imágenes y videos de ${tab.label}`}>
       <style>{CSS}</style>
-      {slogan && <p className="cp-titulo" style={{ color: tab.color }}>{slogan}</p>}
+      {slogan && <p className="cp-titulo" style={{ color: tab.color, textTransform: mayusculas ? "uppercase" : undefined }}>{slogan}</p>}
       <div
         className={`cp-pista${desborda ? "" : " cp-centrado"}`}
         ref={pistaRef}
