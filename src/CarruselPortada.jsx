@@ -45,7 +45,7 @@ function animarScroll(el, destino, ms, alTerminar) {
   return id;
 }
 
-export default function CarruselPortada({ items = [], tab, slogan, fallback, cargando = false }) {
+export default function CarruselPortada({ items = [], tab, slogan, fallback, cargando = false, inverso = false }) {
   const pistaRef = useRef(null);
   const indiceRef = useRef(0);
   const animRef = useRef(null);
@@ -91,11 +91,21 @@ export default function CarruselPortada({ items = [], tab, slogan, fallback, car
     if (animRef.current) animRef.current.cancelado = true;
   }, []);
 
-  // Cuando cambia el contenido, vuelve al primer cuadro.
+  // Cuando cambia el contenido, vuelve al primer cuadro. En modo "inverso"
+  // (carrusel del final de la página) empieza en la segunda tanda y avanza
+  // hacia atrás, en sentido contrario al de las barras de videos.
   useEffect(() => {
-    indiceRef.current = 0;
-    if (pistaRef.current) pistaRef.current.scrollLeft = 0;
-  }, [n]);
+    const pista = pistaRef.current;
+    if (!pista) return;
+    if (inverso && desborda) {
+      const d = posicionDe(n);
+      indiceRef.current = n;
+      if (d != null) pista.scrollLeft = d;
+    } else {
+      indiceRef.current = 0;
+      pista.scrollLeft = 0;
+    }
+  }, [n, desborda, inverso]);
 
   const posicionDe = (i) => {
     const pista = pistaRef.current;
@@ -111,7 +121,7 @@ export default function CarruselPortada({ items = [], tab, slogan, fallback, car
       if (document.hidden) return;
       const pista = pistaRef.current;
       if (!pista) return;
-      const sig = indiceRef.current + 1;
+      const sig = inverso ? indiceRef.current - 1 : indiceRef.current + 1;
       const destino = posicionDe(sig);
       if (destino == null) return;
       indiceRef.current = sig;
@@ -120,16 +130,22 @@ export default function CarruselPortada({ items = [], tab, slogan, fallback, car
       if (animRef.current) animRef.current.cancelado = true;
       animRef.current = animarScroll(pista, destino, reducirMovimiento ? 0 : ANIMACION_MS, () => {
         // Al entrar a la segunda tanda (copias idénticas) salta, sin que se note, a la primera.
-        if (indiceRef.current >= n) {
+        if (!inverso && indiceRef.current >= n) {
           const ancho = posicionDe(n) - posicionDe(0);
           pista.scrollLeft = pista.scrollLeft - ancho;
           indiceRef.current -= n;
+        }
+        // En reversa, al llegar al primer cuadro salta a su copia de la segunda tanda.
+        if (inverso && indiceRef.current <= 0) {
+          const ancho = posicionDe(n) - posicionDe(0);
+          pista.scrollLeft = pista.scrollLeft + ancho;
+          indiceRef.current += n;
         }
         pista.style.scrollSnapType = "";
       });
     }, INTERVALO_MS);
     return () => clearInterval(id);
-  }, [desborda, pausado, pausaManual, n, reducirMovimiento]);
+  }, [desborda, pausado, pausaManual, n, reducirMovimiento, inverso]);
 
   // Si el usuario desliza a mano, se sincroniza el índice y se pausa un rato.
   const alDeslizar = () => {

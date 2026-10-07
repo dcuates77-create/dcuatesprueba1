@@ -16,7 +16,7 @@ import { AVISO_PRIVACIDAD_INTEGRAL, FAQ_ITEMS, TERMINOS_CONDICIONES } from "./da
 import { TODOS_LOS_PROYECTOS } from "./datos/listas.js";
 import { BOTONES_PORTADA, CATEGORIAS_PROYECTOS, DEGRADADO_SUGERENCIAS, LOGOS_EXTRA_MODAL, RESUMEN_PROYECTO } from "./datos/proyectos.js";
 import { detectarVideo, esPDF, galeriaDesdeColumna, irASeccion, paresBaserow, primerosValores, resolverSrcImagen, tituloProyecto, urlDesdeCeldaBaserow, useCarruselAutomatico, useFilasEnlaces } from "./utilidades/baserow.js";
-import BloqueCentral from "./BloqueCentral";
+import BloqueCentral, { CarruselFinal } from "./BloqueCentral";
 import BotonCompartir from "./BotonCompartir";
 import { iniciarAnalitica, registrar } from "./analitica";
 import { iniciarPWA } from "./pwa";
@@ -61,6 +61,15 @@ export default function App() {
   const [showMapaSitio, setShowMapaSitio] = useState(false);
   // Ventana de los botones Beneficios / Registros (null = cerrada)
   const [accesoAbierto, setAccesoAbierto] = useState(null);
+  // Los botones de Registros pueden pedir que se despliegue un registro (Ventas con causa / Extraviados).
+  useEffect(() => {
+    const alPedir = (e) => {
+      if (e.detail === "ventas") setVentasResumenAbierto(true);
+      else if (e.detail === "extraviados") setExtraviadosResumenAbierto(true);
+    };
+    window.addEventListener("dcuates:abrir-registro", alPedir);
+    return () => window.removeEventListener("dcuates:abrir-registro", alPedir);
+  }, []);
   // Categoría abierta (portada simplificada de 4 botones) — null = cerrada.
   const [categoriaAbierta, setCategoriaAbierta] = useState(null);
   // Ventana emergente única para los 12 botones naranjas de portada.
@@ -484,6 +493,9 @@ export default function App() {
           </div>
         </div>
       </section>
+
+      {/* Portada de la pestaña abierta, al final y en sentido contrario a los videos */}
+      <CarruselFinal portadasItems={portadasItems} categorias={CATEGORIAS_PROYECTOS} cargando={!baserowListo} />
 
       {/* FOOTER */}
       <footer className="bg-[#e8f5e9] text-[#0f2d1e] py-12 px-4 text-center space-y-8 border-t-4 border-[#0f2d1e]">

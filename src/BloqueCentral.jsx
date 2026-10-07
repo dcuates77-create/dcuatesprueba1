@@ -80,6 +80,8 @@ const ID_A_TAB = {
   recursos: "valores",
   "mapa-negocios": "negocios",
   "ventas-con-causa": "negocios",
+  "registro-ventas": "negocios",
+  "registro-extraviados": "causas",
   publicidad: "negocios",
   "retos-regalos": "regalos"
 };
@@ -316,6 +318,12 @@ export default function BloqueCentral({
   const slots = { nosotros, beneficios, causas, valores, negocios: negociosSeccion, regalos, gratitud };
   const imgs = { ...PORTADAS_BASE, ...portadas };
 
+  // Avisa qué pestaña está abierta (la usa el carrusel del final de la página).
+  useEffect(() => {
+    window.__dcuatesTab = tab.id;
+    window.dispatchEvent(new CustomEvent("dcuates:tab-activa", { detail: tab.id }));
+  }, [tab.id]);
+
   // Fuente redondeada (Nunito), una sola vez.
   useEffect(() => {
     if (document.getElementById("bc-font")) return;
@@ -505,7 +513,9 @@ export default function BloqueCentral({
         </div>
 
         <div className="bc-panel" id="bc-panel" role="tabpanel" aria-labelledby={`bc-tab-${tab.id}`} key={tab.id} style={{ background: tab.pastel }}>
-          {tab.cover && (cargando || !tab.ocultarSinItems || (portadasItems[tab.id] || []).length > 0 || imgs[tab.id]) && (
+          {/* La portada (imágenes, videos, PDF) va arriba solo en CAUSAS; en las demás
+              pestañas se muestra al final de la página (ver CarruselFinal). */}
+          {tab.id === "causas" && tab.cover && (cargando || !tab.ocultarSinItems || (portadasItems[tab.id] || []).length > 0 || imgs[tab.id]) && (
             <CarruselPortada items={portadasItems[tab.id] || []} tab={tab} slogan={textoPortada} fallback={imgs[tab.id]} cargando={cargando} />
           )}
 
@@ -519,7 +529,16 @@ export default function BloqueCentral({
             <button type="button" className="bc-acc bc-acc-pro" onClick={() => onAcceso("proyectos")}>
               <span className="bc-acc-e" aria-hidden="true">🧭</span><span className="bc-acc-t">Proyectos</span>
             </button>
+            <button
+              type="button"
+              className="bc-acc bc-acc-largo"
+              onClick={() => document.getElementById("bc-detalle")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+            >
+              <span className="bc-acc-t">Lo que somos y lo que hacemos</span>
+              <span className="bc-mano" aria-hidden="true">👇</span>
+            </button>
           </nav>
+          <div id="bc-detalle" className="bc-ancla" aria-hidden="true" />
 
           {tab.mapa && <MapaLocal url={mapaUrl} color={tab.color} />}
 
@@ -659,6 +678,11 @@ const CSS = `
 .bc-acc-ben{background:#e65100}
 .bc-acc-reg{background:#2E9E5B}
 .bc-acc-pro{background:#1B6F8A}
+.bc-acc-largo{grid-column:1/-1;flex-direction:row;gap:10px;min-height:54px;background:#17472d}
+.bc-acc-largo .bc-acc-t{font-size:13px;color:#FFD84D;letter-spacing:.03em}
+.bc-mano{font-size:26px;line-height:1;display:inline-block;animation:bc-mano 1.1s ease-in-out infinite}
+@keyframes bc-mano{0%,100%{transform:translateY(-4px)}50%{transform:translateY(6px)}}
+.bc-ancla{height:0;scroll-margin-top:190px}
 .bc-sub{margin:10px 2px 6px;font-size:15px;font-weight:900}
 .bc-slot{margin-top:14px;min-width:0}
 .bc-snap{display:flex;gap:12px;margin:8px calc(var(--pad) * -1) 0;padding:4px var(--pad) 12px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:var(--pad);-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;scrollbar-width:none}
@@ -750,3 +774,30 @@ const CSS = `
 }
 @media (prefers-reduced-motion:reduce){.bc-panel{animation:none}.bc-fill,.bc-tab,.bc-chip,#encabezado-fijo,.bc-fija{transition:none}.bc-esq{animation:none}}
 `;
+
+// -------------------------------------------------------------------------
+// CarruselFinal — la portada (imágenes, videos, PDF) de la pestaña abierta,
+// al final de la página, después de la barra de videos. Corre en sentido
+// contrario al de los videos. En CAUSAS no aparece: ahí la portada va arriba.
+// -------------------------------------------------------------------------
+export function CarruselFinal({ portadasItems = {}, portadas = {}, categorias = [], cargando = false }) {
+  const [id, setId] = useState(() => (typeof window !== "undefined" && window.__dcuatesTab) || "nosotros");
+  useEffect(() => {
+    const al = (e) => setId(e.detail);
+    window.addEventListener("dcuates:tab-activa", al);
+    return () => window.removeEventListener("dcuates:tab-activa", al);
+  }, []);
+  const tab = TABS.find((t) => t.id === id) || TABS[0];
+  if (tab.id === "causas" || !tab.cover) return null;
+  const cat = categorias.find((c) => c.id === tab.cat) || {};
+  const imgs = { ...PORTADAS_BASE, ...portadas };
+  const items = portadasItems[tab.id] || [];
+  if (!cargando && items.length === 0 && !imgs[tab.id]) return null;
+  const slogan = tab.cover?.slogan || cat.slogan || tab.label;
+  return (
+    <section className="cf-root" style={{ background: tab.pastel }} aria-label={`Portada de ${tab.label}`}>
+      <style>{".cf-root>.cp-root{padding:16px 16px 6px;margin:0;max-width:72rem;margin-left:auto;margin-right:auto}"}</style>
+      <CarruselPortada key={tab.id} items={items} tab={tab} slogan={slogan} fallback={imgs[tab.id]} cargando={cargando} inverso />
+    </section>
+  );
+}
