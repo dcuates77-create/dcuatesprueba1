@@ -1,395 +1,306 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, lazy, Suspense } from "react";
+import { BarraLogros, BarraPatrocinadores, BarraTicker, TickerFrases } from "./componentes/barras.jsx";
+import { BarraAccionesFinal, BotonNecesidades, SiteHeader } from "./componentes/encabezado.jsx";
+import { BotonCerrar } from "./componentes/legal.jsx";
+import { IframeVideo, MiniaturaVideo } from "./componentes/media.jsx";
+import { PestanaBeneficios } from "./componentes/pestanas/Beneficios.jsx";
+import { PestanaCausas } from "./componentes/pestanas/Causas.jsx";
+import { PestanaGratitud } from "./componentes/pestanas/Gratitud.jsx";
+import { PestanaNegocios } from "./componentes/pestanas/Negocios.jsx";
+import { PestanaNosotros } from "./componentes/pestanas/Nosotros.jsx";
+import { PestanaRegalos } from "./componentes/pestanas/Regalos.jsx";
+import { PestanaValores } from "./componentes/pestanas/Valores.jsx";
+import { LOGROS_ITEMS, RECOMENDACIONES_ESTRELLA } from "./datos/cintas.js";
+import { MAPA_NEGOCIOS_EMBED_URL, REDES_SOCIALES, VERSION_BUILD, WHATSAPP_NUMERO, YOUTUBE_VIDEO_ID } from "./datos/config.js";
+import { AVISO_PRIVACIDAD_INTEGRAL, FAQ_ITEMS, TERMINOS_CONDICIONES } from "./datos/legal.js";
+import { TODOS_LOS_PROYECTOS } from "./datos/listas.js";
+import { BOTONES_PORTADA, CATEGORIAS_PROYECTOS, DEGRADADO_SUGERENCIAS, LOGOS_EXTRA_MODAL, RESUMEN_PROYECTO } from "./datos/proyectos.js";
+import { detectarVideo, esPDF, galeriaDesdeColumna, irASeccion, paresBaserow, primerosValores, resolverSrcImagen, tituloProyecto, urlDesdeCeldaBaserow, useCarruselAutomatico, useFilasEnlaces } from "./utilidades/baserow.js";
+import BloqueCentral, { CarruselFinal } from "./BloqueCentral";
+import BotonCompartir from "./BotonCompartir";
+import { iniciarAnalitica, registrar } from "./analitica";
+import { iniciarPWA } from "./pwa";
 
-// =========================================================================
-// 1. CONFIGURACIÓN CENTRALIZADA DE VARIABLES, REDES Y HOJA DE CÁLCULO y BORRADO DE TODOS LOS ANTERIORES JSX
-// =========================================================================
-const GOOGLE_SHEETS_URL = "https://script.google.com/macros/s/AKfycbxngMxuH03w0rI7AyJHRap9QCVf_Xs5roypGXnnkSGr_22SyfxWAVAiH614r1eGC2DW2g/exec";
+// Ventanas poco usadas: se descargan solo la primera vez que alguien las abre.
+const cargarVentanas = () => import("./componentes/ventanasPesadas.jsx");
+const ContenidoModalProyecto = lazy(() => cargarVentanas().then((m) => ({ default: m.ContenidoModalProyecto })));
+const ModalAccesoRapido = lazy(() => cargarVentanas().then((m) => ({ default: m.ModalAccesoRapido })));
+const ModalAvisoSeguridad = lazy(() => cargarVentanas().then((m) => ({ default: m.ModalAvisoSeguridad })));
+const ModalCategoria = lazy(() => cargarVentanas().then((m) => ({ default: m.ModalCategoria })));
+const ModalCompartirMas = lazy(() => cargarVentanas().then((m) => ({ default: m.ModalCompartirMas })));
+const ModalDudas = lazy(() => cargarVentanas().then((m) => ({ default: m.ModalDudas })));
+const ModalEscudoSeguridad = lazy(() => cargarVentanas().then((m) => ({ default: m.ModalEscudoSeguridad })));
+const ModalFormularioWhatsApp = lazy(() => cargarVentanas().then((m) => ({ default: m.ModalFormularioWhatsApp })));
+const ModalLegal = lazy(() => cargarVentanas().then((m) => ({ default: m.ModalLegal })));
+const ModalMapaSitio = lazy(() => cargarVentanas().then((m) => ({ default: m.ModalMapaSitio })));
 
-// Número de WhatsApp centralizado — cámbialo aquí una sola vez si cambia el teléfono
-const WHATSAPP_NUMERO = "525520696627";
-
-// ID del video de portada en YouTube — reemplaza esto por el ID real de "Chuy el Sapo Soñador"
-// (el ID es lo que va después de "v=" en la URL normal de YouTube)
-const YOUTUBE_VIDEO_ID = "SUnE27QnnyI";
-
-const REDES_SOCIALES = {
-  facebook: "https://www.facebook.com/abelzarem/",
-  instagram: "https://www.instagram.com/conexionesconcausa/",
-  youtube: "http://www.youtube.com/@abelmeraz",
-  tiktok: "https://www.tiktok.com/@dcuates"
-};
-
-// Enlaces del botón "⭐ Recomendaciones" — separados en 2 grupos. Los de
-// "comunidad" son EJEMPLOS, edítalos con los negocios/personas reales que
-// quieras recomendar (de 5 a 10 en total entre los dos grupos).
-const RECOMENDACIONES_ESTRELLA = {
-  dcuates: [
-    { nombre: "Facebook DCUATES", enlace: REDES_SOCIALES.facebook },
-    { nombre: "Instagram DCUATES", enlace: REDES_SOCIALES.instagram },
-    { nombre: "YouTube DCUATES", enlace: REDES_SOCIALES.youtube },
-    { nombre: "TikTok DCUATES", enlace: REDES_SOCIALES.tiktok }
-  ],
-  comunidad: [
-    { nombre: "Panadería Café Sol", enlace: "#" },
-    { nombre: "Taquería El Sol", enlace: "#" },
-    { nombre: "Refugio Animal Ecatepec", enlace: "#" }
-  ]
-};
-
-// Botón "🎵 Escucha Música DCUATES" — pega aquí la ruta de tu archivo de
-// audio (colócalo en /public/audio/, ej. /public/audio/musica-dcuates.mp3).
-// Mientras esté vacío, el botón se muestra pero no reproduce nada.
-const MUSICA_DCUATES_URL = "/audio/musica-dcuates.mp3";
-
-// Barra fija de navegación: 3 accesos directos + un menú "MÁS" con el
-// resto (se despliega hacia abajo). Para agregar/quitar algo del menú "MÁS",
-// edita NAV_LINKS_MAS — no se necesita tocar el componente SiteHeader.
-const NAV_LINKS_PRINCIPALES = [
-  { label: "Inicio", href: "#inicio" },
-  { label: "Proyectos", href: "#iniciativas" },
-  { label: "Publicidad Gratuita", href: "#publicidad" }
-];
-const NAV_LINKS_MAS = [
-  { label: "Quiénes Somos", href: "#quienes-somos" },
-  { label: "Nuevos Proyectos", href: "#nuevos-proyectos" }
-];
-// Segunda fila del menú fijo (debajo de los accesos principales), a un
-// lado del botón de música.
-const NAV_LINKS_FILA2 = [
-  { label: "Alianzas Solidarias", href: "#iniciativas" },
-  { label: "Ventas con Causa", href: "#ventas-con-causa" },
-  { label: "Apoyo Voluntario", href: "#donaciones" }
-];
-
-// Función helper para armar enlaces directos de WhatsApp de forma consistente
-function enlaceWhatsApp(mensaje) {
-  return `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(mensaje)}`;
-}
-
-// Función helper para hacer scroll suave hacia una sección/registro de la
-// misma página (usada por los botones que en vez de abrir WhatsApp llevan
-// directo a un formulario, ej. "Publicar mi negocio" o "Extraviados y Adopciones").
-function irASeccion(id) {
-  document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
-}
-
-// Datos de EJEMPLO para la barra ticker inferior — reemplázalos por contenido real
-// cuando tengas fotos/avisos definitivos. Los 4 tipos rotan automáticamente.
-const TICKER_ITEMS = [
-  { tipo: "negocio", nombre: "Taquería El Sol — 20% en tu primera visita", img: "/images/ticker-negocio-1.png", enlace: enlaceWhatsApp("¡Hola! Vi la promoción de Taquería El Sol en DCUATES.") },
-  { tipo: "mascota", nombre: "Firulais — en búsqueda por la colonia centro", img: "/images/ticker-mascota-1.png", enlace: "#ecatepets" },
-  { tipo: "aviso", texto: "🎉 Bazar comunitario este sábado en la plaza principal, 10am–4pm" },
-  { tipo: "momento", nombre: "Entrega de libros de la Bibliobici, agosto 2026", img: "/images/ticker-momento-1.png", enlace: "#libros" },
-  { tipo: "negocio", nombre: "Estética Lupita — corte + peinado con descuento", img: "/images/ticker-negocio-2.png", enlace: enlaceWhatsApp("¡Hola! Vi la promoción de Estética Lupita en DCUATES.") },
-  { tipo: "mascota", nombre: "Michi — en adopción, ya vacunada y esterilizada", img: "/images/ticker-mascota-2.png", enlace: "#ecatepets" },
-  { tipo: "aviso", texto: "📚 Nueva alianza con la papelería del barrio: 10% para vecinos DCUATES" },
-  { tipo: "momento", nombre: "Taller de bienestar comunitario, julio 2026", img: "/images/ticker-momento-2.png", enlace: "#bienestar" }
-];
-
-const TICKER_ETIQUETAS = {
-  negocio: { emoji: "🏪", label: "Negocio Local" },
-  mascota: { emoji: "🐾", label: "Ecatepets" },
-  aviso: { emoji: "📢", label: "Aviso" },
-  momento: { emoji: "📸", label: "Momento DCUATES" },
-  frase: { emoji: "💚", label: "DCUATES" }
-};
-
-// Ticker SUPERIOR (debajo de la barra fija de menú): frases sobre
-// solidaridad y causas afines, más llamados a la acción para sumarse.
-// Edítalas o agrégalas aquí — cada una puede enlazar a cualquier sección
-// de la página. Si más adelante quieres alimentarlas desde Baserow, se
-// puede conectar igual que las demás pasarelas (crea una tabla con
-// columnas "texto" y "enlace", y pide que se conecte con useCatalogoBaserow).
-const TICKER_FRASES = [
-  { tipo: "frase", texto: "“Nadie es tan rico que no necesite ayuda, ni tan pobre que no pueda ofrecerla.”", enlace: "#quienes-somos" },
-  { tipo: "frase", texto: "“Solos avanzamos más rápido; juntos llegamos más lejos.” — Proverbio africano", enlace: "#donaciones" },
-  { tipo: "frase", texto: "💚 ¿Ya eres parte de la RED DCUATES? Súmate hoy mismo", enlace: "#donaciones" },
-  { tipo: "frase", texto: "“La solidaridad no es un acto de caridad, es un acto de justicia.” — E. Galeano", enlace: "#quienes-somos" },
-  { tipo: "frase", texto: "🤝 Comparte tu talento, tiempo o recursos — cada aportación suma", enlace: "#donaciones" },
-  { tipo: "frase", texto: "“El bien que haces hoy será olvidado mañana. Haz el bien de todos modos.” — Madre Teresa de Calcuta", enlace: "#quienes-somos" }
-];
-
-// Arreglo de los 4 Proyectos Iniciales con Enlaces Directos de WhatsApp
-const INICIATIVAS_PRINCIPALES = [
-  {
-    id: "libros",
-    categoria: "EDUCACIÓN Y DESARROLLO",
-    titulo: "LA BIBLIOBICI Y AMIGOS",
-    descripcion: "Préstamo gratuito de libros y materiales educativos para el desarrollo personal y social. La lectura que llega hasta tu colonia para fortalecer a la COMUNIDAD.",
-    puntos: ["Préstamo sin costo", "Materiales para todas las edades", "Recibimos y hacemos donaciones"],
-    textoBoton: "Quiero participar",
-    enlaceDirectoWA: enlaceWhatsApp("¡Hola DCUATES! Me interesa participar en el proyecto de La Bibliobici y Amigos.")
-  },
-  {
-    id: "ecatepets",
-    categoria: "BIENESTAR ANIMAL",
-    titulo: "ECATEPETS",
-    descripcion: "Apoyo en la búsqueda de mascotas extraviadas, y fomento de la adopción y el cuidado animal responsable en conjunto con los vecinos de DCUATES.",
-    puntos: ["Difusión de extravíos", "Adopción responsable", "Cuidado y concientización"],
-    textoBoton: "Publicar Extravíos y Adopciones",
-    // En vez de abrir WhatsApp, este botón lleva directo al registro de
-    // extraviados/adopciones dentro de la sección "Ventas con Causa".
-    scrollDestino: "extraviados-registro",
-    enlaceDirectoWA: enlaceWhatsApp("¡Hola DCUATES! Quiero sumarme a la causa de Ecatepets para el bienestar animal.")
-  },
-  {
-    id: "alianzas-tarjeta",
-    categoria: "CRECIMIENTO CONJUNTO",
-    titulo: "ALIANZAS GANAR-GANAR",
-    descripcion: "Emprendedores, organizaciones y particulares que desean hacer sinergia para crecer juntos y robustecer el tejido social de la COMUNIDAD.",
-    puntos: ["Colaboración mutua", "Red de contactos", "Impacto comunitario"],
-    textoBoton: "Generar alianza",
-    enlaceDirectoWA: enlaceWhatsApp("¡Hola DCUATES! Me interesa generar una alianza ganar-ganar con ustedes.")
-  },
-  {
-    id: "circulo-confianza",
-    categoria: "APOYOS Y BENEFICIOS MUTUOS",
-    titulo: "CÍRCULO DE CONFIANZA",
-    descripcion: "Si eres una persona o negocio TOTALMENTE CONFIABLE que desea SUMAR con perfiles que están en la misma sintonía, o conoces personas o negocios que les gustaría formar parte de nuestro círculo, ¡serán muy BIENVENIDOS!",
-    puntos: ["Perfiles verificados por confianza", "Sinergia que multiplica", "Red exclusiva de contactos"],
-    textoBoton: "Me interesa sumar",
-    enlaceDirectoWA: enlaceWhatsApp("¡Hola DCUATES! Me interesa sumarme al Círculo de Confianza y sus Apoyos y Beneficios Mutuos.")
-  },
-  {
-    id: "recomienda-evalua-gana",
-    categoria: "CONOCIMIENTOS Y EXPERIENCIAS QUE VALEN",
-    titulo: "RECOMIENDA, EVALÚA Y GANA",
-    descripcion: "Tus recomendaciones y comentarios sobre las buenas o malas prácticas, acciones y calidad que tienen los negocios con sus productos y servicios, y las personas que están a cargo de estos, APORTAN VALOR Y MERECEN ser RECOMPENSADOS de alguna forma.",
-    puntos: ["Recomendaciones con valor real", "Reconocimiento por tu experiencia", "Mejora continua de negocios"],
-    textoBoton: "Me interesa colaborar",
-    enlaceDirectoWA: enlaceWhatsApp("¡Hola DCUATES! Me interesa colaborar con Recomienda, Evalúa y Gana compartiendo mi experiencia.")
-  },
-  {
-    id: "publicidad-tarjeta",
-    categoria: "APOYOS COMUNITARIOS",
-    titulo: "PUBLICIDAD GRATUITA",
-    descripcion: "Difunde tu negocio, promociones y servicios de forma gratuita. Con aportación voluntaria ya ayudas a que la plataforma de DCUATES llegue a más familias.",
-    puntos: ["Registro gratuito", "Comparte promociones e imágenes", "Más clientes de tu zona"],
-    textoBoton: "Publicar mi negocio",
-    // En vez de abrir WhatsApp, este botón lleva directo al formulario de
-    // registro "Publicar mi Negocio" dentro de la sección de Publicidad.
-    scrollDestino: "publicidad",
-    enlaceDirectoWA: enlaceWhatsApp("¡Hola DCUATES! Deseo publicar mi negocio en la plataforma de publicidad comunitaria.")
-  }
-];
-
-// Arreglo de los 4 Proyectos Nuevos con Enlaces Directos de WhatsApp
-const NUEVOS_PROYECTOS_DATA = [
-  {
-    id: "asesorias",
-    categoria: "DESARROLLO PROFESIONAL",
-    titulo: "Asesorías Personales y de Negocios",
-    descripcion: "Orientación profesional sin barreras para impulsar tus metas o regularizar tu modelo de negocio de manera efectiva.",
-    puntos: ["Asesoría gratuita", "Aportación voluntaria", "Impulso de metas"],
-    textoBoton: "Solicitar asesoría",
-    enlaceDirectoWA: enlaceWhatsApp("¡Hola DCUATES! Me gustaría solicitar una asesoría personal o de negocios.")
-  },
-  {
-    id: "bazares",
-    categoria: "VENTAS CON CAUSA",
-    titulo: "Comercios Físicos y Digitales",
-    descripcion: "Ventas caseras y de calle basadas en la confianza mutua para el apoyo de la economía familiar y solidaria.",
-    puntos: ["Comercio local seguro", "Barrio de confianza", "Apoyo a causas"],
-    textoBoton: "Incluir mi negocio",
-    enlaceDirectoWA: enlaceWhatsApp("¡Hola DCUATES! Quiero obtener información para participar en los bazares y mercados.")
-  },
-  {
-    id: "noticias",
-    categoria: "COMUNICACIÓN COLECTIVA",
-    titulo: "Noticias y Agenda Cultural",
-    descripcion: "Mantente al día con los eventos culturales, convocatorias comunitarias y acontecimientos sociales de la zona.",
-    puntos: ["Eventos culturales", "Convocatorias vecinales", "Acontecimientos sociales"],
-    textoBoton: "Sumar Actividades",
-    enlaceDirectoWA: enlaceWhatsApp("¡Hola DCUATES! Me interesa conocer la agenda cultural y las noticias del barrio.")
-  },
-  {
-    id: "bienestar",
-    categoria: "SALUD Y ESPARCIMIENTO",
-    titulo: "Bienestar, Salud y Recreación",
-    descripcion: "Actividades recreativas y talleres enfocados en el desarrollo integral, la salud mental y el esparcimiento familiar.",
-    puntos: ["Desarrollo Personal y Social", "Salud Integral", "Disfrute Personal y Social"],
-    textoBoton: "Sumar Actividades",
-    enlaceDirectoWA: enlaceWhatsApp("¡Hola DCUATES! Solicito información sobre los talleres de bienestar, salud y recreación.")
-  }
-];
-
-// Catálogo de "Ventas con Causa". Mientras no esté conectado a Baserow
-// (ver BASEROW_TABLE_ID_VENTAS_CON_CAUSA abajo), el carrusel usa esta
-// lista de EJEMPLO como respaldo. BASEROW_GALLERY_URL se deja como
-// enlace — "ver catálogo completo" — apuntando a tu galería pública real.
-const BASEROW_GALLERY_URL = "https://baserow.io/public/gallery/xCYm1NOc3A5wuJC1NeYlVYyVeY_w7O2tQdNRKcDsiyE";
-
-const VENTAS_CON_CAUSA_ITEMS = [
-  { id: "vc1", tipo: "Artesanías", nombre: "Bordados hechos a mano", descripcion: "Piezas únicas bordadas por manos locales. Pregunta por diseños personalizados.", img: "/images/ventas-causa-1.png" },
-  { id: "vc2", tipo: "Alimentos", nombre: "Pan casero y repostería", descripcion: "Pedidos con un día de anticipación. Ideal para eventos y reuniones.", img: "/images/ventas-causa-2.png" },
-  { id: "vc3", tipo: "Servicios", nombre: "Jardinería a domicilio", descripcion: "Poda, mantenimiento y diseño de jardines. Cotización sin costo.", img: "/images/ventas-causa-3.png" },
-  { id: "vc4", tipo: "Segunda mano", nombre: "Ropa y accesorios", descripcion: "Prendas en buen estado a precios accesibles. Nuevo inventario cada semana.", img: "/images/ventas-causa-4.png" }
-];
-
-const EXTRAVIADOS_ITEMS = [
-  { id: "ex1", tipo: "Mascota", nombre: "Firulais", descripcion: "Perrito café, orejas caídas, visto por última vez cerca de la colonia centro.", img: "/images/extraviado-1.png" },
-  { id: "ex2", tipo: "Persona", nombre: "Sr. Ramírez", descripcion: "Adulto mayor, salió de casa el martes por la tarde y no ha regresado.", img: "/images/extraviado-2.png" },
-  { id: "ex3", tipo: "Cosa", nombre: "Mochila escolar azul", descripcion: "Olvidada en la parada del camión sobre la avenida principal.", img: "/images/extraviado-3.png" },
-  { id: "ex4", tipo: "Mascota", nombre: "Michi", descripcion: "Gata blanca con manchas grises, muy asustadiza, extraviada desde el fin de semana.", img: "/images/extraviado-4.png" }
-];
-
-// =========================================================================
-// CONEXIÓN REAL A BASEROW (segura: el token vive en el servidor, ver
-// /api/baserow-rows.js, nunca en este archivo). Mientras el ID de una
-// tabla esté vacío ("") o la función /api/baserow-rows todavía no
-// responda datos, el carrusel correspondiente sigue mostrando su lista de
-// EJEMPLO de arriba — nada se rompe entretanto.
-//
-// Para activar el catálogo REAL de Ventas con Causa, pega aquí el Table ID
-// de tu tabla en Baserow (instrucciones de cómo encontrarlo, y cómo
-// configurar el token, están en /api/baserow-rows.js).
-const BASEROW_TABLE_ID_VENTAS_CON_CAUSA = "1164149"; // tabla "Productos"
-const BASEROW_TABLE_ID_EXTRAVIADOS = "1165684";      // tabla "Servicios DC"
-
-// Pega aquí el ID de tabla en cuanto crees las tablas nuevas en Baserow
-// (mismo procedimiento que las 2 de arriba). Mientras estén vacías (""),
-// las pasarelas de Noticias/Comunicación y Bienestar/Salud siguen usando
-// los datos de ejemplo (NOTICIAS_GALERIA_ITEMS / BIENESTAR_GALERIA_ITEMS)
-// sin romper nada.
-// Nota: las galerías de Noticias y Bienestar ya NO usan tablas propias —
-// ahora se alimentan de las columnas GALCULTURA y GALSALUD dentro de la
-// misma tabla ENLACES (ver BASEROW_TABLE_ID_ENLACES más abajo).
-
-// Tabla "ENLACES" en Baserow (la que ya armaste con columnas VIDPORT,
-// RECASA, RECOMUN, RECMUSIC, RECLIBROS, RECVIDEOSYMAS, GALCULTURA, GALSALUD,
-// etc.). Un solo ID de tabla alimenta el video de portada, las
-// recomendaciones, la música y las 2 galerías — cada quien lee su propia
-// columna. IMPORTANTE: esto asume que /api/baserow-rows.js devuelve las
-// filas "crudas" (con el nombre exacto de cada columna de Baserow como
-// llave). Si aún no lo hace así para esta tabla, compárteme ese archivo
-// para ajustarlo — mientras tanto, todo sigue funcionando con los datos
-// de respaldo, sin romper nada.
-const BASEROW_TABLE_ID_ENLACES = "1178299";
-// =========================================================================
-
-// Galerías de EJEMPLO para la prueba de "pasarela en ventana emergente"
-// (ver GALERIAS_PROYECTOS y el modal correspondiente más abajo). Por ahora
-// solo Noticias y Bienestar la tienen, a modo de prueba — si el resultado
-// gusta, se puede replicar para cualquier otro proyecto agregando su propio
-// arreglo aquí y una entrada en GALERIAS_PROYECTOS.
-const NOTICIAS_GALERIA_ITEMS = [
-  { id: "not1", tipo: "Evento", nombre: "Feria cultural de agosto", descripcion: "Música en vivo, gastronomía local y actividades para toda la familia en la plaza principal.", img: "/images/noticias-1.png" },
-  { id: "not2", tipo: "Convocatoria", nombre: "Taller de muralismo vecinal", descripcion: "Convocatoria abierta para pintar un mural comunitario. Se proporcionan materiales.", img: "/images/noticias-2.png" },
-  { id: "not3", tipo: "Aviso", nombre: "Jornada de limpieza del parque", descripcion: "Súmate el próximo sábado a la jornada de limpieza y reforestación del parque de la colonia.", img: "/images/noticias-3.png" }
-];
-
-const BIENESTAR_GALERIA_ITEMS = [
-  { id: "bien1", tipo: "Taller", nombre: "Yoga al aire libre", descripcion: "Sesiones gratuitas los domingos por la mañana, para todos los niveles.", img: "/images/bienestar-1.png" },
-  { id: "bien2", tipo: "Actividad", nombre: "Grupo de caminata vecinal", descripcion: "Caminatas ligeras entre semana para fomentar la actividad física y la convivencia.", img: "/images/bienestar-2.png" },
-  { id: "bien3", tipo: "Charla", nombre: "Salud mental y comunidad", descripcion: "Plática abierta sobre bienestar emocional, con espacio para preguntas.", img: "/images/bienestar-3.png" }
-];
-
-// Mapa que conecta cada id de proyecto con su galería y título de modal —
-// así el botón "Ver galería" sabe qué mostrar sin más configuración.
-const GALERIAS_PROYECTOS = {
-  noticias: { titulo: "Agenda Cultural — Noticias de Barrio", items: NOTICIAS_GALERIA_ITEMS },
-  bienestar: { titulo: "Actividades de Bienestar, Salud y Recreación", items: BIENESTAR_GALERIA_ITEMS }
-};
-
-// =========================================================================
-// 1B. VENTANA EMERGENTE ÚNICA DE PROYECTO (reemplaza el "solo scroll" de
-// los 12 botones naranjas de portada). Junta la info de los 10 proyectos
-// que ya tienen tarjeta (INICIATIVAS_PRINCIPALES + NUEVOS_PROYECTOS_DATA)
-// y agrega, a mano, el contenido de los 2 casos especiales que no son una
-// sola tarjeta: "Ventas con Causa" y "Apoyo Voluntario" (donaciones).
-// =========================================================================
-const TODOS_LOS_PROYECTOS = [...INICIATIVAS_PRINCIPALES, ...NUEVOS_PROYECTOS_DATA];
-
-// Las 4 formas de aportación — se reutilizan aquí y en la sección de Apoyo
-// Voluntario más abajo, para no tener el mismo texto escrito dos veces.
-const OPCIONES_APORTACION = [
-  { t: "Aportación Económica", d: "Solicita los datos bancarios de manera directa y segura.", m: "¡Hola DCUATES! Deseo realizar una Aportación Económica. ¿Me podrías proporcionar los datos seguros?" },
-  { t: "Aportación en Especie", d: "Apoya donando herramientas, materiales o insumos útiles.", m: "¡Hola DCUATES! Quiero realizar una Aportación en Especie. ¿Qué tipo de herramientas o insumos se requieren actualmente?" },
-  { t: "Trueque Solidario", d: "Intercambia productos o servicios de valor equivalente.", m: "¡Hola DCUATES! Me interesa el Trueque Solidario. Tengo productos/servicios para intercambiar a favor de la causa." },
-  { t: "Labor Voluntaria", d: "Dona tu valioso tiempo y conocimientos para crecer juntos.", m: "¡Hola DCUATES! Quiero sumarme con Labor Voluntaria aportando mi tiempo y conocimientos comunitarios." }
-];
-
-// Contenido de "Quiénes Somos" — edítalo aquí, se usa en la nueva sección
-// justo después de la portada.
-const QUIENES_SOMOS = {
-  idea: "DCUATES nace como un programa de CONEXIONES CON CAUSA ♥ para conectar a vecinos, negocios y organizaciones de la comunidad, y así generar apoyos y beneficios mutuos reales, todos los días.",
-  objetivos: ["Difundir de forma gratuita a negocios, personas y causas de la zona", "Facilitar el acceso a libros, asesorías y bienestar para todas las familias", "Conectar a quien necesita ayuda con quien puede darla, sin barreras", "Fortalecer el tejido social a través de alianzas ganar-ganar", "Apoyar a quienes AYUDAN a AYUDAR MÁS Y MEJOR !!!"],
-  filosofia: "Creemos en la CADENA DE VALOR Y DE VALORES: cuando una persona o negocio suma su talento, tiempo o recursos, se multiplica el beneficio para todos. Ninguna aportación es demasiado pequeña.",
-  colofon: "AYUDAR A QUIEN LO NECESITA ES UN GUSTO, UN PRIVILEGIO Y UNA BENDICIÓN; AYUDAR A QUIENES AYUDAN ES UNA GRAN BENDICIÓN, Y GENERAR APOYOS MUTUOS ES UNA LLUVIA DE BENDICIONES PARA TODOS !!!",
-  firma: "ATTE: CONEXIONES CON CAUSA ♥"
-};
-
-// Contenido de los 4 botones verdes desplegables que van junto al video
-// (entre la portada y la sección de Proyectos Base). Edítalo aquí.
-const MISION_VISION = {
-  mision: "Conectar personas, negocios, causas y organizaciones de la comunidad para generar apoyos y beneficios mutuos reales, todos los días, sin costo y sin barreras.",
-  vision: "Ser la red comunitaria de referencia donde cualquier persona o negocio de la zona encuentre, en un solo lugar, difusión gratuita, alianzas confiables y oportunidades de ayudar y ser ayudado.",
-  filosofia: "Creemos en LA CADENA DE VALOR Y DE VALORES: cada aportación, por pequeña que parezca, se multiplica cuando se comparte con la comunidad."
-};
-const COMO_SUMAR = {
-  intro: "Si hay algo en lo que podamos APOYAR O SUMAR a tus proyectos, negocios o causas, escríbenos — con gusto vemos cómo conectar esfuerzos.",
-  ventajas: "Sumarte a una RED CONFIABLE Y DE VALOR como DCUATES multiplica tu alcance: más ojos ven tu negocio o causa, más manos pueden ayudarte, y toda la comunidad sale ganando.",
-  cierre: "Te invitamos a colaborar si hay algún proyecto DCUATES en el que te interese SUMARTE — dinos cuál y platicamos los siguientes pasos."
-};
-
-// Texto del Aviso de Privacidad — se usa tanto en su modal como en el
-// botón verde desplegable "Aviso de Privacidad" de la portada, para no
-// tener el mismo texto escrito dos veces.
-const AVISO_PRIVACIDAD_PARRAFOS = [
-  "En cumplimiento con la normativa de protección de datos, DCUATES le informa que los datos recabados en este formulario (Nombre de Negocio, Categoría y Enlaces Digitales) tienen la única y exclusiva finalidad de promover de forma comunitaria y gratuita sus actividades comerciales.",
-  "Sus datos no serán vendidos, transferidos ni compartidos con terceros con fines de lucro. Al enviar la información y continuar la interacción en WhatsApp, usted acepta el tratamiento de los mismos para los fines de difusión colectiva estipulados en nuestras iniciativas de Apoyo al Emprendimiento.",
-  "Usted puede solicitar la baja, rectificación o eliminación de los datos publicitados en cualquier momento poniéndose en contacto directo mediante nuestros canales oficiales de atención."
-];
-
-// Preguntas frecuentes — cada una se despliega al dar clic (como un
-// acordeón). Para agregar una nueva, solo copia un bloque { pregunta, respuesta } más.
-const FAQ_ITEMS = [
-  { pregunta: "¿DCUATES tiene algún costo para participar?", respuesta: "No. Todos los proyectos (libros, publicidad, Ecatepets, asesorías, etc.) son gratuitos. Las aportaciones voluntarias solo ayudan a que la plataforma llegue a más familias." },
-  { pregunta: "¿Cómo publico mi negocio o servicio?", respuesta: "Usa el botón \"Publicidad Gratuita\" en la portada, o baja hasta la sección de Publicidad Comunitaria y llena el formulario. También puedes escribirnos directo por WhatsApp." },
-  { pregunta: "¿Cómo reporto una mascota, persona o cosa extraviada?", respuesta: "Entra al botón \"Ecatepets\" o a la sección \"Ventas con Causa\" y da clic en \"Reportar un caso por WhatsApp\"; te contactamos directo." },
-  { pregunta: "¿Qué pasa con mis datos si lleno un formulario?", respuesta: "Solo se usan para la difusión comunitaria del proyecto que elegiste. Puedes ver el detalle completo en nuestro Aviso de Privacidad, en el pie de página." },
-  { pregunta: "¿Cómo puedo apoyar como voluntario o con una donación?", respuesta: "En el botón \"Apoyo Voluntario\" puedes elegir entre aportación económica, en especie, trueque solidario o labor voluntaria — cada opción te conecta directo por WhatsApp." },
-  { pregunta: "¿Necesito ser un negocio formal para participar?", respuesta: "No. DCUATES está abierto a negocios formales, informales, personas y organizaciones de la comunidad; lo importante es la intención de sumar y beneficiar a la zona." },
-  { pregunta: "¿Cómo me entero de las noticias y actividades nuevas?", respuesta: "Sigue nuestras redes sociales (Facebook, Instagram, YouTube y TikTok) y revisa el botón de \"Noticias de Barrio\" en la portada; ahí publicamos convocatorias y eventos." }
-];
+if (typeof console !== "undefined") console.info("[DCUATES] versión", VERSION_BUILD);
 
 // =========================================================================
 // 2. COMPONENTE PRINCIPAL (INICIO DEL RENDERIZADO)
 // =========================================================================
 export default function App() {
   const [showPrivacy, setShowPrivacy] = useState(false);
+  const [showTerminos, setShowTerminos] = useState(false);
+  const [showSeguridad, setShowSeguridad] = useState(false);
+  const [showEscudo, setShowEscudo] = useState(false);
+  useEffect(() => {
+    const alPedir = (e) => {
+      if (e.detail === "privacidad") setShowPrivacy(true);
+      else if (e.detail === "terminos") setShowTerminos(true);
+      else if (e.detail === "seguridad") setShowSeguridad(true);
+      else if (e.detail === "escudo") setShowEscudo(true);
+    };
+    window.addEventListener("dcuates:abrir-legal", alPedir);
+    return () => window.removeEventListener("dcuates:abrir-legal", alPedir);
+  }, []);
   const [showFAQ, setShowFAQ] = useState(false);
+  const [showDudas, setShowDudas] = useState(false);
+  // Modal del Mapa de Sitio — tarjetas con acceso directo a todo lo que
+  // hay en la página (accesible desde el pie de página y el menú "Más").
+  const [showMapaSitio, setShowMapaSitio] = useState(false);
+  // Ventana de los botones Beneficios / Registros (null = cerrada)
+  const [accesoAbierto, setAccesoAbierto] = useState(null);
+  // Los botones de Registros pueden pedir que se despliegue un registro (Ventas con causa / Extraviados).
+  useEffect(() => {
+    const alPedir = (e) => {
+      if (e.detail === "ventas") setVentasResumenAbierto(true);
+      else if (e.detail === "extraviados") setExtraviadosResumenAbierto(true);
+    };
+    window.addEventListener("dcuates:abrir-registro", alPedir);
+    return () => window.removeEventListener("dcuates:abrir-registro", alPedir);
+  }, []);
+  // Categoría abierta (portada simplificada de 4 botones) — null = cerrada.
+  const [categoriaAbierta, setCategoriaAbierta] = useState(null);
   // Ventana emergente única para los 12 botones naranjas de portada.
   // null = cerrada; si tiene un id (ej. "libros", "ecatepets", "ventas-con-causa",
   // "donaciones") se abre con la información de ese proyecto.
   const [modalProyecto, setModalProyecto] = useState(null);
+  // Analítica: cuenta visitas y registra qué proyectos se abren.
+  useEffect(() => { iniciarAnalitica(); iniciarPWA(); }, []);
+  useEffect(() => { if (modalProyecto) registrar("proyecto_abrir", { id: String(modalProyecto) }); }, [modalProyecto]);
+  // ¿Ya respondió Baserow (bien o mal)? Mientras no, se muestran esqueletos.
+  const [baserowListo, setBaserowListo] = useState(() => typeof window !== "undefined" && !!window.__dcuatesBaserow);
+  useEffect(() => {
+    const listo = () => setBaserowListo(true);
+    window.addEventListener("dcuates:baserow-estado", listo);
+    const tope = setTimeout(listo, 8000);
+    return () => { window.removeEventListener("dcuates:baserow-estado", listo); clearTimeout(tope); };
+  }, []);
+  // Enlaces con # que abren la ventana de un proyecto:
+  //   dcuates.com/#proyecto-libros  (el que se comparte)  y  dcuates.com/#libros
+  // (el de la barra de logros). Los ids de secciones de la página (#donaciones,
+  // #solicitudes…) no abren ventana: los maneja BloqueCentral.
+  useEffect(() => {
+    const IDS_DE_SECCION = new Set(["donaciones", "chuy-video", "extraviados-registro", "quienes-somos", "solicitudes", "recursos", "mapa-negocios", "ventas-con-causa", "publicidad", "retos-regalos", "inicio", "historias-reflexiones"]);
+    const abrir = () => {
+      const h = decodeURIComponent(window.location.hash || "");
+      if (h.length < 2) return;
+      let id = h.slice(1);
+      if (id === "avisos") { window.dispatchEvent(new Event("dcuates:abrir-avisos")); return; }
+      if (id === "compartir") { setModalFormulario("comparte"); return; }
+      if (id === "seguridad") { setShowSeguridad(true); return; }
+      if (id === "escudo") { setShowEscudo(true); return; }
+      if (id.startsWith("proyecto-")) id = id.slice("proyecto-".length);
+      else if (IDS_DE_SECCION.has(id)) return;
+      if (BOTONES_PORTADA.some((b) => b.modal === id) || TODOS_LOS_PROYECTOS.some((x) => x.id === id)) setModalProyecto(id);
+    };
+    abrir();
+    window.addEventListener("hashchange", abrir);
+    return () => window.removeEventListener("hashchange", abrir);
+  }, []);
+  // Búsqueda: vive aquí (no dentro de SiteHeader) para poder abrirla desde
+  // cualquier parte de la página (ej. el acceso rápido de "Registra tu
+  // Solicitud"), además del botón del encabezado.
+  const [busquedaAbierta, setBusquedaAbierta] = useState(false);
+
+  // Formulario de "Registra tu Solicitud" (junto al mapa): ahora es propio y
+  // siempre se ve completo.
+  const [solicitudExpandida, setSolicitudExpandida] = useState(true);
+  // Botones naranjas junto a los carruseles de Ventas con Causa y de
+  // Extraviados: agrupados en un solo botón resumen debajo del carrusel.
+  const [ventasResumenAbierto, setVentasResumenAbierto] = useState(false);
+  const [extraviadosResumenAbierto, setExtraviadosResumenAbierto] = useState(false);
+  // Botón flotante "Subir" + barra de progreso de lectura (aparecen solo
+  // después de bajar un poco en la página).
+  const [mostrarSubir, setMostrarSubir] = useState(false);
+  const [progresoLectura, setProgresoLectura] = useState(0);
+  useEffect(() => {
+    const onScroll = () => {
+      const alto = document.documentElement.scrollHeight - window.innerHeight;
+      const pct = alto > 0 ? Math.min(100, Math.max(0, (window.scrollY / alto) * 100)) : 0;
+      setProgresoLectura(pct);
+      setMostrarSubir(window.scrollY > 500);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Enlaces con "#algo" (ej. dcuatesmini.vercel.app/#solicitudes): la página
+  // se dibuja con React DESPUÉS de cargar, así que el navegador no encuentra
+  // la sección a tiempo y se queda arriba. Aquí, al entrar, esperamos a que
+  // exista y bajamos hasta ella (reintentando unos segundos, porque el
+  // contenido de Baserow puede mover la altura de la página al cargar).
+  // Si el "#algo" es el id de un proyecto (ej. #ecatepets), abre su ventana.
+  useEffect(() => {
+    const id = decodeURIComponent(window.location.hash.replace("#", ""));
+    if (!id) return;
+    let intentos = 0;
+    const timer = setInterval(() => {
+      intentos += 1;
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+        clearInterval(timer);
+      } else if (TODOS_LOS_PROYECTOS.some((p) => p.id === id)) {
+        setModalProyecto(id);
+        clearInterval(timer);
+      } else if (intentos >= 20) {
+        clearInterval(timer);
+      }
+    }, 250);
+    return () => clearInterval(timer);
+  }, []);
+  // Formulario emergente reutilizable: null = cerrado; "sugerencias" abre el
+  // de Sugerencias y Quejas (pie de página / menú "MÁS"); "comparte" abre el
+  // de Conocer y Compartir Más (desde el botón naranja "Compartir Más" del encabezado).
+  const [modalFormulario, setModalFormulario] = useState(null);
+  // Id de YouTube del video que se está viendo en grande (ventana flotante),
+  // al tocar una miniatura de la barra de videos de portada.
+  const [videoEnGrande, setVideoEnGrande] = useState(null);
   // Controla si el párrafo largo de la portada se ve completo o resumido
   // en pantallas pequeñas (para que se necesite menos scroll en celular).
   const [heroExpandido, setHeroExpandido] = useState(false);
   // Controla si el bloque de "Quiénes Somos" se ve resumido (3 líneas) o
   // completo, con su propio botón "Mostrar más".
   const [quienesExpandido, setQuienesExpandido] = useState(false);
+  // Tarjetas "Nuestra Misión" y "Cómo Podemos Sumar" — mismo formato que
+  // Quiénes Somos (expandir/mostrar más), ya no son botones verdes.
+  const [misionExpandida, setMisionExpandida] = useState(false);
   // Controla cuál de los 4 botones verdes desplegables (Nuestra Misión,
   // Cómo Podemos Sumar, Preguntas Frecuentes, Aviso de Privacidad) está
   // abierto junto al video. null = ninguno abierto; solo uno a la vez.
   const [infoAbierta, setInfoAbierta] = useState(null);
-  // Botón "Escucha Música DCUATES" del pie de página.
-  const [musicaSonando, setMusicaSonando] = useState(false);
-  const audioRef = useRef(null);
-  const alternarMusica = () => {
-    if (!audioRef.current) return;
-    if (musicaSonando) {
-      audioRef.current.pause();
-    } else {
-      audioRef.current.play().catch(() => {});
-    }
-    setMusicaSonando((v) => !v);
-  };
 
   // Filas "crudas" de la tabla ENLACES en Baserow — alimentan el video de
   // portada, las recomendaciones y el botón de Música/Libros/Pelis.
   const filasEnlaces = useFilasEnlaces();
-  const videoIdPortada = idYoutubeDesdeUrl(primerosValores(filasEnlaces, "VIDPORT", 1)[0]) || YOUTUBE_VIDEO_ID;
+  // Miniaturas de video de portada — igual que Recomendaciones: cada video
+  // puede tener un nombre en la columna "NOMBRE VIDPORT"; si no lo tiene,
+  // se numera solo como "Video 1", "Video 2"... Reconoce YouTube y TikTok
+  // (ver detectarVideo más abajo en el archivo).
+  const videosPortada = paresBaserow(filasEnlaces, "NOMBRE VIDPORT", "VIDPORT", 20)
+    .map((v) => ({ video: detectarVideo(v.enlace), nombre: v.nombre }))
+    .filter((v) => v.video);
+  const videosPortadaFinal = videosPortada.length > 0 ? videosPortada : [{ video: { plataforma: "youtube", id: YOUTUBE_VIDEO_ID }, nombre: "Video de presentación DCUATES" }];
+  // Rotación automática de la barra de Historias y reflexiones (misma
+  // lógica que Patrocinadores): se pausa sola en cuanto alguien la toca.
+  const carruselHistorias = useCarruselAutomatico(videosPortadaFinal.length);
+
+  // Retos, Regalos y Reconocimientos — carrusel de fotos desde la columna
+  // "RETOSGALERIA" (Archivo/Adjunto, igual que "MUSICA") y videos
+  // relacionados desde "NOMBRE RETOSVID" / "RETOSVID" (mismo patrón que
+  // los videos de portada, también reconoce YouTube, TikTok y Facebook).
+  // Mientras no subas nada a esas columnas, estas listas simplemente salen
+  // vacías y la sección lo indica.
+  const galeriaRetos = galeriaDesdeColumna(filasEnlaces, "RETOSGALERIA", 10, "Retos");
+  const videosRetos = paresBaserow(filasEnlaces, "NOMBRE RETOSVID", "RETOSVID", 8)
+    .map((v) => ({ video: detectarVideo(v.enlace), nombre: v.nombre }))
+    .filter((v) => v.video);
+
+  // Carrusel de portada de cada pestaña (un cuadro cada 3 segundos). Para cada
+  // pestaña (NOSOTROS, BENEFICIOS, CAUSAS, VALORES, REGALOS, GRATITUD), en la
+  // tabla ENLACES de Baserow:
+  //  - "PORTADA <PESTAÑA>"  (columna Archivo): una imagen o un PDF por fila.
+  //    Opcional: "NOMBRE PORTADA <PESTAÑA>" como texto al pie del cuadro.
+  //  - "VIDEOS <PESTAÑA>" (texto/URL): un enlace de video por fila.
+  //    Opcional: "NOMBRE VIDEOS <PESTAÑA>" como texto al pie del cuadro.
+  //  Pestañas: NOSOTROS, BENEFICIOS, CAUSAS, VALORES, NEGOCIOS, REGALOS, GRATITUD.
+  // En CAUSAS se suman además los videos de RETOSVID (el carrusel que antes
+  // estaba arriba de todo). Si una pestaña no tiene nada, muestra su imagen de
+  // respaldo (ver PORTADAS_BASE en BloqueCentral.jsx).
+  const portadasItems = {};
+  ["nosotros", "beneficios", "causas", "valores", "negocios", "regalos", "gratitud"].forEach((id) => {
+    const K = id.toUpperCase();
+    const archivos = filasEnlaces
+      .flatMap((f, i) => {
+        if (!f) return [];
+        const celda = f[`PORTADA ${K}`];
+        // Una celda de Archivo puede traer varios archivos: se usan todos.
+        const lista = Array.isArray(celda)
+          ? celda
+              .map((x) => x && { url: x.url || (x.thumbnails && x.thumbnails.card && x.thumbnails.card.url), nombreArchivo: x.visible_name || "" })
+              .filter((x) => x && x.url)
+          : [urlDesdeCeldaBaserow(celda)].filter(Boolean).map((url) => ({ url, nombreArchivo: "" }));
+        const nombre = (f[`NOMBRE PORTADA ${K}`] && String(f[`NOMBRE PORTADA ${K}`]).trim()) || "";
+        return lista.map((x, j) => {
+          const esDoc = esPDF(x.url) || /\.pdf$/i.test(x.nombreArchivo);
+          return esDoc
+            ? { id: `${id}-arch-${i}-${j}`, tipo: "pdf", url: x.url, nombre: (j === 0 && nombre) || "Documento PDF" }
+            : { id: `${id}-arch-${i}-${j}`, tipo: "imagen", img: resolverSrcImagen(x.url), nombre: j === 0 ? nombre : "" };
+        });
+      })
+      .slice(0, 10);
+    const videos = filasEnlaces
+      .filter((f) => f && f[`VIDEOS ${K}`] && String(f[`VIDEOS ${K}`]).trim() !== "")
+      .slice(0, 10)
+      .map((f) => ({
+        video: detectarVideo(f[`VIDEOS ${K}`]),
+        nombre: (f[`NOMBRE VIDEOS ${K}`] && String(f[`NOMBRE VIDEOS ${K}`]).trim()) || ""
+      }))
+      .filter((v) => v.video)
+      .map((v, i) => ({
+        id: `${id}-vid-${i}`,
+        tipo: "video",
+        nombre: v.nombre,
+        media: <MiniaturaVideo video={v.video} nombre={v.nombre} />,
+        onClick: () => setVideoEnGrande(v.video)
+      }));
+    portadasItems[id] = [...archivos, ...videos];
+  });
+  portadasItems.causas = [
+    ...portadasItems.causas,
+    ...videosRetos.map((v, i) => ({
+      id: `causas-retos-${i}`,
+      tipo: "video",
+      nombre: v.nombre,
+      media: <MiniaturaVideo video={v.video} nombre={v.nombre} />,
+      onClick: () => setVideoEnGrande(v.video)
+    }))
+  ];
+
+  // Logros para la banda de impacto: los de Baserow ("NOMBRE LOGROS" /
+  // "ENLACE LOGROS") o, si no hay, los ejemplos LOGROS_ITEMS (los mismos de
+  // la barra de logros de arriba).
+  const logrosBaserow = paresBaserow(filasEnlaces, "NOMBRE LOGROS", "ENLACE LOGROS", 20);
+  const logrosBanda = logrosBaserow.length > 0
+    ? logrosBaserow.map((l) => ({ texto: l.nombre, enlace: l.enlace }))
+    : LOGROS_ITEMS;
+
+  // Negocios que aparecen en las fichas debajo del mapa. Se dan de alta en la
+  // tabla ENLACES de Baserow, una fila por negocio, con estas columnas (solo
+  // "NEGOCIO NOMBRE" es obligatoria):
+  //   NEGOCIO NOMBRE · NEGOCIO GIRO · NEGOCIO ZONA · NEGOCIO PROMO ·
+  //   NEGOCIO TEL (con lada, sin +) · NEGOCIO EMOJI · NEGOCIO LOGO (Archivo)
+  const PALETA_NEGOCIOS = ["#F07A1A", "#E5484D", "#C58A1B", "#3B82C4", "#2E9E5B", "#7A5AD8"];
+  const textoDe = (f, col) => (f[col] && String(f[col]).trim()) || "";
+  const negociosBaserow = filasEnlaces
+    .filter((f) => f && textoDe(f, "NEGOCIO NOMBRE"))
+    .slice(0, 20)
+    .map((f, i) => {
+      const logo = f["NEGOCIO LOGO"] ? urlDesdeCeldaBaserow(f["NEGOCIO LOGO"]) : "";
+      return {
+        nombre: textoDe(f, "NEGOCIO NOMBRE"),
+        giro: textoDe(f, "NEGOCIO GIRO") || "Negocio local",
+        zona: textoDe(f, "NEGOCIO ZONA") || "Jardines de Morelos",
+        promo: textoDe(f, "NEGOCIO PROMO"),
+        tel: textoDe(f, "NEGOCIO TEL").replace(/\D/g, ""),
+        emoji: textoDe(f, "NEGOCIO EMOJI") || "🏪",
+        logo: logo ? resolverSrcImagen(logo) : "",
+        color: PALETA_NEGOCIOS[i % PALETA_NEGOCIOS.length]
+      };
+    });
 
   const recomendacionesDcuates = (() => {
     const desdeBaserow = paresBaserow(filasEnlaces, "Nombre Recocasa", "RECASA", 5);
@@ -404,650 +315,197 @@ export default function App() {
   const librosLinks = primerosValores(filasEnlaces, "RECLIBROS", 5);
   const videosLinks = primerosValores(filasEnlaces, "RECVIDEOSYMAS", 6);
 
-  // Audio de fondo real: la columna "MUSICA" en Baserow es de tipo
-  // Archivo/Adjunto (ahí subiste el mp3), así que se lee igual que las
-  // galerías. Si por algún motivo viene vacía, cae al archivo local de
-  // respaldo (MUSICA_DCUATES_URL).
-  const musicaFondoUrl = (() => {
-    for (const fila of filasEnlaces) {
-      const url = fila && urlDesdeCeldaBaserow(fila.MUSICA);
-      if (url) return url;
-    }
-    return MUSICA_DCUATES_URL;
-  })();
+  // Enlaces de apoyo (columnas de Baserow con links de internet, de tipo
+  // texto plano). Se muestran los primeros 5 de cada una; para mostrar más
+  // basta con subir el número.
+  const apoyoCausaAnimalLinks = primerosValores(filasEnlaces, "APOYO CAUSA ANIMAL", 5);
+  const apoyoPersonasExtraviadasLinks = primerosValores(filasEnlaces, "APOYO PERSONAS EXTRAVIADAS", 5);
+  const apoyoCosasCasosLinks = primerosValores(filasEnlaces, "APOYO COSAS Y CASOS", 5);
+  // Apoyo 4 y Apoyo 5 — columnas todavía no creadas en Baserow; en cuanto
+  // se agreguen con estos nombres exactos, los botones las tomarán solas.
+  // Recomendaciones de Compra/Venta/Compra-Venta DCUATES — igual que el
+  // botón verde de Recomendaciones del inicio: cada liga puede tener un
+  // nombre en una columna "NOMBRE ..." de Baserow; si no lo tiene, se
+  // muestra "Recomendación 1", "2"... automáticamente.
+  const recomendacionesCompra = paresBaserow(filasEnlaces, "NOMBRE RECOMENDACIONES DE COMPRA", "RECOMENDACIONES DE COMPRA", 5);
+  const recomendacionesVenta = paresBaserow(filasEnlaces, "NOMBRE RECOMENDACIONES DE VENTA", "RECOMENDACIONES DE VENTA", 5);
+  const compraVentaDcuates = paresBaserow(filasEnlaces, "NOMBRE COMPRA-VENTA DCUATES", "COMPRA-VENTA DCUATES", 5);
 
   return (
     <div className="min-h-screen bg-[#17472d] font-sans antialiased text-slate-900 selection:bg-emerald-500/30 relative pb-28 sm:pb-24">
+
+      {/* Barra de progreso de lectura — línea delgada pegada arriba de todo */}
+      <div className="fixed top-0 left-0 right-0 z-[60] h-1 bg-black/10">
+        <div
+          className="h-full bg-[#e65100] transition-[width] duration-150"
+          style={{ width: `${progresoLectura}%` }}
+        />
+      </div>
 
       {/* Barra Ticker Inferior Fija — combina negocios, mascotas, avisos y momentos */}
       <BarraTicker />
 
       {/* Botón Flotante Permanente de WhatsApp — efecto 3D + anillo parpadeante + etiqueta */}
-      <div className="fixed bottom-20 sm:bottom-24 right-6 z-50 flex items-center gap-3">
-        <span className="bg-[#25d366] text-white text-[11px] sm:text-sm font-black uppercase tracking-wide px-3 py-2 rounded-full shadow-lg border border-white/30 whitespace-nowrap animate-pulse">
+      <div className="fixed right-4 sm:right-6 z-50 flex flex-col items-end gap-1.5" style={{ bottom: "calc(var(--alto-ticker, 48px) + 6px)" }}>
+        {/* Flecha "Subir" — a la derecha, arriba de ¿Qué necesitas hoy?; aparece
+            solo después de bajar un poco. */}
+        {mostrarSubir && (
+          <button
+            type="button"
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            aria-label="Subir al inicio de la página"
+            title="Subir al menú"
+            className="h-12 w-12 flex items-center justify-center rounded-full bg-[#0f2d1e] text-white shadow-lg border-2 border-white/40 hover:bg-emerald-800 transition-colors"
+          >
+            <span className="text-2xl leading-none font-black" aria-hidden="true">↑</span>
+          </button>
+        )}
+        {/* ¿Qué necesitas hoy? — arriba del botón de WhatsApp */}
+        <BotonNecesidades
+          onAbrirProyecto={(id) => setModalProyecto(id)}
+          onAccionEspecial={(accion) => setModalFormulario(accion)}
+          onAbrirFAQ={() => setShowFAQ(true)}
+        />
+        <div className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={() => { registrar("dudas_abrir"); setShowDudas(true); }}
+          className="bg-[#25d366] text-white text-[11px] sm:text-sm font-black uppercase tracking-wide px-3 py-2 rounded-full shadow-lg border border-white/30 whitespace-nowrap animate-pulse"
+        >
           Dudas y Atención
-        </span>
-        <a
-          href={enlaceWhatsApp("¡Hola DCUATES! Me gustaría más información.")}
-          target="_blank"
-          rel="noopener noreferrer"
+        </button>
+        <button
+          type="button"
+          onClick={() => { registrar("dudas_abrir"); setShowDudas(true); }}
+          aria-label="Abrir ventana de dudas y atención"
           className="relative flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[#34e372] to-[#128c7e] text-white shadow-[0_10px_20px_rgba(0,0,0,0.35),inset_0_-3px_6px_rgba(0,0,0,0.25),inset_0_3px_4px_rgba(255,255,255,0.4)] transition-all hover:scale-110 active:scale-95 border-2 border-white/40"
-          title="Chat de Atención Directa"
+          title="Dudas y Atención"
         >
           <span className="absolute inset-0 rounded-full bg-[#25d366] animate-ping opacity-60"></span>
           <svg className="relative z-10 h-7 w-7 fill-current drop-shadow" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.503-5.729-1.458L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.965C16.428 1.978 13.96 1.951 12.01 1.951c-5.438 0-9.863 4.374-9.867 9.802 0 1.685.459 3.324 1.333 4.766L2.483 20.3l3.966-.995zM17.15 14.34c-.283-.141-1.674-.824-1.933-.917-.26-.093-.448-.14-.637.142-.188.282-.729.917-.894 1.105-.165.188-.33.212-.613.07a9.23 9.23 0 0 1-2.28-1.401 10.15 10.15 0 0 1-1.579-1.954c-.165-.282-.018-.434.124-.574.127-.127.283-.329.424-.494.141-.165.188-.282.283-.47.094-.188.047-.353-.024-.494-.071-.141-.637-1.53-.873-2.102-.229-.554-.46-.478-.637-.487-.164-.008-.353-.01-.542-.01-.189 0-.495.07-.755.353-.26.282-.99 1.011-.99 2.467 0 1.457 1.06 2.867 1.201 3.056.142.188 2.086 3.178 5.053 4.462.705.305 1.256.488 1.684.624.708.226 1.353.194 1.863.118.568-.085 1.674-.682 1.909-1.34.236-.658.236-1.223.165-1.34-.07-.117-.26-.188-.542-.329z"/>
           </svg>
-        </a>
+        </button>
+              </div>
       </div>
 
-      {/* Encabezado + ticker de frases, pegados juntos como una sola barra fija */}
-      <div className="sticky top-0 z-40">
+      {/* Encabezado + ticker de frases, pegados juntos como una sola barra fija.
+          "relative" para poder anclar el botón de Necesidades justo debajo
+          (top-full), pegado al borde inferior, y que se mueva junto con todo
+          el bloque al hacer scroll (igual que el header, que es sticky). */}
+      <div id="encabezado-fijo" className="sticky top-0 z-40 relative">
         <SiteHeader
           onAbrirFAQ={() => setShowFAQ(true)}
           onAbrirPrivacidad={() => setShowPrivacy(true)}
-          musicaSonando={musicaSonando}
-          onAlternarMusica={alternarMusica}
+          onAbrirTerminos={() => setShowTerminos(true)}
+          onAbrirSeguridad={() => setShowSeguridad(true)}
+          onAbrirEscudo={() => setShowEscudo(true)}
+          onAbrirProyecto={(id) => setModalProyecto(id)}
+          onAbrirSugerencias={() => setModalFormulario("sugerencias")}
+          onAbrirMapaSitio={() => setShowMapaSitio(true)}
+          onAbrirCategoria={(id) => setCategoriaAbierta(id)}
+          busquedaAbierta={busquedaAbierta}
+          setBusquedaAbierta={setBusquedaAbierta}
         />
-        <audio ref={audioRef} src={musicaFondoUrl} loop onEnded={() => setMusicaSonando(false)} className="hidden" />
         <TickerFrases />
+        <BarraLogros />
+
       </div>
 
       {/* SECCIÓN PORTADA / HERO — izquierda: título+texto+Quiénes Somos+Bibliobici a toda altura; derecha: cuadrícula de 12 botones (2 columnas en celular, 3 en escritorio = 3x4) */}
-      <section id="inicio" className="scroll-mt-48 md:scroll-mt-36 bg-[#e8f5e9] text-[#0f2d1e] py-8 px-4 sm:py-12 md:py-16 border-b-4 border-[#0f2d1e]">
-        <div className="mx-auto max-w-7xl grid gap-8 lg:grid-cols-12 lg:items-stretch">
+      <section id="inicio" className="scroll-mt-48 md:scroll-mt-36 bg-[#e8f5e9] text-[#0f2d1e] py-4 px-4 sm:py-6">
+        <div className="mx-auto max-w-2xl md:max-w-4xl xl:max-w-6xl flex flex-col gap-4">
 
-          {/* Columna izquierda: título, texto, Quiénes Somos y la Bibliobici, todo a la misma altura que la cuadrícula de botones */}
-          <div className="lg:col-span-6 flex flex-col gap-4 min-w-0 lg:h-full">
-            <div>
-              <h1 className="text-3xl sm:text-4xl font-black uppercase tracking-tight text-[#0f2d1e] leading-tight">
-                Juntos hacemos una mejor comunidad ⭐ 😊
-              </h1>
-              <p className={`text-sm sm:text-base text-slate-800 leading-relaxed text-justify font-medium overflow-hidden mt-3 ${heroExpandido ? "max-h-none" : "max-h-[4.9em]"}`}>
-                <strong>DCUATES</strong> impulsa proyectos, <strong>PERSONAS, ORGANIZACIONES Y EMPRENDIMIENTOS</strong> que <strong>BENEFICIAN a las FAMILIAS</strong>: <strong>PUBLICIDAD GRATUITA</strong> para tu negocio, préstamo de <strong>LIBROS</strong> y materiales <strong>EDUCATIVOS</strong>, apoyo a <strong>MASCOTAS Y GRUPOS VULNERABLES</strong>, y <strong>ALIANZAS GANAR-GANAR</strong> que generan apoyos y beneficios mutuos y comunitarios. Suma con tu valiosa colaboración o con tu invaluable <strong>APOYO VOLUNTARIO</strong> para lograr nuestros objetivos de forma más efectiva, y forjar <strong>LA CADENA DE VALOR Y DE VALORES</strong> que nos liberará de nuestras limitaciones para ser mejores, Y ASÍ MEJORAR NUESTRO ENTORNO Y NUESTRO MUNDO !!!
-              </p>
-              <button
-                type="button"
-                onClick={() => setHeroExpandido((v) => !v)}
-                className="text-xs font-black uppercase text-emerald-800 underline underline-offset-2 mt-1"
-              >
-                {heroExpandido ? "Leer menos" : "Leer más"}
-              </button>
-            </div>
-
-            {/* QUIÉNES SOMOS — justo debajo de JUNTOS, resumido con "Mostrar más" */}
-            <div id="quienes-somos" className="scroll-mt-48 md:scroll-mt-36 rounded-2xl bg-[#17472d] text-white p-4 sm:p-5">
-              <span className="flex items-center gap-2 text-xl sm:text-2xl font-black uppercase tracking-wider text-emerald-400 mb-2">
-                <span className="text-3xl sm:text-4xl">✅</span> Quiénes Somos
-              </span>
-              <div className={`overflow-hidden ${quienesExpandido ? "max-h-none" : "max-h-[5.6em]"}`}>
-                <p className="text-sm sm:text-base text-emerald-50 leading-relaxed font-medium">
-                  {QUIENES_SOMOS.idea}
-                </p>
-                <div className="grid gap-2 text-left pt-3">
-                  {QUIENES_SOMOS.objetivos.map((obj, i) => (
-                    <div key={i} className="flex items-start gap-2 bg-emerald-900/40 rounded-xl px-3 py-2">
-                      <span className="h-2 w-2 mt-1.5 rounded-full bg-[#00c853] flex-shrink-0" />
-                      <p className="text-xs sm:text-sm font-bold text-emerald-100 uppercase leading-snug">{obj}</p>
-                    </div>
-                  ))}
-                </div>
-                <p className="text-xs sm:text-sm text-emerald-200/80 italic leading-relaxed pt-3">
-                  {QUIENES_SOMOS.filosofia}
-                </p>
-                <p className="text-sm sm:text-base font-black uppercase text-white bg-[#0f2d1e]/60 border-2 border-emerald-500/40 rounded-2xl py-4 px-4 mt-3 leading-snug">
-                  {QUIENES_SOMOS.colofon}
-                  <span className="block mt-2 text-emerald-300 tracking-wide">{QUIENES_SOMOS.firma}</span>
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setQuienesExpandido((v) => !v)}
-                className="text-xs font-black uppercase text-emerald-300 underline underline-offset-2 mt-2"
-              >
-                {quienesExpandido ? "Mostrar menos" : "Mostrar más"}
-              </button>
-            </div>
-
-            {/* Bibliobici — cubre el espacio restante hasta la altura de la última fila de botones */}
-            <div className="rounded-2xl overflow-hidden border-4 border-[#0f2d1e]/30 shadow-lg h-56 sm:h-72 lg:h-auto lg:flex-1">
-              <img
-                src="/images/bibliobici-movil.png"
-                alt="Bibliobici Móvil DCUATES en la comunidad"
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.target.style.display = 'none';
-                  e.target.parentElement.innerHTML = '<div class="p-12 text-center text-[#0f2d1e]/70 font-bold uppercase text-xs tracking-wider bg-emerald-50 h-full flex items-center justify-center">📷 [Espacio para Foto de la Bibliobici]</div>';
-                }}
-              />
-            </div>
-          </div>
-
-          {/* Cuadrícula de los 12 botones — 2 columnas en celular, 3 columnas x 4 filas en escritorio */}
-          <div className="lg:col-span-6">
-            <p className="flex items-center justify-center gap-3 text-center text-3xl sm:text-4xl font-black text-[#0f2d1e] uppercase tracking-tight leading-none mb-4">
-              <span>⭐</span> Proyectos Comunitarios DCUATES <span>⭐</span>
-            </p>
-            {(() => {
-              // "modal" = id que se busca en TODOS_LOS_PROYECTOS (o los 2 casos
-              // especiales "ventas-con-causa" / "donaciones") para llenar la
-              // ventana emergente. "h" se conserva solo como respaldo por si
-              // JavaScript llegara a fallar (accesibilidad).
-              const BOTONES_PORTADA = [
-                { t: "PRÉSTAMO GRATUITO DE LIBROS", h: "#libros", modal: "libros", img: "/images/bb.png", puntos: ["GRATUITO", "PÍDELO CON UN SOLO CLIC ;)", "SE ACEPTAN DONACIONES DE LIBROS Y MÁS..."] },
-                { t: "ECATEPETS MASCOTAS", h: "#ecatepets", modal: "ecatepets", img: "/images/Ecatepets.png", puntos: ["DIFUSIÓN DE EXTRAVÍOS", "ADOPCIÓN RESPONSABLE", "CUIDADO Y CONCIENTIZACIÓN"] },
-                { t: "ALIANZAS SOLIDARIAS", h: "#iniciativas", modal: "alianzas-tarjeta", img: "/images/Alianzas.png", puntos: ["COLABORACIÓN MUTUA", "RED DE CONTACTOS", "IMPACTO COMUNITARIO"] },
-                { t: "CÍRCULO DE CONFIANZA", h: "#circulo-confianza", modal: "circulo-confianza", img: "/images/Círculo.png", puntos: ["PERFILES VERIFICADOS POR CONFIANZA", "SINERGIA QUE MULTIPLICA", "RED EXCLUSIVA DE CONTACTOS"] },
-                { t: "RECOMIENDA, EVALÚA Y GANA", h: "#recomienda-evalua-gana", modal: "recomienda-evalua-gana", img: "/images/Recomienda.png", puntos: ["RECOMENDACIONES CON VALOR REAL", "RECONOCIMIENTO POR TU EXPERIENCIA", "MEJORA CONTINUA DE NEGOCIOS"] },
-                { t: "PUBLICIDAD GRATUITA", h: "#publicidad", modal: "publicidad-tarjeta", img: "/images/Publicidad2.png", puntos: ["REGISTRO GRATUITO", "COMPARTE PROMOCIONES E IMÁGENES", "MÁS CLIENTES DE TU ZONA"] },
-                { t: "ASESORÍAS GRATUITAS", h: "#asesorias", modal: "asesorias", img: "/images/Asesorías.png", puntos: ["ASESORÍA GRATUITA", "APORTACIÓN VOLUNTARIA", "IMPULSO DE METAS"] },
-                { t: "BAZAR Y COMERCIO", h: "#bazares", modal: "bazares", img: "/images/Bazar.png", puntos: ["COMERCIO LOCAL SEGURO", "BARRIO DE CONFIANZA", "APOYO A CAUSAS"] },
-                { t: "NOTICIAS DE BARRIO", h: "#noticias", modal: "noticias", img: "/images/Noticias.png", puntos: ["EVENTOS CULTURALES", "CONVOCATORIAS VECINALES", "ACONTECIMIENTOS SOCIALES"] },
-                { t: "BIENESTAR Y RECREACIÓN", h: "#bienestar", modal: "bienestar", img: "/images/Bienestar.png", puntos: ["DESARROLLO PERSONAL Y SOCIAL", "SALUD INTEGRAL", "DISFRUTE PERSONAL Y SOCIAL"] },
-                { t: "VENTAS CON CAUSA", h: "#ventas-con-causa", modal: "ventas-con-causa", img: "/images/VentasConCausa.png", puntos: ["PRODUCTOS Y SERVICIOS LOCALES", "CATÁLOGO SIEMPRE ACTUALIZADO", "CONTACTO DIRECTO POR WHATSAPP"] },
-                { t: "APOYO VOLUNTARIO", h: "#donaciones", modal: "donaciones", img: "/images/ApoyoVoluntario.png", puntos: ["ECONÓMICA, EN ESPECIE O TRUEQUE", "LABOR VOLUNTARIA", "TOTAL TRANSPARENCIA"] }
-              ];
-
-              const BotonProyecto = ({ btn }) => (
-                <button
-                  type="button"
-                  onClick={() => setModalProyecto(btn.modal)}
-                  className="flex flex-col rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white shadow-md transition-all hover:scale-[1.02] overflow-hidden font-heading text-left w-full"
-                >
-                  <div className="px-2 pt-3 pb-1 text-center border-b border-white/20">
-                    <h4 className="uppercase font-black leading-tight text-sm sm:text-base lg:text-lg">
-                      {btn.t}
-                    </h4>
-                  </div>
-                  <div className="flex flex-1 items-center gap-2 px-2 py-2">
-                    <div className="w-2/5 h-full flex items-center justify-center">
-                      {btn.img && (
-                        <img
-                          src={btn.img}
-                          alt=""
-                          className="max-h-16 sm:max-h-20 w-auto object-contain drop-shadow"
-                          onError={(e) => { e.target.style.display = 'none'; }}
-                        />
-                      )}
-                    </div>
-                    {btn.puntos.length > 0 && (
-                      <ul className="w-3/5 space-y-1 text-left text-[10px] sm:text-xs font-bold leading-snug">
-                        {btn.puntos.map((p, i) => <li key={i}>* {p}</li>)}
-                      </ul>
-                    )}
-                  </div>
-                </button>
-              );
-
-              return (
-                <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
-                  {BOTONES_PORTADA.map((btn, idx) => <BotonProyecto key={idx} btn={btn} />)}
-                </div>
-              );
-            })()}
-
-            {/* Video + 5 botones verdes, como continuación del mismo grid de 3 columnas de arriba */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 mt-3">
-              <div className="lg:col-span-2 rounded-2xl overflow-hidden border-4 border-[#0f2d1e]/30 shadow-lg aspect-video lg:aspect-auto">
-                <iframe
-                  className="w-full h-full"
-                  src={`https://www.youtube.com/embed/${videoIdPortada}`}
-                  title="Video de presentación DCUATES"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
-              </div>
-
-              <div className="lg:col-span-1 flex flex-col gap-2">
-                <BotonVerdeInfo
-                  titulo="Nuestra Misión"
-                  abierto={infoAbierta === "mision"}
-                  onClick={() => setInfoAbierta((v) => (v === "mision" ? null : "mision"))}
-                >
-                  <p><strong>Misión:</strong> {MISION_VISION.mision}</p>
-                  <p><strong>Visión:</strong> {MISION_VISION.vision}</p>
-                  <p className="italic"><strong className="not-italic">Filosofía:</strong> {MISION_VISION.filosofia}</p>
-                  <p className="font-black uppercase text-emerald-300">Mucha gente pequeña, en lugares pequeños, haciendo cosas pequeñas, puede cambiar el mundo (Eduardo Galeano)</p>
-                </BotonVerdeInfo>
-
-                <BotonVerdeInfo
-                  titulo="Cómo Podemos Sumar"
-                  abierto={infoAbierta === "sumar"}
-                  onClick={() => setInfoAbierta((v) => (v === "sumar" ? null : "sumar"))}
-                >
-                  <p>{COMO_SUMAR.intro}</p>
-                  <p>{COMO_SUMAR.ventajas}</p>
-                  <p className="font-bold">{COMO_SUMAR.cierre}</p>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setInfoAbierta(null);
-                      // Se espera a que termine la animación de cierre (350ms)
-                      // antes de hacer scroll: si se hace al mismo tiempo, la
-                      // página se recorre mientras el acordeón todavía se está
-                      // colapsando y el destino termina desfasado (por eso
-                      // llegaba casi al final de la sección en vez de al inicio).
-                      setTimeout(() => irASeccion("donaciones"), 380);
-                    }}
-                    className="w-full text-center rounded-lg bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-2.5 px-3 uppercase tracking-wide text-[11px] sm:text-xs mt-1"
-                  >
-                    Ir a Apoyo Voluntario
-                  </button>
-                </BotonVerdeInfo>
-
-                <BotonVerdeInfo
-                  titulo="Recomendaciones ⭐⭐⭐⭐⭐"
-                  abierto={infoAbierta === "recomendaciones"}
-                  onClick={() => setInfoAbierta((v) => (v === "recomendaciones" ? null : "recomendaciones"))}
-                >
-                  <p className="font-black uppercase text-emerald-300 text-[11px] tracking-wide">Recomendaciones DCUATES</p>
-                  <ul className="space-y-1">
-                    {recomendacionesDcuates.map((r, i) => (
-                      <li key={i}>
-                        <a href={r.enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-300">
-                          {r.nombre}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                  <p className="font-black uppercase text-emerald-300 text-[11px] tracking-wide pt-2">Recomendaciones de la Comunidad</p>
-                  <ul className="space-y-1">
-                    {recomendacionesComunidad.map((r, i) => (
-                      <li key={i}>
-                        <a href={r.enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-300">
-                          {r.nombre}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                  <p className="pt-2 font-black uppercase text-emerald-300">Si necesitas alguna recomendación en especial, contáctanos !!!</p>
-                </BotonVerdeInfo>
-
-                <BotonVerdeInfo
-                  titulo="Preguntas Frecuentes"
-                  abierto={infoAbierta === "faq"}
-                  onClick={() => setInfoAbierta((v) => (v === "faq" ? null : "faq"))}
-                >
-                  <div className="space-y-2">
-                    {FAQ_ITEMS.map((f, i) => (
-                      <details key={i} className="rounded-lg bg-emerald-900/40 px-3 py-2">
-                        <summary className="cursor-pointer text-xs sm:text-sm font-bold">{f.pregunta}</summary>
-                        <p className="mt-1 text-xs text-emerald-100/90 leading-relaxed">{f.respuesta}</p>
-                      </details>
-                    ))}
-                  </div>
-                </BotonVerdeInfo>
-
-                <BotonVerdeInfo
-                  titulo="Música, Libros, Pelis y Más... 🎵📚🎬"
-                  abierto={infoAbierta === "recursos"}
-                  onClick={() => setInfoAbierta((v) => (v === "recursos" ? null : "recursos"))}
-                >
-                  <p className="font-black uppercase text-emerald-300 text-[11px] tracking-wide">🎵 Música</p>
-                  <ul className="space-y-1">
-                    {musicaLinks.map((enlace, i) => (
-                      <li key={i}>
-                        <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-300">
-                          Música {i + 1}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                  <p className="font-black uppercase text-emerald-300 text-[11px] tracking-wide pt-2">📚 Libros</p>
-                  <ul className="space-y-1">
-                    {librosLinks.map((enlace, i) => (
-                      <li key={i}>
-                        <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-300">
-                          Libro {i + 1}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                  <p className="font-black uppercase text-emerald-300 text-[11px] tracking-wide pt-2">🎬 Películas y Más</p>
-                  <ul className="space-y-1">
-                    {videosLinks.map((enlace, i) => (
-                      <li key={i}>
-                        <a href={enlace} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-300">
-                          Recurso {i + 1}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </BotonVerdeInfo>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      {/* SECCIÓN 1: LOS 4 PROYECTOS BASE */}
-      <section id="iniciativas" className="scroll-mt-48 md:scroll-mt-36 bg-[#17472d] text-white py-10 sm:py-16 px-4 border-b-4 border-[#0f2d1e]">
-        <div className="mx-auto max-w-6xl">
-          <h2 className="text-4xl sm:text-5xl font-black text-center uppercase tracking-tight mb-12 text-emerald-300">
-            Nuestros Proyectos Originales
-          </h2>
-
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2">
-            {INICIATIVAS_PRINCIPALES.map((item) => (
-              <div
-                id={item.id}
-                key={item.id}
-                className={`scroll-mt-48 md:scroll-mt-36 rounded-3xl border-4 border-[#0f2d1e] p-6 text-slate-800 shadow-xl flex flex-col justify-between transition-all hover:scale-[1.01] duration-200 ${
-                  item.id === "libros" || item.id === "alianzas-tarjeta" || item.id === "recomienda-evalua-gana" ? "bg-[#e8f5e9]" : "bg-white"
-                }`}
-              >
-                <div>
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="text-[#0f2d1e]">
-                      <p className="text-sm sm:text-lg font-black uppercase text-amber-700 tracking-wider">
-                        {item.categoria}
-                      </p>
-                      <h3 className="text-2xl sm:text-3xl font-black text-[#0f2d1e] uppercase tracking-tight leading-tight">
-                        {item.titulo}
-                      </h3>
-                    </div>
-                  </div>
-
-                  <p className="text-sm sm:text-base text-slate-600 leading-relaxed text-justify mb-4 pt-2 font-medium">
-                    {item.descripcion}
-                  </p>
-
-                  <ul className="space-y-2 mb-6 pl-1">
-                    {item.puntos.map((punto, pIdx) => (
-                      <li key={pIdx} className="flex items-center gap-2 text-sm sm:text-base font-bold text-slate-700 uppercase">
-                        <span className="h-2 w-2 rounded-full bg-[#00c853] flex-shrink-0" />
-                        {punto}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                {/* Botón de acción: scroll a un registro/formulario, o WhatsApp directo */}
-                {item.scrollDestino ? (
-                  <button
-                    type="button"
-                    onClick={() => irASeccion(item.scrollDestino)}
-                    className="w-full text-center rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3 px-4 shadow-md transition-colors uppercase tracking-wide text-xs sm:text-sm font-heading block"
-                  >
-                    {item.textoBoton}
-                  </button>
-                ) : (
-                  <a
-                    href={item.enlaceDirectoWA}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full text-center rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3 px-4 shadow-md transition-colors uppercase tracking-wide text-xs sm:text-sm font-heading block"
-                  >
-                    {item.textoBoton}
-                  </a>
-                )}
-              </div>
-            ))}
+          {/* Banner de avisos + bloque central de 7 pestañas (BloqueCentral).
+              Nosotros y Causas reciben aquí su contenido; lo que sigue
+              debajo (Retos, Historias, Solicitudes, etc.) se migrará a
+              su pestaña en la fase 2. */}
+          <div className="min-w-0">
+            <BloqueCentral
+              categorias={CATEGORIAS_PROYECTOS}
+              proyectos={BOTONES_PORTADA}
+              mapaUrl={MAPA_NEGOCIOS_EMBED_URL}
+              whatsappNumero={WHATSAPP_NUMERO}
+              portadasItems={portadasItems}
+              resumenes={RESUMEN_PROYECTO}
+              logros={logrosBanda}
+              cargando={!baserowListo}
+              negocios={negociosBaserow}
+              onAbrirCategoria={(id) => setCategoriaAbierta(id)}
+              onAbrirProyecto={(id) => setModalProyecto(id)}
+              onAcceso={(t) => (t === "proyectos" ? setShowMapaSitio(true) : setAccesoAbierto(t))}
+              beneficios={<PestanaBeneficios setBusquedaAbierta={setBusquedaAbierta} setModalProyecto={setModalProyecto} setShowFAQ={setShowFAQ} setSolicitudExpandida={setSolicitudExpandida} solicitudExpandida={solicitudExpandida} />}
+              valores={<PestanaValores infoAbierta={infoAbierta} librosLinks={librosLinks} musicaLinks={musicaLinks} recomendacionesComunidad={recomendacionesComunidad} recomendacionesDcuates={recomendacionesDcuates} setInfoAbierta={setInfoAbierta} setModalProyecto={setModalProyecto} videosLinks={videosLinks} />}
+              negociosSeccion={<PestanaNegocios compraVentaDcuates={compraVentaDcuates} recomendacionesCompra={recomendacionesCompra} recomendacionesVenta={recomendacionesVenta} setVentasResumenAbierto={setVentasResumenAbierto} ventasResumenAbierto={ventasResumenAbierto} />}
+              regalos={<PestanaRegalos galeriaRetos={galeriaRetos} />}
+              gratitud={<PestanaGratitud setModalProyecto={setModalProyecto} />}
+              nosotros={<PestanaNosotros  />}
+              causas={<PestanaCausas apoyoCausaAnimalLinks={apoyoCausaAnimalLinks} apoyoCosasCasosLinks={apoyoCosasCasosLinks} apoyoPersonasExtraviadasLinks={apoyoPersonasExtraviadasLinks} extraviadosResumenAbierto={extraviadosResumenAbierto} setExtraviadosResumenAbierto={setExtraviadosResumenAbierto} />}
+            />
           </div>
         </div>
       </section>
 
-      {/* SECCIÓN 2: LOS 4 NUEVOS PROYECTOS SOCIALES */}
-      <section id="nuevos-proyectos" className="scroll-mt-48 md:scroll-mt-36 bg-[#17472d] text-white py-10 sm:py-16 px-4 border-b-4 border-[#0f2d1e]">
+
+      {/* Accesos rápidos: Avisos y Beneficios · Compartir Más · Inicio */}
+      <BarraAccionesFinal onAbrirComparte={() => setModalFormulario("comparte")} />
+
+      <div className="mt-[1.5cm] mb-[0.5cm]">
+
+        <BarraPatrocinadores />
+      </div>
+
+      {/* HISTORIAS Y REFLEXIONES DCUATES — movida aquí (antes vivía dentro
+          del hero); ahora como barra horizontal de 1-2 videos de alto, con
+          scroll lateral para ver más. Sigue tomando sus videos de las
+          columnas "NOMBRE VIDPORT" / "VIDPORT" en Baserow. */}
+      <section id="historias-reflexiones" className="relative scroll-mt-48 md:scroll-mt-36 bg-[#0f2d1e] py-6 px-4 border-b-4 border-[#0f2d1e]">
+        <BotonCompartir variante="claro" className="absolute top-2 right-2 z-10" hash="historias-reflexiones" titulo="Historias y reflexiones que inspiran" texto="Videos y reflexiones de nuestra comunidad" />
         <div className="mx-auto max-w-6xl">
-          <h2 className="text-4xl sm:text-5xl font-black text-center uppercase tracking-tight mb-3 text-emerald-300">
-            Nuevos Proyectos Sociales
-          </h2>
-          <p className="text-center text-emerald-200/80 mb-12 max-w-xl mx-auto text-xs sm:text-sm font-bold uppercase tracking-wide">
-            Ampliamos nuestro impacto con cuatro nuevos canales comunitarios unificados.
+          <p className="text-white font-black uppercase text-xs sm:text-sm tracking-wide mb-2 px-1 text-center">
+            Historias y reflexiones DCUATES que INSPIRAN 💡
+            <br className="sm:hidden" />
+            <span className="block sm:inline sm:ml-1">Dales clic para ampliarlos y disfrutarlos 🎥 🍿 😊</span>
           </p>
-
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2">
-            {NUEVOS_PROYECTOS_DATA.map((item) => (
-              <div
-                id={item.id}
-                key={item.id}
-                className={`scroll-mt-48 md:scroll-mt-36 rounded-3xl border-4 border-[#0f2d1e] p-6 text-slate-800 shadow-xl flex flex-col justify-between transition-all hover:scale-[1.01] duration-200 ${
-                  item.id === "asesorias" || item.id === "noticias" ? "bg-[#e8f5e9]" : "bg-white"
-                }`}
+          <div
+            ref={carruselHistorias.scrollRef}
+            onPointerDown={carruselHistorias.onPointerDown}
+            className="flex gap-2 sm:gap-3 overflow-x-auto pb-1"
+          >
+            {videosPortadaFinal.map((v, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => setVideoEnGrande(v.video)}
+                className="group relative rounded-xl overflow-hidden border-2 border-white/10 hover:border-[#e65100] transition-colors bg-black/30 text-left w-40 sm:w-56 shrink-0"
               >
-                <div>
-                  <div className="flex items-center gap-3 mb-2">
-                    <div>
-                      <p className="text-sm sm:text-lg font-black uppercase text-amber-700 tracking-wider">
-                        {item.categoria}
-                      </p>
-                      <h3 className="text-2xl sm:text-3xl font-black text-[#0f2d1e] uppercase tracking-tight leading-tight">
-                        {item.titulo}
-                      </h3>
-                    </div>
-                  </div>
-
-                  <p className="text-sm sm:text-base text-slate-600 leading-relaxed text-justify mb-4 pt-2 font-medium">
-                    {item.descripcion}
-                  </p>
-
-                  <ul className="space-y-2 mb-6 pl-1">
-                    {item.puntos.map((punto, pIdx) => (
-                      <li key={pIdx} className="flex items-center gap-2 text-sm sm:text-base font-bold text-slate-700 uppercase">
-                        <span className="h-2 w-2 rounded-full bg-[#00c853] flex-shrink-0" />
-                        {punto}
-                      </li>
-                    ))}
-                  </ul>
+                <div className="aspect-video w-full overflow-hidden">
+                  <MiniaturaVideo video={v.video} nombre={v.nombre} />
                 </div>
-                {/* Enlace directo a WhatsApp */}
-                <a
-                  href={item.enlaceDirectoWA}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full text-center rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3 px-4 shadow-md transition-colors uppercase tracking-wide text-xs sm:text-sm font-heading block"
-                >
-                  {item.textoBoton}
-                </a>
-
-                {/* Prueba: botón que abre una pasarela en ventana emergente (solo Noticias y Bienestar, por ahora) */}
-                {GALERIAS_PROYECTOS[item.id] && (
-                  <button
-                    onClick={() => setModalProyecto(item.id)}
-                    className="w-full mt-2 text-center rounded-xl border-2 border-[#0f2d1e] text-[#0f2d1e] hover:bg-[#0f2d1e] hover:text-white font-black py-2.5 px-4 transition-colors uppercase tracking-wide text-xs sm:text-sm font-heading block"
-                  >
-                    📷 Ver galería
-                  </button>
-                )}
-              </div>
+                <span className="absolute inset-0 flex items-center justify-center">
+                  <span className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-[#e65100]/90 flex items-center justify-center text-white text-base sm:text-lg shadow-md group-hover:bg-[#e65100]">▶</span>
+                </span>
+                <p className="px-2 py-1.5 text-[10px] sm:text-xs font-black text-white uppercase tracking-tight leading-tight">
+                  {v.nombre}
+                </p>
+              </button>
             ))}
           </div>
         </div>
       </section>
 
-      {/* SECCIÓN: VENTAS CON CAUSA */}
-      <section id="ventas-con-causa" className="scroll-mt-48 md:scroll-mt-36 bg-[#e8f5e9] text-[#0f2d1e] py-10 sm:py-16 px-4 border-b-4 border-[#0f2d1e]">
-        <div className="mx-auto max-w-6xl">
-          <div className="text-center max-w-2xl mx-auto mb-10 space-y-3">
-            <span className="inline-block rounded-full bg-emerald-200 px-5 py-2 text-lg sm:text-2xl font-black uppercase tracking-wider text-emerald-800 shadow-sm">
-              🛍️ Ventas con Causa
-            </span>
-            <h2 className="text-4xl sm:text-5xl font-black uppercase tracking-tight leading-none text-[#0f2d1e] font-heading">
-              Productos y servicios que también apoyan la comunidad
-            </h2>
-            <p className="text-sm sm:text-base text-slate-700 font-bold">
-              Artículos y servicios de vecinos y negocios locales. Explora, cuéntanos qué te interesa o qué estás buscando, y te contactamos directo por WhatsApp.
-            </p>
-          </div>
-
-          {/* Pasarela de Ventas con Causa — mismo formato de carrusel que Extraviados */}
-          <div className="max-w-3xl mx-auto mb-4">
-            <PasarelaVentasConCausa />
-          </div>
-          <p className="text-center text-xs sm:text-sm font-bold text-emerald-800 mb-10">
-            ¿Quieres ver el catálogo completo y siempre actualizado?{" "}
-            <a href={BASEROW_GALLERY_URL} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-900">
-              Ábrelo aquí
-            </a>.
-          </p>
-
-          <div className="max-w-xl mx-auto">
-            <FormularioVentasConCausa />
-          </div>
-
-          {/* Pasarela de mascotas, personas y cosas extraviadas */}
-          <div id="extraviados-registro" className="scroll-mt-48 md:scroll-mt-36 mt-14 max-w-3xl mx-auto">
-            <div className="text-center mb-6 space-y-2">
-              <span className="inline-block rounded-full bg-emerald-200 px-5 py-2 text-base sm:text-xl font-black uppercase tracking-wider text-emerald-800 shadow-sm">
-                🔎 Mascotas, Personas y Cosas Extraviadas
-              </span>
-              <p className="text-sm sm:text-base text-slate-700 font-bold max-w-xl mx-auto">
-                Ayuda a la comunidad reconociendo estos casos, o repórtanos uno nuevo.
-              </p>
-            </div>
-
-            <PasarelaExtraviados />
-
-            <a
-              href={enlaceWhatsApp("¡Hola DCUATES! Quiero reportar un caso de mascota, persona o cosa extraviada.")}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-4 block text-center rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3.5 uppercase tracking-wider text-xs sm:text-sm transition-all shadow-md font-heading"
-            >
-              Reportar un caso por WhatsApp
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* SECCIÓN: APORTE VOLUNTARIO */}
-      <section id="donaciones" className="scroll-mt-48 md:scroll-mt-36 bg-[#e8f5e9] text-[#0f2d1e] py-12 sm:py-20 px-4 border-b-4 border-[#0f2d1e]">
-        <div className="mx-auto max-w-6xl flex flex-col md:grid md:grid-cols-12 gap-y-8 md:gap-x-10 md:gap-y-10">
-
-          {/* Bloque 1: intro + CTA — fila 1 en escritorio (col. izquierda) */}
-          <div className="order-1 md:order-none md:col-start-1 md:col-span-5 md:row-start-1 space-y-6">
-            <span className="inline-block rounded-full bg-emerald-200 px-5 py-2 text-lg sm:text-2xl font-black uppercase tracking-wider text-emerald-800 shadow-sm">
-              🟢 Apoyo Voluntario
-            </span>
-            <h2 className="text-4xl sm:text-5xl font-black uppercase tracking-tight leading-none text-[#0f2d1e] font-heading">
-              TU APORTACIÓN IMPULSA A LA COMUNIDAD
-            </h2>
-            <p className="text-base sm:text-lg text-slate-700 leading-relaxed text-justify font-bold">
-              Cada donativo, del formato que decidas, nos ayuda a sostener y hacer crecer los proyectos que benefician a los negocios y familias latinas en conjunto con DCUATES Y CONEXIONES CON CAUSA ♥
-            </p>
-            <p className="text-lg sm:text-xl font-black uppercase text-center text-white bg-[#e65100] border-4 border-[#0f2d1e] rounded-2xl py-4 px-5 shadow-md leading-snug">
-              ¡Tu apoyo hoy es el cambio que nuestra comunidad necesita — súmate ahora! ♥
-            </p>
-          </div>
-
-          {/* Bloque 2: selecciona tu tipo de aportación + botones — fila 1 en escritorio (col. derecha) */}
-          <div className="order-4 md:order-none md:col-start-6 md:col-span-7 md:row-start-1 space-y-3">
-            <p className="text-xl sm:text-3xl font-black uppercase tracking-wide text-[#0f2d1e] mb-4 block leading-tight">
-              Selecciona el tipo de aportación que te agrade más:
-            </p>
-            {[
-              { t: "Aportación Económica", d: "Solicita los datos bancarios de manera directa y segura.", m: "¡Hola DCUATES! Deseo realizar una Aportación Económica. ¿Me podrías proporcionar los datos seguros?" },
-              { t: "Aportación en Especie", d: "Apoya donando herramientas, materiales o insumos útiles.", m: "¡Hola DCUATES! Quiero realizar una Aportación en Especie. ¿Qué tipo de herramientas o insumos se requieren actualmente?" },
-              { t: "Trueque Solidario", d: "Intercambia productos o servicios de valor equivalente.", m: "¡Hola DCUATES! Me interesa el Trueque Solidario. Tengo productos/servicios para intercambiar a favor de la causa." },
-              { t: "Labor Voluntaria", d: "Dona tu valioso tiempo y conocimientos para crecer juntos.", m: "¡Hola DCUATES! Quiero sumarme con Labor Voluntaria aportando mi tiempo y conocimientos comunitarios." }
-            ].map((opc) => (
-              <a
-                key={opc.t}
-                href={enlaceWhatsApp(opc.m)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full text-left rounded-2xl border-4 border-[#0f2d1e] bg-[#e65100] hover:bg-[#bf360c] p-4 sm:p-5 shadow-md transition-all hover:scale-[1.01] group duration-200 block"
-              >
-                <div className="flex justify-between items-center gap-3">
-                  <div>
-                    <p className="text-xl sm:text-2xl font-black text-white uppercase tracking-tight leading-tight">{opc.t}</p>
-                    <p className="text-sm sm:text-base font-bold text-[#0f2d1e] uppercase tracking-wide leading-snug pt-1">{opc.d}</p>
-                  </div>
-                  <svg
-                    viewBox="0 0 100 60"
-                    preserveAspectRatio="none"
-                    className="w-8 h-8 sm:w-10 sm:h-10 shrink-0 opacity-90 group-hover:opacity-100 transition-all drop-shadow"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path d="M4 22 H58 V4 L96 30 L58 56 V38 H4 Z" fill="#ffffff" stroke="#0f2d1e" strokeWidth="6" strokeLinejoin="round" />
-                  </svg>
-                </div>
-              </a>
-            ))}
-          </div>
-
-          {/* Bloque 3: transparencia — fila 2 en escritorio (col. izquierda), justo antes del video en móvil */}
-          <div className="order-2 md:order-none md:col-start-1 md:col-span-5 md:row-start-2">
-            <div className="h-full rounded-2xl bg-emerald-200 border-2 border-emerald-500/40 p-5 sm:p-6 text-base sm:text-lg font-black text-emerald-900 leading-relaxed flex items-start gap-3 shadow-sm">
-              <span className="text-2xl">💡</span>
-              <p className="text-justify uppercase tracking-wide">
-                Rendimos cuentas de cómo se usa cada aportación con total transparencia. Parte de la utilidad de nuestros proyectos y de lo que los amigos y la comunidad suman se destina al apoyo de causas sociales como esta gran causa y ejemplo de vida y de lo que se puede lograr con la suma de voluntades, talentos y corazones solidarios ♥
-              </p>
-            </div>
-          </div>
-
-          {/* Bloque 4: flecha + video de Chuy — fila 2 en escritorio (col. derecha), justo después de la transparencia en móvil.
-              col-start-6 (en vez de 7) para que la flecha quede pegada al cuadro de transparencia, sin columna vacía de por medio;
-              col-span-7 (en vez de 6) le da más ancho al video, y por lo tanto también más alto. */}
-          <div className="order-3 md:order-none md:col-start-6 md:col-span-7 md:row-start-2 flex flex-col md:flex-row items-center gap-2 md:gap-3">
-            {/* Flecha con relleno naranja: apunta hacia abajo en móvil y hacia la derecha en escritorio */}
-            <div className="flex justify-center items-center shrink-0" aria-hidden="true">
-              <svg
-                viewBox="0 0 100 60"
-                preserveAspectRatio="none"
-                className="w-14 h-24 sm:w-16 sm:h-28 md:w-20 md:h-36 rotate-90 md:rotate-0 drop-shadow-md"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M4 22 H58 V4 L96 30 L58 56 V38 H4 Z"
-                  fill="#e65100"
-                  stroke="#0f2d1e"
-                  strokeWidth="5"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </div>
-
-            <div className="w-full">
-              <div className="rounded-2xl overflow-hidden border-4 border-[#0f2d1e] shadow-lg bg-black aspect-[4/3] sm:aspect-[16/10]">
-                <iframe
-                  className="w-full h-full"
-                  src={`https://www.youtube.com/embed/${YOUTUBE_VIDEO_ID}`}
-                  title="Video de Chuy — DCUATES"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                ></iframe>
-              </div>
-              <a
-                href="https://chuytrujillo.blogspot.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-3 block cursor-pointer rounded-2xl border-4 border-[#0f2d1e] bg-[#e65100] hover:bg-[#bf360c] text-white font-black uppercase text-sm sm:text-base px-4 py-3.5 shadow-md transition-all hover:scale-[1.01] text-justify leading-snug"
-              >
-                Conoce la vida y obra de nuestro amigo y maestro de vida, Chuy, el Sapo Soñador aquí: https://chuytrujillo.blogspot.com/
-              </a>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      {/* SECCIÓN 4: FORMULARIO DE PUBLICIDAD */}
-      <section id="publicidad" className="scroll-mt-48 md:scroll-mt-36 bg-[#17472d] text-white py-10 sm:py-16 px-4">
-        <div className="mx-auto max-w-2xl">
-          <div className="text-center space-y-2 mb-8">
-            <span className="inline-block rounded-full bg-emerald-900/60 px-5 py-2 text-lg sm:text-2xl font-black uppercase tracking-wider text-emerald-400">
-              📢 Publicidad Comunitaria
-            </span>
-            <h2 className="text-4xl sm:text-5xl font-black text-center uppercase tracking-tight text-emerald-300">
-              Publica tu negocio gratis
-            </h2>
-            <p className="text-xs font-bold text-emerald-100/70 uppercase max-w-md mx-auto leading-relaxed">
-              Comparte la información de tu negocio, sube imágenes de tus promociones y publicidad, y agrega tu página o redes sociales. Tu aportación voluntaria es bienvenida.
-            </p>
-          </div>
-          <FormularioPublicidad />
-        </div>
-      </section>
+      {/* Portada de la pestaña abierta, al final y en sentido contrario a los videos */}
+      <CarruselFinal portadasItems={portadasItems} categorias={CATEGORIAS_PROYECTOS} cargando={!baserowListo} />
 
       {/* FOOTER */}
       <footer className="bg-[#e8f5e9] text-[#0f2d1e] py-12 px-4 text-center space-y-8 border-t-4 border-[#0f2d1e]">
 
         <div className="flex items-center justify-center gap-3">
           <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#0f2d1e] font-black text-white text-lg shrink-0">DC</span>
-          <span className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#0f2d1e]">DCUATES</span>
+          <div className="flex flex-col items-start leading-none">
+            <span className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#0f2d1e]">DCUATES</span>
+            <span className="text-[10px] sm:text-xs font-black uppercase tracking-wide text-[#e65100] -mt-0.5">¡Comparte y Gana!</span>
+          </div>
         </div>
 
         <p className="max-w-xl mx-auto text-sm sm:text-base text-[#0f2d1e]/80 leading-relaxed font-medium">
@@ -1080,67 +538,143 @@ export default function App() {
         </div>
 
         <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm sm:text-base font-bold text-[#0f2d1e]/80">
-          <a href="#quienes-somos" className="hover:text-[#0f2d1e] transition-colors">Quiénes Somos</a>
-          <a href="#iniciativas" className="hover:text-[#0f2d1e] transition-colors">Proyectos</a>
-          <a href="#publicidad" className="hover:text-[#0f2d1e] transition-colors">Publicidad</a>
-          <a href="#donaciones" className="hover:text-[#0f2d1e] transition-colors">Donaciones</a>
+          <a href="#quienes-somos" className="hover:text-[#0f2d1e] transition-colors">👋 Quiénes Somos</a>
+          <a href="#inicio" className="hover:text-[#0f2d1e] transition-colors">🌱 Proyectos</a>
+          <a href="#publicidad" className="hover:text-[#0f2d1e] transition-colors">📣 Publicidad</a>
+          <a href="#donaciones" className="hover:text-[#0f2d1e] transition-colors">💚 Donaciones</a>
+          <button
+            onClick={() => setShowMapaSitio(true)}
+            className="underline underline-offset-4 hover:text-[#0f2d1e] bg-transparent border-none cursor-pointer font-bold transition-colors"
+          >
+            🗺️ Mapa del Sitio
+          </button>
+          <button
+            onClick={() => irASeccion("solicitudes")}
+            className="underline underline-offset-4 hover:text-[#0f2d1e] bg-transparent border-none cursor-pointer font-bold transition-colors"
+          >
+            📝 Registra tu Solicitud
+          </button>
           <button
             onClick={() => setShowFAQ(true)}
             className="underline underline-offset-4 hover:text-[#0f2d1e] bg-transparent border-none cursor-pointer font-bold transition-colors"
           >
-            Preguntas Frecuentes
+            ❓ Preguntas Frecuentes
+          </button>
+          <button
+            onClick={() => setModalFormulario("sugerencias")}
+            className="underline underline-offset-4 hover:text-[#0f2d1e] bg-transparent border-none cursor-pointer font-bold transition-colors"
+          >
+            💬 Sugerencias y Quejas
           </button>
           <button
             onClick={() => setShowPrivacy(true)}
             className="underline underline-offset-4 hover:text-[#0f2d1e] bg-transparent border-none cursor-pointer font-bold transition-colors"
           >
-            Aviso de Privacidad
+            🔒 Aviso de Privacidad
+          </button>
+          <button
+            onClick={() => setShowTerminos(true)}
+            className="underline underline-offset-4 hover:text-[#0f2d1e] bg-transparent border-none cursor-pointer font-bold transition-colors"
+          >
+            📜 Términos y Condiciones
+          </button>
+          <button
+            onClick={() => setShowSeguridad(true)}
+            className="underline underline-offset-4 text-[#b3261e] hover:text-[#7f1d17] bg-transparent border-none cursor-pointer font-black transition-colors"
+          >
+            ⚠️ Aviso de Seguridad
+          </button>
+          <button
+            onClick={() => setShowEscudo(true)}
+            className="underline underline-offset-4 text-[#0b6e5f] hover:text-[#074a40] bg-transparent border-none cursor-pointer font-black transition-colors"
+          >
+            🛡️ Escudo de Seguridad
           </button>
         </nav>
 
-        <p className="text-xs sm:text-sm text-[#0f2d1e]/60 pt-4 border-t border-[#0f2d1e]/20 max-w-md sm:max-w-lg mx-auto font-medium">
-          © {new Date().getFullYear()} DCUATES, un programa de CONEXIONES CON CAUSA ♥.<br />
-          Todos los derechos reservados.
+        <p className="text-sm sm:text-base text-[#0f2d1e] pt-4 border-t border-[#0f2d1e]/30 max-w-md sm:max-w-lg mx-auto font-black">
+          © {new Date().getFullYear()} DCUATES, un programa de CONEXIONES CON CAUSA ♥<br />
+          Todos los derechos reservados
         </p>
       </footer>
 
-      {/* MODAL DEL AVISO DE PRIVACIDAD */}
-      {showPrivacy && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
-          <div className="bg-white text-slate-900 rounded-2xl max-w-xl w-full p-6 shadow-2xl flex flex-col max-h-[85vh]">
-            <h3 className="text-xl font-bold uppercase tracking-tight border-b pb-3 mb-4 text-emerald-800 font-heading">
-              Aviso de Privacidad Simplificado
-            </h3>
-            <div className="overflow-y-auto space-y-3 pr-2 text-sm text-slate-600 leading-relaxed text-justify font-medium">
-              {AVISO_PRIVACIDAD_PARRAFOS.map((p, i) => <p key={i}>{p}</p>)}
+      {/* VISOR DE VIDEO EN GRANDE — global: lo usan el carrusel superior y el de Historias */}
+      {videoEnGrande && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 backdrop-blur-sm"
+          onClick={() => setVideoEnGrande(null)}
+        >
+          <div className="relative w-full max-w-3xl" onClick={(e) => e.stopPropagation()}>
+            <div className="rounded-2xl overflow-hidden border-4 border-white/20 shadow-2xl aspect-video bg-black">
+              <IframeVideo video={videoEnGrande} className="w-full h-full" />
             </div>
-            <button
-              onClick={() => setShowPrivacy(false)}
-              className="mt-6 w-full rounded-xl bg-emerald-700 text-white font-black py-3.5 text-center transition-colors hover:bg-emerald-800 uppercase text-xs tracking-wider font-heading"
-            >
-              Aceptar y Cerrar
-            </button>
-          </div>
+          
+            <div className="mt-3 flex justify-end">
+              <BotonCerrar claro onClick={() => setVideoEnGrande(null)} label="Cerrar video" />
+            </div>
+</div>
         </div>
       )}
+
+
+      {/* AVISO DE PRIVACIDAD INTEGRAL Y TÉRMINOS Y CONDICIONES */}
+      {showPrivacy && (
+        <Suspense fallback={null}><ModalLegal documento={AVISO_PRIVACIDAD_INTEGRAL} emoji="🔒" degradado="linear-gradient(135deg,#17472d 0%,#1B6F8A 100%)" onCerrar={() => setShowPrivacy(false)} /></Suspense>
+      )}
+      {showTerminos && (
+        <Suspense fallback={null}><ModalLegal documento={TERMINOS_CONDICIONES} emoji="📜" degradado="linear-gradient(135deg,#7A5AD8 0%,#1B6F8A 100%)" onCerrar={() => setShowTerminos(false)} /></Suspense>
+      )}
+      {showSeguridad && <Suspense fallback={null}><ModalAvisoSeguridad onCerrar={() => setShowSeguridad(false)} /></Suspense>}
+      {showEscudo && <Suspense fallback={null}><ModalEscudoSeguridad onCerrar={() => setShowEscudo(false)} /></Suspense>}
 
       {/* MODAL ÚNICO DE PROYECTO — se abre al dar clic en cualquiera de los
           12 botones naranjas de portada. Su contenido lo arma ContenidoModalProyecto. */}
       {modalProyecto && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm" onClick={() => setModalProyecto(null)}>
+        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm" onClick={() => setModalProyecto(null)}>
           <div
             className="bg-[#e8f5e9] text-slate-900 rounded-2xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl flex flex-col max-h-[90vh]"
             onClick={(e) => e.stopPropagation()}
           >
-            <button
-              onClick={() => setModalProyecto(null)}
-              aria-label="Cerrar"
-              className="self-end shrink-0 h-9 w-9 flex items-center justify-center rounded-full bg-[#0f2d1e] text-white font-black hover:bg-emerald-800 transition-colors mb-2"
-            >
-              ×
-            </button>
+            {categoriaAbierta && (
+            <div className="mb-2">
+              {(
+                <button
+                  type="button"
+                  onClick={() => setModalProyecto(null)}
+                  className="text-[11px] sm:text-xs font-black uppercase tracking-wide text-emerald-800 hover:text-[#0f2d1e] transition-colors flex items-center gap-1"
+                >
+                  <span aria-hidden="true">←</span> Volver a {(CATEGORIAS_PROYECTOS.find((c) => c.id === categoriaAbierta) || {}).titulo}
+                </button>
+              )}
+            </div>
+            )}
             <div className="overflow-y-auto pr-1">
-              <ContenidoModalProyecto id={modalProyecto} onCerrar={() => setModalProyecto(null)} />
+              {/* Logo del proyecto, grande y visible al abrir su ventana.
+                  Usa la misma imagen del botón (BOTONES_PORTADA); para
+                  Historias, Cupones y Patrocinadores, LOGOS_EXTRA_MODAL. */}
+              {(() => {
+                const logo = (BOTONES_PORTADA.find((b) => b.modal === modalProyecto) || {}).img || LOGOS_EXTRA_MODAL[modalProyecto];
+                return logo ? (
+                  <div className="flex justify-center pb-3">
+                    <img
+                      src={logo}
+                      alt=""
+                      className="max-h-36 sm:max-h-44 w-auto object-contain drop-shadow-md"
+                      onError={(e) => { e.target.style.display = 'none'; }}
+                    />
+                  </div>
+                ) : null;
+              })()}
+              <Suspense fallback={null}><ContenidoModalProyecto id={modalProyecto} onCerrar={() => setModalProyecto(null)} /></Suspense>
+            </div>
+            <div className="pt-3 flex items-center justify-between gap-3 shrink-0">
+              <BotonCompartir
+                variante="pastilla"
+                hash={`proyecto-${modalProyecto}`}
+                titulo={tituloProyecto(modalProyecto)}
+                texto={RESUMEN_PROYECTO[modalProyecto] || ""}
+              />
+              <BotonCerrar onClick={() => setModalProyecto(null)} />
             </div>
           </div>
         </div>
@@ -1154,7 +688,7 @@ export default function App() {
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="text-xl font-bold uppercase tracking-tight border-b pb-3 mb-4 text-emerald-800 font-heading">
-              Preguntas Frecuentes
+              Preguntas Frecuentes ❓💬
             </h3>
             <div className="overflow-y-auto space-y-3 pr-2">
               {FAQ_ITEMS.map((f, i) => (
@@ -1177,907 +711,65 @@ export default function App() {
         </div>
       )}
 
-    </div>
-  );
-}
-
-// =========================================================================
-// 3. SUBCOMPONENTE: SITE HEADER
-// =========================================================================
-function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, musicaSonando, onAlternarMusica }) {
-  const [menuMasAbierto, setMenuMasAbierto] = useState(false);
-  return (
-    <header className="border-b border-emerald-800/20 bg-white/95 backdrop-blur py-3 px-4 shadow-sm text-slate-900 relative">
-      <div className="mx-auto flex flex-wrap items-center gap-y-2 max-w-6xl">
-
-        {/* Logo + nombre — siempre primero, en la misma fila que las redes en móvil */}
-        <a href="#inicio" className="order-1 flex items-center gap-3 shrink-0">
-          <span className="flex h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 items-center justify-center rounded-full overflow-hidden bg-[#0f2d1e] border-2 border-[#0f2d1e]/20 shadow-sm shrink-0">
-            <img
-              src="/images/logo-circular.png"
-              alt="Logo DCUATES"
-              className="w-full h-full object-contain"
-              onError={(e) => {
-                e.target.style.display = 'none';
-                e.target.parentElement.innerHTML = '<span class="font-black text-white text-2xl">DC</span>';
-              }}
-            />
-          </span>
-          <span className="text-2xl sm:text-3xl md:text-4xl font-black uppercase tracking-tight text-[#0f2d1e]">DCUATES</span>
-        </a>
-
-        {/* Íconos de redes: comparten la primera fila con el logo (empujados a la derecha) en móvil; en escritorio, a la derecha del todo */}
-        <div className="order-2 md:order-3 ml-auto flex items-center gap-2 sm:gap-3">
-          <a href={REDES_SOCIALES.facebook} target="_blank" rel="noreferrer" className="flex h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="Facebook">
-            <svg className="h-4 w-4 sm:h-5 sm:w-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" />
-            </svg>
-          </a>
-          <a href={REDES_SOCIALES.instagram} target="_blank" rel="noreferrer" className="flex h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="Instagram">
-            <svg className="h-4 w-4 sm:h-5 sm:w-5 fill-none stroke-current stroke-2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
-            </svg>
-          </a>
-          <a href={REDES_SOCIALES.youtube} target="_blank" rel="noreferrer" className="flex h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="YouTube">
-            <svg className="h-4 w-4 sm:h-5 sm:w-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-            </svg>
-          </a>
-          <a href={REDES_SOCIALES.tiktok} target="_blank" rel="noreferrer" className="flex h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="TikTok">
-            <svg className="h-4 w-4 sm:h-5 sm:w-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.02 1.59 4.23.94 1.13 2.29 1.89 3.73 2.18l-.02 3.88c-1.63-.03-3.2-.55-4.51-1.52A7.83 7.83 0 0 1 16.43 7.5v8.32a7.83 7.83 0 0 1-3.32 6.42 7.91 7.91 0 0 1-8.73-.24 7.85 7.85 0 0 1-3.23-7.58 7.84 7.84 0 0 1 5.37-6.84V11.5a3.94 3.94 0 0 0-1.5 3.32 3.93 3.93 0 0 0 3.2 3.88 3.93 3.93 0 0 0 4.61-3.2c.04-.33.05-.66.05-.99V.02z" />
-            </svg>
-          </a>
-        </div>
-
-        {/* Segunda fila del menú fijo: botón de música a la izquierda y,
-            a su derecha, los accesos a Alianzas Solidarias, Ventas con
-            Causa y Apoyo Voluntario (antes vivían dentro del desplegable
-            "Más"). Va debajo del renglón de accesos principales. */}
-        <div className="order-5 w-full flex flex-wrap items-center justify-between gap-2 pt-2 mt-1 border-t border-emerald-800/10">
-          <button
-            type="button"
-            onClick={onAlternarMusica}
-            className="inline-flex items-center gap-1.5 rounded-full bg-[#17472d] hover:bg-[#0f2d1e] text-white font-black uppercase tracking-wide text-[10px] sm:text-xs px-3 py-1.5 shadow-sm transition-colors"
-          >
-            <span>🎵</span>
-            {musicaSonando ? "Pausar Música" : "Escucha Música DCUATES"}
-          </button>
-          <div className="flex flex-wrap items-center justify-end gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-black text-emerald-900">
-            {NAV_LINKS_FILA2.map(link => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="rounded-full border-2 border-transparent bg-emerald-50 hover:bg-[#0f2d1e] hover:text-white hover:border-[#0f2d1e] transition-colors uppercase tracking-wide text-center leading-tight px-3 py-1.5"
-              >
-                {link.label}
-              </a>
-            ))}
-          </div>
-        </div>
-
-        {/* Menú reducido: 2 accesos directos + botón "MÁS" con el resto desplegado hacia abajo */}
-        <nav className="order-3 md:order-2 w-full md:w-auto flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-black text-emerald-900 lg:text-sm md:ml-6 lg:ml-10 relative">
-          {NAV_LINKS_PRINCIPALES.map(link => (
-            <a
-              key={link.href}
-              href={link.href}
-              className="rounded-full border-2 border-transparent bg-emerald-50 hover:bg-[#0f2d1e] hover:text-white hover:border-[#0f2d1e] transition-colors uppercase tracking-wide text-center leading-tight px-3 py-1.5 sm:px-4 sm:py-2"
-            >
-              {link.label}
-            </a>
-          ))}
-
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => setMenuMasAbierto((v) => !v)}
-              className="rounded-full border-2 border-transparent bg-emerald-50 hover:bg-[#0f2d1e] hover:text-white hover:border-[#0f2d1e] transition-colors uppercase tracking-wide text-center leading-tight px-3 py-1.5 sm:px-4 sm:py-2 flex items-center gap-1"
-            >
-              Más
-              <span className={`transition-transform ${menuMasAbierto ? "rotate-180" : ""}`}>▾</span>
-            </button>
-
-            {menuMasAbierto && (
-              <>
-                {/* Fondo invisible para poder cerrar el menú al tocar fuera */}
-                <div className="fixed inset-0 z-30" onClick={() => setMenuMasAbierto(false)} />
-                <div className="absolute right-0 md:left-0 top-full mt-2 z-40 w-56 rounded-2xl bg-white shadow-xl border border-emerald-800/10 py-2 flex flex-col">
-                  {NAV_LINKS_MAS.map(link => (
-                    <a
-                      key={link.href}
-                      href={link.href}
-                      onClick={() => setMenuMasAbierto(false)}
-                      className="px-4 py-2.5 text-left uppercase tracking-wide text-[11px] sm:text-xs font-black text-emerald-900 hover:bg-emerald-50 transition-colors"
-                    >
-                      {link.label}
-                    </a>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={() => { setMenuMasAbierto(false); onAbrirFAQ && onAbrirFAQ(); }}
-                    className="px-4 py-2.5 text-left uppercase tracking-wide text-[11px] sm:text-xs font-black text-emerald-900 hover:bg-emerald-50 transition-colors"
-                  >
-                    Preguntas Frecuentes
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => { setMenuMasAbierto(false); onAbrirPrivacidad && onAbrirPrivacidad(); }}
-                    className="px-4 py-2.5 text-left uppercase tracking-wide text-[11px] sm:text-xs font-black text-emerald-900 hover:bg-emerald-50 transition-colors"
-                  >
-                    Aviso de Privacidad
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-        </nav>
-      </div>
-    </header>
-  );
-}
-
-// =========================================================================
-// 4. SUBCOMPONENTE: FORMULARIO DE PUBLICIDAD
-// =========================================================================
-function FormularioPublicidad() {
-  const [nombre, setNombre] = useState("");
-  const [categoria, setCategoria] = useState("");
-  const [contacto, setContacto] = useState("");
-  const [telefono, setTelefono] = useState("");
-  const [canal1, setCanal1] = useState("");
-  const [canal2, setCanal2] = useState("");
-  const [canal3, setCanal3] = useState("");
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const fecha = new Date().toLocaleString();
-
-    // Apps Script (doPost) lee e.parameter.X, así que se envía como
-    // application/x-www-form-urlencoded — NO como JSON.
-    const datosFormulario = new URLSearchParams({
-      Nombre: contacto,
-      Negocio: nombre,
-      Giro: categoria,
-      Telefono: telefono,
-      Fecha: fecha
-    });
-
-    try {
-      await fetch(GOOGLE_SHEETS_URL, {
-        method: "POST",
-        mode: "no-cors",
-        body: datosFormulario
-      });
-    } catch (err) {
-      console.error("Error guardando respaldo en Sheets:", err);
-    }
-
-    const mensaje = `¡Hola DCUATES!\n\nSolicito el registro de publicidad para mi negocio:\n• Contacto: ${contacto}\n• Negocio: ${nombre}\n• Categoría: ${categoria}\n• Teléfono: ${telefono}\n• Enlace 1: ${canal1 || "No especificado"}\n• Enlace 2: ${canal2 || "No especificado"}\n• Canal 3: ${canal3 || "No especificado"}\n\nA continuación adjunto mis imágenes promocionales.`;
-    window.open(enlaceWhatsApp(mensaje), '_blank', 'noopener,noreferrer');
-
-    // Limpiar el formulario para dejarlo listo para un nuevo registro
-    setContacto("");
-    setTelefono("");
-    setNombre("");
-    setCategoria("");
-    setCanal1("");
-    setCanal2("");
-    setCanal3("");
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="bg-white text-slate-800 border-4 border-[#0f2d1e] p-6 rounded-3xl space-y-4 shadow-xl">
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div>
-          <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-slate-700 mb-1">Nombre de contacto</label>
-          <input type="text" value={contacto} onChange={e => setContacto(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="Ej. Juan Pérez" />
-        </div>
-        <div>
-          <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-slate-700 mb-1">Teléfono</label>
-          <input type="text" value={telefono} onChange={e => setTelefono(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="Ej. 5512345678" />
-        </div>
-        <div>
-          <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-slate-700 mb-1">Nombre del negocio</label>
-          <input type="text" value={nombre} onChange={e => setNombre(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="Ej. Taquería El Sol" />
-        </div>
-        <div>
-          <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-slate-700 mb-1">Giro / Categoría</label>
-          <input type="text" value={categoria} onChange={e => setCategoria(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="Ej. Restaurante, Salón, Tienda" />
-        </div>
-      </div>
-      <div className="space-y-2 pt-2">
-        <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-emerald-800">ENLACES Y REDES DIGITALES</label>
-        <input type="text" value={canal1} onChange={e => setCanal1(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="1. Página principal o Correo Electrónico" />
-        <input type="text" value={canal2} onChange={e => setCanal2(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="2. Perfil o Página de Facebook (Opcional)" />
-        <input type="text" value={canal3} onChange={e => setCanal3(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="3. Cualquier otra Red Social (Opcional)" />
-      </div>
-      <button type="submit" className="w-full rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3.5 uppercase tracking-wider text-xs transition-all mt-2 shadow-md font-heading">
-        Enviar registro
-      </button>
-    </form>
-  );
-}
-
-// =========================================================================
-// 4B. SUBCOMPONENTE: FORMULARIO DE VENTAS CON CAUSA
-// =========================================================================
-function FormularioVentasConCausa() {
-  const [contacto, setContacto] = useState("");
-  const [telefono, setTelefono] = useState("");
-  const [meInteresa, setMeInteresa] = useState("");
-  const [estoyBuscando, setEstoyBuscando] = useState("");
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const fecha = new Date().toLocaleString();
-
-    // Mismo patrón que FormularioPublicidad: se envía como
-    // application/x-www-form-urlencoded al Apps Script (doPost).
-    // Nota: el Apps Script necesita distinguir estos registros de los de
-    // Publicidad — por eso se agrega el campo "Tipo". Si el Sheet actual
-    // no lo contempla, conviene sumar una columna "Tipo" (o una pestaña
-    // aparte) en la hoja de cálculo para que no se mezclen los datos.
-    const datosFormulario = new URLSearchParams({
-      Tipo: "VentasConCausa",
-      Nombre: contacto,
-      Telefono: telefono,
-      MeInteresa: meInteresa,
-      EstoyBuscando: estoyBuscando,
-      Fecha: fecha
-    });
-
-    try {
-      await fetch(GOOGLE_SHEETS_URL, {
-        method: "POST",
-        mode: "no-cors",
-        body: datosFormulario
-      });
-    } catch (err) {
-      console.error("Error guardando respaldo en Sheets:", err);
-    }
-
-    const mensaje = `¡Hola DCUATES!\n\nEsto es lo que me interesa de Ventas con Causa:\n• Contacto: ${contacto}\n• Teléfono: ${telefono}\n• Me interesa: ${meInteresa || "No especificado"}\n• Estoy buscando: ${estoyBuscando || "No especificado"}`;
-    window.open(enlaceWhatsApp(mensaje), '_blank', 'noopener,noreferrer');
-
-    setContacto("");
-    setTelefono("");
-    setMeInteresa("");
-    setEstoyBuscando("");
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="bg-white text-slate-800 border-4 border-[#0f2d1e] p-6 rounded-3xl space-y-4 shadow-xl">
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div>
-          <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-slate-700 mb-1">Nombre de contacto</label>
-          <input type="text" value={contacto} onChange={e => setContacto(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="Ej. María López" />
-        </div>
-        <div>
-          <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-slate-700 mb-1">Teléfono</label>
-          <input type="text" value={telefono} onChange={e => setTelefono(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="Ej. 5512345678" />
-        </div>
-      </div>
-      <div>
-        <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-emerald-800 mb-1">¿Qué artículo o servicio te interesa? (nombre y/o clave)</label>
-        <textarea value={meInteresa} onChange={e => setMeInteresa(e.target.value)} rows={2} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium resize-none" placeholder="Ej. Me interesan las artesanías bordadas" />
-      </div>
-      <div>
-        <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-emerald-800 mb-1">¿Qué estás buscando?</label>
-        <textarea value={estoyBuscando} onChange={e => setEstoyBuscando(e.target.value)} rows={2} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium resize-none" placeholder="Ej. Busco quién pueda hacer reparaciones de bicicletas" />
-      </div>
-      <button type="submit" className="w-full rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3.5 uppercase tracking-wider text-xs transition-all mt-2 shadow-md font-heading">
-        Enviar registro
-      </button>
-    </form>
-  );
-}
-
-// =========================================================================
-// 4C. SUBCOMPONENTE GENÉRICO: CARRUSEL AUTOMÁTICO (con pausa y flechas manuales)
-// =========================================================================
-// Reutilizable: gira solo de derecha a izquierda cada "intervaloMs", se
-// puede pausar/reanudar, y se puede navegar manualmente con las flechas o
-// los puntos (al usar cualquier control manual, se pausa solo, para no
-// pelear con quien lo está viendo). "renderItem" decide cómo se ve cada
-// tarjeta — así el mismo carrusel sirve para Extraviados, Ventas con
-// Causa, o cualquier otra pasarela futura.
-function Carrusel({ items, renderItem, intervaloMs = 4000 }) {
-  const [index, setIndex] = useState(0);
-  const [pausado, setPausado] = useState(false);
-
-  useEffect(() => {
-    if (pausado) return;
-    const id = setInterval(() => {
-      setIndex((i) => (i + 1) % items.length);
-    }, intervaloMs);
-    return () => clearInterval(id);
-  }, [pausado, items.length, intervaloMs]);
-
-  // Precarga en segundo plano todas las fotos del carrusel apenas
-  // llegan (o cambian) los items, para que ya estén en caché del
-  // navegador cuando el carrusel las quiera mostrar (evita el
-  // parpadeo/foto en blanco en la primera visita al sitio).
-  useEffect(() => {
-    items.forEach((item) => {
-      if (item.img) {
-        const imgPrecarga = new Image();
-        imgPrecarga.src = resolverSrcImagen(item.img);
-      }
-    });
-  }, [items]);
-
-  const anterior = () => { setIndex((i) => (i - 1 + items.length) % items.length); setPausado(true); };
-  const siguiente = () => { setIndex((i) => (i + 1) % items.length); setPausado(true); };
-
-  const item = items[index];
-
-  return (
-    <div className="rounded-2xl border-4 border-[#0f2d1e] bg-white overflow-hidden shadow-md">
-      <div className="relative flex items-center">
-
-        <button
-          onClick={anterior}
-          aria-label="Anterior"
-          className="absolute left-2 z-10 h-9 w-9 sm:h-10 sm:w-10 flex items-center justify-center rounded-full bg-white/90 border-2 border-[#0f2d1e] text-[#0f2d1e] font-black shadow-md hover:bg-emerald-50 transition-colors"
-        >
-          ‹
-        </button>
-
-        {renderItem(item)}
-
-        <button
-          onClick={siguiente}
-          aria-label="Siguiente"
-          className="absolute right-2 z-10 h-9 w-9 sm:h-10 sm:w-10 flex items-center justify-center rounded-full bg-white/90 border-2 border-[#0f2d1e] text-[#0f2d1e] font-black shadow-md hover:bg-emerald-50 transition-colors"
-        >
-          ›
-        </button>
-      </div>
-
-      <div className="flex items-center justify-center gap-2 py-3 border-t border-[#0f2d1e]/10 bg-emerald-50/60">
-        {items.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => { setIndex(i); setPausado(true); }}
-            aria-label={`Ir al elemento ${i + 1}`}
-            className={`h-2 w-2 rounded-full transition-colors ${i === index ? "bg-emerald-700" : "bg-emerald-700/30"}`}
+      {/* VENTANA DE LOS BOTONES BENEFICIOS / REGISTROS */}
+      {accesoAbierto && (
+        <Suspense fallback={null}>
+          <ModalAccesoRapido
+            tipo={accesoAbierto}
+            onCerrar={() => setAccesoAbierto(null)}
+            onAbrirProyecto={(id) => setModalProyecto(id)}
+            onAccion={(a) => setModalFormulario(a)}
           />
-        ))}
-        <button
-          onClick={() => setPausado((p) => !p)}
-          className="ml-3 text-[10px] sm:text-xs font-black uppercase tracking-wider text-emerald-800 hover:text-emerald-900 underline underline-offset-2"
-        >
-          {pausado ? "▶ Reanudar" : "❚❚ Pausar"}
-        </button>
-      </div>
-    </div>
-  );
-}
-
-// Tarjeta compartida por ambas pasarelas (extraviados y ventas con causa) —
-// misma estructura visual, cambia solo la etiqueta y el pie de foto.
-// Las fotos que vienen de Baserow (URLs de S3) pasan por nuestro propio
-// "puente" (/api/imagen-proxy) para evitar bloqueos del navegador del
-// visitante. Las rutas locales de marcador de posición (/images/...) se
-// usan tal cual, sin pasar por el puente. La usan tanto la tarjeta como
-// la precarga del carrusel, para no repetir la misma lógica dos veces.
-function resolverSrcImagen(img) {
-  if (!img) return img;
-  return img.startsWith("http") ? `/api/imagen-proxy?url=${encodeURIComponent(img)}` : img;
-}
-
-function TarjetaCarrusel({ item, etiqueta, mostrarDetallesVenta = false }) {
-  const srcImagen = resolverSrcImagen(item.img);
-
-  return (
-    <div className="w-full grid sm:grid-cols-2">
-      <div className="aspect-video sm:aspect-square bg-emerald-100">
-        <img
-          key={item.id || srcImagen}
-          src={srcImagen}
-          alt={item.nombre}
-          className="w-full h-full object-contain"
-          onError={(e) => { e.target.style.display = 'none'; }}
-        />
-      </div>
-      <div className="p-5 flex flex-col justify-center gap-2">
-        <span className="inline-block w-fit rounded-full bg-emerald-200 px-3 py-1 text-[10px] sm:text-xs font-black uppercase tracking-wider text-emerald-800">
-          {etiqueta}
-        </span>
-        <p className="text-lg sm:text-xl font-black text-[#0f2d1e] uppercase leading-tight">{item.nombre}</p>
-        {item.codigo && (
-          <p className="text-xs font-bold text-emerald-700 uppercase tracking-wide">Código: {item.codigo}</p>
-        )}
-        <p className="text-sm text-slate-700 font-medium leading-relaxed">{item.descripcion}</p>
-        {mostrarDetallesVenta && (
-          <div className="mt-1 space-y-1">
-            {item.precio && (
-              <p className="text-base font-black text-[#0f2d1e]">
-                ${item.precio} <span className="font-medium text-xs text-slate-600">MXN</span>
-              </p>
-            )}
-            {item.proveedor && (
-              <p className="text-xs font-bold text-slate-600">Proveedor: {item.proveedor}</p>
-            )}
-            {item.notas && (
-              <p className="text-xs text-slate-500 italic">{item.notas}</p>
-            )}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// Trae los renglones reales de una tabla de Baserow a través de nuestra
-// función serverless (/api/baserow-rows) — nunca habla con Baserow
-// directamente desde el navegador. Si "tableId" está vacío, o la petición
-// falla, o Baserow todavía no tiene filas, se queda con "itemsRespaldo"
-// (los datos de ejemplo) sin romper nada.
-// Trae los renglones "crudos" de la tabla ENLACES (uno por fila, con las
-// columnas tal cual las nombraste en Baserow: VIDPORT, RECASA, RECOMUN,
-// RECMUSIC, RECLIBROS, RECVIDEOSYMAS, GALCULTURA, GALSALUD, etc.). Si la tabla
-// aún no responde o está vacía, regresa un arreglo vacío y quien la usa
-// se queda con su propio respaldo — nunca rompe la página.
-function useFilasEnlaces() {
-  const [filas, setFilas] = useState([]);
-
-  useEffect(() => {
-    if (!BASEROW_TABLE_ID_ENLACES) return;
-    let cancelado = false;
-
-    fetch(`/api/baserow-rows?table=${encodeURIComponent(BASEROW_TABLE_ID_ENLACES)}&crudo=1`)
-      .then((r) => r.json())
-      .then((data) => {
-        if (!cancelado && Array.isArray(data.items)) setFilas(data.items);
-      })
-      .catch(() => {
-        // Sin conexión, tabla vacía, etc. — nos quedamos con los respaldos.
-      });
-
-    return () => { cancelado = true; };
-  }, []);
-
-  return filas;
-}
-
-// Toma hasta "max" valores no vacíos de una columna a lo largo de todas
-// las filas (ej. las primeras 5 URLs de la columna RECMUSIC).
-function primerosValores(filas, columna, max) {
-  return filas
-    .map((f) => f && f[columna])
-    .filter((v) => v && String(v).trim() !== "")
-    .slice(0, max);
-}
-
-// Arma pares {nombre, enlace} tomando 2 columnas de la misma fila (ej.
-// "Nombre Recocasa" + "RECASA"). Solo cuenta una fila si tiene enlace; si le
-// falta el nombre, usa un nombre genérico numerado para no dejarlo vacío.
-function paresBaserow(filas, colNombre, colEnlace, max) {
-  return filas
-    .filter((f) => f && f[colEnlace] && String(f[colEnlace]).trim() !== "")
-    .slice(0, max)
-    .map((f, i) => ({
-      nombre: (f[colNombre] && String(f[colNombre]).trim()) || `Recomendación ${i + 1}`,
-      enlace: f[colEnlace]
-    }));
-}
-
-// Saca la URL de una celda de Baserow sin importar si la columna es de
-// texto/URL plano (un string) o de tipo Archivo/Adjunto (Baserow entrega un
-// arreglo de objetos [{url, name, thumbnails...}] para ese tipo de columna,
-// como es el caso de GALCULTURA y GALSALUD).
-function urlDesdeCeldaBaserow(valor) {
-  if (!valor) return null;
-  if (Array.isArray(valor)) {
-    const primero = valor[0];
-    if (!primero) return null;
-    return primero.url || (primero.thumbnails && primero.thumbnails.card && primero.thumbnails.card.url) || null;
-  }
-  const texto = String(valor).trim();
-  return texto === "" ? null : texto;
-}
-
-// Arma items de galería {img, tipo, nombre} a partir de una columna que
-// trae fotos — ya sea de tipo Archivo/Adjunto (GALCULTURA, GALSALUD) o de
-// texto plano con URLs.
-function galeriaDesdeColumna(filas, columna, max, etiqueta) {
-  return filas
-    .map((f) => f && urlDesdeCeldaBaserow(f[columna]))
-    .filter(Boolean)
-    .slice(0, max)
-    .map((url, i) => ({
-      img: url,
-      tipo: etiqueta,
-      nombre: `${etiqueta} ${i + 1}`
-    }));
-}
-
-// Saca el ID de video de un enlace normal de YouTube (watch?v=, youtu.be/,
-// o ya en formato /embed/), para poder armar el src del iframe.
-function idYoutubeDesdeUrl(url) {
-  if (!url) return null;
-  const m = String(url).match(/(?:v=|youtu\.be\/|embed\/)([a-zA-Z0-9_-]{6,})/);
-  return m ? m[1] : null;
-}
-
-function useCatalogoBaserow(tableId, itemsRespaldo) {
-  const [items, setItems] = useState(itemsRespaldo);
-
-  useEffect(() => {
-    if (!tableId) return; // sin Table ID configurado: nos quedamos con el respaldo
-    let cancelado = false;
-
-    fetch(`/api/baserow-rows?table=${encodeURIComponent(tableId)}`)
-      .then((r) => r.json())
-      .then((data) => {
-        if (!cancelado && Array.isArray(data.items) && data.items.length > 0) {
-          setItems(data.items);
-        }
-      })
-      .catch(() => {
-        // Sin conexión, token aún no configurado, etc. — nos quedamos con el respaldo.
-      });
-
-    return () => { cancelado = true; };
-  }, [tableId]);
-
-  return items;
-}
-
-function PasarelaExtraviados() {
-  const items = useCatalogoBaserow(BASEROW_TABLE_ID_EXTRAVIADOS, EXTRAVIADOS_ITEMS);
-  return (
-    <Carrusel
-      items={items}
-      renderItem={(item) => (
-        <TarjetaCarrusel item={item} etiqueta={item.tipo ? `${item.tipo} extraviad${item.tipo === "Persona" ? "a" : "o"}` : ""} />
-      )}
-    />
-  );
-}
-
-function PasarelaVentasConCausa() {
-  const items = useCatalogoBaserow(BASEROW_TABLE_ID_VENTAS_CON_CAUSA, VENTAS_CON_CAUSA_ITEMS);
-  return (
-    <Carrusel
-      items={items}
-      renderItem={(item) => (
-        <TarjetaCarrusel item={item} etiqueta={item.tipo} mostrarDetallesVenta />
-      )}
-    />
-  );
-}
-
-// =========================================================================
-// 4B. CONTENIDO DE LA VENTANA EMERGENTE ÚNICA DE PROYECTO
-// =========================================================================
-// Botón naranja de acción reutilizable dentro de los modales (WhatsApp, etc).
-function BotonModal({ href, children, variante = "principal", onClick }) {
-  const base = "w-full text-center rounded-xl font-black py-3 px-4 shadow-md transition-colors uppercase tracking-wide text-xs sm:text-sm font-heading block";
-  const estilos = variante === "principal"
-    ? "bg-[#e65100] hover:bg-[#bf360c] text-white"
-    : "border-2 border-[#0f2d1e] text-[#0f2d1e] hover:bg-[#0f2d1e] hover:text-white";
-  if (href) {
-    return (
-      <a href={href} target="_blank" rel="noopener noreferrer" className={`${base} ${estilos}`}>
-        {children}
-      </a>
-    );
-  }
-  return (
-    <button type="button" onClick={onClick} className={`${base} ${estilos}`}>
-      {children}
-    </button>
-  );
-}
-
-// Botón verde desplegable — usado en la fila de "resumen rápido" junto al
-// video (Nuestra Misión, Cómo Podemos Sumar, Preguntas Frecuentes, Aviso
-// de Privacidad). Al dar clic se expande hacia abajo mostrando su contenido.
-function BotonVerdeInfo({ titulo, abierto, onClick, children }) {
-  // Animación tipo "pergamino": en vez de mostrar/ocultar de golpe (lo que
-  // hacía que la página "saltara" al cerrar un botón y el siguiente
-  // brincara de lugar), se anima suavemente la altura del contenido con
-  // el truco de CSS Grid (0fr -> 1fr). Así el cierre se ve como un
-  // desenrollado suave y el resto de la columna se acomoda poco a poco,
-  // sin brincos ni saltos de scroll.
-  return (
-    <div className="rounded-xl bg-[#17472d] text-white shadow-md overflow-hidden">
-      <button
-        type="button"
-        onClick={onClick}
-        className="w-full flex items-center justify-between gap-2 px-4 py-3.5 text-left hover:bg-[#0f2d1e] transition-colors"
-      >
-        <span className="text-xs sm:text-sm font-black uppercase tracking-wide">{titulo}</span>
-        <span className={`text-lg leading-none shrink-0 transition-transform ${abierto ? "rotate-45" : ""}`}>+</span>
-      </button>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateRows: abierto ? "1fr" : "0fr",
-          transition: "grid-template-rows 350ms ease-in-out"
-        }}
-      >
-        <div style={{ overflow: "hidden" }}>
-          <div className="px-4 pb-4 pt-1 text-xs sm:text-sm text-emerald-50 leading-relaxed space-y-2 border-t border-emerald-700/40">
-            {children}
-            <button
-              type="button"
-              onClick={onClick}
-              className="w-full mt-2 rounded-lg border-2 border-emerald-500/50 text-emerald-100 hover:bg-emerald-900/60 font-black uppercase tracking-wide text-[11px] sm:text-xs py-2 transition-colors"
-            >
-              Cerrar
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Decide qué mostrar dentro del modal según el id recibido: los 10 proyectos
-// "normales" (con tarjeta propia), o los 2 casos especiales sin tarjeta
-// (Ventas con Causa y Apoyo Voluntario/donaciones).
-function ContenidoModalProyecto({ id, onCerrar }) {
-  // Se llama siempre, sin importar el "id", para respetar las reglas de
-  // React sobre hooks. Las galerías de Noticias y Bienestar ahora se
-  // alimentan de las columnas GALCULTURA y GALSALUD de la tabla ENLACES;
-  // si vienen vacías, cada una usa su arreglo de ejemplo como respaldo.
-  const filasEnlaces = useFilasEnlaces();
-  const itemsNoticias = (() => {
-    const desdeBaserow = galeriaDesdeColumna(filasEnlaces, "GALCULTURA", 12, "Actividad");
-    return desdeBaserow.length > 0 ? desdeBaserow : NOTICIAS_GALERIA_ITEMS;
-  })();
-  const itemsBienestar = (() => {
-    const desdeBaserow = galeriaDesdeColumna(filasEnlaces, "GALSALUD", 12, "Actividad");
-    return desdeBaserow.length > 0 ? desdeBaserow : BIENESTAR_GALERIA_ITEMS;
-  })();
-
-  // Caso especial 1: Ventas con Causa — muestra el catálogo en vivo.
-  if (id === "ventas-con-causa") {
-    return (
-      <div className="space-y-4">
-        <span className="inline-block rounded-full bg-emerald-200 px-4 py-1.5 text-sm font-black uppercase tracking-wider text-emerald-800">
-          🛍️ Ventas con Causa
-        </span>
-        <h3 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#0f2d1e]">
-          Productos y servicios que apoyan a la comunidad
-        </h3>
-        <p className="text-sm text-slate-600 font-medium leading-relaxed">
-          Explora el catálogo, cuéntanos qué te interesa o qué buscas, y te contactamos directo por WhatsApp.
-        </p>
-        <PasarelaVentasConCausa />
-        <p className="text-center text-xs font-bold text-emerald-800">
-          <a href={BASEROW_GALLERY_URL} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 hover:text-emerald-900">
-            Ver catálogo completo
-          </a>
-        </p>
-        <div className="space-y-2 pt-1">
-          <BotonModal href={enlaceWhatsApp("¡Hola DCUATES! Quiero ofrecer un producto o servicio en Ventas con Causa.")}>
-            Publicar mi producto o servicio
-          </BotonModal>
-          <BotonModal href={enlaceWhatsApp("¡Hola DCUATES! Quiero reportar un caso de mascota, persona o cosa extraviada.")} variante="secundario">
-            Reportar caso extraviado
-          </BotonModal>
-        </div>
-      </div>
-    );
-  }
-
-  // Caso especial 2: Apoyo Voluntario / donaciones — muestra las 4 formas de aportar.
-  if (id === "donaciones") {
-    return (
-      <div className="space-y-4">
-        <span className="inline-block rounded-full bg-emerald-200 px-4 py-1.5 text-sm font-black uppercase tracking-wider text-emerald-800">
-          🟢 Apoyo Voluntario
-        </span>
-        <h3 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#0f2d1e]">
-          Tu aportación impulsa a la comunidad
-        </h3>
-        <p className="text-sm text-slate-600 font-medium leading-relaxed">
-          Elige la forma de aportación que prefieras — todas te conectan directo por WhatsApp.
-        </p>
-        <div className="space-y-2">
-          {OPCIONES_APORTACION.map((opc) => (
-            <a
-              key={opc.t}
-              href={enlaceWhatsApp(opc.m)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full text-left rounded-xl border-2 border-[#0f2d1e] bg-[#e65100] hover:bg-[#bf360c] p-3 shadow-sm transition-colors block"
-            >
-              <div className="flex justify-between items-center gap-3">
-                <div>
-                  <p className="text-sm sm:text-base font-black text-white uppercase tracking-tight leading-tight">{opc.t}</p>
-                  <p className="text-xs font-bold text-[#0f2d1e]/90 leading-snug pt-0.5">{opc.d}</p>
-                </div>
-                <svg
-                  viewBox="0 0 100 60"
-                  preserveAspectRatio="none"
-                  className="w-6 h-6 sm:w-8 sm:h-8 shrink-0 opacity-90 drop-shadow"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path d="M4 22 H58 V4 L96 30 L58 56 V38 H4 Z" fill="#ffffff" stroke="#0f2d1e" strokeWidth="6" strokeLinejoin="round" />
-                </svg>
-              </div>
-            </a>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  // Casos normales: busca el proyecto entre los 10 que ya tienen tarjeta.
-  const proyecto = TODOS_LOS_PROYECTOS.find((p) => p.id === id);
-  if (!proyecto) return null;
-  const galeria = id === "noticias"
-    ? { titulo: GALERIAS_PROYECTOS.noticias.titulo, items: itemsNoticias }
-    : id === "bienestar"
-    ? { titulo: GALERIAS_PROYECTOS.bienestar.titulo, items: itemsBienestar }
-    : null;
-
-  return (
-    <div className="space-y-4">
-      <p className="text-xs sm:text-sm font-black uppercase text-amber-700 tracking-wider">
-        {proyecto.categoria}
-      </p>
-      <h3 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#0f2d1e] -mt-2">
-        {proyecto.titulo}
-      </h3>
-      <p className="text-sm text-slate-600 leading-relaxed font-medium">
-        {proyecto.descripcion}
-      </p>
-      <ul className="space-y-2">
-        {proyecto.puntos.map((punto, i) => (
-          <li key={i} className="flex items-center gap-2 text-sm font-bold text-slate-700 uppercase">
-            <span className="h-2 w-2 rounded-full bg-[#00c853] flex-shrink-0" />
-            {punto}
-          </li>
-        ))}
-      </ul>
-
-      {galeria && (
-        <div className="pt-1">
-          <Carrusel
-            items={galeria.items}
-            renderItem={(item) => <TarjetaCarrusel item={item} etiqueta={item.tipo} />}
-          />
-        </div>
+        </Suspense>
       )}
 
-      <div className="pt-1 space-y-2">
-        {proyecto.scrollDestino ? (
-          <BotonModal
-            onClick={() => {
-              onCerrar();
-              irASeccion(proyecto.scrollDestino);
-            }}
-          >
-            {proyecto.textoBoton}
-          </BotonModal>
-        ) : (
-          <BotonModal href={proyecto.enlaceDirectoWA}>{proyecto.textoBoton}</BotonModal>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// =========================================================================
-// 5. SUBCOMPONENTE: BARRA TICKER INFERIOR (negocios / mascotas / avisos / momentos)
-// =========================================================================
-// Una sola fila del ticker — recibe el arreglo de items a mostrar y su
-// propio índice (así el mismo componente sirve tanto para el ticker
-// superior de frases, como para el/los ticker(s) inferior(es) de negocios).
-function FilaTicker({ items, index, onClose, mostrarCerrar }) {
-  const item = items[index];
-  const etiqueta = TICKER_ETIQUETAS[item.tipo];
-  const esExterno = item.enlace && item.enlace.startsWith("http");
-
-  return (
-    <div className="mx-auto max-w-6xl flex items-center gap-2 sm:gap-4 px-3 sm:px-4 py-1.5">
-
-      <span className="hidden sm:flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-emerald-300 shrink-0 border-r border-emerald-700/50 pr-3">
-        <span>{etiqueta.emoji}</span> {etiqueta.label}
-      </span>
-
-      <a
-        key={index}
-        href={item.enlace || "#"}
-        target={esExterno ? "_blank" : undefined}
-        rel={esExterno ? "noopener noreferrer" : undefined}
-        className="flex-1 flex items-center gap-3 text-white overflow-hidden min-w-0"
-      >
-        <span className="sm:hidden text-lg shrink-0">{etiqueta.emoji}</span>
-        {item.img && (
-          <img
-            src={item.img}
-            alt=""
-            className="h-8 w-8 sm:h-9 sm:w-9 rounded-lg object-cover shrink-0 border border-white/20"
-            onError={(e) => { e.target.style.display = 'none'; }}
-          />
-        )}
-        <span className="text-xs sm:text-sm font-bold truncate">
-          {item.texto || item.nombre}
-        </span>
-      </a>
-
-      <div className="hidden sm:flex items-center gap-1 shrink-0">
-        {items.map((_, i) => (
-          <span
-            key={i}
-            className={`h-1.5 w-1.5 rounded-full transition-colors ${i === index ? "bg-emerald-300" : "bg-emerald-700/60"}`}
-          />
-        ))}
-      </div>
-
-      {mostrarCerrar && (
-        <button
-          onClick={onClose}
-          className="text-white/50 hover:text-white text-xl leading-none shrink-0 pl-1"
-          title="Cerrar barra"
-        >
-          ×
-        </button>
+      {/* MODAL DEL MAPA DE SITIO */}
+      {showMapaSitio && (
+        <Suspense fallback={null}><ModalMapaSitio
+          onCerrar={() => setShowMapaSitio(false)}
+          onAbrirProyecto={(id) => setModalProyecto(id)}
+          onAbrirFAQ={() => setShowFAQ(true)}
+          onAbrirSugerencias={() => setModalFormulario("sugerencias")}
+        /></Suspense>
       )}
-    </div>
-  );
-}
 
-// Ticker SUPERIOR — frases de solidaridad y llamados a sumarse. No es fijo
-// (queda fijo junto con el encabezado, dentro del mismo contenedor "sticky"
-// en el render principal): vive pegado debajo de él, visible siempre.
-function TickerFrases() {
-  const [index, setIndex] = useState(0);
-  const [visible, setVisible] = useState(true);
+      {/* MODAL DE CATEGORÍA — portada simplificada de 4 botones */}
+      {categoriaAbierta && (
+        <Suspense fallback={null}><ModalCategoria
+          categoria={CATEGORIAS_PROYECTOS.find((c) => c.id === categoriaAbierta)}
+          onCerrar={() => setCategoriaAbierta(null)}
+          onAbrirProyecto={(id) => setModalProyecto(id)}
+        /></Suspense>
+      )}
 
-  useEffect(() => {
-    if (!visible) return;
-    const id = setInterval(() => {
-      setIndex((i) => (i + 1) % TICKER_FRASES.length);
-    }, 5000);
-    return () => clearInterval(id);
-  }, [visible]);
+      {/* MODAL DE FORMULARIO REUTILIZABLE — Sugerencias y Quejas / Conocer y
+          Compartir Más. Ambos arman un mensaje de WhatsApp, sin backend. */}
+      {modalFormulario === "sugerencias" && (
+        <Suspense fallback={null}><ModalFormularioWhatsApp
+          titulo="Sugerencias y Quejas"
+          emoji="💬"
+          degradado={DEGRADADO_SUGERENCIAS}
+          suave="#e3f3f8"
+          invitacion="Tu voz mejora esta comunidad. Cuéntanos qué te gustó, qué falló o qué podríamos hacer mejor; cada mensaje lo leemos con atención."
+          cierre="Gracias por ayudarnos a mejorar. ¡Juntos lo hacemos mejor! 💬"
+          opciones={["Sugerencia", "Queja", "Reporte de error en la página", "Otro"]}
+          placeholder="Escribe aquí tu mensaje..."
+          etiquetaBoton="Enviar por WhatsApp"
+          onCerrar={() => setModalFormulario(null)}
+        /></Suspense>
+      )}
+      {modalFormulario === "comparte" && (
+        <Suspense fallback={null}><ModalCompartirMas onCerrar={() => setModalFormulario(null)} /></Suspense>
+      )}
 
-  if (!visible) return null;
+      {/* VENTANA DE DUDAS — la abre el botón flotante de WhatsApp */}
+      {showDudas && (
+        <Suspense fallback={null}><ModalDudas
+          onCerrar={() => setShowDudas(false)}
+          onBuscarEnPagina={() => { setBusquedaAbierta(true); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+        /></Suspense>
+      )}
 
-  return (
-    <div className="bg-[#0f2d1e] border-b-2 border-emerald-700/50">
-      <FilaTicker items={TICKER_FRASES} index={index} onClose={() => setVisible(false)} mostrarCerrar={true} />
-    </div>
-  );
-}
-
-// Ticker INFERIOR fijo — anuncios de negocios, productos y servicios,
-// mascotas y avisos comunitarios. Dos filas simultáneas que rotan de forma
-// independiente (desfasadas a la mitad del arreglo) para mostrar el doble
-// de contenido sin esperar tanto tiempo entre anuncios.
-function BarraTicker() {
-  const [index, setIndex] = useState(0);
-  const [visible, setVisible] = useState(true);
-
-  useEffect(() => {
-    if (!visible) return;
-    const id = setInterval(() => {
-      setIndex((i) => (i + 1) % TICKER_ITEMS.length);
-    }, 4500);
-    return () => clearInterval(id);
-  }, [visible]);
-
-  if (!visible) return null;
-
-  // La segunda fila va desfasada a la mitad del arreglo para no repetir
-  // exactamente el mismo anuncio que la primera fila al mismo tiempo.
-  const indexFila2 = (index + Math.floor(TICKER_ITEMS.length / 2)) % TICKER_ITEMS.length;
-
-  return (
-    <div className="fixed bottom-0 inset-x-0 z-40 bg-[#17472d] border-t-2 border-emerald-700/50 shadow-[0_-4px_12px_rgba(0,0,0,0.25)] divide-y divide-emerald-800/40">
-      <FilaTicker items={TICKER_ITEMS} index={index} mostrarCerrar={false} />
-      <FilaTicker items={TICKER_ITEMS} index={indexFila2} onClose={() => setVisible(false)} mostrarCerrar={true} />
     </div>
   );
 }
