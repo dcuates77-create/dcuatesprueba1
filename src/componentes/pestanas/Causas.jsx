@@ -142,7 +142,7 @@ export function PestanaCausas({ apoyoCausaAnimalLinks, apoyoCosasCasosLinks, apo
             <div className="max-w-3xl mx-auto">
               <PasarelaExtraviados />
             </div>
-            <div className="max-w-3xl mx-auto mt-4">
+            <div id="registro-extraviados" className="max-w-3xl mx-auto mt-4 scroll-mt-48 md:scroll-mt-36">
               <BotonNaranjaDesplegable
                 titulo="🔎 Reporta un caso, ve más casos y consulta apoyos para mascotas, personas y objetos"
                 abierto={extraviadosResumenAbierto}

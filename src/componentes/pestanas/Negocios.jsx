@@ -27,7 +27,7 @@ export function PestanaNegocios({ compraVentaDcuates, recomendacionesCompra, rec
           <div className="max-w-3xl mx-auto mb-4">
             <PasarelaVentasConCausa />
           </div>
-          <div className="max-w-3xl mx-auto mb-8">
+          <div id="registro-ventas" className="max-w-3xl mx-auto mb-8 scroll-mt-48 md:scroll-mt-36">
             <BotonNaranjaDesplegable
               titulo="🛍️ Regístrate, ve el catálogo completo y descubre recomendaciones de Compra y Venta"
               abierto={ventasResumenAbierto}
