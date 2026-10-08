@@ -10,7 +10,7 @@ import { PestanaNegocios } from "./componentes/pestanas/Negocios.jsx";
 import { PestanaNosotros } from "./componentes/pestanas/Nosotros.jsx";
 import { PestanaRegalos } from "./componentes/pestanas/Regalos.jsx";
 import { PestanaValores } from "./componentes/pestanas/Valores.jsx";
-import { LOGROS_ITEMS, RECOMENDACIONES_ESTRELLA } from "./datos/cintas.js";
+import { LOGROS_ITEMS, LOGROS_FIJOS, RECOMENDACIONES_ESTRELLA } from "./datos/cintas.js";
 import { MAPA_NEGOCIOS_EMBED_URL, REDES_SOCIALES, VERSION_BUILD, WHATSAPP_NUMERO, YOUTUBE_VIDEO_ID } from "./datos/config.js";
 import { AVISO_PRIVACIDAD_INTEGRAL, FAQ_ITEMS, TERMINOS_CONDICIONES } from "./datos/legal.js";
 import { TODOS_LOS_PROYECTOS } from "./datos/listas.js";
@@ -274,9 +274,12 @@ export default function App() {
   // "ENLACE LOGROS") o, si no hay, los ejemplos LOGROS_ITEMS (los mismos de
   // la barra de logros de arriba).
   const logrosBaserow = paresBaserow(filasEnlaces, "NOMBRE LOGROS", "ENLACE LOGROS", 20);
-  const logrosBanda = logrosBaserow.length > 0
-    ? logrosBaserow.map((l) => ({ texto: l.nombre, enlace: l.enlace }))
-    : LOGROS_ITEMS;
+  const logrosBanda = [
+    ...(logrosBaserow.length > 0
+      ? logrosBaserow.map((l) => ({ texto: l.nombre, enlace: l.enlace }))
+      : LOGROS_ITEMS),
+    ...LOGROS_FIJOS
+  ];
 
   // Negocios que aparecen en las fichas debajo del mapa. Se dan de alta en la
   // tabla ENLACES de Baserow, una fila por negocio, con estas columnas (solo

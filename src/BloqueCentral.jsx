@@ -60,11 +60,13 @@ const TABS = [
   {
     id: "regalos", label: "Regalos", emoji: "🎉", color: "#D6336C", pastel: "#FDE8F1", boton: "#C2255C",
     cover: { slogan: "Retos y regalos que nos motivan" }, slot: "regalos",
+    banda: { titulo: "Lo que hemos logrado juntos" },
     texto: "Porque todo lo bueno merece ser compartido. Envíanos tus propuestas de retos y regalos."
   },
   {
     id: "gratitud", label: "Gratitud", emoji: "🙏", color: "#B7791F", pastel: "#FFF4D6", boton: "#92610F",
     cover: { slogan: "Gracias por hacer el bien" }, slot: "gratitud",
+    banda: { titulo: "Gracias a ti, esto hemos logrado" },
     texto: "Reconocemos a quienes hacen el bien en nuestra comunidad. Cuéntanos a quién quieres agradecer."
   }
 ];
@@ -257,7 +259,27 @@ function Contador({ valor, prefijo }) {
   return <span ref={ref}>{prefijo}{n.toLocaleString("es-MX")}+</span>;
 }
 
+// Banda de logros: carrusel que se desplaza sin parar hacia la izquierda con
+// TODOS los hitos (con cifra -> contador; sin cifra -> tarjeta de texto).
+// La pista se duplica para que el ciclo cierre sin saltos. Se detiene al tocar
+// o pasar el cursor encima.
+function tarjetasLogros(logros) {
+  const out = [];
+  logros.forEach((it) => {
+    const texto = String((it && (it.texto || it.nombre)) || "").trim();
+    if (!texto) return;
+    const p = parsearLogros(it);
+    if (p.length) p.forEach((l) => out.push({ tipo: "num", ...l }));
+    else {
+      const mE = texto.match(EMOJI_INICIAL);
+      out.push({ tipo: "txt", emoji: mE ? mE[1] : "✨", texto: mE ? texto.slice(mE[0].length) : texto, enlace: it.enlace });
+    }
+  });
+  return out;
+}
+
 function BandaImpacto({ logros, cargando, tab }) {
+  const [pausa, setPausa] = useState(false);
   if (cargando) {
     return (
       <section className="bc-banda" aria-hidden="true">
@@ -267,20 +289,39 @@ function BandaImpacto({ logros, cargando, tab }) {
       </section>
     );
   }
-  const lista = elegirLogros(logros.flatMap(parsearLogros), tab.id);
+  const lista = tarjetasLogros(logros);
   if (lista.length < 2) return null;
+  const tarjeta = (l, i, copia) => (
+    l.tipo === "num" ? (
+      <div className="bc-stat" key={(copia ? "c" : "o") + i}>
+        <span className="bc-stat-e" aria-hidden="true">{l.emoji}</span>
+        <b className="bc-stat-n"><Contador valor={l.valor} prefijo={l.prefijo} /></b>
+        <span className="bc-stat-l">{l.etiqueta}</span>
+        {l.nota && <span className="bc-stat-nota">{l.nota}</span>}
+      </div>
+    ) : (
+      <div className="bc-stat bc-stat-txt" key={(copia ? "c" : "o") + i}>
+        <span className="bc-stat-e" aria-hidden="true">{l.emoji}</span>
+        <span className="bc-stat-m">{l.texto}</span>
+      </div>
+    )
+  );
+  const dur = Math.max(30, lista.length * 6);
   return (
     <section className="bc-banda" aria-label={tab.banda.titulo} style={{ "--c": tab.color }}>
       <p className="bc-banda-t"><span aria-hidden="true">🌱</span> {tab.banda.titulo}</p>
-      <div className="bc-banda-g">
-        {lista.map((l, i) => (
-          <div className="bc-stat" key={i}>
-            <span className="bc-stat-e" aria-hidden="true">{l.emoji}</span>
-            <b className="bc-stat-n"><Contador valor={l.valor} prefijo={l.prefijo} /></b>
-            <span className="bc-stat-l">{l.etiqueta}</span>
-            {l.nota && <span className="bc-stat-nota">{l.nota}</span>}
-          </div>
-        ))}
+      <div
+        className={"bc-marq" + (pausa ? " bc-marq-p" : "")}
+        onPointerDown={() => setPausa(true)}
+        onPointerUp={() => setTimeout(() => setPausa(false), 1800)}
+        onPointerCancel={() => setPausa(false)}
+      >
+        <div className="bc-marq-pista" style={{ animationDuration: dur + "s" }}>
+          {lista.map((l, i) => tarjeta(l, i, false))}
+          <span className="bc-marq-copia" aria-hidden="true" style={{ display: "contents" }}>
+            {lista.map((l, i) => tarjeta(l, i, true))}
+          </span>
+        </div>
       </div>
     </section>
   );
@@ -524,7 +565,7 @@ export default function BloqueCentral({
 
           <nav className="bc-accesos" aria-label="Accesos rápidos">
             <button type="button" className="bc-acc bc-acc-ben" onClick={() => onAcceso("beneficios")}>
-              <span className="bc-acc-e" aria-hidden="true">🤲</span><span className="bc-acc-t">Para ti</span>
+              <span className="bc-acc-e bc-latido" aria-hidden="true">💛</span><span className="bc-acc-t">Para ti</span>
             </button>
             <button type="button" className="bc-acc bc-acc-reg" onClick={() => onAcceso("registros")}>
               <span className="bc-acc-e" aria-hidden="true">📝</span><span className="bc-acc-t">Registros</span>
@@ -721,6 +762,15 @@ const CSS = `
 .bc-banda-g{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
 .bc-stat{display:flex;flex-direction:column;gap:2px;padding:10px 11px;border-radius:14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14)}
 .bc-stat-e{font-size:22px;line-height:1}
+.bc-marq{overflow:hidden;margin:0 -4px;-webkit-mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent);mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent)}
+.bc-marq-pista{display:flex;gap:10px;width:max-content;padding:0 4px;animation:bc-marq linear infinite;will-change:transform}
+.bc-marq:hover .bc-marq-pista,.bc-marq-p .bc-marq-pista{animation-play-state:paused}
+.bc-marq .bc-stat{flex:0 0 156px}
+.bc-marq .bc-stat-txt{flex-basis:250px;justify-content:flex-start}
+.bc-stat-m{font-size:13px;font-weight:800;line-height:1.3;color:#fff}
+@keyframes bc-marq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.bc-latido{display:inline-block;animation:bc-latido 1.3s ease-in-out infinite}
+@keyframes bc-latido{0%,100%{transform:scale(1)}15%{transform:scale(1.28)}30%{transform:scale(1)}45%{transform:scale(1.2)}}
 .bc-stat-n{font-size:27px;font-weight:900;line-height:1.05;color:#FFD84D;font-variant-numeric:tabular-nums}
 .bc-stat-l{font-size:12px;font-weight:700;line-height:1.25;color:#eaf6ee;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .bc-stat-nota{font-size:10.5px;font-weight:700;font-style:italic;line-height:1.25;color:#bfe3cb;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
