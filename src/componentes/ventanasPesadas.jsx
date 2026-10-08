@@ -918,7 +918,7 @@ export function ModalAccesoRapido({ tipo, onCerrar, onAbrirProyecto, onAccion })
   const esBen = tipo === "beneficios";
   const lista = esBen ? ACCESOS_BENEFICIOS : ACCESOS_REGISTROS;
   const color = esBen ? "#e65100" : "#2E9E5B";
-  const titulo = esBen ? "Para ti 🤲" : "Regístrate o participa 📝";
+  const titulo = esBen ? "Para ti 💛" : "Regístrate o participa 📝";
   const invitacion = esBen
     ? "Toca el que te interese y conoce cómo usarlo, sin costo."
     : "Elige qué quieres registrar o a qué quieres sumarte.";

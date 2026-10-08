@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { BotonCerrar } from "./legal.jsx";
 import { IframeVideo } from "./media.jsx";
-import { LOGROS_ITEMS, TICKER_ETIQUETAS, TICKER_FRASES } from "../datos/cintas.js";
+import { LOGROS_ITEMS, LOGROS_FIJOS, TICKER_ETIQUETAS, TICKER_FRASES } from "../datos/cintas.js";
 import { detectarVideo, enlaceWhatsApp, esPDF, paresBaserow, urlDesdeCeldaBaserow, useCarruselAutomatico, useFilasEnlaces } from "../utilidades/baserow.js";
 
 export const TICKER_ITEMS = [
@@ -88,14 +88,26 @@ export function BarraLogros() {
 
   const filasEnlaces = useFilasEnlaces();
   const logrosBaserow = paresBaserow(filasEnlaces, "NOMBRE LOGROS", "ENLACE LOGROS", 20);
-  const itemsLogros = logrosBaserow.length > 0 ? logrosBaserow : LOGROS_ITEMS;
+  const itemsLogros = [...(logrosBaserow.length > 0 ? logrosBaserow : LOGROS_ITEMS), ...LOGROS_FIJOS];
+
+  // Si el texto no cabe, se desplaza hacia la izquierda y al terminar pasa al
+  // siguiente; si cabe, rota cada 5 s como antes.
+  const cajaRef = useRef(null);
+  const textoRef = useRef(null);
+  const [recorrido, setRecorrido] = useState(0); // px que desborda; 0 = cabe
+  const siguiente = () => setIndex((i) => (i + 1) % itemsLogros.length);
 
   useEffect(() => {
-    const id = setInterval(() => {
-      setIndex((i) => (i + 1) % itemsLogros.length);
-    }, 5000);
-    return () => clearInterval(id);
-  }, [itemsLogros.length]);
+    const c = cajaRef.current, t = textoRef.current;
+    const sobra = c && t ? t.scrollWidth - c.clientWidth : 0;
+    setRecorrido(sobra > 4 ? t.scrollWidth : 0);
+  }, [index, itemsLogros.length]);
+
+  useEffect(() => {
+    if (recorrido) return undefined;
+    const id = setTimeout(siguiente, 5000);
+    return () => clearTimeout(id);
+  }, [index, recorrido, itemsLogros.length]);
 
   const item = itemsLogros[index];
   const esExterno = item.enlace && item.enlace.startsWith("http");
@@ -112,8 +124,17 @@ export function BarraLogros() {
         <span className="hidden sm:flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-amber-300 shrink-0 border-r border-emerald-700/50 pr-4">
           🏆 Logros DCUATES
         </span>
-        <span className="text-sm sm:text-base font-bold text-white flex-1 min-w-0 truncate">
-          {item.texto || item.nombre}
+        <span ref={cajaRef} className="text-sm sm:text-base font-bold text-white flex-1 min-w-0 overflow-hidden whitespace-nowrap">
+          <span
+            ref={textoRef}
+            key={index}
+            className={recorrido ? "bc-logro-desliza" : ""}
+            style={recorrido ? { display: "inline-block", animation: `bc-logro-desliza ${Math.max(8, (recorrido + 360) / 80)}s linear 1 forwards`, "--w": recorrido + "px" } : { display: "inline-block" }}
+            onAnimationEnd={recorrido ? siguiente : undefined}
+          >
+            {item.texto || item.nombre}
+          </span>
+          <style>{"@keyframes bc-logro-desliza{from{transform:translateX(100vw)}to{transform:translateX(calc(-1 * var(--w)))}}"}</style>
         </span>
         <div className="hidden sm:flex items-center gap-1 shrink-0">
           {itemsLogros.map((_, i) => (
