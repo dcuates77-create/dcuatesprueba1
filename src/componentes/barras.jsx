@@ -119,12 +119,12 @@ export function BarraLogros() {
         href={item.enlace || "#"}
         target={esExterno ? "_blank" : undefined}
         rel={esExterno ? "noopener noreferrer" : undefined}
-        className="mx-auto max-w-6xl flex items-center gap-3 sm:gap-4 px-3 sm:px-4 py-3 sm:py-4"
+        className="mx-auto max-w-6xl flex items-center gap-3 sm:gap-4 px-3 sm:px-4 py-4 sm:py-5"
       >
-        <span className="hidden sm:flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-amber-300 shrink-0 border-r border-emerald-700/50 pr-4">
+        <span className="hidden sm:flex items-center gap-1.5 text-sm font-black uppercase tracking-wider text-amber-300 shrink-0 border-r border-emerald-700/50 pr-4">
           🏆 Logros DCUATES
         </span>
-        <span ref={cajaRef} className="text-sm sm:text-base font-bold text-white flex-1 min-w-0 overflow-hidden whitespace-nowrap">
+        <span ref={cajaRef} className="text-base sm:text-xl font-bold text-white flex-1 min-w-0 overflow-hidden whitespace-nowrap">
           <span
             ref={textoRef}
             key={index}
