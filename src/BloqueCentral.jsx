@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
 import CarruselPortada from "./CarruselPortada";
+import BloqueAgenda from "./BloqueAgenda.jsx";
 import TiraAuto from "./TiraAuto";
 import BotonCompartir from "./BotonCompartir";
 import { registrar } from "./analitica";
@@ -338,6 +339,7 @@ export default function BloqueCentral({
   nosotros = null, beneficios = null, causas = null, valores = null,
   negociosSeccion = null, regalos = null, gratitud = null,   // JSX de cada pestaña (viene de App.jsx)
   resumenes = {},           // { idProyecto: "una línea" } para las tarjetas
+  agenda = [],              // eventos de la agenda [{ fecha, titulo, info, enlace }]
   logros = [],              // [{ texto, enlace }] para la banda de impacto
   cargando = false,         // true mientras Baserow aún no responde (muestra esqueletos)
   onAbrirCategoria = () => {},
@@ -564,14 +566,14 @@ export default function BloqueCentral({
           )}
 
           <nav className="bc-accesos" aria-label="Accesos rápidos">
+            <button type="button" className="bc-acc bc-acc-pro" onClick={() => onAcceso("proyectos")}>
+              <span className="bc-acc-e" aria-hidden="true">🧭</span><span className="bc-acc-t">Proyectos</span>
+            </button>
             <button type="button" className="bc-acc bc-acc-ben" onClick={() => onAcceso("beneficios")}>
               <span className="bc-acc-e bc-latido" aria-hidden="true">💛</span><span className="bc-acc-t">Para ti</span>
             </button>
             <button type="button" className="bc-acc bc-acc-reg" onClick={() => onAcceso("registros")}>
               <span className="bc-acc-e" aria-hidden="true">📝</span><span className="bc-acc-t">Registros</span>
-            </button>
-            <button type="button" className="bc-acc bc-acc-pro" onClick={() => onAcceso("proyectos")}>
-              <span className="bc-acc-e" aria-hidden="true">🧭</span><span className="bc-acc-t">Proyectos</span>
             </button>
             <button
               type="button"
@@ -614,6 +616,7 @@ export default function BloqueCentral({
                   <button type="button" onClick={() => document.getElementById("publicidad")?.scrollIntoView({ behavior: "smooth", block: "start" })} style={{ background: "#D1530A" }}>Empezar ›</button>
                 </div>
               </article>
+              <BloqueAgenda eventos={agenda} color={tab.boton || tab.color} />
             </div>
           )}
 
@@ -743,6 +746,10 @@ const CSS = `
 .bc-ficha-btns{display:flex;gap:6px;margin-top:auto;padding-top:10px}
 .bc-ficha-btns a,.bc-ficha-btns button{flex:1;min-height:40px;display:grid;place-items:center;border:0;border-radius:12px;color:#fff;font-family:inherit;font-weight:900;font-size:13px;text-decoration:none;cursor:pointer}
 .bc-ficha-cta{border-style:dashed}
+.bc-agenda-card{border-style:solid}
+.ag-hoy{width:56px;border-radius:12px;overflow:hidden;background:#fff;border:2px solid #e5ebe8;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+.ag-hoy-m{display:block;color:#fff;font-size:11px;font-weight:900;letter-spacing:.06em;padding:2px 0}
+.ag-hoy-d{display:block;font-size:28px;font-weight:900;line-height:1.25;color:#1f2a37}
 .bc-map{position:relative;margin:0 0 14px;height:280px;background:#dfe7e2;border-radius:16px;overflow:hidden;box-shadow:0 6px 16px rgba(31,42,55,.12)}
 .bc-map iframe{width:100%;height:100%;border:0;display:block}
 .bc-map-lock{position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:center;padding:12px;touch-action:pan-x pan-y;background:rgba(255,255,255,.04)}
@@ -765,9 +772,15 @@ const CSS = `
 .bc-marq{overflow:hidden;margin:0 -4px;-webkit-mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent);mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent)}
 .bc-marq-pista{display:flex;gap:10px;width:max-content;padding:0 4px;animation:bc-marq linear infinite;will-change:transform}
 .bc-marq:hover .bc-marq-pista,.bc-marq-p .bc-marq-pista{animation-play-state:paused}
-.bc-marq .bc-stat{flex:0 0 156px}
-.bc-marq .bc-stat-txt{flex-basis:250px;justify-content:flex-start}
-.bc-stat-m{font-size:13px;font-weight:800;line-height:1.3;color:#fff}
+.bc-marq .bc-stat{flex:0 0 196px;padding:14px 14px;gap:4px}
+.bc-marq .bc-stat-txt{flex-basis:290px;justify-content:flex-start}
+.bc-marq .bc-stat-e{font-size:30px}
+.bc-marq .bc-stat-n{font-size:36px}
+.bc-marq .bc-stat-l{font-size:15px;line-height:1.3;-webkit-line-clamp:6}
+.bc-marq .bc-stat-nota{font-size:12.5px;-webkit-line-clamp:5}
+.bc-banda-t{font-size:14px}
+.bc-stat-m{font-size:16px;font-weight:800;line-height:1.35;color:#fff}
+@media(min-width:768px){.bc-marq .bc-stat{flex-basis:250px}.bc-marq .bc-stat-txt{flex-basis:360px}.bc-marq .bc-stat-n{font-size:42px}.bc-marq .bc-stat-l{font-size:17px}.bc-stat-m{font-size:18px}.bc-banda-t{font-size:16px}}
 @keyframes bc-marq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 .bc-latido{display:inline-block;animation:bc-latido 1.3s ease-in-out infinite}
 @keyframes bc-latido{0%,100%{transform:scale(1)}15%{transform:scale(1.28)}30%{transform:scale(1)}45%{transform:scale(1.2)}}
