@@ -35,6 +35,14 @@ export const TICKER_ETIQUETAS = {
 // "ENLACE LOGROS" — una fila por logro. En cuanto haya al menos una fila
 // con esas 2 columnas llenas, sustituyen automáticamente a estos ejemplos
 // (ver BarraLogros más abajo).
+// Mensajes fijos: se agregan SIEMPRE al final de los logros (de Baserow o de
+// los ejemplos) y salen tanto en la barra de logros como en la banda.
+export const LOGROS_FIJOS = [
+  { texto: "🌟 19 AÑOS GENERANDO PROYECTOS SOCIALES COMUNITARIOS, Y CULTIVANDO AMISTADES, CONFIANZA Y CONEXIONES QUE HACEN MEJORES NUESTRAS VIDAS 🌟 💛 😊", enlace: "#quienes-somos" },
+  { texto: "💛 19 AÑOS APOYANDO PERSONAS, GRUPOS VULNERABLES Y CAUSAS QUE GENERAN CADENA DE VALOR Y DE VALORES ♥ ♥ ♥", enlace: "#donaciones" },
+  { texto: "🚀 MÁS DE 25 AÑOS IMPULSANDO Y DESARROLLANDO TALENTOS Y VIDAS QUE SON INSPIRACIÓN Y EJEMPLO PARA NUESTRAS COMUNIDADES, NUESTRO PAÍS Y EL MUNDO.", enlace: "#asesorias" }
+];
+
 export const LOGROS_ITEMS = [
   { texto: "🤝 Más de 2,000 recomendaciones y conexiones de apoyo", enlace: "#circulo-confianza" },
   { texto: "📚 Más de 1,000 libros y materiales educativos prestados", enlace: "#libros" },
