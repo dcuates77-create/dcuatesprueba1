@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
 import CarruselPortada from "./CarruselPortada";
 import BloqueAgenda from "./BloqueAgenda.jsx";
+import BloqueRegalos from "./BloqueRegalos.jsx";
 import TiraAuto from "./TiraAuto";
 import BotonCompartir from "./BotonCompartir";
 import { registrar } from "./analitica";
@@ -279,8 +280,67 @@ function tarjetasLogros(logros) {
   return out;
 }
 
+// Pista de logros: se desplaza sola a la izquierda (≈ 38 px/s); ‹ › avanzan o
+// retroceden una tarjeta; ❚❚ pausa; si la tocas o la arrastras se detiene 6 s.
+function PistaLogros({ children }) {
+  const ref = useRef(null);
+  const st = useRef({ pos: 1, pausaManual: false, hasta: 0, tween: null });
+  const [pausaManual, setPausaManual] = useState(false);
+  st.current.pausaManual = pausaManual;
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return undefined;
+    let raf = 0, t0 = performance.now();
+    el.scrollLeft = 1;
+    const bucle = (t) => {
+      const dt = Math.min(64, t - t0); t0 = t;
+      const s = st.current;
+      const mitad = el.scrollWidth / 2;
+      if (mitad > 0) {
+        if (Math.abs(el.scrollLeft - s.pos) > 2) s.pos = el.scrollLeft; // la persona movió la pista
+        if (s.tween) {
+          const k = Math.min(1, (t - s.tween.t0) / 450);
+          s.pos = s.tween.de + (s.tween.a - s.tween.de) * (k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2);
+          if (k >= 1) s.tween = null;
+        } else if (!s.pausaManual && Date.now() > s.hasta && !document.hidden) {
+          s.pos += dt * 0.038;
+        }
+        if (s.pos >= mitad) { s.pos -= mitad; if (s.tween) s.tween.a -= mitad, s.tween.de -= mitad; }
+        if (s.pos < 1) { s.pos += mitad; if (s.tween) s.tween.a += mitad, s.tween.de += mitad; }
+        el.scrollLeft = s.pos;
+        s.pos = el.scrollLeft;
+      }
+      raf = requestAnimationFrame(bucle);
+    };
+    raf = requestAnimationFrame(bucle);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  const detener = () => { st.current.hasta = Date.now() + 6000; st.current.tween = null; };
+  const mover = (dir) => {
+    const el = ref.current; if (!el) return;
+    const hijo = el.querySelector(".bc-stat");
+    const paso = (hijo ? hijo.getBoundingClientRect().width : 200) + 10;
+    const s = st.current;
+    s.hasta = Date.now() + 6000;
+    s.tween = { t0: performance.now(), de: el.scrollLeft, a: el.scrollLeft + dir * paso };
+  };
+  return (
+    <div className="bc-marq-w">
+      <div className="bc-marq" ref={ref} onPointerDown={detener} onTouchStart={detener} onWheel={detener}>
+        <div className="bc-marq-pista">{children}</div>
+      </div>
+      <div className="bc-marq-ctl">
+        <button type="button" onClick={() => mover(-1)} aria-label="Anterior">‹</button>
+        <button type="button" className="bc-marq-p" onClick={() => setPausaManual((v) => !v)} aria-pressed={pausaManual}>{pausaManual ? "▶ Reanudar" : "❚❚ Pausar"}</button>
+        <button type="button" onClick={() => mover(1)} aria-label="Siguiente">›</button>
+      </div>
+    </div>
+  );
+}
+
 function BandaImpacto({ logros, cargando, tab }) {
-  const [pausa, setPausa] = useState(false);
   if (cargando) {
     return (
       <section className="bc-banda" aria-hidden="true">
@@ -311,19 +371,12 @@ function BandaImpacto({ logros, cargando, tab }) {
   return (
     <section className="bc-banda" aria-label={tab.banda.titulo} style={{ "--c": tab.color }}>
       <p className="bc-banda-t"><span aria-hidden="true">🌱</span> {tab.banda.titulo}</p>
-      <div
-        className={"bc-marq" + (pausa ? " bc-marq-p" : "")}
-        onPointerDown={() => setPausa(true)}
-        onPointerUp={() => setTimeout(() => setPausa(false), 1800)}
-        onPointerCancel={() => setPausa(false)}
-      >
-        <div className="bc-marq-pista" style={{ animationDuration: dur + "s" }}>
-          {lista.map((l, i) => tarjeta(l, i, false))}
-          <span className="bc-marq-copia" aria-hidden="true" style={{ display: "contents" }}>
-            {lista.map((l, i) => tarjeta(l, i, true))}
-          </span>
-        </div>
-      </div>
+      <PistaLogros dur={dur}>
+        {lista.map((l, i) => tarjeta(l, i, false))}
+        <span className="bc-marq-copia" aria-hidden="true" style={{ display: "contents" }}>
+          {lista.map((l, i) => tarjeta(l, i, true))}
+        </span>
+      </PistaLogros>
     </section>
   );
 }
@@ -339,6 +392,7 @@ export default function BloqueCentral({
   nosotros = null, beneficios = null, causas = null, valores = null,
   negociosSeccion = null, regalos = null, gratitud = null,   // JSX de cada pestaña (viene de App.jsx)
   resumenes = {},           // { idProyecto: "una línea" } para las tarjetas
+  juegos = [],              // tableros de regalos (normalizarRegalos)
   agenda = [],              // eventos de la agenda [{ fecha, titulo, info, enlace }]
   logros = [],              // [{ texto, enlace }] para la banda de impacto
   cargando = false,         // true mientras Baserow aún no responde (muestra esqueletos)
@@ -592,32 +646,62 @@ export default function BloqueCentral({
           {tab.banda && <BandaImpacto logros={logros} cargando={cargando} tab={tab} />}
 
           {tab.fichas && (
-            <div className="bc-snap bc-fichas" aria-label="Comercios aliados">
-              {negocios.map((n) => (
-                <article className="bc-ficha" key={n.nombre}>
-                  <BotonCompartir variante="circulo" className="bc-ficha-share" hash="mapa-negocios" titulo={n.nombre} texto={n.promo || `${n.giro} en ${n.zona}`} />
-                  {n.logo
-                    ? <img className="bc-ficha-logo" src={n.logo} alt="" loading="lazy" />
-                    : <span className="bc-ficha-ico" style={{ background: n.color }} aria-hidden="true">{n.emoji}</span>}
-                  <h3>{n.nombre}</h3>
-                  <p>{n.giro} · {n.zona}</p>
-                  {n.promo && <p className="bc-promo">{n.promo}</p>}
+            <TiraAuto intervalo={2500} etiqueta="Comercios, cupones, aliados y agenda" fondo={tab.pastel}>
+              <div className="bc-mini-w">
+                <article className="bc-ficha bc-mini bc-ficha-cta" style={{ borderColor: tab.color }}>
+                  <span className="bc-ficha-ico" style={{ background: tab.boton || tab.color }} aria-hidden="true">💼</span>
+                  <h3>REGISTRA TU NEGOCIO GRATIS</h3>
+                  <p>Aparece en el mapa y en la lista.</p>
                   <div className="bc-ficha-btns">
-                    <a href={n.tel ? `https://wa.me/${n.tel}` : wa(`¡Hola! Vi ${n.nombre} en DCUATES.`)} target="_blank" rel="noopener noreferrer" style={{ background: "#25d366" }}>WhatsApp</a>
-                    <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${n.nombre} ${n.zona} Ecatepec`)}`} target="_blank" rel="noopener noreferrer" style={{ background: tab.boton || tab.color }}>Cómo llegar</a>
+                    <button type="button" onClick={() => document.getElementById("publicidad")?.scrollIntoView({ behavior: "smooth", block: "start" })} style={{ background: "#D1530A" }}>Empezar ›</button>
                   </div>
                 </article>
-              ))}
-              <article className="bc-ficha bc-ficha-cta" style={{ borderColor: tab.color }}>
-                <span className="bc-ficha-ico" style={{ background: tab.boton || tab.color }} aria-hidden="true">💼</span>
-                <h3>REGISTRA TU NEGOCIO GRATIS</h3>
-                <p>Aparece en el mapa y en esta lista.</p>
-                <div className="bc-ficha-btns">
-                  <button type="button" onClick={() => document.getElementById("publicidad")?.scrollIntoView({ behavior: "smooth", block: "start" })} style={{ background: "#D1530A" }}>Empezar ›</button>
+              </div>
+              <div className="bc-mini-w">
+                <article className="bc-ficha bc-mini" style={{ borderColor: "#E5484D" }}>
+                  <span className="bc-ficha-ico" style={{ background: "#E5484D" }} aria-hidden="true">🏷️</span>
+                  <h3>CUPONES, PROMOS Y MÁS</h3>
+                  <p>Descuentos en negocios locales.</p>
+                  <div className="bc-ficha-btns">
+                    <button type="button" onClick={() => onAbrirProyecto("cupones-promos")} style={{ background: "#E5484D" }}>Ver ›</button>
+                  </div>
+                </article>
+              </div>
+              <div className="bc-mini-w">
+                <article className="bc-ficha bc-mini" style={{ borderColor: "#7A5AD8" }}>
+                  <span className="bc-ficha-ico" style={{ background: "#7A5AD8" }} aria-hidden="true">🤝</span>
+                  <h3>PATROCINADORES Y ALIANZAS</h3>
+                  <p>Quienes nos ayudan a crecer.</p>
+                  <div className="bc-ficha-btns">
+                    <button type="button" onClick={() => onAbrirProyecto("patrocinadores-alianzas")} style={{ background: "#7A5AD8" }}>Ver ›</button>
+                  </div>
+                </article>
+              </div>
+              <div className="bc-mini-w"><BloqueAgenda eventos={agenda} color={tab.boton || tab.color} /></div>
+              {negocios.map((n) => (
+                <div className="bc-neg-w" key={n.nombre}>
+                  <article className="bc-ficha">
+                    <BotonCompartir variante="circulo" className="bc-ficha-share" hash="mapa-negocios" titulo={n.nombre} texto={n.promo || `${n.giro} en ${n.zona}`} />
+                    {n.logo
+                      ? <img className="bc-ficha-logo" src={n.logo} alt="" loading="lazy" />
+                      : <span className="bc-ficha-ico" style={{ background: n.color }} aria-hidden="true">{n.emoji}</span>}
+                    <h3>{n.nombre}</h3>
+                    <p>{n.giro} · {n.zona}</p>
+                    {n.promo && <p className="bc-promo">{n.promo}</p>}
+                    <div className="bc-ficha-btns">
+                      <a href={n.tel ? `https://wa.me/${n.tel}` : wa(`¡Hola! Vi ${n.nombre} en DCUATES.`)} target="_blank" rel="noopener noreferrer" style={{ background: "#25d366" }}>WhatsApp</a>
+                      <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${n.nombre} ${n.zona} Ecatepec`)}`} target="_blank" rel="noopener noreferrer" style={{ background: tab.boton || tab.color }}>Cómo llegar</a>
+                    </div>
+                  </article>
                 </div>
-              </article>
-              <BloqueAgenda eventos={agenda} color={tab.boton || tab.color} />
-            </div>
+              ))}
+            </TiraAuto>
+          )}
+
+          {tab.id === "regalos" && (
+            <TiraAuto intervalo={2500} etiqueta="Regalos: música, pelis, páginas y libros" fondo={tab.pastel}>
+              {juegos.map((t) => <div className="bc-mini-w" key={t.id}><BloqueRegalos tema={t} /></div>)}
+            </TiraAuto>
           )}
 
           {tab.mapa && <MapaLocal url={mapaUrl} color={tab.color} />}
@@ -747,6 +831,17 @@ const CSS = `
 .bc-ficha-btns a,.bc-ficha-btns button{flex:1;min-height:40px;display:grid;place-items:center;border:0;border-radius:12px;color:#fff;font-family:inherit;font-weight:900;font-size:13px;text-decoration:none;cursor:pointer}
 .bc-ficha-cta{border-style:dashed}
 .bc-agenda-card{border-style:solid}
+.bc-mini-w{width:150px;display:flex}
+.bc-neg-w{width:230px;display:flex}
+.bc-mini-w>.bc-ficha,.bc-neg-w>.bc-ficha{flex:1 1 auto;width:100%}
+.bc-mini{padding:10px;gap:3px}
+.bc-mini .bc-ficha-ico{width:38px;height:38px;font-size:20px;border-radius:12px}
+.bc-mini h3{font-size:13px;margin:4px 0 0;line-height:1.15}
+.bc-mini p{font-size:11.5px;line-height:1.25}
+.bc-mini .bc-ficha-btns{padding-top:8px}
+.bc-mini .bc-ficha-btns button{min-height:38px;font-size:12.5px}
+.bc-mini .ag-hoy{width:46px}
+.bc-mini .ag-hoy-d{font-size:22px}
 .ag-hoy{width:56px;border-radius:12px;overflow:hidden;background:#fff;border:2px solid #e5ebe8;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.08)}
 .ag-hoy-m{display:block;color:#fff;font-size:11px;font-weight:900;letter-spacing:.06em;padding:2px 0}
 .ag-hoy-d{display:block;font-size:28px;font-weight:900;line-height:1.25;color:#1f2a37}
@@ -769,9 +864,12 @@ const CSS = `
 .bc-banda-g{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
 .bc-stat{display:flex;flex-direction:column;gap:2px;padding:10px 11px;border-radius:14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14)}
 .bc-stat-e{font-size:22px;line-height:1}
-.bc-marq{overflow:hidden;margin:0 -4px;-webkit-mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent);mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent)}
-.bc-marq-pista{display:flex;gap:10px;width:max-content;padding:0 4px;animation:bc-marq linear infinite;will-change:transform}
-.bc-marq:hover .bc-marq-pista,.bc-marq-p .bc-marq-pista{animation-play-state:paused}
+.bc-marq{overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;margin:0 -4px;-webkit-mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent);mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent)}
+.bc-marq::-webkit-scrollbar{display:none}
+.bc-marq-pista{display:flex;gap:10px;width:max-content;padding:0 4px}
+.bc-marq-ctl{display:flex;justify-content:center;align-items:center;gap:10px;margin-top:10px}
+.bc-marq-ctl button{min-width:44px;min-height:40px;border:0;border-radius:99px;background:rgba(255,255,255,.16);color:#fff;font-family:inherit;font-size:22px;font-weight:900;line-height:1;cursor:pointer}
+.bc-marq-ctl .bc-marq-p{font-size:14px;padding:0 18px;background:#FFD84D;color:#0f2d1e}
 .bc-marq .bc-stat{flex:0 0 196px;padding:14px 14px;gap:4px}
 .bc-marq .bc-stat-txt{flex-basis:290px;justify-content:flex-start}
 .bc-marq .bc-stat-e{font-size:30px}

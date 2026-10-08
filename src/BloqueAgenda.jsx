@@ -43,15 +43,15 @@ export default function BloqueAgenda({ eventos = [], color = "#2E9E5B" }) {
 
   return (
     <>
-      <article className="bc-ficha bc-agenda-card" style={{ borderColor: color }}>
+      <article className="bc-ficha bc-mini bc-agenda-card" style={{ borderColor: color }}>
         <div className="ag-hoy" aria-hidden="true">
           <span className="ag-hoy-m" style={{ background: color }}>{MESES[hoy.getMonth()].slice(0, 3).toUpperCase()}</span>
           <span className="ag-hoy-d">{hoy.getDate()}</span>
         </div>
         <h3>AGENDA COMUNITARIA</h3>
-        <p>Hoy es {DIAS[hoy.getDay()]}. {proximos > 0 ? `${proximos} actividad${proximos > 1 ? "es" : ""} próxima${proximos > 1 ? "s" : ""}.` : "Consulta las actividades."}</p>
+        <p>{DIAS[hoy.getDay()]}{proximos > 0 ? ` · ${proximos} próxima${proximos > 1 ? "s" : ""}` : ""}</p>
         <div className="bc-ficha-btns">
-          <button type="button" onClick={() => setAbierta(true)} style={{ background: color }}>📅 Ver calendario</button>
+          <button type="button" onClick={() => setAbierta(true)} style={{ background: color }}>📅 Ver</button>
         </div>
       </article>
 

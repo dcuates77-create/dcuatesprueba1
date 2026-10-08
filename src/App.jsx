@@ -12,6 +12,7 @@ import { PestanaRegalos } from "./componentes/pestanas/Regalos.jsx";
 import { PestanaValores } from "./componentes/pestanas/Valores.jsx";
 import { AGENDA_EVENTOS } from "./datos/agenda.js";
 import { normalizarAgenda } from "./BloqueAgenda.jsx";
+import { normalizarRegalos } from "./BloqueRegalos.jsx";
 import { LOGROS_ITEMS, LOGROS_FIJOS, RECOMENDACIONES_ESTRELLA } from "./datos/cintas.js";
 import { MAPA_NEGOCIOS_EMBED_URL, REDES_SOCIALES, VERSION_BUILD, WHATSAPP_NUMERO, YOUTUBE_VIDEO_ID } from "./datos/config.js";
 import { AVISO_PRIVACIDAD_INTEGRAL, FAQ_ITEMS, TERMINOS_CONDICIONES } from "./datos/legal.js";
@@ -276,6 +277,7 @@ export default function App() {
   // "ENLACE LOGROS") o, si no hay, los ejemplos LOGROS_ITEMS (los mismos de
   // la barra de logros de arriba).
   const agendaEventos = normalizarAgenda(filasEnlaces, AGENDA_EVENTOS);
+  const juegosRegalos = normalizarRegalos(filasEnlaces);
   const logrosBaserow = paresBaserow(filasEnlaces, "NOMBRE LOGROS", "ENLACE LOGROS", 20);
   const logrosBanda = [
     ...(logrosBaserow.length > 0
@@ -436,6 +438,7 @@ export default function App() {
               resumenes={RESUMEN_PROYECTO}
               logros={logrosBanda}
               agenda={agendaEventos}
+              juegos={juegosRegalos}
               cargando={!baserowListo}
               negocios={negociosBaserow}
               onAbrirCategoria={(id) => setCategoriaAbierta(id)}
