@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
 import CarruselPortada from "./CarruselPortada";
 import BloqueAgenda from "./BloqueAgenda.jsx";
-import BloqueRegalos from "./BloqueRegalos.jsx";
 import TiraAuto from "./TiraAuto";
 import BotonCompartir from "./BotonCompartir";
 import { registrar } from "./analitica";
@@ -392,7 +391,6 @@ export default function BloqueCentral({
   nosotros = null, beneficios = null, causas = null, valores = null,
   negociosSeccion = null, regalos = null, gratitud = null,   // JSX de cada pestaña (viene de App.jsx)
   resumenes = {},           // { idProyecto: "una línea" } para las tarjetas
-  juegos = [],              // tableros de regalos (normalizarRegalos)
   agenda = [],              // eventos de la agenda [{ fecha, titulo, info, enlace }]
   logros = [],              // [{ texto, enlace }] para la banda de impacto
   cargando = false,         // true mientras Baserow aún no responde (muestra esqueletos)
@@ -695,12 +693,6 @@ export default function BloqueCentral({
                   </article>
                 </div>
               ))}
-            </TiraAuto>
-          )}
-
-          {tab.id === "regalos" && (
-            <TiraAuto intervalo={2500} etiqueta="Regalos: música, pelis, páginas y libros" fondo={tab.pastel}>
-              {juegos.map((t) => <div className="bc-mini-w" key={t.id}><BloqueRegalos tema={t} /></div>)}
             </TiraAuto>
           )}
 

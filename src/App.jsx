@@ -21,6 +21,7 @@ import { BOTONES_PORTADA, CATEGORIAS_PROYECTOS, DEGRADADO_SUGERENCIAS, LOGOS_EXT
 import { detectarVideo, esPDF, galeriaDesdeColumna, irASeccion, paresBaserow, primerosValores, resolverSrcImagen, tituloProyecto, urlDesdeCeldaBaserow, useCarruselAutomatico, useFilasEnlaces } from "./utilidades/baserow.js";
 import BloqueCentral, { CarruselFinal } from "./BloqueCentral";
 import ZonaJuegos from "./ZonaJuegos.jsx";
+import { normalizarPremios } from "./datos/zona.js";
 import BotonCompartir from "./BotonCompartir";
 import { iniciarAnalitica, registrar } from "./analitica";
 import { iniciarPWA } from "./pwa";
@@ -439,7 +440,6 @@ export default function App() {
               resumenes={RESUMEN_PROYECTO}
               logros={logrosBanda}
               agenda={agendaEventos}
-              juegos={juegosRegalos}
               cargando={!baserowListo}
               negocios={negociosBaserow}
               onAbrirCategoria={(id) => setCategoriaAbierta(id)}
@@ -459,7 +459,14 @@ export default function App() {
 
 
       {/* Accesos rápidos: Avisos y Beneficios · Compartir Más · Inicio */}
-      <ZonaJuegos onAbrirProyecto={(id) => setModalProyecto(id)} filas={filasEnlaces} />
+      <ZonaJuegos
+        onAbrirProyecto={(id) => setModalProyecto(id)}
+        filas={filasEnlaces}
+        temasAprende={juegosRegalos}
+        premios={normalizarPremios(filasEnlaces)}
+        agenda={agendaEventos}
+        menu={{ mapa: () => setShowMapaSitio(true), faq: () => setShowFAQ(true), sugerencias: () => setModalFormulario("sugerencias") }}
+      />
 
       <BarraAccionesFinal onAbrirComparte={() => setModalFormulario("comparte")} />
 
