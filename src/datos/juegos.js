@@ -2,7 +2,7 @@
 // src/datos/juegos.js — Zona de juegos (Juega y diviértete + Empieza aquí)
 // "Contextos" = el tema (skin) con el que se visten los juegos.
 // Desde Baserow (tabla ENLACES, opcional) se puede apagar o renombrar un juego:
-//   JUEGO CLAVE (memorama | culebrita | papalote | atrapa | escaleras)
+//   JUEGO CLAVE (memorama | bloques | cometacos | fusiona | papalote | atrapa | escaleras | gato | simon)
 //   JUEGO TITULO (nombre nuevo) · JUEGO ACTIVO (no = se oculta)
 // =========================================================================
 export const CONTEXTOS = [
@@ -22,10 +22,14 @@ export const CONTEXTOS = [
 
 export const JUEGOS = [
   { id: "memorama", nombre: "Memorama", emoji: "🃏", info: "Encuentra las parejas." },
-  { id: "culebrita", nombre: "Culebrita", emoji: "🐍", info: "Desliza el dedo y come." },
+  { id: "bloques", nombre: "Bloques", emoji: "🧱", info: "Acomoda piezas y completa líneas." },
+  { id: "cometacos", nombre: "Come-tacos", emoji: "🌮", info: "Come todo y esquiva las alertas." },
+  { id: "fusiona", nombre: "Fusiona", emoji: "🔢", info: "Desliza y une números." },
   { id: "papalote", nombre: "Papalote", emoji: "🪁", info: "Toca para volar." },
   { id: "atrapa", nombre: "Atrapa", emoji: "🧺", info: "Mueve la canasta." },
-  { id: "escaleras", nombre: "Escaleras", emoji: "🎲", info: "Serpientes y escaleras." }
+  { id: "escaleras", nombre: "Escaleras", emoji: "🎲", info: "Serpientes y escaleras." },
+  { id: "gato", nombre: "Gato", emoji: "❌", info: "Tres en raya." },
+  { id: "simon", nombre: "Simón dice", emoji: "💡", info: "Repite las luces." }
 ];
 
 export const NIVELES = [
