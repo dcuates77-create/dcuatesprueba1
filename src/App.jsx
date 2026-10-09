@@ -20,6 +20,7 @@ import { TODOS_LOS_PROYECTOS } from "./datos/listas.js";
 import { BOTONES_PORTADA, CATEGORIAS_PROYECTOS, DEGRADADO_SUGERENCIAS, LOGOS_EXTRA_MODAL, RESUMEN_PROYECTO } from "./datos/proyectos.js";
 import { detectarVideo, esPDF, galeriaDesdeColumna, irASeccion, paresBaserow, primerosValores, resolverSrcImagen, tituloProyecto, urlDesdeCeldaBaserow, useCarruselAutomatico, useFilasEnlaces } from "./utilidades/baserow.js";
 import BloqueCentral, { CarruselFinal } from "./BloqueCentral";
+import ZonaJuegos from "./ZonaJuegos.jsx";
 import BotonCompartir from "./BotonCompartir";
 import { iniciarAnalitica, registrar } from "./analitica";
 import { iniciarPWA } from "./pwa";
@@ -458,6 +459,8 @@ export default function App() {
 
 
       {/* Accesos rápidos: Avisos y Beneficios · Compartir Más · Inicio */}
+      <ZonaJuegos onAbrirProyecto={(id) => setModalProyecto(id)} filas={filasEnlaces} />
+
       <BarraAccionesFinal onAbrirComparte={() => setModalFormulario("comparte")} />
 
       <div className="mt-[1.5cm] mb-[0.5cm]">
