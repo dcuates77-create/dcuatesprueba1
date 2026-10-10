@@ -3,7 +3,7 @@ import React, { useRef, useState } from "react";
 // Tablero de 5x5 (25 casillas). Escaleras suben, serpientes bajan.
 const ESCALERAS = { 3: 11, 6: 17, 9: 20 };
 const SERPIENTES = { 14: 5, 19: 8, 23: 12 };
-const MENSAJES = { 3: "¡Confianza! Subes 🪜", 6: "¡Amistad! Subes 🪜", 9: "¡Solidaridad! Subes 🪜", 14: "Un descuido… bajas 🐍", 19: "Prisa… bajas 🐍", 23: "Falta de diálogo… bajas 🐍" };
+const MENSAJES = { 3: "¡Confianza! Subes ⬆️", 6: "¡Amistad! Subes ⬆️", 9: "¡Solidaridad! Subes ⬆️", 14: "Un descuido… bajas 🐍", 19: "Prisa… bajas 🐍", 23: "Falta de diálogo… bajas 🐍" };
 
 export default function Escaleras({ ctx, onFin }) {
   const [yo, setYo] = useState(1);
@@ -46,12 +46,12 @@ export default function Escaleras({ ctx, onFin }) {
   }
   return (
     <div>
-      <p className="jg-info">Tú {ctx.heroe} contra la compu 🤖 · sube con 🪜, cuidado con 🐍</p>
+      <p className="jg-info">Tú {ctx.heroe} contra la compu 🤖 · sube con ⬆️, cuidado con 🐍</p>
       <div className="jg-tab">
         {casillas.map((n) => (
           <div key={n} className={"jg-cas" + (ESCALERAS[n] ? " jg-esc" : "") + (SERPIENTES[n] ? " jg-ser" : "") + (n === 25 ? " jg-meta" : "")}>
             <small>{n === 25 ? "🏁" : n}</small>
-            <span>{ESCALERAS[n] ? "🪜" : SERPIENTES[n] ? "🐍" : ""}</span>
+            <span>{ESCALERAS[n] ? "⬆️" : SERPIENTES[n] ? "🐍" : ""}</span>
             <b>{yo === n ? ctx.heroe : ""}{cpu === n ? "🤖" : ""}</b>
           </div>
         ))}
