@@ -1,8 +1,9 @@
-// PROPÓN Y RECOMIENDA — buzón de alertas, recomendaciones y propuestas + atajos al menú principal.
+// RECOMIENDA Y GANA — buzón de alertas, recomendaciones y propuestas + atajos al menú principal.
 import React, { useState } from "react";
 import { GOOGLE_SHEETS_URL, WHATSAPP_NUMERO } from "./datos/config.js";
 import { CasillaAcepto, abrirLegal, useAceptacion } from "./componentes/legal.jsx";
 import { irASeccion } from "./utilidades/baserow.js";
+import { sumarSemillas } from "./datos/juegos.js";
 
 const TIPOS = {
   recomienda: { emoji: "👍", nombre: "Recomienda", tipo: "Recomendacion", ph: "¿Qué negocio, persona o práctica hace bien las cosas y por qué?", nota: "Cuéntanos quién lo hace bien y qué lo distingue." },
@@ -10,7 +11,7 @@ const TIPOS = {
   alerta: { emoji: "🚨", nombre: "Alerta", tipo: "Alerta", ph: "Describe la mala práctica (qué pasó, dónde y cuándo), sin nombres de personas.", nota: "Reporta PRÁCTICAS, no personas con nombre. Revisamos todo antes de publicar. En emergencias llama al 911; para denuncia anónima, 089." }
 };
 
-export default function ZonaPropon({ onCerrar, menu = {}, onAbrirProyecto = () => {} }) {
+export default function ZonaPropon({ onCerrar, menu = {}, onAbrirProyecto = () => {}, alSumar }) {
   const [t, setT] = useState("propon");
   const [nombre, setNombre] = useState("");
   const [texto, setTexto] = useState("");
@@ -27,6 +28,7 @@ export default function ZonaPropon({ onCerrar, menu = {}, onAbrirProyecto = () =
     setError("");
     const datos = new URLSearchParams({ Tipo: cfg.tipo, Nombre: nombre || "Anónimo", Contacto: contacto, Mensaje: texto, Estado: "Recibido", Fecha: new Date().toLocaleString("es-MX") });
     try { await fetch(GOOGLE_SHEETS_URL, { method: "POST", mode: "no-cors", body: datos }); } catch (err) { console.error("No se pudo guardar:", err); }
+    const tot = sumarSemillas(2); alSumar && alSumar(tot);
     setEnviado(true); ac.reiniciar();
   };
   const ir = (fn) => () => { onCerrar(); setTimeout(fn, 150); };
@@ -37,10 +39,10 @@ export default function ZonaPropon({ onCerrar, menu = {}, onAbrirProyecto = () =
     ["🐾", "Ecatepets", () => onAbrirProyecto("ecatepets")], ["🛡️", "Escudo de seguridad", () => abrirLegal("escudo")]
   ];
   return (
-    <div className="zj-fondo" role="dialog" aria-modal="true" aria-label="Propón y recomienda" onClick={(e) => { if (e.target === e.currentTarget) onCerrar(); }}>
+    <div className="zj-fondo" role="dialog" aria-modal="true" aria-label="Recomienda y gana" onClick={(e) => { if (e.target === e.currentTarget) onCerrar(); }}>
       <div className="zj-caja">
-        <div className="zj-cab"><b>💡 Propón y recomienda</b><button type="button" className="zj-x" onClick={onCerrar} aria-label="Cerrar">✕</button></div>
-        <p className="zj-p">Esta comunidad se construye entre todos. Cuéntanos qué te gustaría, a quién recomiendas o qué se puede mejorar.</p>
+        <div className="zj-cab"><b>💡 Recomienda y gana</b><button type="button" className="zj-x" onClick={onCerrar} aria-label="Cerrar">✕</button></div>
+        <p className="zj-p">Esta comunidad se construye entre todos. Recomienda, propón o avisa y suma 2 Semillas 🌱 por cada aporte.</p>
         <div className="zj-chips">
           {Object.entries(TIPOS).map(([k, v]) => <button type="button" key={k} className={"zj-chip" + (t === k ? " zj-on" : "")} onClick={() => { setT(k); setEnviado(false); setError(""); }} aria-pressed={t === k}><span>{v.emoji}</span>{v.nombre}</button>)}
         </div>

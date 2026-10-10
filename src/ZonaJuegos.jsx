@@ -1,11 +1,12 @@
 // ZONA DCUATES — tarjetas de juego y participación (etapa 11).
 //  👋 EMPIEZA AQUÍ · 🎉 JUEGA Y DIVIÉRTETE · 🧠 JUEGA Y APRENDE · 🏆 JUEGA Y GANA
-//  💡 PROPÓN Y RECOMIENDA · 📌 INFO CLAVE   (Semillas y nivel en el chip del encabezado)
+//  💡 RECOMIENDA Y GANA · 🛍️ DONA, COMPRA Y VENDE CON CAUSA · 📌 INFO CLAVE   (Semillas y nivel en el chip del encabezado)
 import React, { Suspense, lazy, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import TiraAuto from "./TiraAuto.jsx";
 import { WHATSAPP_NUMERO } from "./datos/config.js";
 import { LOGROS_ITEMS } from "./datos/cintas.js";
+import { juegosActivosDesdeZona, necesidadesDesdeZona, palabrasDesdeZona, premiosDesdeZona, telefonosDesdeZona, temasDesdeZona, agendaDesdeZona } from "./datos/zona.js";
 import { CONTEXTOS, guardarPref, guardarRecord, leerPref, leerRecord, leerSemillas, nivelDe, normalizarJuegos, sumarSemillas } from "./datos/juegos.js";
 
 const COMPONENTES = {
@@ -23,6 +24,7 @@ const VentanaAprende = lazy(() => import("./ZonaAprende.jsx"));
 const VentanaGana = lazy(() => import("./ZonaGana.jsx"));
 const VentanaPropon = lazy(() => import("./ZonaPropon.jsx"));
 const VentanaInfo = lazy(() => import("./ZonaInfo.jsx"));
+const VentanaCausa = lazy(() => import("./ZonaCausa.jsx"));
 const SIGUIENTE_PASO = { nosotros: ["asesorias", "Conoce las asesorías gratuitas"], beneficios: ["libros", "Pide un libro prestado"], causas: ["ecatepets", "Conoce a los peluditos de Ecatepets"], negocios: ["cupones-promos", "Mira los cupones de negocios locales"] };
 
 function Marco({ juegos, onCerrar, onAbrirProyecto, alSumar }) {
@@ -111,7 +113,8 @@ const PALABRAS = [
   ["😊", "Alegría", "Una sonrisa compartida vale más que muchas palabras."]
 ];
 
-function Empieza({ onCerrar, onAbrirProyecto, alSumar }) {
+function Empieza({ onCerrar, onAbrirProyecto, alSumar, palabras }) {
+  const LISTA = palabras && palabras.length ? palabras : PALABRAS;
   const [vista, setVista] = useState("menu"); // menu | animo | nuevo | palabra
   const [paso, setPaso] = useState(0);
   const [animo, setAnimo] = useState(null);
@@ -180,7 +183,7 @@ function Empieza({ onCerrar, onAbrirProyecto, alSumar }) {
             {volver}
             <p className="zj-p">Toca la palabra que más necesitas hoy:</p>
             <div className="zj-pal">
-              {PALABRAS.map((p) => <button type="button" key={p[1]} className={pal === p ? "zj-on" : ""} onClick={() => { if (!pal) sumar(); setPal(p); }}><span>{p[0]}</span>{p[1]}</button>)}
+              {LISTA.map((p) => <button type="button" key={p[1]} className={pal === p ? "zj-on" : ""} onClick={() => { if (!pal) sumar(); setPal(p); }}><span>{p[0]}</span>{p[1]}</button>)}
             </div>
             {pal && <div className="zj-resp"><p><b>{pal[0]} {pal[1]}.</b> {pal[2]}</p></div>}
           </div>
@@ -217,28 +220,39 @@ const TARJETAS = [
   { id: "juegos", color: "#E5484D", emoji: "🎉", t: "JUEGA Y DIVIÉRTETE", p: "9 juegos clásicos con tu tema favorito.", b: "🎮 Jugar" },
   { id: "aprende", color: "#7a5ad8", emoji: "🧠", t: "JUEGA Y APRENDE", p: "Lotería, ruleta, galleta y más para descubrir.", b: "🧠 Descubrir" },
   { id: "gana", color: "#B7791F", emoji: "🏆", t: "JUEGA Y GANA", p: "Gira, suma Semillas y gana cupones.", b: "🏆 Ganar" },
-  { id: "propon", color: "#1B6F8A", emoji: "💡", t: "PROPÓN Y RECOMIENDA", p: "Comparte ideas, avisos y atajos del menú.", b: "💡 Participar" },
+  { id: "propon", color: "#1B6F8A", emoji: "💡", t: "RECOMIENDA Y GANA", p: "Recomienda, propón o avisa y suma Semillas.", b: "💡 Participar" },
+  { id: "causa", color: "#BE185D", emoji: "🛍️", t: "DONA, COMPRA Y VENDE CON CAUSA", p: "Dona, compra o ofrece algo que apoye a la comunidad.", b: "🛍️ Entrar" },
   { id: "info", color: "#C2410C", emoji: "📌", t: "INFO CLAVE", p: "🚨 Teléfonos de emergencia, agenda y más. ¡Conoce lo que hay aquí!", b: "📌 Ver" }
 ];
 
-export default function ZonaJuegos({ onAbrirProyecto = () => {}, filas = [], temasAprende = [], premios = [], agenda = [], menu = {} }) {
+export default function ZonaJuegos({ onAbrirProyecto = () => {}, filas = [], filasZona = [], temasAprende = [], premios = [], agenda = [], menu = {} }) {
   const [abierto, setAbierto] = useState(null);
   const [semillas, setSemillas] = useState(leerSemillas());
-  const juegos = useMemo(() => normalizarJuegos(filas), [filas]);
+  const juegos = useMemo(() => {
+    const todos = normalizarJuegos(filas); const act = juegosActivosDesdeZona(filasZona);
+    const f = act ? todos.filter((j) => act.has(j.id)) : todos; return f.length ? f : todos;
+  }, [filas, filasZona]);
+  const temas = useMemo(() => temasDesdeZona(temasAprende, filasZona), [temasAprende, filasZona]);
+  const premiosZ = useMemo(() => { const z = premiosDesdeZona(filasZona); return z.length ? [...premios, ...z] : premios; }, [premios, filasZona]);
+  const agendaZ = useMemo(() => [...agenda, ...agendaDesdeZona(filasZona)], [agenda, filasZona]);
+  const telefonos = useMemo(() => { const t = telefonosDesdeZona(filasZona); return t.length ? t : null; }, [filasZona]);
+  const palabras = useMemo(() => palabrasDesdeZona(filasZona), [filasZona]);
+  const necesidades = useMemo(() => necesidadesDesdeZona(filasZona), [filasZona]);
   const niv = nivelDe(semillas);
   const falta = niv.siguiente ? niv.siguiente.min - semillas : 0;
   const cerrar = () => { setAbierto(null); setSemillas(leerSemillas()); };
   useEffect(() => { setSemillas(leerSemillas()); }, []);
   const sus = <Suspense fallback={<div className="zj-fondo"><div className="zj-caja"><p className="jg-info">Cargando…</p></div></div>}>
-    {abierto === "aprende" && temasAprende.length > 0 && <VentanaAprende temas={temasAprende} onCerrar={cerrar} />}
-    {abierto === "gana" && <VentanaGana premios={premios} onCerrar={cerrar} alSumar={setSemillas} />}
-    {abierto === "propon" && <VentanaPropon onCerrar={cerrar} menu={menu} onAbrirProyecto={onAbrirProyecto} />}
-    {abierto === "info" && <VentanaInfo onCerrar={cerrar} agenda={agenda} menu={menu} />}
+    {abierto === "aprende" && temas.length > 0 && <VentanaAprende temas={temas} onCerrar={cerrar} />}
+    {abierto === "gana" && <VentanaGana premios={premiosZ} onCerrar={cerrar} alSumar={setSemillas} />}
+    {abierto === "propon" && <VentanaPropon onCerrar={cerrar} menu={menu} onAbrirProyecto={onAbrirProyecto} alSumar={setSemillas} />}
+    {abierto === "causa" && <VentanaCausa onCerrar={cerrar} necesidades={necesidades} onAbrirProyecto={onAbrirProyecto} alSumar={setSemillas} />}
+    {abierto === "info" && <VentanaInfo onCerrar={cerrar} agenda={agendaZ} menu={menu} telefonos={telefonos} />}
   </Suspense>;
 
   return (
     <section className="zj-sec" aria-label="Zona de juegos y participación">
-      <h2 className="zj-tit">🎮 ZONA DCUATES</h2>
+      <h2 className="zj-tit">🎮 ZONA PÚBLICA DE CUATES</h2>
       <p className="zj-sub">Juega, participa y suma Semillas 🌱</p>
       <p className="zj-nivel"><span>{niv.emoji} {niv.nombre} · {semillas} 🌱</span>{niv.siguiente ? ` · faltan ${falta} para ${niv.siguiente.nombre}` : " · ¡nivel máximo!"}</p>
       <TiraAuto intervalo={3500} etiqueta="Zona DCUATES" fondo="#fff">
@@ -254,7 +268,7 @@ export default function ZonaJuegos({ onAbrirProyecto = () => {}, filas = [], tem
         ))}
       </TiraAuto>
       {abierto === "juegos" && createPortal(<Marco juegos={juegos} onCerrar={cerrar} onAbrirProyecto={onAbrirProyecto} alSumar={setSemillas} />, document.body)}
-      {abierto === "empieza" && createPortal(<Empieza onCerrar={cerrar} onAbrirProyecto={onAbrirProyecto} alSumar={setSemillas} />, document.body)}
+      {abierto === "empieza" && createPortal(<Empieza onCerrar={cerrar} onAbrirProyecto={onAbrirProyecto} alSumar={setSemillas} palabras={palabras} />, document.body)}
       {abierto && !["juegos", "empieza"].includes(abierto) && createPortal(sus, document.body)}
       <style>{CSS}</style>
     </section>

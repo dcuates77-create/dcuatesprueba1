@@ -18,9 +18,10 @@ import { MAPA_NEGOCIOS_EMBED_URL, REDES_SOCIALES, VERSION_BUILD, WHATSAPP_NUMERO
 import { AVISO_PRIVACIDAD_INTEGRAL, FAQ_ITEMS, TERMINOS_CONDICIONES } from "./datos/legal.js";
 import { TODOS_LOS_PROYECTOS } from "./datos/listas.js";
 import { BOTONES_PORTADA, CATEGORIAS_PROYECTOS, DEGRADADO_SUGERENCIAS, LOGOS_EXTRA_MODAL, RESUMEN_PROYECTO } from "./datos/proyectos.js";
-import { detectarVideo, esPDF, galeriaDesdeColumna, irASeccion, paresBaserow, primerosValores, resolverSrcImagen, tituloProyecto, urlDesdeCeldaBaserow, useCarruselAutomatico, useFilasEnlaces } from "./utilidades/baserow.js";
+import { detectarVideo, esPDF, galeriaDesdeColumna, irASeccion, paresBaserow, primerosValores, resolverSrcImagen, tituloProyecto, urlDesdeCeldaBaserow, useCarruselAutomatico, useFilasEnlaces, useFilasZona } from "./utilidades/baserow.js";
 import BloqueCentral, { CarruselFinal } from "./BloqueCentral";
 import ZonaJuegos from "./ZonaJuegos.jsx";
+import ZonaAliados from "./ZonaAliados.jsx";
 import { normalizarPremios } from "./datos/zona.js";
 import BotonCompartir from "./BotonCompartir";
 import { iniciarAnalitica, registrar } from "./analitica";
@@ -191,6 +192,7 @@ export default function App() {
   // Filas "crudas" de la tabla ENLACES en Baserow — alimentan el video de
   // portada, las recomendaciones y el botón de Música/Libros/Pelis.
   const filasEnlaces = useFilasEnlaces();
+  const filasZona = useFilasZona();
   // Miniaturas de video de portada — igual que Recomendaciones: cada video
   // puede tener un nombre en la columna "NOMBRE VIDPORT"; si no lo tiene,
   // se numera solo como "Video 1", "Video 2"... Reconoce YouTube y TikTok
@@ -462,11 +464,13 @@ export default function App() {
       <ZonaJuegos
         onAbrirProyecto={(id) => setModalProyecto(id)}
         filas={filasEnlaces}
+        filasZona={filasZona}
         temasAprende={juegosRegalos}
         premios={normalizarPremios(filasEnlaces)}
         agenda={agendaEventos}
         menu={{ mapa: () => setShowMapaSitio(true), faq: () => setShowFAQ(true), sugerencias: () => setModalFormulario("sugerencias") }}
       />
+      <ZonaAliados agenda={agendaEventos} />
 
       <BarraAccionesFinal onAbrirComparte={() => setModalFormulario("comparte")} />
 

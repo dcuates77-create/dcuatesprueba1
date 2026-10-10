@@ -8,7 +8,7 @@ import { irASeccion } from "./utilidades/baserow.js";
 const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
 const fmt = (f) => { const [, m, d] = f.split("-").map(Number); return `${d} ${MESES[m - 1]}`; };
 
-export default function ZonaInfo({ onCerrar, agenda = [], menu = {} }) {
+export default function ZonaInfo({ onCerrar, agenda = [], menu = {}, telefonos }) {
   const hoy = new Date().toISOString().slice(0, 10);
   const proximos = agenda.filter((e) => e.fecha >= hoy).sort((a, b) => a.fecha.localeCompare(b.fecha)).slice(0, 6);
   const tel = (t) => <a key={t.nombre} className="in-tel" href={`tel:${t.tel}`}><span>{t.emoji}</span><b>{t.nombre}</b><i>{t.mostrar || t.tel}</i><small>{t.info}</small></a>;
@@ -19,7 +19,7 @@ export default function ZonaInfo({ onCerrar, agenda = [], menu = {} }) {
         <p className="zj-p">Lo importante, a la mano. Guarda esta página en tu celular.</p>
         <details className="in-sec" open>
           <summary>🚨 Teléfonos de emergencia</summary>
-          <div className="in-tels">{TELEFONOS_EMERGENCIA.map(tel)}{TELEFONOS_LOCALES.map(tel)}</div>
+          <div className="in-tels">{(telefonos && telefonos.length ? telefonos : TELEFONOS_EMERGENCIA).map(tel)}{TELEFONOS_LOCALES.map(tel)}</div>
           <p className="in-nota">Toca un número para llamar. Verifica los datos locales con las autoridades.</p>
         </details>
         <details className="in-sec">
