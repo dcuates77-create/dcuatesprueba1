@@ -78,7 +78,7 @@ export const NECESIDADES_BASE = [
   { emoji: "🐾", titulo: "Croquetas y cobijas", info: "Para los peluditos de Ecatepets que esperan hogar.", proyecto: "ecatepets" },
   { emoji: "✏️", titulo: "Útiles escolares", info: "Cuadernos, colores y mochilas para niñas y niños de la colonia.", proyecto: "donaciones" },
   { emoji: "👕", titulo: "Ropa limpia y en buen estado", info: "Para familias que la necesitan; se entrega por medio de la comunidad.", proyecto: "donaciones" },
-  { emoji: "🙋", titulo: "Tu tiempo como voluntario", info: "Una tarde al mes para leer, orientar o acompañar.", proyecto: "apoyo-voluntario" }
+  { emoji: "🙋", titulo: "Tu tiempo como voluntario", info: "Una tarde al mes para leer, orientar o acompañar.", proyecto: "donaciones" }
 ];
 
 // ---- RETO DEL DÍA (individual; un reto distinto cada día, +1 Semilla al cumplirlo) ----
