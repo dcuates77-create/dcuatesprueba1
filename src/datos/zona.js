@@ -41,3 +41,42 @@ export const TIPS_SEGURIDAD = [
   "Nunca des claves, códigos ni datos bancarios por mensaje. Los pagos son solo por transferencia a la CLABE oficial.",
   "Si una promoción parece demasiado buena o te presiona, desconfía y pregúntanos antes."
 ];
+
+// ---- TABLA NUEVA DE BASEROW: ZONA PÚBLICA DE CUATES ------------------------
+// Crea una tabla nueva en Baserow, importa ZONA_PUBLICA.csv y pega aquí su ID
+// (el número que aparece en la dirección: .../table/XXXXXX). Mientras esté
+// vacío ("") la zona usa los contenidos de ejemplo que ya trae el código.
+// Columnas: ZONA, TARJETA, TIPO, TITULO, INFO, ENLACE, EMOJI, FECHA, ORDEN, ACTIVO, NOTA
+// ¡OJO! Todo lo que pongas en esa tabla es PÚBLICO (la página la lee sin clave).
+export const BASEROW_TABLE_ID_ZONA = "2498435";
+
+const activa = (f) => !/^(no|0|false|falso)$/i.test(String(f.ACTIVO == null ? "SI" : f.ACTIVO).trim());
+const ord = (a, b) => (Number(a.ORDEN) || 999) - (Number(b.ORDEN) || 999);
+export const filasDe = (filas, tarjeta, tipo) =>
+  (filas || []).filter((f) => f && String(f.ZONA || "publica").toLowerCase() === "publica" && String(f.TARJETA || "").toLowerCase() === tarjeta && (!tipo || String(f.TIPO || "").toLowerCase() === tipo) && f.TITULO && activa(f)).sort(ord);
+
+// Reemplaza, en orden, los botones de cada tema (música, pelis, páginas, libros).
+export function temasDesdeZona(temasBase, filas) {
+  return temasBase.map((t) => {
+    const nuevos = filasDe(filas, "aprende", t.id).map((f) => ({ titulo: String(f.TITULO).trim(), info: f.INFO ? String(f.INFO).trim() : "", enlace: f.ENLACE ? String(f.ENLACE).trim() : "", emoji: f.EMOJI ? String(f.EMOJI).trim() : "" }));
+    return { ...t, items: t.items.map((d, i) => (nuevos[i] ? { ...d, ...nuevos[i], emoji: nuevos[i].emoji || d.emoji } : d)) };
+  });
+}
+export const agendaDesdeZona = (filas) => filasDe(filas, "agenda").map((f) => ({ fecha: String(f.FECHA || "").trim().slice(0, 10), titulo: String(f.TITULO).trim(), info: f.INFO ? String(f.INFO).trim() : "", enlace: f.ENLACE ? String(f.ENLACE).trim() : "" })).filter((e) => /^\d{4}-\d{2}-\d{2}$/.test(e.fecha));
+export const premiosDesdeZona = (filas) => filasDe(filas, "gana", "premio").map((f) => ({ tipo: "cupon", emoji: f.EMOJI || "🎁", titulo: String(f.TITULO).trim(), info: f.INFO ? String(f.INFO).trim() : "", enlace: f.ENLACE ? String(f.ENLACE).trim() : "" }));
+export const telefonosDesdeZona = (filas) => filasDe(filas, "info", "telefono").filter((f) => f.ENLACE).map((f) => ({ emoji: f.EMOJI || "📞", nombre: String(f.TITULO).trim(), tel: String(f.ENLACE).replace(/\s/g, ""), info: f.INFO ? String(f.INFO).trim() : "" }));
+export const palabrasDesdeZona = (filas) => filasDe(filas, "empieza", "palabra").map((f) => [f.EMOJI || "🌟", String(f.TITULO).trim(), f.INFO ? String(f.INFO).trim() : ""]);
+export const necesidadesDesdeZona = (filas) => filasDe(filas, "causa", "dona").map((f) => ({ emoji: f.EMOJI || "🎁", titulo: String(f.TITULO).trim(), info: f.INFO ? String(f.INFO).trim() : "", proyecto: f.ENLACE ? String(f.ENLACE).trim() : "" }));
+export const juegosActivosDesdeZona = (filas) => {
+  const hay = (filas || []).some((f) => f && String(f.TARJETA || "").toLowerCase() === "juegos");
+  if (!hay) return null;
+  return new Set((filas || []).filter((f) => f && String(f.TARJETA || "").toLowerCase() === "juegos" && activa(f)).map((f) => String(f.ENLACE || "").trim().toLowerCase()));
+};
+
+export const NECESIDADES_BASE = [
+  { emoji: "📚", titulo: "Libros y cuentos en buen estado", info: "Para el préstamo de libros y Bibliobici: de lectura, escolares o infantiles.", proyecto: "libros" },
+  { emoji: "🐾", titulo: "Croquetas y cobijas", info: "Para los peluditos de Ecatepets que esperan hogar.", proyecto: "ecatepets" },
+  { emoji: "✏️", titulo: "Útiles escolares", info: "Cuadernos, colores y mochilas para niñas y niños de la colonia.", proyecto: "donaciones" },
+  { emoji: "👕", titulo: "Ropa limpia y en buen estado", info: "Para familias que la necesitan; se entrega por medio de la comunidad.", proyecto: "donaciones" },
+  { emoji: "🙋", titulo: "Tu tiempo como voluntario", info: "Una tarde al mes para leer, orientar o acompañar.", proyecto: "apoyo-voluntario" }
+];
