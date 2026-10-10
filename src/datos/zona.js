@@ -80,3 +80,20 @@ export const NECESIDADES_BASE = [
   { emoji: "👕", titulo: "Ropa limpia y en buen estado", info: "Para familias que la necesitan; se entrega por medio de la comunidad.", proyecto: "donaciones" },
   { emoji: "🙋", titulo: "Tu tiempo como voluntario", info: "Una tarde al mes para leer, orientar o acompañar.", proyecto: "apoyo-voluntario" }
 ];
+
+// ---- RETO DEL DÍA (individual; un reto distinto cada día, +1 Semilla al cumplirlo) ----
+export const RETOS_DIA = [
+  "Saluda hoy a un vecino y pregúntale cómo está.",
+  "Escribe un mensaje de gratitud a alguien que te ayudó.",
+  "Lee 10 minutos de un libro o cuento.",
+  "Comparte DCUATES con una persona que creas que lo disfrutará.",
+  "Toma agua, estírate y respira profundo durante 5 minutos.",
+  "Recoge un papel o basura que veas en la calle.",
+  "Llama o escribe a un familiar que no veas seguido.",
+  "Aprende una palabra nueva y úsala hoy.",
+  "Prepara algo rico para compartir en casa.",
+  "Recomienda un negocio local que te guste.",
+  "Anota tres cosas buenas que te pasaron hoy.",
+  "Recuerda con cariño a alguien que ya no está y cuéntale a otra persona una anécdota suya."
+];
+export const retosDesdeZona = (filas) => filasDe(filas, "empieza", "reto").map((f) => String(f.TITULO).trim());
