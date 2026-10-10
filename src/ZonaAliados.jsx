@@ -1,6 +1,6 @@
 // ZONA DE ALIADOS, PATROCINADORES, VOLUNTARIOS Y AMIGOS — barra con candado general y candado por tarjeta/perfil.
 // Candado sencillo de prueba (claves en src/datos/aliados.js): no pongas aquí información confidencial.
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import TiraAuto from "./TiraAuto.jsx";
 import BotonCompartir from "./BotonCompartir.jsx";
@@ -78,7 +78,7 @@ function Formulario({ tipo, perfil, ph, boton, etiqueta, extra, onListo }) {
 
 function Ventana({ tarjeta, perfil, agenda, onCerrar }) {
   const P = PERFILES[perfil];
-  const hoy = new Date().toISOString().slice(0, 10);
+  const hoy = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
   const proximos = agenda.filter((e) => e.fecha >= hoy).sort((a, b) => a.fecha.localeCompare(b.fecha)).slice(0, 8);
   const [copiado, setCopiado] = useState(-1);
   const copiar = async (t, i) => { try { await navigator.clipboard.writeText(t); setCopiado(i); setTimeout(() => setCopiado(-1), 1500); } catch (e) {} };
@@ -133,6 +133,11 @@ export default function ZonaAliados({ agenda = [] }) {
   const [perfil, setPerfil] = useState(leerPerfil);
   const [pidiendo, setPidiendo] = useState(null); // id de tarjeta pendiente o "_"
   const [abierta, setAbierta] = useState(null);
+  useEffect(() => {
+    const oir = () => setPidiendo((x) => x || "_");
+    window.addEventListener("dcuates:abrir-acceso-aliados", oir);
+    return () => window.removeEventListener("dcuates:abrir-acceso-aliados", oir);
+  }, []);
   const P = perfil ? PERFILES[perfil] : null;
   const tocar = (t) => {
     if (!perfil) { setPidiendo(t.id); return; }
@@ -149,6 +154,7 @@ export default function ZonaAliados({ agenda = [] }) {
   return (
     <section className="zl-sec" id="zona-aliados" aria-label="Zona de aliados, patrocinadores, voluntarios y amigos">
       <span className="zj-comp"><BotonCompartir hash="zona-aliados" titulo="Zona de aliados, patrocinadores, voluntarios y amigos" texto="Beneficios y contacto para quienes forman parte de la red DCUATES" variante="claro" /></span>
+      <p className="zl-paso">PASO 3 · COLABORA</p>
       <h2 className="zl-tit">🔐 ZONA DE ALIADOS, PATROCINADORES, VOLUNTARIOS Y AMIGOS</h2>
       {P ? (
         <p className="zl-sub"><span style={{ background: P.color }}>{P.emoji} Perfil: {P.nombre}</span> <button type="button" onClick={salir}>Salir 🔒</button></p>
@@ -174,7 +180,8 @@ export default function ZonaAliados({ agenda = [] }) {
       {tarjeta && perfil && createPortal(<Ventana tarjeta={tarjeta} perfil={perfil} agenda={agenda} onCerrar={() => setAbierta(null)} />, document.body)}
       <style>{`
 .zl-sec{position:relative;max-width:72rem;margin:12px auto 6px;padding:14px 16px 6px;border-radius:20px;background:linear-gradient(135deg,#1f2a37,#33415a);color:#fff}
-.zl-tit{margin:0 36px;font-size:16px;font-weight:900;text-align:center;line-height:1.2}
+.zl-paso{margin:0;text-align:center;font-size:11px;font-weight:900;letter-spacing:.12em;color:#fcd34d}
+.zl-tit{margin:2px 36px 0;font-size:16px;font-weight:900;text-align:center;line-height:1.2}
 .zl-sub{margin:6px 0 8px;text-align:center;font-size:13px;font-weight:700;color:#dbe4ef}
 .zl-sub span{display:inline-block;border-radius:99px;padding:3px 10px;font-weight:900;color:#fff}
 .zl-sub button{margin-left:6px;min-height:34px;border:0;border-radius:99px;padding:4px 12px;background:#fff;font-family:inherit;font-size:12.5px;font-weight:900;cursor:pointer;color:#1f2a37}

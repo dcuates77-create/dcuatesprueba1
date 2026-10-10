@@ -1,4 +1,5 @@
 // INFO CLAVE — teléfonos de emergencia, agenda, canal oficial, redes y tips de seguridad.
+import { SiguientePaso } from "./ZonaPaso.jsx";
 import React from "react";
 import { REDES_SOCIALES, WHATSAPP_NUMERO } from "./datos/config.js";
 import { TELEFONOS_EMERGENCIA, TELEFONOS_LOCALES, TIPS_SEGURIDAD } from "./datos/zona.js";
@@ -9,7 +10,7 @@ const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "o
 const fmt = (f) => { const [, m, d] = f.split("-").map(Number); return `${d} ${MESES[m - 1]}`; };
 
 export default function ZonaInfo({ onCerrar, agenda = [], menu = {}, telefonos }) {
-  const hoy = new Date().toISOString().slice(0, 10);
+  const hoy = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
   const proximos = agenda.filter((e) => e.fecha >= hoy).sort((a, b) => a.fecha.localeCompare(b.fecha)).slice(0, 6);
   const tel = (t) => <a key={t.nombre} className="in-tel" href={`tel:${t.tel}`}><span>{t.emoji}</span><b>{t.nombre}</b><i>{t.mostrar || t.tel}</i><small>{t.info}</small></a>;
   return (
@@ -48,6 +49,7 @@ export default function ZonaInfo({ onCerrar, agenda = [], menu = {}, telefonos }
           <button type="button" className="in-btn" onClick={() => { onCerrar(); setTimeout(() => irASeccion("mapa-negocios"), 150); }}>🗺️ Mapa de negocios locales</button>
           {menu.faq && <button type="button" className="in-btn in-sec2" onClick={() => { onCerrar(); setTimeout(menu.faq, 150); }}>❓ Preguntas frecuentes</button>}
         </details>
+        <SiguientePaso actual="info" />
       </div>
     </div>
   );

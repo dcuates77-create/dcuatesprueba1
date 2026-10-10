@@ -1,5 +1,6 @@
 // JUEGA Y APRENDE / DESCUBRE — 4 temas (Música, Pelis, Páginas, Libros) x 4 juegos
 // (Tablero luminoso, Ruleta, Lotería, Galleta de la suerte). Mismo contenido, distinto juego.
+import { SiguientePaso } from "./ZonaPaso.jsx";
 import React, { useEffect, useRef, useState } from "react";
 import { FRASE_REGALOS } from "./datos/regalos.js";
 import { guardarPref, leerPref, sumarSemillas } from "./datos/juegos.js";
@@ -190,6 +191,7 @@ export default function ZonaAprende({ temas, onCerrar }) {
           {temas.map((t) => <button type="button" key={t.id} className={"zj-chip" + (t.id === temaId ? " zj-on" : "")} style={t.id === temaId ? { background: t.color, borderColor: t.color, color: "#fff" } : { borderColor: t.color }} onClick={() => cambiaTema(t.id)} aria-pressed={t.id === temaId}><span>{t.emoji}</span>{t.nombre.replace(" DCUATES", "")}</button>)}
         </div>
         <p className="rg-cierre">{FRASE_REGALOS}</p>
+        <SiguientePaso actual="aprende" />
       </div>
     </div>
   );

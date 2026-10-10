@@ -1,11 +1,12 @@
 // JUEGA Y GANA — ruleta y tragamonedas con premios de aliados, Semillas y retos.
 // 3 giros al día (guardados en el celular). Los cupones ganados se guardan en "Mis premios".
 import BotonCompartir from "./BotonCompartir.jsx";
+import { SiguientePaso } from "./ZonaPaso.jsx";
 import React, { useEffect, useRef, useState } from "react";
 import { GIROS_POR_DIA } from "./datos/zona.js";
 import { sumarSemillas } from "./datos/juegos.js";
 
-const hoy = () => new Date().toISOString().slice(0, 10);
+const hoy = () => new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
 const leerGiros = () => { try { const [d, n] = (localStorage.getItem("dc_giros") || "").split("|"); return d === hoy() ? parseInt(n, 10) || 0 : 0; } catch { return 0; } };
 const guardarGiros = (n) => { try { localStorage.setItem("dc_giros", `${hoy()}|${n}`); } catch { /* nada */ } };
 const leerPremios = () => { try { return JSON.parse(localStorage.getItem("dc_premios") || "[]"); } catch { return []; } };
@@ -129,6 +130,7 @@ export default function ZonaGana({ premios, onCerrar, alSumar }) {
           ))}
         </div>
         <p className="zj-rec">Participar es gratis. Los premios los aportan negocios aliados y patrocinadores; esto no es un sorteo.</p>
+        <SiguientePaso actual="gana" />
       </div>
     </div>
   );

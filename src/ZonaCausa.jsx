@@ -1,10 +1,12 @@
 // DONA, COMPRA Y VENDE CON CAUSA — necesidades para donar, catálogo de Ventas con Causa y formulario para ofrecer.
+import { SiguientePaso } from "./ZonaPaso.jsx";
 import React, { useState } from "react";
 import { GOOGLE_SHEETS_URL, WHATSAPP_NUMERO } from "./datos/config.js";
 import { BASEROW_TABLE_ID_VENTAS_CON_CAUSA, VENTAS_CON_CAUSA_ITEMS } from "./datos/proyectos.js";
 import { NECESIDADES_BASE } from "./datos/zona.js";
 import { sumarSemillas } from "./datos/juegos.js";
 import { CasillaAcepto, abrirLegal, useAceptacion } from "./componentes/legal.jsx";
+import { identidad } from "./datos/identidad.js";
 import { useCatalogoBaserow } from "./utilidades/baserow.js";
 
 const wa = (t) => `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(t)}`;
@@ -47,12 +49,12 @@ export default function ZonaCausa({ onCerrar, necesidades, onAbrirProyecto = () 
           <div className="ca-lista">
             <p className="pr-nota">Esto es lo que más se necesita. Cuéntanos qué quieres donar y coordinamos la entrega.</p>
             {lista.map((n, i) => (
-              <div className="ag-ev" key={i}>
+              <div className="ag-ev" key={i} style={n.proyecto ? { borderLeft: `6px solid ${identidad(n.proyecto).color}` } : undefined}>
                 <b>{n.emoji} {n.titulo}</b>
                 {n.info && <p>{n.info}</p>}
                 <div className="ca-btns">
                   <a href={wa(`Hola, quiero donar: ${n.titulo}. ¿Cómo coordinamos la entrega?`)} target="_blank" rel="noopener noreferrer">💬 Quiero donar</a>
-                  {n.proyecto && <button type="button" onClick={() => abrir(n.proyecto)}>Ver proyecto ›</button>}
+                  {n.proyecto && <button type="button" style={{ background: identidad(n.proyecto).color }} onClick={() => abrir(n.proyecto)}>{identidad(n.proyecto).emoji} Ver {identidad(n.proyecto).nombre} ›</button>}
                 </div>
               </div>
             ))}
@@ -93,6 +95,7 @@ export default function ZonaCausa({ onCerrar, necesidades, onAbrirProyecto = () 
             <button type="submit" className="pr-enviar">🏷️ Enviar mi oferta</button>
           </form>
         ))}
+        <SiguientePaso actual="causa" />
       </div>
     </div>
   );

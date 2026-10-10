@@ -5,6 +5,8 @@ import React, { Suspense, lazy, useEffect, useMemo, useRef, useState } from "rea
 import { createPortal } from "react-dom";
 import TiraAuto from "./TiraAuto.jsx";
 import BotonCompartir from "./BotonCompartir.jsx";
+import { PasoCtx, SiguientePaso } from "./ZonaPaso.jsx";
+import { identidad } from "./datos/identidad.js";
 import { WHATSAPP_NUMERO } from "./datos/config.js";
 import { LOGROS_ITEMS } from "./datos/cintas.js";
 import { juegosActivosDesdeZona, necesidadesDesdeZona, palabrasDesdeZona, premiosDesdeZona, telefonosDesdeZona, temasDesdeZona, agendaDesdeZona, RETOS_DIA, retosDesdeZona } from "./datos/zona.js";
@@ -100,6 +102,7 @@ function Marco({ juegos, onCerrar, onAbrirProyecto, alSumar }) {
           ))}
         </div>
         <p className="zj-rec">Tu récord en este juego: <b>{leerRecord(juego)}</b></p>
+        <SiguientePaso actual="juegos" />
       </div>
     </div>
   );
@@ -116,7 +119,7 @@ const PALABRAS = [
 ];
 
 function Empieza({ onCerrar, onAbrirProyecto, alSumar, palabras, retos }) {
-  const hoyTxt = new Date().toISOString().slice(0, 10);
+  const hoyTxt = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
   const listaRetos = retos && retos.length ? retos : RETOS_DIA;
   const retoHoy = listaRetos[Math.floor(Date.now() / 86400000) % listaRetos.length];
   const [retoHecho, setRetoHecho] = useState(() => { try { return localStorage.getItem("dc_reto") === hoyTxt; } catch (e) { return false; } });
@@ -178,10 +181,9 @@ function Empieza({ onCerrar, onAbrirProyecto, alSumar, palabras, retos }) {
             {volver}
             <p className="zj-p">Cuéntanos qué te gustaría hacer:</p>
             <div className="zj-col">
-              <button type="button" onClick={() => ir("libros")}>📚 Leer o aprender algo</button>
-              <button type="button" onClick={() => ir("ecatepets")}>🐾 Ayudar a quien lo necesita</button>
-              <button type="button" onClick={() => ir("circulo-confianza")}>🤝 Convivir y conocer gente de confianza</button>
-              <button type="button" onClick={() => ir("cupones-promos")}>🏷️ Ahorrar o vender en mi colonia</button>
+              {[["libros", "Leer o aprender algo"], ["ecatepets", "Ayudar a quien lo necesita"], ["circulo-confianza", "Convivir y conocer gente de confianza"], ["cupones-promos", "Ahorrar o vender en mi colonia"]].map(([id, t]) => (
+                <button type="button" key={id} style={{ background: identidad(id).color }} onClick={() => ir(id)}>{identidad(id).emoji} {t}</button>
+              ))}
             </div>
           </div>
         )}
@@ -213,9 +215,9 @@ function Empieza({ onCerrar, onAbrirProyecto, alSumar, palabras, retos }) {
               {BIENVENIDA[paso][2] && <p>{BIENVENIDA[paso][2]}</p>}
               {paso === 2 && (
                 <div className="zj-col">
-                  <button type="button" onClick={() => ir("libros")}>📚 Quiero un libro</button>
-                  <button type="button" onClick={() => ir("ecatepets")}>🐾 Quiero ayudar a un peludito</button>
-                  <button type="button" onClick={() => ir("cupones-promos")}>🏷️ Busco descuentos locales</button>
+                  <button type="button" style={{ background: identidad("libros").color }} onClick={() => ir("libros")}>📚 Quiero un libro</button>
+                  <button type="button" style={{ background: identidad("ecatepets").color }} onClick={() => ir("ecatepets")}>🐾 Quiero ayudar a un peludito</button>
+                  <button type="button" style={{ background: identidad("cupones-promos").color }} onClick={() => ir("cupones-promos")}>🏷️ Busco descuentos locales</button>
                 </div>
               )}
             </div>
@@ -226,6 +228,7 @@ function Empieza({ onCerrar, onAbrirProyecto, alSumar, palabras, retos }) {
             </div>
           </div>
         )}
+        <SiguientePaso actual="empieza" />
       </div>
     </div>
   );
@@ -258,6 +261,16 @@ export default function ZonaJuegos({ onAbrirProyecto = () => {}, filas = [], fil
   const niv = nivelDe(semillas);
   const falta = niv.siguiente ? niv.siguiente.min - semillas : 0;
   const cerrar = () => { setAbierto(null); setSemillas(leerSemillas()); };
+  const irA = (id) => {
+    setSemillas(leerSemillas());
+    if (id) { setAbierto(null); setTimeout(() => setAbierto(id), 60); return; }
+    setAbierto(null); setTimeout(() => document.getElementById("zona-aliados")?.scrollIntoView({ behavior: "smooth", block: "start" }), 120);
+  };
+  useEffect(() => {
+    const oir = (e) => { const id = e.detail; if (["empieza", "juegos", "aprende", "gana", "propon", "causa", "info"].includes(id)) setAbierto(id); };
+    window.addEventListener("dcuates:abrir-zona", oir);
+    return () => window.removeEventListener("dcuates:abrir-zona", oir);
+  }, []);
   useEffect(() => { setSemillas(leerSemillas()); }, []);
   const sus = <Suspense fallback={<div className="zj-fondo"><div className="zj-caja"><p className="jg-info">Cargando…</p></div></div>}>
     {abierto === "aprende" && temas.length > 0 && <VentanaAprende temas={temas} onCerrar={cerrar} />}
@@ -270,6 +283,7 @@ export default function ZonaJuegos({ onAbrirProyecto = () => {}, filas = [], fil
   return (
     <section className="zj-sec" id="zona-publica" aria-label="Zona de juegos y participación">
       <span className="zj-comp"><BotonCompartir hash="zona-publica" titulo="Zona pública de CUATES" texto="Juega, aprende, gana y participa en la comunidad" variante="circulo" /></span>
+      <p className="zj-paso">PASO 2 · PARTICIPA</p>
       <h2 className="zj-tit">🎮 ZONA PÚBLICA DE CUATES</h2>
       <p className="zj-sub">Juega, participa y suma Semillas 🌱</p>
       <p className="zj-nivel"><span>{niv.emoji} {niv.nombre} · {semillas} 🌱</span>{niv.siguiente ? ` · faltan ${falta} para ${niv.siguiente.nombre}` : " · ¡nivel máximo!"}</p>
@@ -285,9 +299,11 @@ export default function ZonaJuegos({ onAbrirProyecto = () => {}, filas = [], fil
           </div>
         ))}
       </TiraAuto>
+      <PasoCtx.Provider value={{ irA }}>
       {abierto === "juegos" && createPortal(<Marco juegos={juegos} onCerrar={cerrar} onAbrirProyecto={onAbrirProyecto} alSumar={setSemillas} />, document.body)}
       {abierto === "empieza" && createPortal(<Empieza onCerrar={cerrar} onAbrirProyecto={onAbrirProyecto} alSumar={setSemillas} palabras={palabras} retos={retos} />, document.body)}
       {abierto && !["juegos", "empieza"].includes(abierto) && createPortal(sus, document.body)}
+      </PasoCtx.Provider>
       <style>{CSS}</style>
     </section>
   );
@@ -297,6 +313,7 @@ const CSS = `
 .zj-sec{max-width:72rem;margin:18px auto 6px;padding:14px 16px 6px;border-radius:20px;background:linear-gradient(135deg,#fff7e6,#ffeef2)}
 .zj-sec{position:relative}
 .zj-comp{position:absolute;top:10px;right:10px;z-index:4}
+.zj-paso{margin:0;text-align:center;font-size:11px;font-weight:900;letter-spacing:.12em;color:#b45309}
 .zj-tit{margin:0 36px;font-size:20px;font-weight:900;text-align:center;color:#1f2a37}
 .zj-sub{margin:2px 0 6px;text-align:center;font-size:14px;font-weight:700;color:#5b6675}
 .zj-nivel{margin:0 0 8px;text-align:center;font-size:12.5px;font-weight:700;color:#5b6675}.zj-nivel span{display:inline-block;background:#fff4d6;border-radius:99px;padding:3px 10px;font-weight:900;color:#1f2a37}
@@ -344,6 +361,10 @@ const CSS = `
 .jg-msg{min-height:40px;margin:8px 0 4px;text-align:center;font-size:14px;font-weight:700}
 .jg-dado{display:block;margin:0 auto;min-width:160px;min-height:50px;border:0;border-radius:99px;background:#1f2a37;color:#fff;font-family:inherit;font-size:20px;font-weight:900;cursor:pointer}
 .jg-dado:disabled{opacity:.5}
+.sp-next{margin-top:14px;padding:10px;border-radius:14px;background:#f4f7f5;text-align:center}
+.sp-next p{margin:0 0 6px;font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.05em;color:#6b7785}
+.sp-next button{width:100%;min-height:48px;border:0;border-radius:12px;background:#1f2a37;color:#fff;font-family:inherit;font-size:15px;font-weight:900;cursor:pointer}
+.rg-oscura .sp-next{background:rgba(255,255,255,.1)}
 .zj-p{margin:4px 2px 10px;font-size:15px;font-weight:700;line-height:1.35}
 .zj-menu{display:flex;flex-direction:column;gap:8px}
 .zj-menu button,.zj-resp button,.zj-resp a,.zj-col button{display:block;width:100%;min-height:50px;padding:8px 12px;border:0;border-radius:14px;background:#2E9E5B;color:#fff;font-family:inherit;font-size:15px;font-weight:900;text-align:center;text-decoration:none;cursor:pointer;margin-top:6px;display:grid;place-items:center}

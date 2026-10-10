@@ -1,4 +1,5 @@
 // RECOMIENDA Y GANA — buzón de alertas, recomendaciones y propuestas + atajos al menú principal.
+import { SiguientePaso } from "./ZonaPaso.jsx";
 import React, { useState } from "react";
 import { GOOGLE_SHEETS_URL, WHATSAPP_NUMERO } from "./datos/config.js";
 import { CasillaAcepto, abrirLegal, useAceptacion } from "./componentes/legal.jsx";
@@ -69,6 +70,7 @@ export default function ZonaPropon({ onCerrar, menu = {}, onAbrirProyecto = () =
         <div className="pr-atajos">
           {ATAJOS.map(([e, n, fn]) => <button type="button" key={n} onClick={ir(fn || (() => {}))}><span>{e}</span>{n}</button>)}
         </div>
+        <SiguientePaso actual="propon" />
       </div>
     </div>
   );

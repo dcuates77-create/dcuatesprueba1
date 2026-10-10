@@ -22,6 +22,8 @@ import { detectarVideo, esPDF, galeriaDesdeColumna, irASeccion, paresBaserow, pr
 import BloqueCentral, { CarruselFinal } from "./BloqueCentral";
 import ZonaJuegos from "./ZonaJuegos.jsx";
 import ZonaAliados from "./ZonaAliados.jsx";
+import ZonaRed from "./ZonaRed.jsx";
+import CaminoDcuates from "./CaminoDcuates.jsx";
 import { normalizarPremios } from "./datos/zona.js";
 import BotonCompartir from "./BotonCompartir";
 import { iniciarAnalitica, registrar } from "./analitica";
@@ -461,6 +463,7 @@ export default function App() {
 
 
       {/* Accesos rápidos: Avisos y Beneficios · Compartir Más · Inicio */}
+      <CaminoDcuates menu={{ mapa: () => setShowMapaSitio(true) }} onAbrirProyecto={(id) => setModalProyecto(id)} />
       <ZonaJuegos
         onAbrirProyecto={(id) => setModalProyecto(id)}
         filas={filasEnlaces}
@@ -471,6 +474,7 @@ export default function App() {
         menu={{ mapa: () => setShowMapaSitio(true), faq: () => setShowFAQ(true), sugerencias: () => setModalFormulario("sugerencias") }}
       />
       <ZonaAliados agenda={agendaEventos} />
+      <ZonaRed onAbrirProyecto={(id) => setModalProyecto(id)} />
 
       <BarraAccionesFinal onAbrirComparte={() => setModalFormulario("comparte")} />
 
