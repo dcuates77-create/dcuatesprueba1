@@ -4,6 +4,7 @@ import BloqueAgenda from "./BloqueAgenda.jsx";
 import TiraAuto from "./TiraAuto";
 import BotonCompartir from "./BotonCompartir";
 import { registrar } from "./analitica";
+import { identidad } from "./datos/identidad.js";
 
 // =========================================================================
 // BLOQUE CENTRAL INTERACTIVO — DCUATES (CLON8) · FASE 5
@@ -708,8 +709,8 @@ export default function BloqueCentral({
                   const nombre = bonito(p.t);
                   return (
                     <div className="bc-card" key={p.modal}>
-                      <button type="button" className="bc-chip" onClick={() => onAbrirProyecto(p.modal)} aria-label={`Entrar a ${nombre}`}>
-                        <Logo src={p.img} emoji={tab.emoji} />
+                      <button type="button" className="bc-chip" style={{ "--c": identidad(p.modal).color }} onClick={() => onAbrirProyecto(p.modal)} aria-label={`Entrar a ${nombre}`}>
+                        <Logo src={p.img} emoji={identidad(p.modal).emoji} />
                         <span className="bc-chip-n">{nombre}</span>
                         {resumenes[p.modal] && <span className="bc-chip-d">{resumenes[p.modal]}</span>}
                         <span className="bc-chip-go">Entrar ›</span>

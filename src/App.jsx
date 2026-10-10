@@ -24,6 +24,8 @@ import ZonaJuegos from "./ZonaJuegos.jsx";
 import ZonaAliados from "./ZonaAliados.jsx";
 import ZonaRed from "./ZonaRed.jsx";
 import CaminoDcuates from "./CaminoDcuates.jsx";
+import HoyDcuates, { QueSigue, guardarUltimo } from "./HoyDcuates.jsx";
+import { identidad } from "./datos/identidad.js";
 import { normalizarPremios } from "./datos/zona.js";
 import BotonCompartir from "./BotonCompartir";
 import { iniciarAnalitica, registrar } from "./analitica";
@@ -84,6 +86,7 @@ export default function App() {
   // null = cerrada; si tiene un id (ej. "libros", "ecatepets", "ventas-con-causa",
   // "donaciones") se abre con la información de ese proyecto.
   const [modalProyecto, setModalProyecto] = useState(null);
+  useEffect(() => { if (modalProyecto) { const d = identidad(modalProyecto); guardarUltimo("proyecto", modalProyecto, `${d.emoji} ${d.nombre}`); } }, [modalProyecto]);
   // Analítica: cuenta visitas y registra qué proyectos se abren.
   useEffect(() => { iniciarAnalitica(); iniciarPWA(); }, []);
   useEffect(() => { if (modalProyecto) registrar("proyecto_abrir", { id: String(modalProyecto) }); }, [modalProyecto]);
@@ -464,6 +467,7 @@ export default function App() {
 
       {/* Accesos rápidos: Avisos y Beneficios · Compartir Más · Inicio */}
       <CaminoDcuates menu={{ mapa: () => setShowMapaSitio(true) }} onAbrirProyecto={(id) => setModalProyecto(id)} />
+      <HoyDcuates agenda={agendaEventos} filasZona={filasZona} onAbrirProyecto={(id) => setModalProyecto(id)} />
       <ZonaJuegos
         onAbrirProyecto={(id) => setModalProyecto(id)}
         filas={filasEnlaces}
@@ -661,6 +665,7 @@ export default function App() {
         <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm" onClick={() => setModalProyecto(null)}>
           <div
             className="bg-[#e8f5e9] text-slate-900 rounded-2xl max-w-2xl w-full p-5 sm:p-6 shadow-2xl flex flex-col max-h-[90vh]"
+            style={{ borderTop: `8px solid ${identidad(modalProyecto).color}` }}
             onClick={(e) => e.stopPropagation()}
           >
             {categoriaAbierta && (
@@ -694,6 +699,7 @@ export default function App() {
                 ) : null;
               })()}
               <Suspense fallback={null}><ContenidoModalProyecto id={modalProyecto} onCerrar={() => setModalProyecto(null)} /></Suspense>
+              <QueSigue id={modalProyecto} onIr={(id) => setModalProyecto(id)} onCerrar={() => setModalProyecto(null)} />
             </div>
             <div className="pt-3 flex items-center justify-between gap-3 shrink-0">
               <BotonCompartir
