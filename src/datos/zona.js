@@ -48,7 +48,7 @@ export const TIPS_SEGURIDAD = [
 // vacío ("") la zona usa los contenidos de ejemplo que ya trae el código.
 // Columnas: ZONA, TARJETA, TIPO, TITULO, INFO, ENLACE, EMOJI, FECHA, ORDEN, ACTIVO, NOTA
 // ¡OJO! Todo lo que pongas en esa tabla es PÚBLICO (la página la lee sin clave).
-export const BASEROW_TABLE_ID_ZONA = "2498435";
+export const BASEROW_TABLE_ID_ZONA = "1254189";
 
 const activa = (f) => !/^(no|0|false|falso)$/i.test(String(f.ACTIVO == null ? "SI" : f.ACTIVO).trim());
 const ord = (a, b) => (Number(a.ORDEN) || 999) - (Number(b.ORDEN) || 999);
