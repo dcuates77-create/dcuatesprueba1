@@ -4,9 +4,10 @@
 import React, { Suspense, lazy, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import TiraAuto from "./TiraAuto.jsx";
+import BotonCompartir from "./BotonCompartir.jsx";
 import { WHATSAPP_NUMERO } from "./datos/config.js";
 import { LOGROS_ITEMS } from "./datos/cintas.js";
-import { juegosActivosDesdeZona, necesidadesDesdeZona, palabrasDesdeZona, premiosDesdeZona, telefonosDesdeZona, temasDesdeZona, agendaDesdeZona } from "./datos/zona.js";
+import { juegosActivosDesdeZona, necesidadesDesdeZona, palabrasDesdeZona, premiosDesdeZona, telefonosDesdeZona, temasDesdeZona, agendaDesdeZona, RETOS_DIA, retosDesdeZona } from "./datos/zona.js";
 import { CONTEXTOS, guardarPref, guardarRecord, leerPref, leerRecord, leerSemillas, nivelDe, normalizarJuegos, sumarSemillas } from "./datos/juegos.js";
 
 const COMPONENTES = {
@@ -109,11 +110,17 @@ const PALABRAS = [
   ["🌟", "Esperanza", "Cada paso pequeño, repetido con otros, mueve montañas."],
   ["🤝", "Confianza", "Se construye de a poquito, con palabras cumplidas."],
   ["🌱", "Crecer", "Lo que se cuida con paciencia, florece."],
-  ["🫶", "Solidaridad", "Nadie es tan pobre que no pueda dar, ni tan rico que no necesite recibir."],
-  ["😊", "Alegría", "Una sonrisa compartida vale más que muchas palabras."]
+  ["🤲", "Solidaridad", "Nadie es tan pobre que no pueda dar, ni tan rico que no necesite recibir."],
+  ["😊", "Alegría", "Una sonrisa compartida vale más que muchas palabras."],
+  ["🌼", "Recuerdo", "Recordar con cariño a quienes ya no están es una forma de mantenerlos cerca."]
 ];
 
-function Empieza({ onCerrar, onAbrirProyecto, alSumar, palabras }) {
+function Empieza({ onCerrar, onAbrirProyecto, alSumar, palabras, retos }) {
+  const hoyTxt = new Date().toISOString().slice(0, 10);
+  const listaRetos = retos && retos.length ? retos : RETOS_DIA;
+  const retoHoy = listaRetos[Math.floor(Date.now() / 86400000) % listaRetos.length];
+  const [retoHecho, setRetoHecho] = useState(() => { try { return localStorage.getItem("dc_reto") === hoyTxt; } catch (e) { return false; } });
+  const cumplir = () => { try { localStorage.setItem("dc_reto", hoyTxt); } catch (e) {} setRetoHecho(true); const t = sumarSemillas(1); alSumar && alSumar(t); };
   const LISTA = palabras && palabras.length ? palabras : PALABRAS;
   const [vista, setVista] = useState("menu"); // menu | animo | nuevo | palabra
   const [paso, setPaso] = useState(0);
@@ -136,6 +143,7 @@ function Empieza({ onCerrar, onAbrirProyecto, alSumar, palabras }) {
         {vista === "menu" && (
           <div className="zj-menu">
             <p className="zj-p">Pasos de un solo clic para conocernos. ¡Varios suman una Semilla! 🌱</p>
+            <button type="button" onClick={() => setVista("reto")}>🎯 Mi reto de hoy</button>
             <button type="button" onClick={() => setVista("nuevo")}>🧭 Soy nuevo: ¿por dónde empiezo?</button>
             <button type="button" onClick={() => setVista("hacer")}>🙋 ¿Qué te gustaría hacer?</button>
             <button type="button" onClick={() => setVista("animo")}>😊 ¿Cómo estás hoy?</button>
@@ -155,6 +163,14 @@ function Empieza({ onCerrar, onAbrirProyecto, alSumar, palabras }) {
             {animo === "😊" && <div className="zj-resp"><p>¡Qué gusto! Comparte esa alegría: invita a un vecino a conocer DCUATES.</p><a href={wa("¡Hola! Te invito a conocer la comunidad DCUATES: dcuates.com 💛")} target="_blank" rel="noopener noreferrer">💬 Invitar por WhatsApp</a></div>}
             {animo === "😐" && <div className="zj-resp"><p>A veces un buen libro o una charla ayudan. Mira cómo pedir uno prestado, es gratis.</p><button type="button" onClick={() => ir("libros")}>📚 Ver préstamo de libros</button></div>}
             {animo === "😟" && <div className="zj-resp"><p>Gracias por contarlo. No tienes que estar solo(a): aquí hay personas dispuestas a escucharte y orientarte.</p><button type="button" onClick={() => ir("asesorias")}>🎓 Ver asesorías gratuitas</button><a href={wa("Hola, me gustaría recibir orientación o apoyo.")} target="_blank" rel="noopener noreferrer">💬 Escribirnos por WhatsApp</a></div>}
+          </div>
+        )}
+        {vista === "reto" && (
+          <div>
+            {volver}
+            <div className="zj-resp zj-bien"><p className="zj-bien-e">🎯</p><p><b>Tu reto de hoy</b></p><p>{retoHoy}</p>
+              {retoHecho ? <p className="gn-nota">¡Reto cumplido! Vuelve mañana por otro 🌱</p> : <button type="button" onClick={cumplir}>✅ ¡Lo hice! (+1 Semilla)</button>}
+            </div>
           </div>
         )}
         {vista === "hacer" && (
@@ -237,6 +253,7 @@ export default function ZonaJuegos({ onAbrirProyecto = () => {}, filas = [], fil
   const agendaZ = useMemo(() => [...agenda, ...agendaDesdeZona(filasZona)], [agenda, filasZona]);
   const telefonos = useMemo(() => { const t = telefonosDesdeZona(filasZona); return t.length ? t : null; }, [filasZona]);
   const palabras = useMemo(() => palabrasDesdeZona(filasZona), [filasZona]);
+  const retos = useMemo(() => retosDesdeZona(filasZona), [filasZona]);
   const necesidades = useMemo(() => necesidadesDesdeZona(filasZona), [filasZona]);
   const niv = nivelDe(semillas);
   const falta = niv.siguiente ? niv.siguiente.min - semillas : 0;
@@ -251,7 +268,8 @@ export default function ZonaJuegos({ onAbrirProyecto = () => {}, filas = [], fil
   </Suspense>;
 
   return (
-    <section className="zj-sec" aria-label="Zona de juegos y participación">
+    <section className="zj-sec" id="zona-publica" aria-label="Zona de juegos y participación">
+      <span className="zj-comp"><BotonCompartir hash="zona-publica" titulo="Zona pública de CUATES" texto="Juega, aprende, gana y participa en la comunidad" variante="circulo" /></span>
       <h2 className="zj-tit">🎮 ZONA PÚBLICA DE CUATES</h2>
       <p className="zj-sub">Juega, participa y suma Semillas 🌱</p>
       <p className="zj-nivel"><span>{niv.emoji} {niv.nombre} · {semillas} 🌱</span>{niv.siguiente ? ` · faltan ${falta} para ${niv.siguiente.nombre}` : " · ¡nivel máximo!"}</p>
@@ -268,7 +286,7 @@ export default function ZonaJuegos({ onAbrirProyecto = () => {}, filas = [], fil
         ))}
       </TiraAuto>
       {abierto === "juegos" && createPortal(<Marco juegos={juegos} onCerrar={cerrar} onAbrirProyecto={onAbrirProyecto} alSumar={setSemillas} />, document.body)}
-      {abierto === "empieza" && createPortal(<Empieza onCerrar={cerrar} onAbrirProyecto={onAbrirProyecto} alSumar={setSemillas} palabras={palabras} />, document.body)}
+      {abierto === "empieza" && createPortal(<Empieza onCerrar={cerrar} onAbrirProyecto={onAbrirProyecto} alSumar={setSemillas} palabras={palabras} retos={retos} />, document.body)}
       {abierto && !["juegos", "empieza"].includes(abierto) && createPortal(sus, document.body)}
       <style>{CSS}</style>
     </section>
@@ -277,7 +295,9 @@ export default function ZonaJuegos({ onAbrirProyecto = () => {}, filas = [], fil
 
 const CSS = `
 .zj-sec{max-width:72rem;margin:18px auto 6px;padding:14px 16px 6px;border-radius:20px;background:linear-gradient(135deg,#fff7e6,#ffeef2)}
-.zj-tit{margin:0;font-size:20px;font-weight:900;text-align:center;color:#1f2a37}
+.zj-sec{position:relative}
+.zj-comp{position:absolute;top:10px;right:10px;z-index:4}
+.zj-tit{margin:0 36px;font-size:20px;font-weight:900;text-align:center;color:#1f2a37}
 .zj-sub{margin:2px 0 6px;text-align:center;font-size:14px;font-weight:700;color:#5b6675}
 .zj-nivel{margin:0 0 8px;text-align:center;font-size:12.5px;font-weight:700;color:#5b6675}.zj-nivel span{display:inline-block;background:#fff4d6;border-radius:99px;padding:3px 10px;font-weight:900;color:#1f2a37}
 .zj-w{width:158px;display:flex}

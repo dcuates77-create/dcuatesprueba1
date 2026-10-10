@@ -16,6 +16,10 @@ import React, { useState, useEffect, useRef, cloneElement } from "react";
 // =========================================================================
 
 const REANUDAR_MS = 6000;
+// MODO CONTINUO (por defecto): las tarjetas corren solas, suave y sin parar, sin degradado
+// al borde. Las tiras vecinas de la página alternan el sentido (una a la izquierda, la
+// siguiente a la derecha). Para volver al modo "un cuadro cada X segundos" usa continuo={false}.
+const VELOCIDAD_PX_S = 34;
 const ANIMACION_MS = 500;
 
 function animarScroll(el, destino, ms, alTerminar) {
@@ -39,9 +43,11 @@ function animarScroll(el, destino, ms, alTerminar) {
   return id;
 }
 
-export default function TiraAuto({ children, intervalo = 2000, etiqueta = "Carrusel", fondo = "#fff" }) {
+export default function TiraAuto({ children, intervalo = 2000, etiqueta = "Carrusel", fondo = "#fff", continuo = true, sentido: sentidoFijo, velocidad = VELOCIDAD_PX_S }) {
   const items = React.Children.toArray(children);
   const n = items.length;
+  const rootRef = useRef(null);
+  const posRef = useRef(0);
   const pistaRef = useRef(null);
   const indiceRef = useRef(0);
   const animRef = useRef(null);
@@ -110,15 +116,58 @@ export default function TiraAuto({ children, intervalo = 2000, etiqueta = "Carru
         indiceRef.current -= n;
       }
       pista.style.scrollSnapType = "";
+      posRef.current = pista.scrollLeft;
     });
   };
 
   // Avance automático: un cuadro cada "intervalo" ms.
   useEffect(() => {
-    if (!desborda || pausado || pausaManual) return;
+    if (continuo || !desborda || pausado || pausaManual) return;
     const id = setInterval(() => { if (!document.hidden) irPor(1); }, intervalo);
     return () => clearInterval(id);
-  }, [desborda, pausado, pausaManual, intervalo, n]);
+  }, [continuo, desborda, pausado, pausaManual, intervalo, n]);
+
+  // Movimiento continuo con acumulador decimal (en celulares el scroll se redondea).
+  useEffect(() => {
+    if (!continuo || !desborda || reducir) return;
+    const pista = pistaRef.current;
+    if (!pista || n === 0) return;
+    const todas = Array.from(document.querySelectorAll(".ta-root"));
+    const dir = sentidoFijo || (todas.indexOf(rootRef.current) % 2 === 0 ? 1 : -1);
+    const ancho = () => posicionDe(n) - posicionDe(0);
+    if (!(posRef.current > 0)) posRef.current = dir < 0 ? ancho() : 0;
+    pista.scrollLeft = posRef.current;
+    let visible = true, raf = 0, ultimo = performance.now();
+    const io = typeof IntersectionObserver !== "undefined" ? new IntersectionObserver(([e]) => { visible = e.isIntersecting; }, { threshold: 0.01 }) : null;
+    io && io.observe(pista);
+    const paso = (t) => {
+      const dt = Math.min(64, t - ultimo); ultimo = t;
+      if (visible && !document.hidden && !pausado && !pausaManual) {
+        const w = ancho();
+        if (w > 0) {
+          let p = posRef.current + dir * velocidad * dt / 1000;
+          if (p >= w) p -= w;
+          if (p < 0) p += w;
+          posRef.current = p;
+          pista.scrollLeft = p;
+        }
+      }
+      raf = requestAnimationFrame(paso);
+    };
+    raf = requestAnimationFrame(paso);
+    return () => { cancelAnimationFrame(raf); io && io.disconnect(); };
+  }, [continuo, desborda, pausado, pausaManual, n, reducir, velocidad, sentidoFijo]);
+
+  const recalcIndice = () => {
+    const pista = pistaRef.current;
+    if (!pista) return;
+    let mejor = 0, dist = Infinity;
+    for (let i = 0; i < pista.children.length; i++) {
+      const d = Math.abs(posicionDe(i) - pista.scrollLeft);
+      if (d < dist) { dist = d; mejor = i; }
+    }
+    indiceRef.current = mejor;
+  };
 
   const pausarUnRato = () => {
     if (animRef.current) animRef.current.cancelado = true;
@@ -131,23 +180,21 @@ export default function TiraAuto({ children, intervalo = 2000, etiqueta = "Carru
   const alDeslizar = () => {
     const pista = pistaRef.current;
     if (!pista || Date.now() < ignorarHasta.current) return;
-    let mejor = 0, dist = Infinity;
-    for (let i = 0; i < pista.children.length; i++) {
-      const d = Math.abs(posicionDe(i) - pista.scrollLeft);
-      if (d < dist) { dist = d; mejor = i; }
-    }
-    indiceRef.current = mejor;
+    if (Math.abs(pista.scrollLeft - posRef.current) > 2) posRef.current = pista.scrollLeft; // solo si fue la mano, no nuestro propio avance
+    recalcIndice();
   };
 
-  const flecha = (delta) => () => { pausarUnRato(); irPor(delta); };
+  const flecha = (delta) => () => { pausarUnRato(); recalcIndice(); irPor(delta); };
 
   return (
-    <div className="ta-root" style={{ "--ta-fondo": fondo }} role="group" aria-roledescription={desborda ? "carrusel" : undefined} aria-label={etiqueta}>
+    <div className={"ta-root" + (continuo ? " ta-cont" : "")} ref={rootRef} style={{ "--ta-fondo": fondo }} role="group" aria-roledescription={desborda ? "carrusel" : undefined} aria-label={etiqueta}>
       <style>{CSS}</style>
       <div
         className={`ta-pista${desborda ? "" : " ta-centrado"}`}
         ref={pistaRef}
         onScroll={alDeslizar}
+        onMouseEnter={() => continuo && setPausado(true)}
+        onMouseLeave={() => continuo && setPausado(false)}
         onPointerDown={pausarUnRato}
         onTouchStart={pausarUnRato}
       >
@@ -155,7 +202,7 @@ export default function TiraAuto({ children, intervalo = 2000, etiqueta = "Carru
       </div>
       {desborda && (
         <>
-          <span className="ta-borde" aria-hidden="true" />
+          {!continuo && <span className="ta-borde" aria-hidden="true" />}
           <button type="button" className="ta-flecha ta-prev" onClick={flecha(-1)} aria-label="Anterior">‹</button>
           <button type="button" className="ta-flecha ta-next" onClick={flecha(1)} aria-label="Siguiente">›</button>
         </>
@@ -176,6 +223,7 @@ const CSS = `
 .ta-pista{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;padding:6px 2px 12px}
 .ta-pista::-webkit-scrollbar{display:none}
 .ta-pista.ta-centrado{justify-content:center}
+.ta-cont .ta-pista{scroll-snap-type:none}
 .ta-pista>*{scroll-snap-align:start;flex:0 0 auto}
 .ta-borde{position:absolute;top:0;bottom:0;right:0;width:46px;pointer-events:none;background:linear-gradient(to left,var(--ta-fondo),transparent)}
 .ta-flecha{position:absolute;top:calc(50% - 16px);transform:translateY(-50%);z-index:3;width:38px;height:38px;border:0;border-radius:50%;background:#fff;color:#1f2a37;font-family:inherit;font-size:26px;font-weight:900;line-height:1;display:grid;place-items:center;padding:0 0 3px;box-shadow:0 4px 12px rgba(0,0,0,.28);cursor:pointer}

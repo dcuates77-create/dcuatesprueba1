@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { createPortal } from "react-dom";
 import TiraAuto from "./TiraAuto.jsx";
+import BotonCompartir from "./BotonCompartir.jsx";
 import { GOOGLE_SHEETS_URL, WHATSAPP_NUMERO } from "./datos/config.js";
 import { LOGROS_ITEMS } from "./datos/cintas.js";
 import { ACTIVIDADES_VOLUNTARIOS, BENEFICIOS, MENSAJES_DIFUSION, PERFILES, TARJETAS_ALIADOS } from "./datos/aliados.js";
@@ -146,7 +147,8 @@ export default function ZonaAliados({ agenda = [] }) {
   const nombresPerfiles = (t) => t.perfiles === "todos" ? "Todos los perfiles" : t.perfiles.map((p) => PERFILES[p].nombre).join(", ");
 
   return (
-    <section className="zl-sec" aria-label="Zona de aliados, patrocinadores, voluntarios y amigos">
+    <section className="zl-sec" id="zona-aliados" aria-label="Zona de aliados, patrocinadores, voluntarios y amigos">
+      <span className="zj-comp"><BotonCompartir hash="zona-aliados" titulo="Zona de aliados, patrocinadores, voluntarios y amigos" texto="Beneficios y contacto para quienes forman parte de la red DCUATES" variante="claro" /></span>
       <h2 className="zl-tit">🔐 ZONA DE ALIADOS, PATROCINADORES, VOLUNTARIOS Y AMIGOS</h2>
       {P ? (
         <p className="zl-sub"><span style={{ background: P.color }}>{P.emoji} Perfil: {P.nombre}</span> <button type="button" onClick={salir}>Salir 🔒</button></p>
@@ -171,8 +173,8 @@ export default function ZonaAliados({ agenda = [] }) {
       {pidiendo && createPortal(<Acceso onCerrar={() => setPidiendo(null)} onEntrar={entrar} />, document.body)}
       {tarjeta && perfil && createPortal(<Ventana tarjeta={tarjeta} perfil={perfil} agenda={agenda} onCerrar={() => setAbierta(null)} />, document.body)}
       <style>{`
-.zl-sec{max-width:72rem;margin:12px auto 6px;padding:14px 16px 6px;border-radius:20px;background:linear-gradient(135deg,#1f2a37,#33415a);color:#fff}
-.zl-tit{margin:0;font-size:16px;font-weight:900;text-align:center;line-height:1.2}
+.zl-sec{position:relative;max-width:72rem;margin:12px auto 6px;padding:14px 16px 6px;border-radius:20px;background:linear-gradient(135deg,#1f2a37,#33415a);color:#fff}
+.zl-tit{margin:0 36px;font-size:16px;font-weight:900;text-align:center;line-height:1.2}
 .zl-sub{margin:6px 0 8px;text-align:center;font-size:13px;font-weight:700;color:#dbe4ef}
 .zl-sub span{display:inline-block;border-radius:99px;padding:3px 10px;font-weight:900;color:#fff}
 .zl-sub button{margin-left:6px;min-height:34px;border:0;border-radius:99px;padding:4px 12px;background:#fff;font-family:inherit;font-size:12.5px;font-weight:900;cursor:pointer;color:#1f2a37}

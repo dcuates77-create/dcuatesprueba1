@@ -1,5 +1,6 @@
 // JUEGA Y GANA — ruleta y tragamonedas con premios de aliados, Semillas y retos.
 // 3 giros al día (guardados en el celular). Los cupones ganados se guardan en "Mis premios".
+import BotonCompartir from "./BotonCompartir.jsx";
 import React, { useEffect, useRef, useState } from "react";
 import { GIROS_POR_DIA } from "./datos/zona.js";
 import { sumarSemillas } from "./datos/juegos.js";
@@ -106,7 +107,8 @@ export default function ZonaGana({ premios, onCerrar, alSumar }) {
                 <p className="gn-t">{premio.emoji} ¡{premio.tipo === "cupon" ? "Ganaste un cupón" : premio.tipo === "semillas" ? "Ganaste Semillas" : premio.tipo === "reto" ? "Te toca un reto" : "Un mensaje para ti"}!</p>
                 <p><b>{premio.titulo}</b></p>
                 {premio.info && <p>{premio.info}</p>}
-                {premio.tipo === "cupon" && <p className="gn-nota">Guardado en “Mis premios”. Muéstralo en el negocio aliado.</p>}
+                {premio.tipo === "cupon" && <p className="gn-nota">Guardado en “Mis premios”. Muéstralo en el negocio aliado. ¡Compártelo con quien quieras: entre más lo usen, mejor para el negocio!</p>}
+                {premio.tipo === "cupon" && <BotonCompartir hash="zona-publica" titulo={`Cupón: ${premio.titulo}`} texto="Gánalo tú también jugando en DCUATES" variante="pastilla" etiqueta="Compartir cupón" />}
                 {premio.enlace && <a href={premio.enlace} target="_blank" rel="noopener noreferrer">Abrir ›</a>}
               </div>
             )}
@@ -116,7 +118,7 @@ export default function ZonaGana({ premios, onCerrar, alSumar }) {
         {modo === "mis" && (
           <div className="gn-mis">
             {mis.length === 0 && <p className="ag-vacio">Aún no tienes cupones guardados. ¡Gira la ruleta!</p>}
-            {mis.map((m, i) => <div className="ag-ev" key={i}><b>🏷️ {m.titulo}</b>{m.info && <p>{m.info}</p>}<p className="gn-nota">Ganado el {m.fecha}</p></div>)}
+            {mis.map((m, i) => <div className="ag-ev" key={i}><b>🏷️ {m.titulo}</b>{m.info && <p>{m.info}</p>}<p className="gn-nota">Ganado el {m.fecha}</p><BotonCompartir hash="zona-publica" titulo={`Cupón: ${m.titulo}`} texto="Gánalo tú también jugando en DCUATES" variante="pastilla" etiqueta="Compartir" /></div>)}
           </div>
         )}
 

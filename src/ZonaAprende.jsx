@@ -112,7 +112,7 @@ function Loteria({ tema, alElegir, elegido }) {
         {tema.items.map((d, i) => (
           <button type="button" key={i} className={"rg-carta" + (elegido === i ? " rg-carta-on" : "")} onClick={() => { if (!salidas.includes(i)) setSalidas((s) => [...s, i]); alElegir(i); }} aria-label={d.titulo}>
             <span className="rg-carta-e">{d.emoji}</span><span className="rg-carta-t">{d.titulo}</span>
-            {salidas.includes(i) && <span className="rg-frijol" aria-hidden="true">🫘</span>}
+            {salidas.includes(i) && <span className="rg-frijol" aria-hidden="true">🔴</span>}
           </button>
         ))}
       </div>
