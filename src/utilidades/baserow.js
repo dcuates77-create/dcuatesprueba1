@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { WHATSAPP_NUMERO } from "../datos/config.js";
 import { BASEROW_TABLE_ID_ENLACES, BOTONES_PORTADA, CACHE_ENLACES_MS } from "../datos/proyectos.js";
+import { BASEROW_TABLE_ID_ZONA } from "../datos/zona.js";
 
 export function enlaceWhatsApp(mensaje) {
   return `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(mensaje)}`;
@@ -274,4 +275,21 @@ export function useCatalogoBaserow(tableId, itemsRespaldo) {
   }, [tableId]);
 
   return items;
+}
+
+// Lee la tabla nueva de la ZONA PÚBLICA (si ya pegaste su ID en datos/zona.js).
+let cacheZona = null;
+export function useFilasZona() {
+  const [filas, setFilas] = useState(() => (cacheZona ? cacheZona.datos : []));
+  useEffect(() => {
+    if (!BASEROW_TABLE_ID_ZONA) return;
+    if (cacheZona && Date.now() - cacheZona.momento < 300000) { setFilas(cacheZona.datos); return; }
+    let cancelado = false;
+    fetch(`/api/baserow-rows?table=${encodeURIComponent(BASEROW_TABLE_ID_ZONA)}&crudo=1`)
+      .then((r) => r.json())
+      .then((d) => { if (!cancelado && Array.isArray(d.items)) { cacheZona = { datos: d.items, momento: Date.now() }; setFilas(d.items); } })
+      .catch((e) => console.warn("[DCUATES] No se pudo leer la tabla de la zona:", e));
+    return () => { cancelado = true; };
+  }, []);
+  return filas;
 }
