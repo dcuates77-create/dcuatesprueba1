@@ -74,7 +74,7 @@ export const juegosActivosDesdeZona = (filas) => {
 };
 
 export const NECESIDADES_BASE = [
-  { emoji: "📚", titulo: "Libros y cuentos en buen estado", info: "Para el préstamo de libros y Bibliobici: de lectura, escolares o infantiles.", proyecto: "libros" },
+  { emoji: "📚", titulo: "Libros, materiales y lo que consideres de valor y utilidad para la comunidad", info: "Para el préstamo de libros y Bibliobici y para quien lo necesite: de lectura, escolares, infantiles u otros materiales útiles.", proyecto: "libros" },
   { emoji: "🐾", titulo: "Croquetas y cobijas", info: "Para los peluditos de Ecatepets que esperan hogar.", proyecto: "ecatepets" },
   { emoji: "✏️", titulo: "Útiles escolares", info: "Cuadernos, colores y mochilas para niñas y niños de la colonia.", proyecto: "donaciones" },
   { emoji: "👕", titulo: "Ropa limpia y en buen estado", info: "Para familias que la necesitan; se entrega por medio de la comunidad.", proyecto: "donaciones" },
