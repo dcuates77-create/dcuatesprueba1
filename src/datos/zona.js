@@ -83,11 +83,11 @@ export const NECESIDADES_BASE = [
 
 // ---- RETO DEL DÍA (individual; un reto distinto cada día, +1 Semilla al cumplirlo) ----
 export const RETOS_DIA = [
-  "Saluda hoy a un vecino y pregúntale cómo está.",
+  "Dedica 10 minutos solo para ti: toma agua, estírate, respira y escribe una meta pequeña para hoy.",
   "Escribe un mensaje de gratitud a alguien que te ayudó.",
   "Lee 10 minutos de un libro o cuento.",
   "Comparte DCUATES con una persona que creas que lo disfrutará.",
-  "Toma agua, estírate y respira profundo durante 5 minutos.",
+  "Saluda hoy a un vecino y pregúntale cómo está.",
   "Recoge un papel o basura que veas en la calle.",
   "Llama o escribe a un familiar que no veas seguido.",
   "Aprende una palabra nueva y úsala hoy.",
