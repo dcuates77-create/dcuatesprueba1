@@ -6,6 +6,7 @@ import { createPortal } from "react-dom";
 import TiraAuto from "./TiraAuto.jsx";
 import BotonCompartir from "./BotonCompartir.jsx";
 import { guardarUltimo, NOMBRE_ZONA } from "./HoyDcuates.jsx";
+import Tablero, { abrirAcceso } from "./Tablero.jsx";
 import { PasoCtx, SiguientePaso } from "./ZonaPaso.jsx";
 import { identidad } from "./datos/identidad.js";
 import { WHATSAPP_NUMERO } from "./datos/config.js";
@@ -245,8 +246,10 @@ const TARJETAS = [
   { id: "info", color: "#C2410C", emoji: "📌", t: "INFO CLAVE", p: "🚨 Teléfonos de emergencia, agenda y más. ¡Conoce lo que hay aquí!", b: "📌 Ver" }
 ];
 
-export default function ZonaJuegos({ onAbrirProyecto = () => {}, filas = [], filasZona = [], temasAprende = [], premios = [], agenda = [], menu = {} }) {
+export default function ZonaJuegos({ onAbrirProyecto: abrirProy = () => {}, filas = [], filasZona = [], temasAprende = [], premios = [], agenda = [], menu = {} }) {
   const [abierto, setAbierto] = useState(null);
+  const [tablero, setTablero] = useState(false);
+  const onAbrirProyecto = (id) => { setTablero(false); abrirProy(id); };
   const [semillas, setSemillas] = useState(leerSemillas());
   const juegos = useMemo(() => {
     const todos = normalizarJuegos(filas); const act = juegosActivosDesdeZona(filasZona);
@@ -266,12 +269,15 @@ export default function ZonaJuegos({ onAbrirProyecto = () => {}, filas = [], fil
   const irA = (id) => {
     setSemillas(leerSemillas());
     if (id) { setAbierto(null); setTimeout(() => setAbierto(id), 60); return; }
-    setAbierto(null); setTimeout(() => document.getElementById("zona-aliados")?.scrollIntoView({ behavior: "smooth", block: "start" }), 120);
+    setAbierto(null); setTablero(false); setTimeout(() => window.dispatchEvent(new CustomEvent("dcuates:abrir-tablero", { detail: "colabora" })), 120);
   };
   useEffect(() => {
     const oir = (e) => { const id = e.detail; if (["empieza", "juegos", "aprende", "gana", "propon", "causa", "info"].includes(id)) setAbierto(id); };
+    const oirT = (e) => { if (e.detail === "participa") setTablero(true); };
     window.addEventListener("dcuates:abrir-zona", oir);
-    return () => window.removeEventListener("dcuates:abrir-zona", oir);
+    window.addEventListener("dcuates:abrir-tablero", oirT);
+    try { if (window.location.hash === "#zona-publica") setTablero(true); } catch (e) {}
+    return () => { window.removeEventListener("dcuates:abrir-zona", oir); window.removeEventListener("dcuates:abrir-tablero", oirT); };
   }, []);
   useEffect(() => { setSemillas(leerSemillas()); }, []);
   const sus = <Suspense fallback={<div className="zj-fondo"><div className="zj-caja"><p className="jg-info">Cargando…</p></div></div>}>
@@ -283,31 +289,24 @@ export default function ZonaJuegos({ onAbrirProyecto = () => {}, filas = [], fil
   </Suspense>;
 
   return (
-    <section className="zj-sec" id="zona-publica" aria-label="Zona de juegos y participación">
-      <span className="zj-comp"><BotonCompartir hash="zona-publica" titulo="Zona pública de CUATES" texto="Juega, aprende, gana y participa en la comunidad" variante="circulo" /></span>
-      <p className="zj-paso">PASO 2 · PARTICIPA</p>
-      <h2 className="zj-tit">🎮 ZONA PÚBLICA DE CUATES</h2>
-      <p className="zj-sub">Juega, participa y suma Semillas 🌱</p>
-      <p className="zj-nivel"><span>{niv.emoji} {niv.nombre} · {semillas} 🌱</span>{niv.siguiente ? ` · faltan ${falta} para ${niv.siguiente.nombre}` : " · ¡nivel máximo!"}</p>
-      <TiraAuto intervalo={3500} etiqueta="Zona DCUATES" fondo="#fff">
-        {TARJETAS.map((c) => (
-          <div className="zj-w" key={c.id}>
-            <article className="zj-card" style={{ borderColor: c.color }}>
-              <span className="zj-ico" style={{ background: c.color }} aria-hidden="true">{c.emoji}</span>
-              <h3>{c.t}</h3>
-              <p>{c.p}</p>
-              <button type="button" onClick={() => setAbierto(c.id)} style={{ background: c.color }}>{c.b}</button>
-            </article>
-          </div>
-        ))}
-      </TiraAuto>
+    <>
+      {tablero && (
+        <Tablero
+          paso="PASO 2 · PARTICIPA" emoji="🎮" titulo="ZONA PÚBLICA DE CUATES" color="#E5484D" hash="zona-publica"
+          intro="Aquí participas con tu comunidad: juega, aprende, gana cupones, recomienda y apoya con causa. Cada actividad te suma Semillas 🌱 y te lleva a la siguiente."
+          sub={<p className="zj-nivel"><span>{niv.emoji} {niv.nombre} · {semillas} 🌱</span>{niv.siguiente ? ` · faltan ${falta} para ${niv.siguiente.nombre}` : " · ¡nivel máximo!"}</p>}
+          tarjetas={TARJETAS.map((c) => ({ id: c.id, emoji: c.emoji, t: c.t, d: c.p, color: c.color, onClick: () => setAbierto(c.id) }))}
+          onCerrar={() => setTablero(false)}
+          onRegistros={() => { setTablero(false); abrirAcceso("registros"); }}
+        />
+      )}
       <PasoCtx.Provider value={{ irA }}>
       {abierto === "juegos" && createPortal(<Marco juegos={juegos} onCerrar={cerrar} onAbrirProyecto={onAbrirProyecto} alSumar={setSemillas} />, document.body)}
       {abierto === "empieza" && createPortal(<Empieza onCerrar={cerrar} onAbrirProyecto={onAbrirProyecto} alSumar={setSemillas} palabras={palabras} retos={retos} />, document.body)}
       {abierto && !["juegos", "empieza"].includes(abierto) && createPortal(sus, document.body)}
       </PasoCtx.Provider>
       <style>{CSS}</style>
-    </section>
+    </>
   );
 }
 

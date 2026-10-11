@@ -1,27 +1,28 @@
 // CAMINO DCUATES — mapa de 4 pasos (Conoce → Participa → Colabora → Crece) y "Soy…" por perfil.
 import React from "react";
 import { identidad } from "./datos/identidad.js";
+import { abrirTablero } from "./Tablero.jsx";
 
 const baja = (id) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
-const abrirZona = (id) => { baja("zona-publica"); setTimeout(() => window.dispatchEvent(new CustomEvent("dcuates:abrir-zona", { detail: id })), 450); };
+const abrirZona = (id) => window.dispatchEvent(new CustomEvent("dcuates:abrir-zona", { detail: id }));
 
 export default function CaminoDcuates({ menu = {}, onAbrirProyecto = () => {} }) {
   const PASOS = [
-    ["1", "🧭", "CONOCE", "Mira todo lo que hacemos", "#1B6F8A", () => (menu.mapa ? menu.mapa() : baja("zona-publica"))],
-    ["2", "🎮", "PARTICIPA", "Juega, aprende y gana", "#E5484D", () => baja("zona-publica")],
-    ["3", "🤝", "COLABORA", "Aliados, voluntarios y amigos", "#C2410C", () => baja("zona-aliados")],
-    ["4", "🌳", "CRECE", "Tu camino personal", "#2E9E5B", () => baja("zona-red")]
+    ["1", "🧭", "CONOCE", "Mira todo lo que hacemos", "#1B6F8A", () => abrirTablero("conoce")],
+    ["2", "🎮", "PARTICIPA", "Juega, aprende y gana", "#E5484D", () => abrirTablero("participa")],
+    ["3", "🤝", "COLABORA", "Aliados, voluntarios y amigos", "#C2410C", () => abrirTablero("colabora")],
+    ["4", "🌳", "CRECE", "Tu camino personal", "#2E9E5B", () => abrirTablero("crece")]
   ];
   const SOY = [
     ["🏘️", "Soy vecino o vecina", "#2E9E5B", () => abrirZona("empieza")],
     ["🏪", "Tengo un negocio", identidad("publicidad-tarjeta").color, () => onAbrirProyecto("publicidad-tarjeta")],
     ["🙋", "Quiero ser voluntario(a)", identidad("donaciones").color, () => onAbrirProyecto("donaciones")],
     ["🎁", "Quiero donar o ayudar", "#BE185D", () => abrirZona("causa")],
-    ["🌟", "Quiero ser aliado o patrocinador", "#B7791F", () => { baja("zona-aliados"); setTimeout(() => window.dispatchEvent(new CustomEvent("dcuates:abrir-acceso-aliados")), 450); }]
+    ["🌟", "Quiero ser aliado o patrocinador", "#B7791F", () => window.dispatchEvent(new CustomEvent("dcuates:abrir-acceso-aliados"))]
   ];
   return (
     <section className="cm-sec" aria-label="Tu camino en DCUATES">
-      <h2 className="cm-tit">🧭 TU CAMINO EN DCUATES</h2>
+      <h2 className="cm-tit">🧭 CAMINO DCUATES</h2>
       <ol className="cm-pasos">
         {PASOS.map(([n, e, t, d, c, fn]) => (
           <li key={n}><button type="button" onClick={fn} style={{ "--c": c }}><span className="cm-n">{n}</span><span className="cm-e">{e}</span><b>{t}</b><small>{d}</small></button></li>

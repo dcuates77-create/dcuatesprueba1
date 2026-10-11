@@ -1,7 +1,7 @@
 // RED DE CONFIANZA (3er nivel) — actividades INDIVIDUALES por invitación. Todo se guarda en el celular de cada persona.
 import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import TiraAuto from "./TiraAuto.jsx";
+import Tablero, { abrirAcceso } from "./Tablero.jsx";
 import BotonCompartir from "./BotonCompartir.jsx";
 import { GOOGLE_SHEETS_URL, WHATSAPP_NUMERO } from "./datos/config.js";
 import { IDENTIDAD, identidad } from "./datos/identidad.js";
@@ -216,10 +216,18 @@ function Ventana({ t, onCerrar, onAbrirProyecto }) {
   );
 }
 
-export default function ZonaRed({ onAbrirProyecto = () => {} }) {
+export default function ZonaRed({ onAbrirProyecto: abrirProy = () => {} }) {
   const [ok, setOk] = useState(dentro);
   const [pidiendo, setPidiendo] = useState(null);
   const [abierta, setAbierta] = useState(null);
+  const [tablero, setTablero] = useState(false);
+  const onAbrirProyecto = (id) => { setTablero(false); setAbierta(null); abrirProy(id); };
+  useEffect(() => {
+    const oirT = (e) => { if (e.detail === "crece") setTablero(true); };
+    window.addEventListener("dcuates:abrir-tablero", oirT);
+    try { if (window.location.hash === "#zona-red") setTablero(true); } catch (e) {}
+    return () => window.removeEventListener("dcuates:abrir-tablero", oirT);
+  }, []);
   useEffect(() => {
     // Si llegó con ?ref=CODIGO, se guarda quién la invitó (solo en este celular).
     try { const r = new URLSearchParams(window.location.search).get("ref"); if (r && !localStorage.getItem("dc_ref")) localStorage.setItem("dc_ref", r.slice(0, 12)); } catch (e) {}
@@ -229,25 +237,24 @@ export default function ZonaRed({ onAbrirProyecto = () => {} }) {
   const salir = () => { marcar(false); setOk(false); setAbierta(null); };
   const t = TARJETAS.find((x) => x.id === abierta);
   return (
-    <section className="rd-sec" id="zona-red" aria-label="Red de confianza">
-      <span className="zj-comp"><BotonCompartir hash="zona-red" titulo="Red de confianza DCUATES" texto="Un espacio personal para crecer con la comunidad" variante="claro" /></span>
-      <p className="rd-paso">PASO 4 · CRECE</p>
-      <h2 className="rd-tit">🌳 RED DE CONFIANZA</h2>
-      <p className="rd-sub">{ok ? <>Tu espacio personal para crecer. <button type="button" onClick={salir}>Salir 🔒</button></> : <>Por invitación: actividades tuyas para crecer a tu ritmo. <button type="button" className="rd-ent" onClick={() => setPidiendo("_")}>🔑 Entrar con mi clave</button></>}</p>
-      <TiraAuto intervalo={4000} etiqueta="Red de confianza" fondo="#fff">
-        {TARJETAS.map((c) => (
-          <div className="zj-w" key={c.id}>
-            <article className={"zj-card" + (ok ? "" : " zl-bloq")} style={{ borderColor: c.color }}>
-              <span className="zj-ico" style={{ background: c.color }} aria-hidden="true">{ok ? c.emoji : "🔒"}</span>
-              <h3>{c.titulo}</h3><p>{ok ? c.texto : "Solo con invitación."}</p>
-              <button type="button" onClick={() => tocar(c)} style={{ background: ok ? c.color : "#6b7785" }}>{ok ? "Abrir" : "🔒 Ingresar"}</button>
-            </article>
-          </div>
-        ))}
-      </TiraAuto>
+    <>
+      {tablero && (
+        <Tablero
+          paso="PASO 4 · CRECE" emoji="🌳" titulo="RED DE CONFIANZA" color="#2E9E5B" hash="zona-red"
+          intro="Tu espacio personal para crecer a tu ritmo: sella tu pasaporte, lee, agradece, cumple retos y comparte lo que sabes. Todo se guarda solo en tu celular. Es por invitación."
+          sub={ok
+            ? <p className="tb-sub2">Tu espacio personal. <button type="button" onClick={salir}>Salir 🔒</button></p>
+            : <p className="tb-sub2"><button type="button" className="tb-ent2" onClick={() => setPidiendo("_")}>🔑 Entrar con mi clave</button></p>}
+          tarjetas={TARJETAS.map((c) => ({ id: c.id, emoji: c.emoji, t: c.titulo, d: ok ? c.texto : "Solo con invitación.", color: c.color, bloq: !ok, onClick: () => tocar(c) }))}
+          onCerrar={() => setTablero(false)}
+          onRegistros={() => { setTablero(false); abrirAcceso("registros"); }}
+        />
+      )}
       {pidiendo && createPortal(<Acceso onCerrar={() => setPidiendo(null)} onEntrar={entrar} />, document.body)}
       {t && ok && createPortal(<Ventana t={t} onCerrar={() => setAbierta(null)} onAbrirProyecto={onAbrirProyecto} />, document.body)}
       <style>{`
+.tb-sub2{margin:0 0 8px;text-align:center;font-size:13px;font-weight:700;color:#3a4654}
+.tb-sub2 button{margin-left:6px;min-height:40px;border:0;border-radius:99px;padding:6px 14px;background:#14532d;color:#fff;font-family:inherit;font-size:13px;font-weight:900;cursor:pointer}
 .rd-sec{position:relative;max-width:72rem;margin:12px auto 6px;padding:14px 16px 6px;border-radius:20px;background:linear-gradient(135deg,#14532d,#166534);color:#fff}
 .rd-paso{margin:0;text-align:center;font-size:11px;font-weight:900;letter-spacing:.12em;color:#bbf7d0}
 .rd-tit{margin:2px 36px 0;font-size:18px;font-weight:900;text-align:center}
@@ -268,6 +275,6 @@ export default function ZonaRed({ onAbrirProyecto = () => {} }) {
 .rd-in.rd-on{background:#fff4d6;opacity:1}
 .rd-in span{font-size:28px}.rd-in b{font-size:12.5px}.rd-in small{font-size:11px;font-weight:600;color:#5b6675;line-height:1.2}
 `}</style>
-    </section>
+    </>
   );
 }

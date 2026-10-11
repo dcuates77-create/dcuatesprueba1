@@ -24,6 +24,7 @@ import ZonaJuegos from "./ZonaJuegos.jsx";
 import ZonaAliados from "./ZonaAliados.jsx";
 import ZonaRed from "./ZonaRed.jsx";
 import CaminoDcuates from "./CaminoDcuates.jsx";
+import TableroConoce from "./TableroConoce.jsx";
 import HoyDcuates, { QueSigue, guardarUltimo } from "./HoyDcuates.jsx";
 import { identidad } from "./datos/identidad.js";
 import { normalizarPremios } from "./datos/zona.js";
@@ -71,6 +72,11 @@ export default function App() {
   const [showMapaSitio, setShowMapaSitio] = useState(false);
   // Ventana de los botones Beneficios / Registros (null = cerrada)
   const [accesoAbierto, setAccesoAbierto] = useState(null);
+  useEffect(() => {
+    const f = (e) => { if (e.detail === "mapa") setShowMapaSitio(true); else if (e.detail) setAccesoAbierto(e.detail); };
+    window.addEventListener("dcuates:abrir-acceso", f);
+    return () => window.removeEventListener("dcuates:abrir-acceso", f);
+  }, []);
   // Los botones de Registros pueden pedir que se despliegue un registro (Ventas con causa / Extraviados).
   useEffect(() => {
     const alPedir = (e) => {
@@ -452,6 +458,7 @@ export default function App() {
               onAbrirCategoria={(id) => setCategoriaAbierta(id)}
               onAbrirProyecto={(id) => setModalProyecto(id)}
               onAcceso={(t) => (t === "proyectos" ? setShowMapaSitio(true) : setAccesoAbierto(t))}
+              accesosSlot={<><CaminoDcuates menu={{}} onAbrirProyecto={(id) => setModalProyecto(id)} /><HoyDcuates agenda={agendaEventos} filasZona={filasZona} onAbrirProyecto={(id) => setModalProyecto(id)} /></>}
               beneficios={<PestanaBeneficios setBusquedaAbierta={setBusquedaAbierta} setModalProyecto={setModalProyecto} setShowFAQ={setShowFAQ} setSolicitudExpandida={setSolicitudExpandida} solicitudExpandida={solicitudExpandida} />}
               valores={<PestanaValores infoAbierta={infoAbierta} librosLinks={librosLinks} musicaLinks={musicaLinks} recomendacionesComunidad={recomendacionesComunidad} recomendacionesDcuates={recomendacionesDcuates} setInfoAbierta={setInfoAbierta} setModalProyecto={setModalProyecto} videosLinks={videosLinks} />}
               negociosSeccion={<PestanaNegocios compraVentaDcuates={compraVentaDcuates} recomendacionesCompra={recomendacionesCompra} recomendacionesVenta={recomendacionesVenta} setVentasResumenAbierto={setVentasResumenAbierto} ventasResumenAbierto={ventasResumenAbierto} />}
@@ -466,8 +473,7 @@ export default function App() {
 
 
       {/* Accesos rápidos: Avisos y Beneficios · Compartir Más · Inicio */}
-      <CaminoDcuates menu={{ mapa: () => setShowMapaSitio(true) }} onAbrirProyecto={(id) => setModalProyecto(id)} />
-      <HoyDcuates agenda={agendaEventos} filasZona={filasZona} onAbrirProyecto={(id) => setModalProyecto(id)} />
+      <TableroConoce onAbrirProyecto={(id) => setModalProyecto(id)} onMapa={() => setShowMapaSitio(true)} />
       <ZonaJuegos
         onAbrirProyecto={(id) => setModalProyecto(id)}
         filas={filasEnlaces}

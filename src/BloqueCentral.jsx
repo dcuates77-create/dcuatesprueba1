@@ -397,7 +397,8 @@ export default function BloqueCentral({
   cargando = false,         // true mientras Baserow aún no responde (muestra esqueletos)
   onAbrirCategoria = () => {},
   onAbrirProyecto = () => {},
-  onAcceso = () => {}
+  onAcceso = () => {},
+  accesosSlot = null
 }) {
   const [idx, setIdx] = useState(0);
   const rootRef = useRef(null);
@@ -618,16 +619,8 @@ export default function BloqueCentral({
             <CarruselPortada items={portadasItems[tab.id] || []} tab={tab} fallback={imgs[tab.id]} cargando={cargando} />
           )}
 
+          {accesosSlot}
           <nav className="bc-accesos" aria-label="Accesos rápidos">
-            <button type="button" className="bc-acc bc-acc-pro" onClick={() => onAcceso("proyectos")}>
-              <span className="bc-acc-e" aria-hidden="true">🧭</span><span className="bc-acc-t">Proyectos</span>
-            </button>
-            <button type="button" className="bc-acc bc-acc-ben" onClick={() => onAcceso("beneficios")}>
-              <span className="bc-acc-e bc-latido" aria-hidden="true">💛</span><span className="bc-acc-t">Para ti</span>
-            </button>
-            <button type="button" className="bc-acc bc-acc-reg" onClick={() => onAcceso("registros")}>
-              <span className="bc-acc-e" aria-hidden="true">📝</span><span className="bc-acc-t">Registros</span>
-            </button>
             <button
               type="button"
               className="bc-acc bc-acc-largo"

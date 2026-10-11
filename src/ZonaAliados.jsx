@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import TiraAuto from "./TiraAuto.jsx";
+import Tablero, { abrirAcceso } from "./Tablero.jsx";
 import BotonCompartir from "./BotonCompartir.jsx";
 import { GOOGLE_SHEETS_URL, WHATSAPP_NUMERO } from "./datos/config.js";
 import { LOGROS_ITEMS } from "./datos/cintas.js";
@@ -36,7 +37,7 @@ function Acceso({ onCerrar, onEntrar }) {
           {error && <p className="pr-err" role="alert">{error}</p>}
           <button type="submit" className="pr-enviar">🔓 Entrar</button>
         </form>
-        <a className="in-btn in-sec2" href={wa("Hola, quisiera solicitar acceso a la Zona de Aliados, Patrocinadores, Voluntarios y Amigos de DCUATES.")} target="_blank" rel="noopener noreferrer">💬 Solicitar mi clave por WhatsApp</a>
+        <a className="in-btn in-sec2" href={wa("Hola, quiero unirme a la Zona de Aliados, Patrocinadores, Voluntarios y Amigos de DCUATES y solicitar mi clave. Mi nombre es: ___ · Me gustaría participar como (aliado / patrocinador / voluntario / amigo): ___ · Mi negocio u organización (si aplica): ___")} target="_blank" rel="noopener noreferrer">🤝 SOLICITAR UNIRME Y MI CLAVE</a>
         <p className="pr-nota">Nunca compartas tu clave con desconocidos. DCUATES jamás te la pedirá por mensaje.</p>
       </div>
     </div>
@@ -133,10 +134,14 @@ export default function ZonaAliados({ agenda = [] }) {
   const [perfil, setPerfil] = useState(leerPerfil);
   const [pidiendo, setPidiendo] = useState(null); // id de tarjeta pendiente o "_"
   const [abierta, setAbierta] = useState(null);
+  const [tablero, setTablero] = useState(false);
   useEffect(() => {
-    const oir = () => setPidiendo((x) => x || "_");
+    const oir = () => { setTablero(true); setPidiendo((x) => x || "_"); };
+    const oirT = (e) => { if (e.detail === "colabora") setTablero(true); };
     window.addEventListener("dcuates:abrir-acceso-aliados", oir);
-    return () => window.removeEventListener("dcuates:abrir-acceso-aliados", oir);
+    window.addEventListener("dcuates:abrir-tablero", oirT);
+    try { if (window.location.hash === "#zona-aliados") setTablero(true); } catch (e) {}
+    return () => { window.removeEventListener("dcuates:abrir-acceso-aliados", oir); window.removeEventListener("dcuates:abrir-tablero", oirT); };
   }, []);
   const P = perfil ? PERFILES[perfil] : null;
   const tocar = (t) => {
@@ -152,33 +157,26 @@ export default function ZonaAliados({ agenda = [] }) {
   const nombresPerfiles = (t) => t.perfiles === "todos" ? "Todos los perfiles" : t.perfiles.map((p) => PERFILES[p].nombre).join(", ");
 
   return (
-    <section className="zl-sec" id="zona-aliados" aria-label="Zona de aliados, patrocinadores, voluntarios y amigos">
-      <span className="zj-comp"><BotonCompartir hash="zona-aliados" titulo="Zona de aliados, patrocinadores, voluntarios y amigos" texto="Beneficios y contacto para quienes forman parte de la red DCUATES" variante="claro" /></span>
-      <p className="zl-paso">PASO 3 · COLABORA</p>
-      <h2 className="zl-tit">🔐 ZONA DE ALIADOS, PATROCINADORES, VOLUNTARIOS Y AMIGOS</h2>
-      {P ? (
-        <p className="zl-sub"><span style={{ background: P.color }}>{P.emoji} Perfil: {P.nombre}</span> <button type="button" onClick={salir}>Salir 🔒</button></p>
-      ) : (
-        <p className="zl-sub">Beneficios, reuniones y contacto directo con la administración. <button type="button" className="zl-ent" onClick={() => setPidiendo("_")}>🔑 Entrar con mi clave</button></p>
+    <>
+      {tablero && (
+        <Tablero
+          paso="PASO 3 · COLABORA" emoji="🤝" titulo="ALIADOS, PATROCINADORES, VOLUNTARIOS Y AMIGOS" color="#C2410C" hash="zona-aliados"
+          intro="Un espacio para quienes ya quieren sumar su colaboración: beneficios, reuniones, voluntariado y contacto directo con la administración. Entra con tu clave; si aún no la tienes, solicítala y te damos la bienvenida."
+          sub={P
+            ? <p className="tb-sub"><span style={{ background: P.color }}>{P.emoji} Perfil: {P.nombre}</span> <button type="button" onClick={salir}>Salir 🔒</button></p>
+            : <p className="tb-sub"><button type="button" className="tb-ent" onClick={() => setPidiendo("_")}>🔑 Entrar con mi clave</button></p>}
+          tarjetas={TARJETAS_ALIADOS.map((t) => { const ok = permitido(t, perfil); return { id: t.id, emoji: t.emoji, t: t.titulo, d: ok ? t.texto : `Solo para: ${nombresPerfiles(t)}.`, color: t.color, bloq: !ok, onClick: () => tocar(t) }; })}
+          onCerrar={() => setTablero(false)}
+          onRegistros={() => { setTablero(false); abrirAcceso("registros"); }}
+        />
       )}
-      <TiraAuto intervalo={4000} etiqueta="Zona de aliados" fondo="#fff">
-        {TARJETAS_ALIADOS.map((t) => {
-          const ok = permitido(t, perfil);
-          return (
-            <div className="zj-w" key={t.id}>
-              <article className={"zj-card" + (ok ? "" : " zl-bloq")} style={{ borderColor: t.color }}>
-                <span className="zj-ico" style={{ background: t.color }} aria-hidden="true">{ok ? t.emoji : "🔒"}</span>
-                <h3>{t.titulo}</h3>
-                <p>{ok ? t.texto : `Solo para: ${nombresPerfiles(t)}.`}</p>
-                <button type="button" onClick={() => tocar(t)} style={{ background: ok ? t.color : "#6b7785" }}>{ok ? "Abrir" : "🔒 Ingresar"}</button>
-              </article>
-            </div>
-          );
-        })}
-      </TiraAuto>
       {pidiendo && createPortal(<Acceso onCerrar={() => setPidiendo(null)} onEntrar={entrar} />, document.body)}
       {tarjeta && perfil && createPortal(<Ventana tarjeta={tarjeta} perfil={perfil} agenda={agenda} onCerrar={() => setAbierta(null)} />, document.body)}
       <style>{`
+.tb-sub{margin:0 0 8px;text-align:center}
+.tb-sub span{display:inline-block;border-radius:99px;padding:4px 12px;font-size:13px;font-weight:900;color:#fff}
+.tb-sub button{margin-left:6px;min-height:40px;border:0;border-radius:99px;padding:6px 14px;background:#1f2a37;color:#fff;font-family:inherit;font-size:13px;font-weight:900;cursor:pointer}
+.tb-ent{background:#C2410C!important}
 .zl-sec{position:relative;max-width:72rem;margin:12px auto 6px;padding:14px 16px 6px;border-radius:20px;background:linear-gradient(135deg,#1f2a37,#33415a);color:#fff}
 .zl-paso{margin:0;text-align:center;font-size:11px;font-weight:900;letter-spacing:.12em;color:#fcd34d}
 .zl-tit{margin:2px 36px 0;font-size:16px;font-weight:900;text-align:center;line-height:1.2}
@@ -194,6 +192,6 @@ export default function ZonaAliados({ agenda = [] }) {
 .ca-btns a,.ca-btns button{display:inline-grid;place-items:center;min-height:42px;padding:6px 12px;border:0;border-radius:12px;background:#2E9E5B;color:#fff;font-family:inherit;font-size:14px;font-weight:900;text-decoration:none;cursor:pointer}
 .ca-btns button{background:#1f2a37}
 `}</style>
-    </section>
+    </>
   );
 }

@@ -5,7 +5,7 @@ import { identidad } from "./datos/identidad.js";
 import { RETOS_DIA, NECESIDADES_BASE, retosDesdeZona, necesidadesDesdeZona, agendaDesdeZona } from "./datos/zona.js";
 
 const baja = (id) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
-const abrirZona = (id) => { baja("zona-publica"); setTimeout(() => window.dispatchEvent(new CustomEvent("dcuates:abrir-zona", { detail: id })), 450); };
+const abrirZona = (id) => window.dispatchEvent(new CustomEvent("dcuates:abrir-zona", { detail: id }));
 const hoyLocal = () => new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
 const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
 
@@ -23,7 +23,7 @@ export function QueSigue({ id, onIr, onCerrar }) {
     <div className="hy-sigue">
       <p>Tu siguiente paso</p>
       {sig && <button type="button" style={{ background: sig.color }} onClick={() => onIr(CICLO[(i + 1) % CICLO.length])}>{sig.emoji} Conoce: {sig.nombre} ›</button>}
-      <button type="button" style={{ background: "#E5484D" }} onClick={() => { onCerrar(); setTimeout(() => baja("zona-publica"), 120); }}>🎮 Participa: juega y gana en la Zona pública ›</button>
+      <button type="button" style={{ background: "#E5484D" }} onClick={() => { onCerrar(); setTimeout(() => window.dispatchEvent(new CustomEvent("dcuates:abrir-tablero", { detail: "participa" })), 120); }}>🎮 Participa: juega y gana en la Zona pública ›</button>
     </div>
   );
 }
@@ -69,7 +69,7 @@ export default function HoyDcuates({ agenda = [], filasZona = [], onAbrirProyect
         )}
       </div>
       <style>{`
-.hy-sec{max-width:72rem;margin:14px auto 6px;padding:12px 14px;border-radius:20px;background:#fffbea;border:2px solid #f3e3a6}
+.hy-sec{max-width:72rem;margin:10px auto 6px;padding:12px 14px;border-radius:20px;background:#fffbea;border:2px solid #f3e3a6}
 .hy-tit{margin:0 0 8px;font-size:17px;font-weight:900;text-align:center;color:#92610F}
 .hy-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .hy-c{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:10px 10px 10px;min-height:96px;border:2px solid var(--c);border-left-width:7px;border-radius:14px;background:#fff;font-family:inherit;color:#1f2a37;text-align:left;cursor:pointer}
