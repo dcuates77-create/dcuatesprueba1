@@ -619,7 +619,7 @@ export default function BloqueCentral({
             <CarruselPortada items={portadasItems[tab.id] || []} tab={tab} fallback={imgs[tab.id]} cargando={cargando} />
           )}
 
-          {accesosSlot}
+          <div style={{ "--tc": tab.boton || tab.color }}>{accesosSlot}</div>
           <nav className="bc-accesos" aria-label="Accesos rápidos">
             <button
               type="button"

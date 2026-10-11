@@ -24,8 +24,8 @@ export default function CaminoDcuates({ menu = {}, onAbrirProyecto = () => {} })
     <section className="cm-sec" aria-label="Tu camino en DCUATES">
       <h2 className="cm-tit">🧭 CAMINO DCUATES</h2>
       <ol className="cm-pasos">
-        {PASOS.map(([n, e, t, d, c, fn]) => (
-          <li key={n}><button type="button" onClick={fn} style={{ "--c": c }}><span className="cm-n">{n}</span><span className="cm-e">{e}</span><b>{t}</b><small>{d}</small></button></li>
+        {PASOS.map(([n, e, t, d, c, fn], i) => (
+          <li key={n}><button type="button" onClick={fn} style={{ "--c": c }}><span className="cm-n">{n}</span><span className="cm-e pz-e" style={{ "--d": `${[0, 0.6, 1.8, 1.2][i]}s`, "--dd": `${i * 0.6}s` }}>{e}</span><b>{t}</b><small>{d}</small></button></li>
         ))}
       </ol>
       <p className="cm-soy">¿Cómo quieres sumarte?</p>
@@ -33,21 +33,24 @@ export default function CaminoDcuates({ menu = {}, onAbrirProyecto = () => {} })
         {SOY.map(([e, t, c, fn]) => <button type="button" key={t} onClick={fn} style={{ background: c }}><span>{e}</span>{t}</button>)}
       </div>
       <style>{`
-.cm-sec{max-width:72rem;margin:14px auto 6px;padding:14px 14px 12px;border-radius:20px;background:#fff;border:2px solid #e3e8e5}
-.cm-tit{margin:0 0 8px;font-size:17px;font-weight:900;text-align:center;color:#1f2a37}
-.cm-pasos{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
-.cm-pasos button{position:relative;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;gap:1px;padding:8px 3px 6px;border:2px solid var(--c);border-radius:14px;background:#fff;font-family:inherit;color:#1f2a37;cursor:pointer}
+.cm-sec{max-width:72rem;margin:12px auto 6px;padding:14px 12px 12px;border-radius:20px;background:var(--tc,#1B6F8A);border:2px solid rgba(255,255,255,.35);box-shadow:0 6px 16px rgba(0,0,0,.18)}
+.cm-tit{margin:0 0 10px;font-size:19px;font-weight:900;text-align:center;color:#fff;letter-spacing:.02em}
+.cm-pasos{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 8px}
+.cm-pasos button{position:relative;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 3px 8px;border:2px solid var(--c);border-left-width:7px;border-radius:14px;background:#fff;font-family:inherit;color:#1f2a37;cursor:pointer;box-shadow:0 5px 12px rgba(0,0,0,.25)}
 .cm-pasos button:active{background:var(--c);color:#fff}
-.cm-n{position:absolute;top:-8px;left:-6px;width:20px;height:20px;border-radius:50%;background:var(--c);color:#fff;font-size:11px;font-weight:900;display:grid;place-items:center}
-.cm-e{font-size:22px}
-.cm-pasos b{font-size:11px;font-weight:900;letter-spacing:.03em}
-.cm-pasos small{font-size:9.5px;font-weight:700;line-height:1.15;text-align:center;color:#5b6675}
-.cm-soy{margin:12px 0 6px;text-align:center;font-size:13px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;color:#6b7785}
-.cm-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.cm-grid button{min-height:52px;display:flex;align-items:center;gap:6px;padding:6px 10px;border:0;border-radius:14px;color:#fff;font-family:inherit;font-size:13px;font-weight:900;line-height:1.15;text-align:left;cursor:pointer}
+.cm-n{position:absolute;top:-9px;left:-10px;width:22px;height:22px;border-radius:50%;background:var(--c);color:#fff;font-size:12px;font-weight:900;display:grid;place-items:center;border:2px solid #fff}
+.cm-e{font-size:32px;line-height:1.1}
+.cm-pasos b{font-size:15px;font-weight:900;letter-spacing:.02em}
+.cm-pasos small{font-size:12px;font-weight:700;line-height:1.15;text-align:center;color:#4a5564}
+.cm-soy{margin:14px 0 8px;text-align:center;font-size:14.5px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;color:#fff}
+.cm-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.cm-grid button{min-height:58px;display:flex;align-items:center;gap:7px;padding:6px 10px;border:2px solid rgba(255,255,255,.9);border-radius:14px;color:#fff;font-family:inherit;font-size:15px;font-weight:900;line-height:1.15;text-align:left;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,.22)}
 .cm-grid button:last-child{grid-column:1/-1;justify-content:center;text-align:center}
-.cm-grid span{font-size:22px}
-@media(min-width:640px){.cm-grid{grid-template-columns:repeat(5,1fr)}.cm-grid button:last-child{grid-column:auto}}
+.cm-grid span{font-size:24px}
+.pz-e{display:inline-block;animation:pz-latido 4.8s ease-in-out infinite;animation-delay:var(--d,0s)}
+@keyframes pz-latido{0%{transform:scale(1);filter:none}4%{transform:scale(1.45);filter:drop-shadow(0 0 7px #ffd84d)}12%{transform:scale(1);filter:none}100%{transform:scale(1);filter:none}}
+@media(prefers-reduced-motion:reduce){.pz-e{animation:none}}
+@media(min-width:640px){.cm-pasos{grid-template-columns:repeat(4,minmax(0,1fr))}.cm-grid{grid-template-columns:repeat(5,1fr)}.cm-grid button:last-child{grid-column:auto}.pz-e{animation-delay:var(--dd,0s)}}
 `}</style>
     </section>
   );
