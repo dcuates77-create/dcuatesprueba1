@@ -320,7 +320,8 @@ export function BotonNecesidades({ onAbrirProyecto, onAccionEspecial, onAbrirFAQ
   const alTocarPregunta = (p) => {
     registrar("necesidad", { tema: String(p.texto).slice(0, 50) });
     cerrarTodo();
-    if (p.modal) onAbrirProyecto && onAbrirProyecto(p.modal);
+    if (p.evento === "servicios") setTimeout(() => window.dispatchEvent(new CustomEvent("dcuates:abrir-servicios")), 120);
+    else if (p.modal) onAbrirProyecto && onAbrirProyecto(p.modal);
     else if (p.action) onAccionEspecial && onAccionEspecial(p.action);
     else if (p.enlace) window.open(p.enlace, "_blank", "noopener,noreferrer");
   };

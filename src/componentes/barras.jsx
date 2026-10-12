@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { BotonCerrar } from "./legal.jsx";
+import BotonCompartir from "../BotonCompartir.jsx";
 import { IframeVideo } from "./media.jsx";
 import { LOGROS_ITEMS, LOGROS_FIJOS, TICKER_ETIQUETAS, TICKER_FRASES } from "../datos/cintas.js";
 import { detectarVideo, enlaceWhatsApp, esPDF, paresBaserow, urlDesdeCeldaBaserow, useCarruselAutomatico, useFilasEnlaces } from "../utilidades/baserow.js";
@@ -235,9 +236,12 @@ export function BarraPatrocinadores() {
   return (
     <div className="bg-[#17472d] py-5 px-4 border-t-4 border-b-4 border-[#0f2d1e]">
       <div className="mx-auto max-w-6xl">
-        <p className="text-emerald-300 font-black uppercase text-lg sm:text-2xl tracking-wide text-center mb-3 px-2 leading-snug">
-          Muchas gracias a nuestros Patrocinadores y Amigos por su valiosa confianza y apoyo ⭐⭐⭐⭐⭐
-        </p>
+        <div className="relative">
+          <p className="text-emerald-300 font-black uppercase text-lg sm:text-2xl tracking-wide text-center mb-3 px-12 leading-snug">
+            Muchas gracias a nuestros Patrocinadores y Amigos por su valiosa confianza y apoyo ⭐⭐⭐⭐⭐
+          </p>
+          <span className="absolute top-0 right-0"><BotonCompartir hash="patrocinadores" titulo="Gracias a nuestros Patrocinadores y Amigos" texto="Muchas gracias a quienes confían y apoyan a DCUATES" variante="claro" /></span>
+        </div>
         <div
           ref={scrollRef}
           onPointerDown={onPointerDown}
