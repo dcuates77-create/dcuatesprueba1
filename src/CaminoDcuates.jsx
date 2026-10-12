@@ -16,7 +16,7 @@ export default function CaminoDcuates({ menu = {}, onAbrirProyecto = () => {} })
   ];
   const SOY = [
     ["🏘️", "Soy vecino o vecina", "#2E9E5B", () => abrirZona("empieza")],
-    ["🏪", "Tengo un negocio", identidad("publicidad-tarjeta").color, () => onAbrirProyecto("publicidad-tarjeta")],
+    ["🏪", "Tengo un negocio", identidad("publicidad-tarjeta").color, () => abrirZona("negocio")],
     ["🙋", "Quiero ser voluntario(a)", "#334155", () => onAbrirProyecto("donaciones")],
     ["🎁", "Quiero donar o ayudar", "#BE185D", () => abrirZona("causa")],
     ["🌟", "Quiero ser aliado o patrocinador", "#B7791F", () => window.dispatchEvent(new CustomEvent("dcuates:abrir-acceso-aliados"))]

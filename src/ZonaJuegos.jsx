@@ -6,6 +6,8 @@ import { createPortal } from "react-dom";
 import TiraAuto from "./TiraAuto.jsx";
 import BotonCompartir from "./BotonCompartir.jsx";
 import { guardarUltimo, NOMBRE_ZONA } from "./HoyDcuates.jsx";
+import Negocio from "./ZonaNegocio.jsx";
+import { abrirServicios, abrirLogros, abrirDespues } from "./Extras.jsx";
 import { useAtras } from "./atras.js";
 import Tablero, { abrirAcceso } from "./Tablero.jsx";
 import { PasoCtx, SiguientePaso } from "./ZonaPaso.jsx";
@@ -121,6 +123,33 @@ const PALABRAS = [
   ["🌼", "Recuerdo", "Recordar con cariño a quienes ya no están es una forma de mantenerlos cerca."]
 ];
 
+const abrirZona = (id) => window.dispatchEvent(new CustomEvent("dcuates:abrir-zona", { detail: id }));
+const OPC_HACER = [
+  ["libros", "Leer o aprender algo"],
+  ["ecatepets", "Ayudar a quien lo necesita (peluditos)"],
+  ["circulo-confianza", "Convivir y conocer gente de confianza"],
+  ["cupones-promos", "Ahorrar con descuentos locales"],
+  ["ventas-con-causa", "Comprar o vender con causa"],
+  ["bazares", "Participar en un bazar o trueque"],
+  ["asesorias", "Recibir orientación educativa o laboral"],
+  ["bienestar", "Tomar un taller o cuidar mi bienestar"],
+  ["donaciones", "Dar mi tiempo como voluntario(a)"],
+  ["noticias", "Enterarme de lo que pasa en mi colonia"],
+  ["recomienda-evalua-gana", "Recomendar un servicio y ganar"]
+];
+const OPC_NUEVO = [
+  ["libros", "Pedir prestado o donar un libro"],
+  ["ecatepets", "Adoptar, reportar o ayudar a un peludito"],
+  ["cupones-promos", "Descuentos en negocios de mi colonia"],
+  ["asesorias", "Asesoría educativa o laboral gratuita"],
+  ["bienestar", "Talleres, cursos y bienestar"],
+  ["circulo-confianza", "Recomendaciones de servicios de confianza"],
+  ["noticias", "Noticias y avisos de mi barrio"],
+  ["bazares", "Bazares y trueques"],
+  ["ventas-con-causa", "Comprar algo que apoya una causa"],
+  ["donaciones", "Ser voluntario(a) o donar"]
+];
+
 function Empieza({ onCerrar, onAbrirProyecto, alSumar, palabras, retos }) {
   const hoyTxt = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
   const listaRetos = retos && retos.length ? retos : RETOS_DIA;
@@ -129,19 +158,13 @@ function Empieza({ onCerrar, onAbrirProyecto, alSumar, palabras, retos }) {
   const cumplir = () => { try { localStorage.setItem("dc_reto", hoyTxt); } catch (e) {} setRetoHecho(true); const t = sumarSemillas(1); alSumar && alSumar(t); };
   const LISTA = palabras && palabras.length ? palabras : PALABRAS;
   const [vista, setVista] = useState("menu"); // menu | animo | nuevo | palabra
-  const [paso, setPaso] = useState(0);
-  const [animo, setAnimo] = useState(null);
+    const [animo, setAnimo] = useState(null);
   const [pal, setPal] = useState(null);
   const [dato, setDato] = useState(null);
   const sumar = () => { const t = sumarSemillas(1); alSumar && alSumar(t); };
   const ir = (id) => { onCerrar(); onAbrirProyecto(id); };
   const wa = (t) => `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(t)}`;
-  const volver = <button type="button" className="zj-link" onClick={() => { setVista("menu"); setAnimo(null); setPal(null); setPaso(0); setDato(null); }}>‹ Volver</button>;
-  const BIENVENIDA = [
-    ["🏠", "Esto es DCUATES", "Una comunidad que genera proyectos sociales, cultiva amistades y apoya a personas, grupos y causas. Llevamos 19 años creciendo juntos."],
-    ["🎮", "Juega, participa y suma", "Jugar, opinar y ayudar te da Semillas 🌱. Con ellas subes de nivel: Semilla, Brote, Árbol, Fruto y Bosque."],
-    ["🧭", "Elige por dónde empezar", null]
-  ];
+  const volver = <button type="button" className="zj-link" onClick={() => { setVista("menu"); setAnimo(null); setPal(null); setDato(null); }}>‹ Volver</button>;
   return (
     <div className="zj-fondo" role="dialog" aria-modal="true" aria-label="Empieza aquí" onClick={(e) => { if (e.target === e.currentTarget) onCerrar(); }}>
       <div className="zj-caja">
@@ -149,12 +172,13 @@ function Empieza({ onCerrar, onAbrirProyecto, alSumar, palabras, retos }) {
         {vista === "menu" && (
           <div className="zj-menu">
             <p className="zj-p">Pasos de un solo clic para conocernos. ¡Varios suman una Semilla! 🌱</p>
-            <button type="button" onClick={() => setVista("reto")}>🎯 Mi reto de hoy</button>
             <button type="button" onClick={() => setVista("nuevo")}>🧭 Soy nuevo: ¿por dónde empiezo?</button>
             <button type="button" onClick={() => setVista("hacer")}>🙋 ¿Qué te gustaría hacer?</button>
             <button type="button" onClick={() => setVista("animo")}>😊 ¿Cómo estás hoy?</button>
             <button type="button" onClick={() => setVista("palabra")}>🌟 Elige tu palabra de hoy</button>
+            <button type="button" onClick={() => setVista("reto")}>🎯 Mi reto de hoy</button>
             <button type="button" onClick={() => { setDato(LOGROS_ITEMS[Math.floor(Math.random() * LOGROS_ITEMS.length)]); setVista("dato"); sumar(); }}>💡 Un dato curioso de DCUATES</button>
+            <button type="button" style={{ background: "#7a5ad8" }} onClick={() => abrirDespues(onCerrar, abrirServicios)}>💼 Servicios y promociones especiales</button>
           </div>
         )}
         {vista === "animo" && (
@@ -184,9 +208,12 @@ function Empieza({ onCerrar, onAbrirProyecto, alSumar, palabras, retos }) {
             {volver}
             <p className="zj-p">Cuéntanos qué te gustaría hacer:</p>
             <div className="zj-col">
-              {[["libros", "Leer o aprender algo"], ["ecatepets", "Ayudar a quien lo necesita"], ["circulo-confianza", "Convivir y conocer gente de confianza"], ["cupones-promos", "Ahorrar o vender en mi colonia"]].map(([id, t]) => (
+              {OPC_HACER.map(([id, t]) => (
                 <button type="button" key={id} style={{ background: identidad(id).color }} onClick={() => ir(id)}>{identidad(id).emoji} {t}</button>
               ))}
+              <button type="button" style={{ background: "#E5484D" }} onClick={() => abrirDespues(onCerrar, () => abrirZona("gana"))}>🏆 Jugar y ganar cupones o regalos</button>
+              <button type="button" style={{ background: "#7a5ad8" }} onClick={() => abrirDespues(onCerrar, abrirServicios)}>💼 Conocer servicios y promociones especiales</button>
+              <a className="in-btn" style={{ background: "#25a244" }} href={wa("¡Hola! Te invito a conocer la comunidad DCUATES: dcuates.com 💛")} target="_blank" rel="noopener noreferrer">📲 Invitar a un vecino por WhatsApp</a>
             </div>
           </div>
         )}
@@ -213,21 +240,21 @@ function Empieza({ onCerrar, onAbrirProyecto, alSumar, palabras, retos }) {
           <div>
             {volver}
             <div className="zj-resp zj-bien">
-              <p className="zj-bien-e">{BIENVENIDA[paso][0]}</p>
-              <p><b>{BIENVENIDA[paso][1]}</b></p>
-              {BIENVENIDA[paso][2] && <p>{BIENVENIDA[paso][2]}</p>}
-              {paso === 2 && (
-                <div className="zj-col">
-                  <button type="button" style={{ background: identidad("libros").color }} onClick={() => ir("libros")}>📚 Quiero un libro</button>
-                  <button type="button" style={{ background: identidad("ecatepets").color }} onClick={() => ir("ecatepets")}>🐾 Quiero ayudar a un peludito</button>
-                  <button type="button" style={{ background: identidad("cupones-promos").color }} onClick={() => ir("cupones-promos")}>🏷️ Busco descuentos locales</button>
-                </div>
-              )}
+              <p className="zj-bien-e">🧭</p>
+              <p><b>Elige por dónde empezar</b></p>
+              <p>DCUATES es una comunidad de vecinos que se apoyan, con 19 años creciendo juntos. Todo esto puedes aprovecharlo y compartirlo con quien lo necesite:</p>
             </div>
-            <div className="zj-nav">
-              <button type="button" disabled={paso === 0} onClick={() => setPaso((p) => p - 1)}>‹</button>
-              <span>{paso + 1} / 3</span>
-              <button type="button" disabled={paso === 2} onClick={() => { setPaso((p) => p + 1); if (paso === 1) sumar(); }}>›</button>
+            <p className="zj-et">Para ti y tu familia</p>
+            <div className="zj-col">
+              {OPC_NUEVO.map(([id, t]) => <button type="button" key={id} style={{ background: identidad(id).color }} onClick={() => ir(id)}>{identidad(id).emoji} {t}</button>)}
+            </div>
+            <p className="zj-et">Para compartir y participar</p>
+            <div className="zj-col">
+              <a className="in-btn" style={{ background: "#25a244" }} href={wa("¡Hola! Te comparto DCUATES, una comunidad de apoyo mutuo con libros, asesorías, mascotas, cupones y más: dcuates.com 💛")} target="_blank" rel="noopener noreferrer">📲 Compartir DCUATES con un vecino</a>
+              <button type="button" style={{ background: "#E5484D" }} onClick={() => abrirDespues(onCerrar, () => abrirZona("gana"))}>🏆 Jugar y ganar cupones o regalos</button>
+              <button type="button" style={{ background: "#C2410C" }} onClick={() => abrirDespues(onCerrar, () => abrirZona("info"))}>📌 Teléfonos de emergencia y agenda</button>
+              <button type="button" style={{ background: "#B7791F" }} onClick={() => abrirDespues(onCerrar, abrirLogros)}>🏆 Sé parte de nuestros logros</button>
+              <button type="button" style={{ background: "#7a5ad8" }} onClick={() => abrirDespues(onCerrar, abrirServicios)}>💼 Servicios y promociones especiales</button>
             </div>
           </div>
         )}
@@ -275,7 +302,7 @@ export default function ZonaJuegos({ onAbrirProyecto: abrirProy = () => {}, fila
     setAbierto(null); setTablero(false); setTimeout(() => window.dispatchEvent(new CustomEvent("dcuates:abrir-tablero", { detail: "colabora" })), 120);
   };
   useEffect(() => {
-    const oir = (e) => { const id = e.detail; if (["empieza", "juegos", "aprende", "gana", "propon", "causa", "info"].includes(id)) setAbierto(id); };
+    const oir = (e) => { const id = e.detail; if (["empieza", "juegos", "aprende", "gana", "propon", "causa", "info", "negocio"].includes(id)) setAbierto(id); };
     const oirT = (e) => { if (e.detail === "participa") setTablero(true); };
     window.addEventListener("dcuates:abrir-zona", oir);
     window.addEventListener("dcuates:abrir-tablero", oirT);
@@ -306,7 +333,8 @@ export default function ZonaJuegos({ onAbrirProyecto: abrirProy = () => {}, fila
       <PasoCtx.Provider value={{ irA }}>
       {abierto === "juegos" && createPortal(<Marco juegos={juegos} onCerrar={cerrar} onAbrirProyecto={onAbrirProyecto} alSumar={setSemillas} />, document.body)}
       {abierto === "empieza" && createPortal(<Empieza onCerrar={cerrar} onAbrirProyecto={onAbrirProyecto} alSumar={setSemillas} palabras={palabras} retos={retos} />, document.body)}
-      {abierto && !["juegos", "empieza"].includes(abierto) && createPortal(sus, document.body)}
+      {abierto === "negocio" && createPortal(<Negocio onCerrar={cerrar} onAbrirProyecto={onAbrirProyecto} />, document.body)}
+      {abierto && !["juegos", "empieza", "negocio"].includes(abierto) && createPortal(sus, document.body)}
       </PasoCtx.Provider>
       <style>{CSS}</style>
     </>

@@ -1,11 +1,10 @@
 // HOY EN DCUATES — panel que une la página: reto del día, próximo evento, una necesidad abierta y "Seguías en…".
 // También exporta QueSigue (pie "Tu siguiente paso" dentro de cada ventana de proyecto).
 import React, { useMemo, useState } from "react";
-import { createPortal } from "react-dom";
-import { WHATSAPP_NUMERO } from "./datos/config.js";
 import BotonCompartir from "./BotonCompartir.jsx";
 import { useAtras } from "./atras.js";
 import { abrirAcceso } from "./Tablero.jsx";
+import { abrirLogros } from "./Extras.jsx";
 import { identidad } from "./datos/identidad.js";
 import { RETOS_DIA, NECESIDADES_BASE, retosDesdeZona, necesidadesDesdeZona, agendaDesdeZona } from "./datos/zona.js";
 
@@ -17,7 +16,7 @@ const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "o
 export function guardarUltimo(t, id, n) { try { localStorage.setItem("dc_ultimo", JSON.stringify({ t, id, n })); } catch (e) {} try { window.dispatchEvent(new Event("dcuates:ultimo")); } catch (e) {} }
 const leerUltimo = () => { try { return JSON.parse(localStorage.getItem("dc_ultimo") || "null"); } catch (e) { return null; } };
 
-export const NOMBRE_ZONA = { empieza: "👋 Empieza aquí", juegos: "🎉 Juega y diviértete", aprende: "🧠 Juega y aprende", gana: "🏆 Juega y gana", propon: "💡 Recomienda y gana", causa: "🛍️ Dona, compra y vende con causa", info: "📌 Info clave" };
+export const NOMBRE_ZONA = { empieza: "👋 Empieza aquí", juegos: "🎉 Juega y diviértete", aprende: "🧠 Juega y aprende", gana: "🏆 Juega y gana", propon: "💡 Recomienda y gana", causa: "🛍️ Dona, compra y vende con causa", info: "📌 Info clave", negocio: "🏪 Tengo un negocio" };
 
 const CICLO = ["libros", "asesorias", "bienestar", "noticias", "recomienda-evalua-gana", "circulo-confianza", "alianzas-tarjeta", "publicidad-tarjeta", "bazares", "ventas-con-causa", "ecatepets", "donaciones"];
 
@@ -43,18 +42,7 @@ export default function HoyDcuates({ agenda = [], filasZona = [], onAbrirProyect
   const necesidades = useMemo(() => { const z = necesidadesDesdeZona(filasZona); return z.length ? z : NECESIDADES_BASE; }, [filasZona]);
   const nec = necesidades.length ? necesidades[dia % necesidades.length] : null;
   const fechaTxt = (f) => { const [, m, d] = f.split("-"); return `${Number(d)} ${MESES[Number(m) - 1]}`; };
-  const [servicios, setServicios] = useState(false);
   const [abierto, setAbierto] = useState(false);
-  useAtras(servicios, () => setServicios(false));
-  const SERV = [
-    ["🎯", "Coaching personal y de equipos"],
-    ["📈", "Consultoría y asesoría de negocios"],
-    ["🏫", "Asesoría a organizaciones educativas"],
-    ["🏢", "Acompañamiento a empresas y organizaciones privadas"],
-    ["🏛️", "Apoyo a instituciones de gobierno"],
-    ["🏷️", "Promociones especiales para la comunidad"]
-  ];
-  const wa = `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent("Hola, me interesa recibir informes de los servicios y promociones especiales de DCUATES (coaching, consultoría y asesoría). Mi nombre es: ___ · Me interesa para: ___")}`;
   return (
     <section className="hy-sec" id="hoy-dcuates" aria-label="Hoy en DCUATES">
       <span className="hy-comp"><BotonCompartir hash="hoy-dcuates" titulo="Hoy en DCUATES" texto="El reto del día, los eventos y lo que se necesita hoy en la comunidad" variante="claro" /></span>
@@ -76,21 +64,11 @@ export default function HoyDcuates({ agenda = [], filasZona = [], onAbrirProyect
           <span className="hy-e pz-e" style={{ "--d": "4.2s", "--dd": "3.6s" }}>{nec ? nec.emoji : "🎁"}</span><small>SE NECESITA HOY</small><b>{nec ? nec.titulo : "Mira cómo ayudar"}</b>
           <em className="hy-sub">También: croquetas, difusión y…</em>
         </button>
-        <button type="button" className="hy-c" style={{ "--c": "#7a5ad8" }} onClick={() => setServicios(true)}>
-          <span className="hy-e pz-e" style={{ "--d": "3.6s", "--dd": "4.2s" }}>💼</span><small>NUEVO</small><b>SERVICIOS Y PROMOCIONES ESPECIALES</b>
+        <button type="button" className="hy-c" style={{ "--c": "#7a5ad8" }} onClick={abrirLogros}>
+          <span className="hy-e pz-e" style={{ "--d": "3.6s", "--dd": "4.2s" }}>🏆</span><small>ÚNETE</small><b>SÉ PARTE DE NUESTROS LOGROS</b>
         </button>
       </div>
       )}
-      {servicios && createPortal(
-        <div className="zj-fondo" role="dialog" aria-modal="true" aria-label="Servicios y promociones especiales" onClick={(e) => { if (e.target === e.currentTarget) setServicios(false); }}>
-          <div className="zj-caja">
-            <div className="zj-cab"><b>💼 Servicios y promociones especiales</b><button type="button" className="zj-x" onClick={() => setServicios(false)} aria-label="Cerrar">✕</button></div>
-            <p className="zj-p">Además de los apoyos comunitarios, DCUATES y Conexiones con Causa ofrecen servicios y promociones especiales para personas, negocios y organizaciones. Esta lista se irá completando; mientras tanto, pide informes y te orientamos.</p>
-            <p className="zj-et">Algunas áreas (por definir)</p>
-            <div className="hy-serv">{SERV.map(([e, t]) => <div className="ag-ev" key={t}><b>{e} {t}</b></div>)}</div>
-            <a className="in-btn" href={wa} target="_blank" rel="noopener noreferrer">💬 Pedir informes por WhatsApp</a>
-          </div>
-        </div>, document.body)}
       <style>{`
 .hy-comp{position:absolute;top:26px;right:14px;z-index:4}
 .hy-sec{position:relative;max-width:72rem;margin:10px auto 6px;padding:10px 10px 10px;border-radius:20px;background:color-mix(in srgb,var(--tc,#1B6F8A) 62%,#000);border:2px solid rgba(255,255,255,.3);box-shadow:0 6px 16px rgba(0,0,0,.18)}
@@ -122,16 +100,19 @@ export default function HoyDcuates({ agenda = [], filasZona = [], onAbrirProyect
 
 export function BotonRegistrate() {
   return (
-    <>
-      <button type="button" className="rg-btn" onClick={() => abrirAcceso("registros")}>
-        <span className="rg-e" aria-hidden="true">📝</span>
-        <span className="rg-t"><b>REGÍSTRATE Y PARTICIPA</b><small>Pide o suma: ayuda, negocio, voluntariado</small></span>
+    <div className="rp-wrap">
+      <button type="button" className="rp-btn" onClick={() => abrirAcceso("registros")}>
+        <span className="rp-e" aria-hidden="true">📝</span>
+        <span className="rp-t"><b>REGÍSTRATE Y PARTICIPA</b><small>Pide o suma: ayuda, negocio, voluntariado</small></span>
       </button>
+      <span className="rp-comp"><BotonCompartir hash="registrate" titulo="Regístrate y participa en DCUATES" texto="Cuéntanos qué necesitas o qué puedes ofrecer a la comunidad" variante="claro" /></span>
       <style>{`
-.rg-btn{width:100%;display:flex;align-items:center;gap:12px;min-height:76px;margin:10px 0 0;padding:8px 14px;border:2px solid #fff;border-bottom-width:6px;border-radius:18px;background:#1F7A46;color:#fff;font-family:inherit;text-align:left;cursor:pointer;box-shadow:0 5px 12px rgba(0,0,0,.25)}
-.rg-e{width:44px;height:44px;flex:none;display:grid;place-items:center;border-radius:14px;background:#fff;font-size:24px}
-.rg-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.rg-t b{display:block;white-space:normal;overflow:visible;text-overflow:clip;font-size:16px;font-weight:900}.rg-t small{display:block;white-space:normal;overflow:visible;text-overflow:clip;font-size:12.5px;font-weight:700;line-height:1.2;color:#e3f6ea}
+.rp-wrap{position:relative}
+.rp-comp{position:absolute;top:50%;right:10px;margin-top:-18px;z-index:3}
+.rp-btn{width:100%;display:flex;align-items:center;gap:12px;min-height:76px;margin:10px 0 0;padding:8px 56px 8px 14px;border:2px solid #fff;border-bottom-width:6px;border-radius:18px;background:#1F7A46;color:#fff;font-family:inherit;text-align:left;cursor:pointer;box-shadow:0 5px 12px rgba(0,0,0,.25)}
+.rp-e{width:44px;height:44px;flex:none;display:grid;place-items:center;border-radius:14px;background:#fff;font-size:24px}
+.rp-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.rp-t b{display:block;white-space:normal;overflow:visible;text-overflow:clip;font-size:16px;font-weight:900}.rp-t small{display:block;white-space:normal;overflow:visible;text-overflow:clip;font-size:12.5px;font-weight:700;line-height:1.2;color:#e3f6ea}
 `}</style>
-    </>
+    </div>
   );
 }

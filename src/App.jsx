@@ -27,6 +27,7 @@ import CaminoDcuates from "./CaminoDcuates.jsx";
 import TableroConoce from "./TableroConoce.jsx";
 import HoyDcuates, { QueSigue, guardarUltimo, BotonRegistrate } from "./HoyDcuates.jsx";
 import InstalarApp from "./InstalarApp.jsx";
+import Extras from "./Extras.jsx";
 import { identidad } from "./datos/identidad.js";
 import { useAtras } from "./atras.js";
 import { normalizarPremios } from "./datos/zona.js";
@@ -490,6 +491,7 @@ export default function App() {
 
       {/* Accesos rápidos: Avisos y Beneficios · Compartir Más · Inicio */}
       <TableroConoce />
+      <Extras logros={logrosBanda} />
       <ZonaJuegos
         onAbrirProyecto={(id) => setModalProyecto(id)}
         filas={filasEnlaces}

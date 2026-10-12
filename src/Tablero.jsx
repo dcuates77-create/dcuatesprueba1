@@ -3,6 +3,7 @@
 import React from "react";
 import { createPortal } from "react-dom";
 import BotonCompartir from "./BotonCompartir.jsx";
+import { abrirServicios } from "./Extras.jsx";
 
 export const abrirAcceso = (tipo) => window.dispatchEvent(new CustomEvent("dcuates:abrir-acceso", { detail: tipo }));
 export const abrirTablero = (id) => window.dispatchEvent(new CustomEvent("dcuates:abrir-tablero", { detail: id }));
@@ -28,6 +29,11 @@ export default function Tablero({ paso, emoji, titulo, intro, color = "#1B6F8A",
               {lista && <span className="tb-go" aria-hidden="true">›</span>}
             </button>
           ))}
+          <button type="button" className="tb-card" style={{ "--c": "#7a5ad8" }} onClick={() => { onCerrar(); setTimeout(abrirServicios, 90); }}>
+            <span className="tb-e" aria-hidden="true">💼</span>
+            <span className="tb-t"><b>SERVICIOS Y PROMOCIONES ESPECIALES</b><small>Coaching, consultoría, asesoría y promociones para la comunidad</small></span>
+            {lista && <span className="tb-go" aria-hidden="true">›</span>}
+          </button>
           <button type="button" className="tb-card tb-reg" style={{ "--c": "#2E9E5B" }} onClick={onRegistros}>
             <span className="tb-e" aria-hidden="true">📝</span>
             <span className="tb-t"><b>REGÍSTRATE Y PARTICIPA</b>
