@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import TiraAuto from "./TiraAuto.jsx";
+import { useAtras } from "./atras.js";
 import Tablero, { abrirAcceso } from "./Tablero.jsx";
 import BotonCompartir from "./BotonCompartir.jsx";
 import { GOOGLE_SHEETS_URL, WHATSAPP_NUMERO } from "./datos/config.js";
@@ -135,6 +136,9 @@ export default function ZonaAliados({ agenda = [] }) {
   const [pidiendo, setPidiendo] = useState(null); // id de tarjeta pendiente o "_"
   const [abierta, setAbierta] = useState(null);
   const [tablero, setTablero] = useState(false);
+  useAtras(tablero, () => setTablero(false));
+  useAtras(!!pidiendo, () => setPidiendo(null));
+  useAtras(!!abierta, () => setAbierta(null));
   useEffect(() => {
     const oir = () => { setTablero(true); setPidiendo((x) => x || "_"); };
     const oirT = (e) => { if (e.detail === "colabora") setTablero(true); };

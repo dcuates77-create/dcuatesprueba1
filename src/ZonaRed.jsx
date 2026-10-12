@@ -1,6 +1,7 @@
 // RED DE CONFIANZA (3er nivel) — actividades INDIVIDUALES por invitación. Todo se guarda en el celular de cada persona.
 import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { useAtras } from "./atras.js";
 import Tablero, { abrirAcceso } from "./Tablero.jsx";
 import BotonCompartir from "./BotonCompartir.jsx";
 import { GOOGLE_SHEETS_URL, WHATSAPP_NUMERO } from "./datos/config.js";
@@ -221,6 +222,9 @@ export default function ZonaRed({ onAbrirProyecto: abrirProy = () => {} }) {
   const [pidiendo, setPidiendo] = useState(null);
   const [abierta, setAbierta] = useState(null);
   const [tablero, setTablero] = useState(false);
+  useAtras(tablero, () => setTablero(false));
+  useAtras(!!pidiendo, () => setPidiendo(null));
+  useAtras(!!abierta, () => setAbierta(null));
   const onAbrirProyecto = (id) => { setTablero(false); setAbierta(null); abrirProy(id); };
   useEffect(() => {
     const oirT = (e) => { if (e.detail === "crece") setTablero(true); };

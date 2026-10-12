@@ -2,6 +2,8 @@
 import React from "react";
 import { identidad } from "./datos/identidad.js";
 import { abrirTablero } from "./Tablero.jsx";
+import BotonCompartir from "./BotonCompartir.jsx";
+import InstalarApp from "./InstalarApp.jsx";
 
 const baja = (id) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
 const abrirZona = (id) => window.dispatchEvent(new CustomEvent("dcuates:abrir-zona", { detail: id }));
@@ -16,12 +18,13 @@ export default function CaminoDcuates({ menu = {}, onAbrirProyecto = () => {} })
   const SOY = [
     ["🏘️", "Soy vecino o vecina", "#2E9E5B", () => abrirZona("empieza")],
     ["🏪", "Tengo un negocio", identidad("publicidad-tarjeta").color, () => onAbrirProyecto("publicidad-tarjeta")],
-    ["🙋", "Quiero ser voluntario(a)", identidad("donaciones").color, () => onAbrirProyecto("donaciones")],
+    ["🙋", "Quiero ser voluntario(a)", "#334155", () => onAbrirProyecto("donaciones")],
     ["🎁", "Quiero donar o ayudar", "#BE185D", () => abrirZona("causa")],
     ["🌟", "Quiero ser aliado o patrocinador", "#B7791F", () => window.dispatchEvent(new CustomEvent("dcuates:abrir-acceso-aliados"))]
   ];
   return (
-    <section className="cm-sec" aria-label="Tu camino en DCUATES">
+    <section className="cm-sec" id="camino-dcuates" aria-label="Camino DCUATES">
+      <span className="cm-comp"><BotonCompartir hash="camino-dcuates" titulo="Camino DCUATES" texto="Conoce, participa, colabora y crece con DCUATES" variante="claro" /></span>
       <h2 className="cm-tit">🧭 CAMINO DCUATES</h2>
       <ol className="cm-pasos">
         {PASOS.map(([n, e, t, d, c, fn], i) => (
@@ -32,9 +35,11 @@ export default function CaminoDcuates({ menu = {}, onAbrirProyecto = () => {} })
       <div className="cm-grid">
         {SOY.map(([e, t, c, fn]) => <button type="button" key={t} onClick={fn} style={{ background: c }}><span>{e}</span>{t}</button>)}
       </div>
+      <InstalarApp />
       <style>{`
-.cm-sec{max-width:72rem;margin:12px auto 6px;padding:14px 12px 12px;border-radius:20px;background:var(--tc,#1B6F8A);border:2px solid rgba(255,255,255,.35);box-shadow:0 6px 16px rgba(0,0,0,.18)}
-.cm-tit{margin:0 0 10px;font-size:19px;font-weight:900;text-align:center;color:#fff;letter-spacing:.02em}
+.cm-sec{position:relative;max-width:72rem;margin:12px auto 6px;padding:14px 12px 12px;border-radius:20px;background:var(--tc,#1B6F8A);border:2px solid rgba(255,255,255,.35);box-shadow:0 6px 16px rgba(0,0,0,.18)}
+.cm-comp{position:absolute;top:8px;right:8px;z-index:4}
+.cm-tit{margin:0 38px 10px;font-size:19px;font-weight:900;text-align:center;color:#fff;letter-spacing:.02em}
 .cm-pasos{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 8px}
 .cm-pasos button{position:relative;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 3px 8px;border:2px solid var(--c);border-left-width:7px;border-radius:14px;background:#fff;font-family:inherit;color:#1f2a37;cursor:pointer;box-shadow:0 5px 12px rgba(0,0,0,.25)}
 .cm-pasos button:active{background:var(--c);color:#fff}
@@ -49,7 +54,6 @@ export default function CaminoDcuates({ menu = {}, onAbrirProyecto = () => {} })
 .cm-grid span{font-size:24px}
 .pz-e{display:inline-block;animation:pz-latido 4.8s ease-in-out infinite;animation-delay:var(--d,0s)}
 @keyframes pz-latido{0%{transform:scale(1);filter:none}4%{transform:scale(1.45);filter:drop-shadow(0 0 7px #ffd84d)}12%{transform:scale(1);filter:none}100%{transform:scale(1);filter:none}}
-@media(prefers-reduced-motion:reduce){.pz-e{animation:none}}
 @media(min-width:640px){.cm-pasos{grid-template-columns:repeat(4,minmax(0,1fr))}.cm-grid{grid-template-columns:repeat(5,1fr)}.cm-grid button:last-child{grid-column:auto}.pz-e{animation-delay:var(--dd,0s)}}
 `}</style>
     </section>

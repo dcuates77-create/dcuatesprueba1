@@ -1,5 +1,6 @@
 // TABLERO CONOCE — introducción, proyectos, Para ti (beneficios) y Mapa del sitio, todo como botones.
 import React, { useEffect, useState } from "react";
+import { useAtras } from "./atras.js";
 import Tablero, { abrirAcceso } from "./Tablero.jsx";
 import { IDENTIDAD } from "./datos/identidad.js";
 import { RESUMEN_PROYECTO } from "./datos/proyectos.js";
@@ -13,6 +14,7 @@ export default function TableroConoce({ onAbrirProyecto = () => {}, onMapa = () 
     window.addEventListener("dcuates:abrir-tablero", oir);
     return () => window.removeEventListener("dcuates:abrir-tablero", oir);
   }, []);
+  useAtras(abierto, () => setAbierto(false));
   if (!abierto) return null;
   const cerrar = () => setAbierto(false);
   const tarjetas = [

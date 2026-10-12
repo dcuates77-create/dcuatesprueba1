@@ -6,6 +6,7 @@ import { createPortal } from "react-dom";
 import TiraAuto from "./TiraAuto.jsx";
 import BotonCompartir from "./BotonCompartir.jsx";
 import { guardarUltimo, NOMBRE_ZONA } from "./HoyDcuates.jsx";
+import { useAtras } from "./atras.js";
 import Tablero, { abrirAcceso } from "./Tablero.jsx";
 import { PasoCtx, SiguientePaso } from "./ZonaPaso.jsx";
 import { identidad } from "./datos/identidad.js";
@@ -250,6 +251,7 @@ export default function ZonaJuegos({ onAbrirProyecto: abrirProy = () => {}, fila
   const [abierto, setAbierto] = useState(null);
   const [tablero, setTablero] = useState(false);
   const onAbrirProyecto = (id) => { setTablero(false); abrirProy(id); };
+  useAtras(tablero, () => setTablero(false));
   const [semillas, setSemillas] = useState(leerSemillas());
   const juegos = useMemo(() => {
     const todos = normalizarJuegos(filas); const act = juegosActivosDesdeZona(filasZona);
@@ -264,6 +266,7 @@ export default function ZonaJuegos({ onAbrirProyecto: abrirProy = () => {}, fila
   const necesidades = useMemo(() => necesidadesDesdeZona(filasZona), [filasZona]);
   const niv = nivelDe(semillas);
   const falta = niv.siguiente ? niv.siguiente.min - semillas : 0;
+  useAtras(!!abierto, () => setAbierto(null));
   useEffect(() => { if (abierto && NOMBRE_ZONA[abierto]) guardarUltimo("zona", abierto, NOMBRE_ZONA[abierto]); }, [abierto]);
   const cerrar = () => { setAbierto(null); setSemillas(leerSemillas()); };
   const irA = (id) => {

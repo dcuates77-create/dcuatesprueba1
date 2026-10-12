@@ -3,6 +3,8 @@
 import React, { useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { WHATSAPP_NUMERO } from "./datos/config.js";
+import BotonCompartir from "./BotonCompartir.jsx";
+import { useAtras } from "./atras.js";
 import { identidad } from "./datos/identidad.js";
 import { RETOS_DIA, NECESIDADES_BASE, retosDesdeZona, necesidadesDesdeZona, agendaDesdeZona } from "./datos/zona.js";
 
@@ -41,6 +43,7 @@ export default function HoyDcuates({ agenda = [], filasZona = [], onAbrirProyect
   const nec = necesidades.length ? necesidades[dia % necesidades.length] : null;
   const fechaTxt = (f) => { const [, m, d] = f.split("-"); return `${Number(d)} ${MESES[Number(m) - 1]}`; };
   const [servicios, setServicios] = useState(false);
+  useAtras(servicios, () => setServicios(false));
   const SERV = [
     ["🎯", "Coaching personal y de equipos"],
     ["📈", "Consultoría y asesoría de negocios"],
@@ -51,7 +54,8 @@ export default function HoyDcuates({ agenda = [], filasZona = [], onAbrirProyect
   ];
   const wa = `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent("Hola, me interesa recibir informes de los servicios y promociones especiales de DCUATES (coaching, consultoría y asesoría). Mi nombre es: ___ · Me interesa para: ___")}`;
   return (
-    <section className="hy-sec" aria-label="Hoy en DCUATES">
+    <section className="hy-sec" id="hoy-dcuates" aria-label="Hoy en DCUATES">
+      <span className="hy-comp"><BotonCompartir hash="hoy-dcuates" titulo="Hoy en DCUATES" texto="El reto del día, los eventos y lo que se necesita hoy en la comunidad" variante="claro" /></span>
       <h2 className="hy-tit">☀️ HOY EN DCUATES</h2>
       <div className="hy-grid">
         <button type="button" className="hy-c" style={{ "--c": "#2E9E5B" }} onClick={() => abrirZona("empieza")}>
@@ -80,8 +84,9 @@ export default function HoyDcuates({ agenda = [], filasZona = [], onAbrirProyect
           </div>
         </div>, document.body)}
       <style>{`
-.hy-sec{max-width:72rem;margin:10px auto 6px;padding:12px 12px 14px;border-radius:20px;background:color-mix(in srgb,var(--tc,#1B6F8A) 62%,#000);border:2px solid rgba(255,255,255,.3);box-shadow:0 6px 16px rgba(0,0,0,.18)}
-.hy-tit{margin:0 0 10px;font-size:19px;font-weight:900;text-align:center;color:#ffe9a8;letter-spacing:.02em}
+.hy-comp{position:absolute;top:8px;right:8px;z-index:4}
+.hy-sec{position:relative;max-width:72rem;margin:10px auto 6px;padding:12px 12px 14px;border-radius:20px;background:color-mix(in srgb,var(--tc,#1B6F8A) 62%,#000);border:2px solid rgba(255,255,255,.3);box-shadow:0 6px 16px rgba(0,0,0,.18)}
+.hy-tit{margin:0 38px 10px;font-size:19px;font-weight:900;text-align:center;color:#ffe9a8;letter-spacing:.02em}
 .hy-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .hy-c{display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding:10px 10px 10px;min-height:118px;border:2px solid var(--c);border-left-width:7px;border-radius:14px;background:#fff;font-family:inherit;color:#1f2a37;text-align:left;cursor:pointer;box-shadow:0 5px 12px rgba(0,0,0,.25)}
 .hy-c:active{background:#f4f6f5}
@@ -92,7 +97,6 @@ export default function HoyDcuates({ agenda = [], filasZona = [], onAbrirProyect
 .hy-serv{display:flex;flex-direction:column;gap:6px;margin:6px 0 10px}
 .pz-e{display:inline-block;animation:pz-latido 4.8s ease-in-out infinite;animation-delay:var(--d,0s)}
 @keyframes pz-latido{0%{transform:scale(1);filter:none}4%{transform:scale(1.45);filter:drop-shadow(0 0 7px #ffd84d)}12%{transform:scale(1);filter:none}100%{transform:scale(1);filter:none}}
-@media(prefers-reduced-motion:reduce){.pz-e{animation:none}}
 @media(min-width:640px){.hy-grid{grid-template-columns:repeat(4,1fr)}.pz-e{animation-delay:var(--dd,0s)}}
 .hy-sigue{margin:14px 0 4px;padding:10px;border-radius:14px;background:#fff;border:2px dashed #b8c4bd;display:flex;flex-direction:column;gap:6px}
 .hy-sigue p{margin:0;font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#6b7785;text-align:center}

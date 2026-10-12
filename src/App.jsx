@@ -27,6 +27,7 @@ import CaminoDcuates from "./CaminoDcuates.jsx";
 import TableroConoce from "./TableroConoce.jsx";
 import HoyDcuates, { QueSigue, guardarUltimo } from "./HoyDcuates.jsx";
 import { identidad } from "./datos/identidad.js";
+import { useAtras } from "./atras.js";
 import { normalizarPremios } from "./datos/zona.js";
 import BotonCompartir from "./BotonCompartir";
 import { iniciarAnalitica, registrar } from "./analitica";
@@ -186,6 +187,20 @@ export default function App() {
   // Id de YouTube del video que se está viendo en grande (ventana flotante),
   // al tocar una miniatura de la barra de videos de portada.
   const [videoEnGrande, setVideoEnGrande] = useState(null);
+  // Botón "Atrás" del celular: cierra la ventana de arriba en vez de salir de la página.
+  useAtras(!!modalProyecto, () => setModalProyecto(null));
+  useAtras(!!accesoAbierto, () => setAccesoAbierto(null));
+  useAtras(showMapaSitio, () => setShowMapaSitio(false));
+  useAtras(!!categoriaAbierta, () => setCategoriaAbierta(null));
+  useAtras(showFAQ, () => setShowFAQ(false));
+  useAtras(showDudas, () => setShowDudas(false));
+  useAtras(!!modalFormulario, () => setModalFormulario(null));
+  useAtras(showPrivacy, () => setShowPrivacy(false));
+  useAtras(showTerminos, () => setShowTerminos(false));
+  useAtras(showSeguridad, () => setShowSeguridad(false));
+  useAtras(showEscudo, () => setShowEscudo(false));
+  useAtras(busquedaAbierta, () => setBusquedaAbierta(false));
+  useAtras(!!videoEnGrande, () => setVideoEnGrande(null));
   // Controla si el párrafo largo de la portada se ve completo o resumido
   // en pantallas pequeñas (para que se necesite menos scroll en celular).
   const [heroExpandido, setHeroExpandido] = useState(false);
