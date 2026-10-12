@@ -8,7 +8,7 @@ export const abrirAcceso = (tipo) => window.dispatchEvent(new CustomEvent("dcuat
 export const abrirTablero = (id) => window.dispatchEvent(new CustomEvent("dcuates:abrir-tablero", { detail: id }));
 export const IDS_TABLERO = ["conoce", "participa", "colabora", "crece"];
 
-export default function Tablero({ paso, emoji, titulo, intro, color = "#1B6F8A", sub = null, tarjetas = [], hash, onCerrar, onRegistros }) {
+export default function Tablero({ paso, emoji, titulo, intro, color = "#1B6F8A", sub = null, tarjetas = [], hash, onCerrar, onRegistros, lista = false }) {
   return createPortal(
     <div className="zj-fondo" role="dialog" aria-modal="true" aria-label={titulo} onClick={(e) => { if (e.target === e.currentTarget) onCerrar(); }}>
       <div className="zj-caja tb-caja">
@@ -20,18 +20,18 @@ export default function Tablero({ paso, emoji, titulo, intro, color = "#1B6F8A",
         {paso && <p className="tb-paso" style={{ color }}>{paso}</p>}
         <p className="tb-intro">{intro}</p>
         {sub}
-        <div className="tb-grid">
+        <div className={"tb-grid" + (lista ? " tb-lista" : "")}>
           {tarjetas.map((c) => (
             <button type="button" key={c.id} className={"tb-card" + (c.bloq ? " tb-bloq" : "")} style={{ "--c": c.color || color }} onClick={c.onClick}>
               <span className="tb-e" aria-hidden="true">{c.bloq ? "🔒" : c.emoji}</span>
-              <b>{c.t}</b>
-              <small>{c.d}</small>
+              <span className="tb-t"><b>{c.t}</b><small>{c.d}</small></span>
+              {lista && <span className="tb-go" aria-hidden="true">›</span>}
             </button>
           ))}
           <button type="button" className="tb-card tb-reg" style={{ "--c": "#2E9E5B" }} onClick={onRegistros}>
             <span className="tb-e" aria-hidden="true">📝</span>
-            <b>REGÍSTRATE Y PARTICIPA</b>
-            <small>Solicitudes, negocio, ventas con causa, reportes, voluntariado y sugerencias</small>
+            <span className="tb-t"><b>REGÍSTRATE Y PARTICIPA</b>
+            <small>Solicitudes, negocio, ventas con causa, reportes, voluntariado y sugerencias</small></span>
           </button>
         </div>
       </div>
@@ -45,6 +45,15 @@ export default function Tablero({ paso, emoji, titulo, intro, color = "#1B6F8A",
 .tb-e{display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--c);font-size:22px}
 .tb-card b{font-size:13.5px;font-weight:900;line-height:1.15}
 .tb-card small{font-size:11.5px;font-weight:700;line-height:1.25;color:#5b6675}
+.tb-t{display:flex;flex-direction:column;gap:3px;min-width:0}
+.tb-lista{grid-template-columns:1fr}
+.tb-lista .tb-card{flex-direction:row;align-items:center;gap:12px;min-height:76px;border-bottom-width:2px;border-left-width:8px}
+.tb-lista .tb-e{width:44px;height:44px;border-radius:50%;flex:none}
+.tb-lista .tb-t{flex:1}
+.tb-go{font-size:26px;font-weight:900;color:#64748b;line-height:1}
+.tb-lista .tb-reg{flex-direction:row;align-items:center;border-bottom-width:6px;background:#1F7A46;color:#fff}
+.tb-lista .tb-reg small{color:#e3f6ea}
+.tb-lista .tb-reg .tb-e{background:#fff}
 .tb-bloq{opacity:.85}
 .tb-reg{grid-column:1/-1;min-height:84px;background:#eafaf0}
 `}</style>

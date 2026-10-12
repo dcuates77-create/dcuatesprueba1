@@ -3,14 +3,13 @@ import React from "react";
 import { identidad } from "./datos/identidad.js";
 import { abrirTablero } from "./Tablero.jsx";
 import BotonCompartir from "./BotonCompartir.jsx";
-import InstalarApp from "./InstalarApp.jsx";
 
 const baja = (id) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
 const abrirZona = (id) => window.dispatchEvent(new CustomEvent("dcuates:abrir-zona", { detail: id }));
 
 export default function CaminoDcuates({ menu = {}, onAbrirProyecto = () => {} }) {
   const PASOS = [
-    ["1", "🧭", "CONOCE", "Mira todo lo que hacemos", "#1B6F8A", () => abrirTablero("conoce")],
+    ["1", "🧭", "CONOCE", "6 secciones para explorar", "#1B6F8A", () => abrirTablero("conoce")],
     ["2", "🎮", "PARTICIPA", "Juega, aprende y gana", "#E5484D", () => abrirTablero("participa")],
     ["3", "🤝", "COLABORA", "Aliados, voluntarios y amigos", "#C2410C", () => abrirTablero("colabora")],
     ["4", "🌳", "CRECE", "Tu camino personal", "#2E9E5B", () => abrirTablero("crece")]
@@ -28,25 +27,25 @@ export default function CaminoDcuates({ menu = {}, onAbrirProyecto = () => {} })
       <h2 className="cm-tit">🧭 CAMINO DCUATES</h2>
       <ol className="cm-pasos">
         {PASOS.map(([n, e, t, d, c, fn], i) => (
-          <li key={n}><button type="button" onClick={fn} style={{ "--c": c }}><span className="cm-n">{n}</span><span className="cm-e pz-e" style={{ "--d": `${[0, 0.6, 1.8, 1.2][i]}s`, "--dd": `${i * 0.6}s` }}>{e}</span><b>{t}</b><small>{d}</small></button></li>
+          <li key={n}><button type="button" onClick={fn} style={{ "--c": c }}><span className="cm-e pz-e" style={{ "--d": `${[0, 0.6, 1.8, 1.2][i]}s`, "--dd": `${i * 0.6}s` }}>{e}</span><span className="cm-tx"><span className="cm-n">PASO {n}</span><b>{t}</b><small>{d}</small></span></button></li>
         ))}
       </ol>
       <p className="cm-soy">¿Cómo quieres sumarte?</p>
       <div className="cm-grid">
         {SOY.map(([e, t, c, fn]) => <button type="button" key={t} onClick={fn} style={{ background: c }}><span>{e}</span>{t}</button>)}
       </div>
-      <InstalarApp />
       <style>{`
 .cm-sec{position:relative;max-width:72rem;margin:12px auto 6px;padding:14px 12px 12px;border-radius:20px;background:var(--tc,#1B6F8A);border:2px solid rgba(255,255,255,.35);box-shadow:0 6px 16px rgba(0,0,0,.18)}
 .cm-comp{position:absolute;top:8px;right:8px;z-index:4}
 .cm-tit{margin:0 38px 10px;font-size:19px;font-weight:900;text-align:center;color:#fff;letter-spacing:.02em}
 .cm-pasos{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 8px}
-.cm-pasos button{position:relative;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 3px 8px;border:2px solid var(--c);border-left-width:7px;border-radius:14px;background:#fff;font-family:inherit;color:#1f2a37;cursor:pointer;box-shadow:0 5px 12px rgba(0,0,0,.25)}
-.cm-pasos button:active{background:var(--c);color:#fff}
-.cm-n{position:absolute;top:-9px;left:-10px;width:22px;height:22px;border-radius:50%;background:var(--c);color:#fff;font-size:12px;font-weight:900;display:grid;place-items:center;border:2px solid #fff}
-.cm-e{font-size:32px;line-height:1.1}
-.cm-pasos b{font-size:15px;font-weight:900;letter-spacing:.02em}
-.cm-pasos small{font-size:12px;font-weight:700;line-height:1.15;text-align:center;color:#4a5564}
+.cm-pasos button{width:100%;height:100%;min-height:96px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:2px;padding:8px 9px 8px 10px;border:2px solid var(--c);border-left-width:8px;border-radius:14px;background:#fff;font-family:inherit;color:#1f2a37;cursor:pointer;text-align:left;box-shadow:0 5px 12px rgba(0,0,0,.25)}
+.cm-pasos button:active{background:#f4f6f5}
+.cm-tx{display:flex;flex-direction:column;gap:1px;min-width:0;width:100%}
+.cm-n{font-size:11.5px;font-weight:900;letter-spacing:.06em;color:var(--c)}
+.cm-e{font-size:28px;line-height:1.1;flex:none}
+.cm-pasos b{display:block;font-size:15.5px;font-weight:900;letter-spacing:.01em;line-height:1.1}
+.cm-pasos small{display:block;font-size:12px;font-weight:700;line-height:1.15;color:#4a5564}
 .cm-soy{margin:14px 0 8px;text-align:center;font-size:14.5px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;color:#fff}
 .cm-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
 .cm-grid button{min-height:58px;display:flex;align-items:center;gap:7px;padding:6px 10px;border:2px solid rgba(255,255,255,.9);border-radius:14px;color:#fff;font-family:inherit;font-size:15px;font-weight:900;line-height:1.15;text-align:left;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,.22)}

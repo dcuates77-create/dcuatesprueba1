@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { WHATSAPP_NUMERO } from "./datos/config.js";
 import BotonCompartir from "./BotonCompartir.jsx";
 import { useAtras } from "./atras.js";
+import { abrirAcceso } from "./Tablero.jsx";
 import { identidad } from "./datos/identidad.js";
 import { RETOS_DIA, NECESIDADES_BASE, retosDesdeZona, necesidadesDesdeZona, agendaDesdeZona } from "./datos/zona.js";
 
@@ -43,6 +44,7 @@ export default function HoyDcuates({ agenda = [], filasZona = [], onAbrirProyect
   const nec = necesidades.length ? necesidades[dia % necesidades.length] : null;
   const fechaTxt = (f) => { const [, m, d] = f.split("-"); return `${Number(d)} ${MESES[Number(m) - 1]}`; };
   const [servicios, setServicios] = useState(false);
+  const [abierto, setAbierto] = useState(false);
   useAtras(servicios, () => setServicios(false));
   const SERV = [
     ["🎯", "Coaching personal y de equipos"],
@@ -56,7 +58,12 @@ export default function HoyDcuates({ agenda = [], filasZona = [], onAbrirProyect
   return (
     <section className="hy-sec" id="hoy-dcuates" aria-label="Hoy en DCUATES">
       <span className="hy-comp"><BotonCompartir hash="hoy-dcuates" titulo="Hoy en DCUATES" texto="El reto del día, los eventos y lo que se necesita hoy en la comunidad" variante="claro" /></span>
-      <h2 className="hy-tit">☀️ HOY EN DCUATES</h2>
+      <button type="button" className="hy-franja" aria-expanded={abierto} onClick={() => setAbierto((v) => !v)}>
+        <span className="hy-fe">☀️</span>
+        <span className="hy-ft"><b>HOY EN DCUATES</b><small>{abierto ? "Toca para cerrar" : `Reto, evento y lo que se necesita hoy`}</small></span>
+        <span className={"hy-fl" + (abierto ? " hy-fl-on" : "")} aria-hidden="true">▾</span>
+      </button>
+      {abierto && (
       <div className="hy-grid">
         <button type="button" className="hy-c" style={{ "--c": "#2E9E5B" }} onClick={() => abrirZona("empieza")}>
           <span className="hy-e pz-e" style={{ "--d": "2.4s", "--dd": "2.4s" }}>🎯</span><small>RETO DEL DÍA {hecho ? "· ✅ cumplido" : ""}</small><b>{reto}</b>
@@ -73,6 +80,7 @@ export default function HoyDcuates({ agenda = [], filasZona = [], onAbrirProyect
           <span className="hy-e pz-e" style={{ "--d": "3.6s", "--dd": "4.2s" }}>💼</span><small>NUEVO</small><b>SERVICIOS Y PROMOCIONES ESPECIALES</b>
         </button>
       </div>
+      )}
       {servicios && createPortal(
         <div className="zj-fondo" role="dialog" aria-modal="true" aria-label="Servicios y promociones especiales" onClick={(e) => { if (e.target === e.currentTarget) setServicios(false); }}>
           <div className="zj-caja">
@@ -84,10 +92,16 @@ export default function HoyDcuates({ agenda = [], filasZona = [], onAbrirProyect
           </div>
         </div>, document.body)}
       <style>{`
-.hy-comp{position:absolute;top:8px;right:8px;z-index:4}
-.hy-sec{position:relative;max-width:72rem;margin:10px auto 6px;padding:12px 12px 14px;border-radius:20px;background:color-mix(in srgb,var(--tc,#1B6F8A) 62%,#000);border:2px solid rgba(255,255,255,.3);box-shadow:0 6px 16px rgba(0,0,0,.18)}
+.hy-comp{position:absolute;top:26px;right:14px;z-index:4}
+.hy-sec{position:relative;max-width:72rem;margin:10px auto 6px;padding:10px 10px 10px;border-radius:20px;background:color-mix(in srgb,var(--tc,#1B6F8A) 62%,#000);border:2px solid rgba(255,255,255,.3);box-shadow:0 6px 16px rgba(0,0,0,.18)}
 .hy-tit{margin:0 38px 10px;font-size:19px;font-weight:900;text-align:center;color:#ffe9a8;letter-spacing:.02em}
-.hy-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.hy-franja{width:100%;display:flex;align-items:center;gap:10px;min-height:68px;padding:8px 54px 8px 10px;border:2px solid rgba(255,255,255,.85);border-bottom-width:6px;border-radius:18px;background:transparent;font-family:inherit;text-align:left;cursor:pointer;color:#fff}
+.hy-fe{font-size:26px;line-height:1;flex:none}
+.hy-ft{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.hy-ft b{display:block;white-space:nowrap;font-size:15px;font-weight:900;color:#ffe9a8;letter-spacing:.02em}
+.hy-ft small{display:block;font-size:12.5px;font-weight:700;line-height:1.25;color:#fff}
+.hy-fl{font-size:20px;font-weight:900;color:#ffe9a8;transition:transform .2s}.hy-fl-on{transform:rotate(180deg)}
+.hy-grid{margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .hy-c{display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding:10px 10px 10px;min-height:118px;border:2px solid var(--c);border-left-width:7px;border-radius:14px;background:#fff;font-family:inherit;color:#1f2a37;text-align:left;cursor:pointer;box-shadow:0 5px 12px rgba(0,0,0,.25)}
 .hy-c:active{background:#f4f6f5}
 .hy-e{font-size:30px;line-height:1.1}
@@ -103,5 +117,21 @@ export default function HoyDcuates({ agenda = [], filasZona = [], onAbrirProyect
 .hy-sigue button{min-height:46px;border:0;border-radius:12px;padding:8px 12px;color:#fff;font-family:inherit;font-size:13.5px;font-weight:900;cursor:pointer}
 `}</style>
     </section>
+  );
+}
+
+export function BotonRegistrate() {
+  return (
+    <>
+      <button type="button" className="rg-btn" onClick={() => abrirAcceso("registros")}>
+        <span className="rg-e" aria-hidden="true">📝</span>
+        <span className="rg-t"><b>REGÍSTRATE Y PARTICIPA</b><small>Pide o suma: ayuda, negocio, voluntariado</small></span>
+      </button>
+      <style>{`
+.rg-btn{width:100%;display:flex;align-items:center;gap:12px;min-height:76px;margin:10px 0 0;padding:8px 14px;border:2px solid #fff;border-bottom-width:6px;border-radius:18px;background:#1F7A46;color:#fff;font-family:inherit;text-align:left;cursor:pointer;box-shadow:0 5px 12px rgba(0,0,0,.25)}
+.rg-e{width:44px;height:44px;flex:none;display:grid;place-items:center;border-radius:14px;background:#fff;font-size:24px}
+.rg-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.rg-t b{display:block;white-space:normal;overflow:visible;text-overflow:clip;font-size:16px;font-weight:900}.rg-t small{display:block;white-space:normal;overflow:visible;text-overflow:clip;font-size:12.5px;font-weight:700;line-height:1.2;color:#e3f6ea}
+`}</style>
+    </>
   );
 }

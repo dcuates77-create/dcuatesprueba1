@@ -25,7 +25,8 @@ import ZonaAliados from "./ZonaAliados.jsx";
 import ZonaRed from "./ZonaRed.jsx";
 import CaminoDcuates from "./CaminoDcuates.jsx";
 import TableroConoce from "./TableroConoce.jsx";
-import HoyDcuates, { QueSigue, guardarUltimo } from "./HoyDcuates.jsx";
+import HoyDcuates, { QueSigue, guardarUltimo, BotonRegistrate } from "./HoyDcuates.jsx";
+import InstalarApp from "./InstalarApp.jsx";
 import { identidad } from "./datos/identidad.js";
 import { useAtras } from "./atras.js";
 import { normalizarPremios } from "./datos/zona.js";
@@ -473,7 +474,7 @@ export default function App() {
               onAbrirCategoria={(id) => setCategoriaAbierta(id)}
               onAbrirProyecto={(id) => setModalProyecto(id)}
               onAcceso={(t) => (t === "proyectos" ? setShowMapaSitio(true) : setAccesoAbierto(t))}
-              accesosSlot={<><CaminoDcuates menu={{}} onAbrirProyecto={(id) => setModalProyecto(id)} /><HoyDcuates agenda={agendaEventos} filasZona={filasZona} onAbrirProyecto={(id) => setModalProyecto(id)} /></>}
+              accesosSlot={<><CaminoDcuates menu={{}} onAbrirProyecto={(id) => setModalProyecto(id)} /><HoyDcuates agenda={agendaEventos} filasZona={filasZona} onAbrirProyecto={(id) => setModalProyecto(id)} /><BotonRegistrate /><InstalarApp /></>}
               beneficios={<PestanaBeneficios setBusquedaAbierta={setBusquedaAbierta} setModalProyecto={setModalProyecto} setShowFAQ={setShowFAQ} setSolicitudExpandida={setSolicitudExpandida} solicitudExpandida={solicitudExpandida} />}
               valores={<PestanaValores infoAbierta={infoAbierta} librosLinks={librosLinks} musicaLinks={musicaLinks} recomendacionesComunidad={recomendacionesComunidad} recomendacionesDcuates={recomendacionesDcuates} setInfoAbierta={setInfoAbierta} setModalProyecto={setModalProyecto} videosLinks={videosLinks} />}
               negociosSeccion={<PestanaNegocios compraVentaDcuates={compraVentaDcuates} recomendacionesCompra={recomendacionesCompra} recomendacionesVenta={recomendacionesVenta} setVentasResumenAbierto={setVentasResumenAbierto} ventasResumenAbierto={ventasResumenAbierto} />}
@@ -488,7 +489,7 @@ export default function App() {
 
 
       {/* Accesos rápidos: Avisos y Beneficios · Compartir Más · Inicio */}
-      <TableroConoce onAbrirProyecto={(id) => setModalProyecto(id)} onMapa={() => setShowMapaSitio(true)} />
+      <TableroConoce />
       <ZonaJuegos
         onAbrirProyecto={(id) => setModalProyecto(id)}
         filas={filasEnlaces}
