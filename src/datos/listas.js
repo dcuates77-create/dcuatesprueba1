@@ -151,7 +151,8 @@ export const NECESIDADES_GRUPOS = [
       { texto: "Quiero adoptar una mascota", modal: "ecatepets" },
       { texto: "Rescaté a un peludito y no sé qué hacer", modal: "ecatepets" },
       { texto: "Busco una recomendación de atención veterinaria de confianza (próximamente)", enlace: enlaceWhatsApp("¡Hola DCUATES! Busco una recomendación de atención veterinaria de confianza.") },
-      { texto: "Busco accesorios, alimentos o productos de calidad para mi mascota (próximamente)", enlace: enlaceWhatsApp("¡Hola DCUATES! Busco accesorios, alimentos o productos de calidad para mi mascota.") }
+      { texto: "Busco accesorios, alimentos o productos de calidad para mi mascota (próximamente)", enlace: enlaceWhatsApp("¡Hola DCUATES! Busco accesorios, alimentos o productos de calidad para mi mascota.") },
+      { texto: "Quiero conocer los servicios y promociones especiales (coaching, consultoría, asesoría)", evento: "servicios" }
     ]
   },
   {
@@ -170,7 +171,8 @@ export const NECESIDADES_GRUPOS = [
       { texto: "Quiero vender mi producto o servicio con causa", modal: "ventas-con-causa" },
       { texto: "Busco descuentos en negocios locales", modal: "cupones-promos" },
       { texto: "Mi negocio quiere patrocinar o aliarse con DCUATES", modal: "patrocinadores-alianzas" },
-      { texto: "Busco trabajo o quiero ofrecer una vacante (próximamente)", enlace: enlaceWhatsApp("¡Hola DCUATES! Me interesa la futura bolsa de empleo comunitaria.") }
+      { texto: "Busco trabajo o quiero ofrecer una vacante (próximamente)", enlace: enlaceWhatsApp("¡Hola DCUATES! Me interesa la futura bolsa de empleo comunitaria.") },
+      { texto: "Quiero conocer los servicios y promociones especiales (coaching, consultoría, asesoría)", evento: "servicios" }
     ]
   },
   {
@@ -187,7 +189,8 @@ export const NECESIDADES_GRUPOS = [
       { texto: "Tuve una experiencia con un negocio y quiero compartirla", modal: "recomienda-evalua-gana" },
       { texto: "Quiero apoyar con dinero, en especie, trueque o mi tiempo", modal: "donaciones" },
       { texto: "Mi familia o yo necesitamos apoyo y no sabemos a quién acudir", modal: "donaciones" },
-      { texto: "Quiero avisar o enterarme de algo importante de mi colonia (próximamente)", enlace: enlaceWhatsApp("¡Hola DCUATES! Quiero compartir o enterarme de alertas de mi colonia.") }
+      { texto: "Quiero avisar o enterarme de algo importante de mi colonia (próximamente)", enlace: enlaceWhatsApp("¡Hola DCUATES! Quiero compartir o enterarme de alertas de mi colonia.") },
+      { texto: "Quiero conocer los servicios y promociones especiales (coaching, consultoría, asesoría)", evento: "servicios" }
     ]
   },
   {
@@ -204,7 +207,8 @@ export const NECESIDADES_GRUPOS = [
       { texto: "Quiero enterarme de eventos y convocatorias de mi colonia", modal: "noticias" },
       { texto: "Tengo una noticia o evento que quiero compartir", modal: "noticias" },
       { texto: "Busco actividades para mi salud física o mental", modal: "bienestar" },
-      { texto: "Quiero organizarme o sumarme a una actividad recreativa comunitaria", modal: "bienestar" }
+      { texto: "Quiero organizarme o sumarme a una actividad recreativa comunitaria", modal: "bienestar" },
+      { texto: "Quiero conocer los servicios y promociones especiales (coaching, consultoría, asesoría)", evento: "servicios" }
     ]
   }
 ];
