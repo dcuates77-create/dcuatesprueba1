@@ -43,12 +43,16 @@ export default function HoyDcuates({ agenda = [], filasZona = [], onAbrirProyect
   const nec = necesidades.length ? necesidades[dia % necesidades.length] : null;
   const fechaTxt = (f) => { const [, m, d] = f.split("-"); return `${Number(d)} ${MESES[Number(m) - 1]}`; };
   const [abierto, setAbierto] = useState(false);
+  const [nuevo, setNuevo] = useState(() => { try { return localStorage.getItem("dc_hoy_visto") !== hoy; } catch (e) { return false; } });
+  const alTocar = () => { setAbierto((v) => !v); if (nuevo) { try { localStorage.setItem("dc_hoy_visto", hoy); } catch (e) {} setNuevo(false); } };
+  const faltan = evento ? Math.round((new Date(evento.fecha + "T00:00:00") - new Date(hoy + "T00:00:00")) / 86400000) : null;
+  const cuando = faltan === null ? "" : faltan === 0 ? "¡Es hoy!" : faltan === 1 ? "Mañana" : `Faltan ${faltan} días`;
   return (
     <section className="hy-sec" id="hoy-dcuates" aria-label="Hoy en DCUATES">
       <span className="hy-comp"><BotonCompartir hash="hoy-dcuates" titulo="Hoy en DCUATES" texto="El reto del día, los eventos y lo que se necesita hoy en la comunidad" variante="claro" /></span>
-      <button type="button" className="hy-franja" aria-expanded={abierto} onClick={() => setAbierto((v) => !v)}>
-        <span className="hy-fe">☀️</span>
-        <span className="hy-ft"><b>HOY EN DCUATES</b><small>{abierto ? "Toca para cerrar" : `Reto, evento y lo que se necesita hoy`}</small></span>
+      <button type="button" className="hy-franja" aria-expanded={abierto} onClick={alTocar}>
+        <span className="hy-fe">☀️{nuevo && <i className="hy-nuevo">NUEVO</i>}</span>
+        <span className="hy-ft"><b>HOY EN DCUATES</b><small>{abierto ? "Toca para cerrar" : (evento ? `${cuando}: ${evento.titulo}` : "Reto, evento y lo que se necesita hoy")}</small></span>
         <span className={"hy-fl" + (abierto ? " hy-fl-on" : "")} aria-hidden="true">▾</span>
       </button>
       {abierto && (
@@ -74,10 +78,11 @@ export default function HoyDcuates({ agenda = [], filasZona = [], onAbrirProyect
 .hy-sec{position:relative;max-width:72rem;margin:10px auto 6px;padding:10px 10px 10px;border-radius:20px;background:color-mix(in srgb,var(--tc,#1B6F8A) 62%,#000);border:2px solid rgba(255,255,255,.3);box-shadow:0 6px 16px rgba(0,0,0,.18)}
 .hy-tit{margin:0 38px 10px;font-size:19px;font-weight:900;text-align:center;color:#ffe9a8;letter-spacing:.02em}
 .hy-franja{width:100%;display:flex;align-items:center;gap:10px;min-height:68px;padding:8px 54px 8px 10px;border:2px solid rgba(255,255,255,.85);border-bottom-width:6px;border-radius:18px;background:transparent;font-family:inherit;text-align:left;cursor:pointer;color:#fff}
-.hy-fe{font-size:26px;line-height:1;flex:none}
+.hy-fe{position:relative;font-size:26px;line-height:1;flex:none}
 .hy-ft{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
 .hy-ft b{display:block;white-space:nowrap;font-size:15px;font-weight:900;color:#ffe9a8;letter-spacing:.02em}
 .hy-ft small{display:block;font-size:12.5px;font-weight:700;line-height:1.25;color:#fff}
+.hy-nuevo{position:absolute;top:-8px;left:-6px;padding:1px 5px;border-radius:99px;background:#E5484D;color:#fff;font-size:9px;font-weight:900;line-height:1.2;font-style:normal;letter-spacing:0}
 .hy-fl{font-size:20px;font-weight:900;color:#ffe9a8;transition:transform .2s}.hy-fl-on{transform:rotate(180deg)}
 .hy-grid{margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .hy-c{display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding:10px 10px 10px;min-height:118px;border:2px solid var(--c);border-left-width:7px;border-radius:14px;background:#fff;font-family:inherit;color:#1f2a37;text-align:left;cursor:pointer;box-shadow:0 5px 12px rgba(0,0,0,.25)}

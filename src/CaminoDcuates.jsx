@@ -1,5 +1,5 @@
 // CAMINO DCUATES — mapa de 4 pasos (Conoce → Participa → Colabora → Crece) y "Soy…" por perfil.
-import React from "react";
+import React, { useState } from "react";
 import { identidad } from "./datos/identidad.js";
 import { abrirTablero } from "./Tablero.jsx";
 import BotonCompartir from "./BotonCompartir.jsx";
@@ -7,7 +7,12 @@ import BotonCompartir from "./BotonCompartir.jsx";
 const baja = (id) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
 const abrirZona = (id) => window.dispatchEvent(new CustomEvent("dcuates:abrir-zona", { detail: id }));
 
+const leerVis = () => { try { return JSON.parse(localStorage.getItem("dc_camino") || "[]"); } catch (e) { return []; } };
+
 export default function CaminoDcuates({ menu = {}, onAbrirProyecto = () => {} }) {
+  const [vis, setVis] = useState(leerVis);
+  const marcar = (n) => setVis((v) => { const x = v.includes(n) ? v : [...v, n]; try { localStorage.setItem("dc_camino", JSON.stringify(x)); } catch (e) {} return x; });
+  const sig = ["1", "2", "3", "4"].find((n) => !vis.includes(n));
   const PASOS = [
     ["1", "🧭", "CONOCE", "6 secciones para explorar", "#1B6F8A", () => abrirTablero("conoce")],
     ["2", "🎮", "PARTICIPA", "Juega, aprende y gana", "#E5484D", () => abrirTablero("participa")],
@@ -25,9 +30,10 @@ export default function CaminoDcuates({ menu = {}, onAbrirProyecto = () => {} })
     <section className="cm-sec" id="camino-dcuates" aria-label="Camino DCUATES">
       <span className="cm-comp"><BotonCompartir hash="camino-dcuates" titulo="Camino DCUATES" texto="Conoce, participa, colabora y crece con DCUATES" variante="claro" /></span>
       <h2 className="cm-tit">🧭 CAMINO DCUATES</h2>
+      <p className="cm-prog">{sig ? `Llevas ${vis.length} de 4 pasos · ~2 min c/u` : "🎉 ¡Completaste los 4 pasos! Gracias por caminar con nosotros"}</p>
       <ol className="cm-pasos">
         {PASOS.map(([n, e, t, d, c, fn], i) => (
-          <li key={n}><button type="button" onClick={fn} style={{ "--c": c }}><span className="cm-e pz-e" style={{ "--d": `${[0, 0.6, 1.8, 1.2][i]}s`, "--dd": `${i * 0.6}s` }}>{e}</span><span className="cm-tx"><span className="cm-n">PASO {n}</span><b>{t}</b><small>{d}</small></span></button></li>
+          <li key={n}><button type="button" className={(vis.includes(n) ? "cm-ok " : "") + (n === sig ? "cm-sig" : "")} onClick={() => { marcar(n); fn(); }} style={{ "--c": c }}><span className="cm-e pz-e" style={{ "--d": `${[0, 0.6, 1.8, 1.2][i]}s`, "--dd": `${i * 0.6}s` }}>{e}</span><span className="cm-tx"><span className="cm-n">PASO {n}{vis.includes(n) ? " ✅" : n === sig ? " · TE TOCA" : ""}</span><b>{t}</b><small>{d}</small></span></button></li>
         ))}
       </ol>
       <p className="cm-soy">¿Cómo quieres sumarte?</p>
@@ -46,6 +52,10 @@ export default function CaminoDcuates({ menu = {}, onAbrirProyecto = () => {} })
 .cm-e{font-size:28px;line-height:1.1;flex:none}
 .cm-pasos b{display:block;font-size:15.5px;font-weight:900;letter-spacing:.01em;line-height:1.1}
 .cm-pasos small{display:block;font-size:12px;font-weight:700;line-height:1.15;color:#4a5564}
+.cm-prog{margin:-4px 0 10px;text-align:center;font-size:13px;font-weight:800;color:#fff}
+.cm-sig{animation:cm-pulso 1.8s ease-in-out infinite}
+@keyframes cm-pulso{0%,100%{box-shadow:0 5px 12px rgba(0,0,0,.25)}50%{box-shadow:0 0 0 4px rgba(255,255,255,.85),0 5px 12px rgba(0,0,0,.25)}}
+.cm-ok{background:#f1faf4!important}
 .cm-soy{margin:14px 0 8px;text-align:center;font-size:14.5px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;color:#fff}
 .cm-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
 .cm-grid button{min-height:58px;display:flex;align-items:center;gap:7px;padding:6px 10px;border:2px solid rgba(255,255,255,.9);border-radius:14px;color:#fff;font-family:inherit;font-size:15px;font-weight:900;line-height:1.15;text-align:left;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,.22)}
