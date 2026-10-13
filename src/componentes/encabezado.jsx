@@ -545,6 +545,8 @@ export function BarraAccionesFinal({ onAbrirComparte }) {
           <span aria-hidden="true">🏠</span>
         </button>
       </div>
+      {/* Aquí aterrizan (en todas las secciones menos NOSOTROS) el texto "lo que somos" y la banda de logros */}
+      <div id="bc-final-slot" className="mt-4 -mx-4" />
       {/* Enlace directo a la barra de videos del final de la página */}
       <div className="mx-auto max-w-2xl md:max-w-4xl xl:max-w-6xl mt-3">
         <button
