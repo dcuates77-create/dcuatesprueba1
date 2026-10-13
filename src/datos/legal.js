@@ -164,6 +164,7 @@ export const AVISO_PRIVACIDAD_PARRAFOS = [
 // Preguntas frecuentes — cada una se despliega al dar clic (como un
 // acordeón). Para agregar una nueva, solo copia un bloque { pregunta, respuesta } más.
 export const FAQ_ITEMS = [
+  { pregunta: "¿Qué son los servicios y promociones especiales?", respuesta: "Además de los apoyos comunitarios gratuitos, DCUATES y Conexiones con Causa ofrecen coaching, consultoría y asesoría para personas, negocios y organizaciones, y promociones especiales con aliados. Toca \"Servicios y promociones especiales\" en el botón ¿Qué necesitas hoy?, en CAMINO DCUATES o escríbenos por WhatsApp para recibir informes." },
   { pregunta: "¿DCUATES tiene algún costo para participar?", respuesta: "No. Todos los proyectos (libros, publicidad, Ecatepets, asesorías, etc.) son gratuitos. Las aportaciones voluntarias solo ayudan a que la plataforma llegue a más familias." },
   { pregunta: "¿Cómo publico mi negocio o servicio?", respuesta: "Usa el botón \"Publicidad Gratuita\" en la portada, o baja hasta la sección de Publicidad Comunitaria y llena el formulario. También puedes escribirnos directo por WhatsApp." },
   { pregunta: "¿Cómo reporto una mascota, persona o cosa extraviada?", respuesta: "Entra al botón \"Ecatepets\" o a la sección \"Ventas con Causa\" y da clic en \"Reportar un caso por WhatsApp\"; te contactamos directo." },
