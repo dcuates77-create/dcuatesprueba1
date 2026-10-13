@@ -7,6 +7,7 @@ import { NECESIDADES_GRUPOS, TODOS_LOS_PROYECTOS } from "../datos/listas.js";
 import { BOTONES_PORTADA, CATEGORIAS_PROYECTOS, normalizarBusqueda } from "../datos/proyectos.js";
 import { enlaceWhatsApp, irASeccion } from "../utilidades/baserow.js";
 import { registrar } from "../analitica";
+import BotonCompartir from "../BotonCompartir.jsx";
 
 export function BarraBusqueda({ onAbrirProyecto, onAbrirCategoria, onAbrirFAQ, abierta, setAbierta }) {
   const [texto, setTexto] = useState("");
@@ -363,10 +364,11 @@ export function BotonNecesidades({ onAbrirProyecto, onAccionEspecial, onAbrirFAQ
             aria-modal="true"
             aria-label="¿Qué necesitas hoy?"
           >
-            <div className="p-5 pb-3">
+            <div className="p-5 pb-3 flex items-start justify-between gap-3">
               <p className="font-black uppercase text-[#0f2d1e] text-xl sm:text-2xl leading-tight">
                 ¿Qué necesitas hoy? <span aria-hidden="true">😊</span>
               </p>
+              <BotonCompartir hash="necesitas-hoy" titulo="¿Qué necesitas hoy? — DCUATES" texto="Encuentra apoyos, libros, mascotas, negocios y servicios en tu comunidad" variante="circulo" />
             </div>
 
             {!grupo ? (
@@ -400,11 +402,12 @@ export function BotonNecesidades({ onAbrirProyecto, onAccionEspecial, onAbrirFAQ
                 </button>
                 <button
                   type="button"
-                  onClick={() => irA("mapa-negocios")}
-                  className="w-full flex items-center justify-center gap-3 rounded-2xl bg-[#4f9d6a] hover:bg-[#3f8657] text-white font-black uppercase text-[13px] sm:text-sm leading-tight px-4 py-4 shadow-md text-center transition-colors"
+                  onClick={() => { cerrarTodo(); setTimeout(() => window.dispatchEvent(new CustomEvent("dcuates:abrir-servicios")), 120); }}
+                  className="w-full flex items-center justify-center gap-3 rounded-2xl font-black uppercase text-[13px] sm:text-sm leading-tight px-4 py-4 shadow-md transition-colors text-center"
+                  style={{ background: "#7a5ad8", color: "#fff" }}
                 >
-                  <span className="text-2xl" aria-hidden="true">🗺️</span>
-                  Ver mapa de negocios locales
+                  <span className="text-2xl" aria-hidden="true">💼</span>
+                  Servicios y promociones especiales
                 </button>
                 <button
                   type="button"

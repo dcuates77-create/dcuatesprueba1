@@ -383,8 +383,21 @@ export function ModalDudas({ onCerrar, onBuscarEnPagina }) {
       emoji="💬"
       titulo="¿En qué podemos ayudarte?"
       invitacion="Quizá tu duda ya tiene respuesta. Busca una palabra o toca una pregunta frecuente."
+      compartir={{ hash: "dudas", titulo: "¿En qué podemos ayudarte? — DCUATES", texto: "Dudas y atención de la comunidad DCUATES" }}
       onCerrar={onCerrar}
     >
+      <div className="mb-3 rounded-2xl border-2 p-3" style={{ background: "#f3efff", borderColor: "#cdbff5" }}>
+        <p className="text-xs font-black uppercase" style={{ color: "#4c2fa0" }}>¿Buscas algo de esto?</p>
+        <div className="mt-2 grid gap-2">
+          {["Necesito coaching o asesoría para mi negocio u organización", "Quiero conocer promociones y servicios especiales"].map((t) => (
+            <button key={t} type="button"
+              onClick={() => { onCerrar(); setTimeout(() => window.dispatchEvent(new CustomEvent("dcuates:abrir-servicios")), 120); }}
+              className="w-full rounded-xl px-3 py-2.5 text-left text-sm font-black leading-snug" style={{ background: "#7a5ad8", color: "#fff" }}>
+              💼 {t}
+            </button>
+          ))}
+        </div>
+      </div>
       <label className="relative block">
         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-base" aria-hidden="true">🔍</span>
         <input
