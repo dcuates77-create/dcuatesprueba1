@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { createPortal } from "react-dom";
+import { rota, FRASE } from "./datos/secciones.js";
 import CarruselPortada from "./CarruselPortada";
 import BloqueAgenda from "./BloqueAgenda.jsx";
 import TiraAuto from "./TiraAuto";
@@ -771,6 +772,21 @@ export default function BloqueCentral({
             <BotonCompartir variante="bloque" etiqueta="Compartir esta sección" hash={tab.id} titulo={tab.label} texto={tab.invitacion?.texto || tab.texto || "Conoce lo que hacemos por la comunidad"} />
           </div>
 
+          {(() => {
+            const sg = TABS[(idx + 1) % TABS.length];
+            const fr = FRASE[tab.id] ? rota(FRASE[tab.id]) : null;
+            return (
+              <div className="bc-mira" style={{ "--c": sg.boton || sg.color }}>
+                {fr && <p className="bc-mira-f">💬 Frase de la semana: «{fr}»</p>}
+                <button type="button" onClick={() => cambiar((idx + 1) % TABS.length)}>
+                  <span className="bc-mira-e" aria-hidden="true">{sg.emoji}</span>
+                  <span className="bc-mira-t"><small>MIRA TAMBIÉN</small><b>{sg.label}</b></span>
+                  <span className="bc-mira-go" aria-hidden="true">›</span>
+                </button>
+              </div>
+            );
+          })()}
+
           <div className="bc-nav">
             <button type="button" disabled={idx === 0} onClick={() => cambiar(idx - 1)}>‹ {idx > 0 ? TABS[idx - 1].label : "Anterior"}</button>
             <button type="button" onClick={() => cambiar(idx < TABS.length - 1 ? idx + 1 : 0)}>{idx < TABS.length - 1 ? TABS[idx + 1].label : "Volver a " + TABS[0].label + " (inicio)"} {idx < TABS.length - 1 ? "›" : "↺"}</button>
@@ -832,6 +848,14 @@ const CSS = `
 .bc-acc-compacto .bc-acc-largo .bc-acc-t{font-size:11.5px}
 .bc-acc-compacto .bc-mano{font-size:17px}
 .bc-acc-compacto{margin-top:8px}
+.bc-mira{margin:14px 0 6px}
+.bc-mira-f{margin:0 0 8px;text-align:center;font-size:13.5px;font-weight:800;font-style:italic;line-height:1.3;color:var(--ink)}
+.bc-mira button{width:100%;display:flex;align-items:center;gap:12px;min-height:60px;padding:8px 14px;border:2px solid #fff;border-bottom-width:6px;border-radius:18px;background:var(--c);color:#fff;font-family:inherit;text-align:left;cursor:pointer;box-shadow:0 5px 12px rgba(0,0,0,.2)}
+.bc-mira-e{font-size:30px;line-height:1;flex:none}
+.bc-mira-t{flex:1;display:flex;flex-direction:column;gap:1px}
+.bc-mira-t small{font-size:11px;font-weight:900;letter-spacing:.1em;opacity:.9}
+.bc-mira-t b{font-size:18px;font-weight:900;text-transform:uppercase}
+.bc-mira-go{font-size:28px;font-weight:900}
 .bc-final{padding:14px 16px 10px;max-width:none}
 .bc-final .bc-text{max-width:72rem;margin-left:auto;margin-right:auto}
 .bc-mano{font-size:26px;line-height:1;display:inline-block;animation:bc-mano 1.1s ease-in-out infinite}

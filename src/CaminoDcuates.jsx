@@ -3,18 +3,22 @@ import React, { useState } from "react";
 import { identidad } from "./datos/identidad.js";
 import { abrirTablero } from "./Tablero.jsx";
 import BotonCompartir from "./BotonCompartir.jsx";
+import { CAMINO, ejecutar } from "./datos/secciones.js";
 
 const baja = (id) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
 const abrirZona = (id) => window.dispatchEvent(new CustomEvent("dcuates:abrir-zona", { detail: id }));
 
-const leerVis = () => { try { return JSON.parse(localStorage.getItem("dc_camino") || "[]"); } catch (e) { return []; } };
+const llave = (sec) => (sec && sec !== "nosotros" ? `dc_camino_${sec}` : "dc_camino");
+const leerVis = (sec) => { try { return JSON.parse(localStorage.getItem(llave(sec)) || "[]"); } catch (e) { return []; } };
+const COLORES = ["#1B6F8A", "#E5484D", "#C2410C", "#2E9E5B"];
 
-export default function CaminoDcuates({ menu = {}, onAbrirProyecto = () => {}, compacto = false }) {
+export default function CaminoDcuates({ menu = {}, onAbrirProyecto = () => {}, compacto = false, seccion = "nosotros" }) {
   const [abierto, setAbierto] = useState(false);
-  const [vis, setVis] = useState(leerVis);
-  const marcar = (n) => setVis((v) => { const x = v.includes(n) ? v : [...v, n]; try { localStorage.setItem("dc_camino", JSON.stringify(x)); } catch (e) {} return x; });
+  const [vis, setVis] = useState(() => leerVis(seccion));
+  const marcar = (n) => setVis((v) => { const x = v.includes(n) ? v : [...v, n]; try { localStorage.setItem(llave(seccion), JSON.stringify(x)); } catch (e) {} return x; });
   const sig = ["1", "2", "3", "4"].find((n) => !vis.includes(n));
-  const PASOS = [
+  const propios = CAMINO[seccion];
+  const PASOS = propios ? propios.map(([e, t, d, a], i) => [String(i + 1), e, t, d, COLORES[i], () => ejecutar(a, onAbrirProyecto)]) : [
     ["1", "🧭", "CONOCE", "6 secciones para explorar", "#1B6F8A", () => abrirTablero("conoce")],
     ["2", "🎮", "PARTICIPA", "Juega, aprende y gana", "#E5484D", () => abrirTablero("participa")],
     ["3", "🤝", "COLABORA", "Aliados, voluntarios y amigos", "#C2410C", () => abrirTablero("colabora")],

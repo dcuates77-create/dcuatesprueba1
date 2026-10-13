@@ -6,6 +6,7 @@ import { useAtras } from "./atras.js";
 import { abrirAcceso } from "./Tablero.jsx";
 import { abrirLogros } from "./Extras.jsx";
 import { identidad } from "./datos/identidad.js";
+import { tarjetasHoy, ejecutar } from "./datos/secciones.js";
 import { RETOS_DIA, NECESIDADES_BASE, retosDesdeZona, necesidadesDesdeZona, agendaDesdeZona } from "./datos/zona.js";
 
 const baja = (id) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -32,7 +33,7 @@ export function QueSigue({ id, onIr, onCerrar }) {
   );
 }
 
-export default function HoyDcuates({ agenda = [], filasZona = [], onAbrirProyecto = () => {}, fijo = false }) {
+export default function HoyDcuates({ agenda = [], filasZona = [], onAbrirProyecto = () => {}, fijo = false, seccion = "nosotros", negocios = [] }) {
   const hoy = hoyLocal();
   const dia = Math.floor((Date.now() - new Date().getTimezoneOffset() * 60000) / 86400000);
   const retos = useMemo(() => { const r = retosDesdeZona(filasZona); return r.length ? r : RETOS_DIA; }, [filasZona]);
@@ -41,6 +42,8 @@ export default function HoyDcuates({ agenda = [], filasZona = [], onAbrirProyect
   const evento = useMemo(() => [...agenda, ...agendaDesdeZona(filasZona)].filter((e) => e.fecha >= hoy).sort((a, b) => a.fecha.localeCompare(b.fecha))[0], [agenda, filasZona, hoy]);
   const necesidades = useMemo(() => { const z = necesidadesDesdeZona(filasZona); return z.length ? z : NECESIDADES_BASE; }, [filasZona]);
   const nec = necesidades.length ? necesidades[dia % necesidades.length] : null;
+  const propias = seccion !== "nosotros" ? tarjetasHoy(seccion, { retos, nec, negocios, evento }) : null;
+  const corto = (t, n = 34) => (t.length > n ? t.slice(0, n - 1) + "…" : t);
   const fechaTxt = (f) => { const [, m, d] = f.split("-"); return `${Number(d)} ${MESES[Number(m) - 1]}`; };
   const [abiertoSel, setAbierto] = useState(false);
   const abierto = fijo || abiertoSel;
@@ -53,11 +56,17 @@ export default function HoyDcuates({ agenda = [], filasZona = [], onAbrirProyect
       <span className="hy-comp"><BotonCompartir hash="hoy-dcuates" titulo="Hoy en DCUATES" texto="El reto del día, los eventos y lo que se necesita hoy en la comunidad" variante="claro" /></span>
       <button type="button" className={"hy-franja" + (fijo ? " hy-fija" : "")} aria-expanded={abierto} onClick={fijo ? undefined : alTocar} disabled={false}>
         <span className="hy-fe">☀️{nuevo && !fijo && <i className="hy-nuevo">NUEVO</i>}</span>
-        <span className="hy-ft"><b>HOY EN DCUATES</b><small>{fijo ? "Lo que pasa hoy en la comunidad" : abierto ? "Toca para cerrar" : (evento ? `${cuando}: ${evento.titulo}` : "Reto, evento y lo que se necesita hoy")}</small></span>
+        <span className="hy-ft"><b>HOY EN DCUATES</b><small>{fijo ? "Lo que pasa hoy en la comunidad" : abierto ? "Toca para cerrar" : (propias ? `Esta semana: ${corto(propias[0].t)}` : evento ? `${cuando}: ${evento.titulo}` : "Reto, evento y lo que se necesita hoy")}</small></span>
         {!fijo && <span className={"hy-fl" + (abierto ? " hy-fl-on" : "")} aria-hidden="true">▾</span>}
       </button>
       {abierto && (
       <div className="hy-grid">
+        {propias ? propias.map((c, i) => (
+          <button type="button" key={c.et} className="hy-c" style={{ "--c": c.c }} onClick={() => ejecutar(c.a, onAbrirProyecto)}>
+            <span className="hy-e pz-e" style={{ "--d": `${[2.4, 3, 4.2][i]}s`, "--dd": `${[2.4, 3, 3.6][i]}s` }}>{c.e}</span><small>{c.et}</small><b style={c.t.length > 42 ? { fontSize: 13.5 } : undefined}>{c.t}</b>
+            {c.s && <em className="hy-sub">{c.s}</em>}
+          </button>
+        )) : <>
         <button type="button" className="hy-c" style={{ "--c": "#2E9E5B" }} onClick={() => abrirZona("empieza")}>
           <span className="hy-e pz-e" style={{ "--d": "2.4s", "--dd": "2.4s" }}>🎯</span><small>RETO DEL DÍA {hecho ? "· ✅ cumplido" : ""}</small><b>{reto}</b>
         </button>
@@ -69,6 +78,7 @@ export default function HoyDcuates({ agenda = [], filasZona = [], onAbrirProyect
           <span className="hy-e pz-e" style={{ "--d": "4.2s", "--dd": "3.6s" }}>{nec ? nec.emoji : "🎁"}</span><small>SE NECESITA HOY</small><b>{nec ? nec.titulo : "Mira cómo ayudar"}</b>
           <em className="hy-sub">También: croquetas, difusión y…</em>
         </button>
+</>}
         <button type="button" className="hy-c" style={{ "--c": "#7a5ad8" }} onClick={abrirLogros}>
           <span className="hy-e pz-e" style={{ "--d": "3.6s", "--dd": "4.2s" }}>🏆</span><small>ÚNETE</small><b>SÉ PARTE DE NUESTROS LOGROS</b>
         </button>
