@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import CarruselPortada from "./CarruselPortada";
 import BloqueAgenda from "./BloqueAgenda.jsx";
 import TiraAuto from "./TiraAuto";
@@ -401,6 +402,8 @@ export default function BloqueCentral({
   accesosSlot = null
 }) {
   const [idx, setIdx] = useState(0);
+  const [slotFinal, setSlotFinal] = useState(null);
+  useEffect(() => { setSlotFinal(document.getElementById("bc-final-slot")); }, []);
   const rootRef = useRef(null);
   const barraRef = useRef(null);
   const fijaRef = useRef(null);
@@ -631,14 +634,31 @@ export default function BloqueCentral({
               <span className="bc-mano" aria-hidden="true">👇</span>
             </button>
           </nav>
-          <div id="bc-detalle" className="bc-ancla" aria-hidden="true" />
-
-          {tab.texto && <p className="bc-text">{tab.texto}</p>}
-
-          {tab.banda && <BandaImpacto logros={logros} cargando={cargando} tab={tab} />}
+          {/* En NOSOTROS el texto y la banda de logros van aquí; en las demás secciones se pasan al final de la página (arriba de Historias). */}
+          {(() => {
+            const detalle = (
+              <>
+                <div id="bc-detalle" className="bc-ancla" aria-hidden="true" />
+                {tab.texto && <p className="bc-text">{tab.texto}</p>}
+                {tab.banda && <BandaImpacto logros={logros} cargando={cargando} tab={tab} />}
+              </>
+            );
+            if (tab.id !== "nosotros" && slotFinal) return createPortal(<div className="bc-final" style={{ background: tab.pastel, "--tc": tab.boton || tab.color }}>{detalle}</div>, slotFinal);
+            return detalle;
+          })()}
 
           {tab.fichas && (
             <TiraAuto intervalo={2500} etiqueta="Comercios, cupones, aliados y agenda" fondo={tab.pastel}>
+              <div className="bc-mini-w">
+                <article className="bc-ficha bc-mini bc-ficha-cta" style={{ borderColor: "#C2410C" }}>
+                  <span className="bc-ficha-ico" style={{ background: "#C2410C" }} aria-hidden="true">🏪</span>
+                  <h3>TENGO UN NEGOCIO</h3>
+                  <p>Publicidad, cupones, alianzas y más para ti.</p>
+                  <div className="bc-ficha-btns">
+                    <button type="button" onClick={() => window.dispatchEvent(new CustomEvent("dcuates:abrir-zona", { detail: "negocio" }))} style={{ background: "#C2410C" }}>Entrar ›</button>
+                  </div>
+                </article>
+              </div>
               <div className="bc-mini-w">
                 <article className="bc-ficha bc-mini bc-ficha-cta" style={{ borderColor: tab.color }}>
                   <span className="bc-ficha-ico" style={{ background: tab.boton || tab.color }} aria-hidden="true">💼</span>
@@ -656,6 +676,16 @@ export default function BloqueCentral({
                   <p>Descuentos en negocios locales.</p>
                   <div className="bc-ficha-btns">
                     <button type="button" onClick={() => onAbrirProyecto("cupones-promos")} style={{ background: "#E5484D" }}>Ver ›</button>
+                  </div>
+                </article>
+              </div>
+              <div className="bc-mini-w">
+                <article className="bc-ficha bc-mini" style={{ borderColor: "#7A5AD8" }}>
+                  <span className="bc-ficha-ico" style={{ background: "#7A5AD8" }} aria-hidden="true">💼</span>
+                  <h3>SERVICIOS Y PROMOS ESPECIALES</h3>
+                  <p>Coaching, consultoría y asesoría.</p>
+                  <div className="bc-ficha-btns">
+                    <button type="button" onClick={() => window.dispatchEvent(new CustomEvent("dcuates:abrir-servicios"))} style={{ background: "#7A5AD8" }}>Ver ›</button>
                   </div>
                 </article>
               </div>
@@ -802,6 +832,8 @@ const CSS = `
 .bc-acc-compacto .bc-acc-largo .bc-acc-t{font-size:11.5px}
 .bc-acc-compacto .bc-mano{font-size:17px}
 .bc-acc-compacto{margin-top:8px}
+.bc-final{padding:14px 16px 10px;max-width:none}
+.bc-final .bc-text{max-width:72rem;margin-left:auto;margin-right:auto}
 .bc-mano{font-size:26px;line-height:1;display:inline-block;animation:bc-mano 1.1s ease-in-out infinite}
 @keyframes bc-mano{0%,100%{transform:translateY(-4px)}50%{transform:translateY(6px)}}
 .bc-ancla{height:0;scroll-margin-top:190px}
