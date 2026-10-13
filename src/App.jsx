@@ -475,7 +475,7 @@ export default function App() {
               onAbrirCategoria={(id) => setCategoriaAbierta(id)}
               onAbrirProyecto={(id) => setModalProyecto(id)}
               onAcceso={(t) => (t === "proyectos" ? setShowMapaSitio(true) : setAccesoAbierto(t))}
-              accesosSlot={(tabId) => <><CaminoDcuates compacto={tabId !== "nosotros"} menu={{}} onAbrirProyecto={(id) => setModalProyecto(id)} /><HoyDcuates agenda={agendaEventos} filasZona={filasZona} onAbrirProyecto={(id) => setModalProyecto(id)} /><BotonRegistrate />{tabId === "nosotros" && <InstalarApp />}</>}
+              accesosSlot={(tabId) => <><CaminoDcuates compacto={tabId !== "nosotros"} menu={{}} onAbrirProyecto={(id) => setModalProyecto(id)} /><HoyDcuates fijo={tabId === "nosotros"} agenda={agendaEventos} filasZona={filasZona} onAbrirProyecto={(id) => setModalProyecto(id)} /><BotonRegistrate />{tabId === "nosotros" && <InstalarApp />}</>}
               beneficios={<PestanaBeneficios setBusquedaAbierta={setBusquedaAbierta} setModalProyecto={setModalProyecto} setShowFAQ={setShowFAQ} setSolicitudExpandida={setSolicitudExpandida} solicitudExpandida={solicitudExpandida} />}
               valores={<PestanaValores infoAbierta={infoAbierta} librosLinks={librosLinks} musicaLinks={musicaLinks} recomendacionesComunidad={recomendacionesComunidad} recomendacionesDcuates={recomendacionesDcuates} setInfoAbierta={setInfoAbierta} setModalProyecto={setModalProyecto} videosLinks={videosLinks} />}
               negociosSeccion={<PestanaNegocios compraVentaDcuates={compraVentaDcuates} recomendacionesCompra={recomendacionesCompra} recomendacionesVenta={recomendacionesVenta} setVentasResumenAbierto={setVentasResumenAbierto} ventasResumenAbierto={ventasResumenAbierto} />}

@@ -32,7 +32,7 @@ export function QueSigue({ id, onIr, onCerrar }) {
   );
 }
 
-export default function HoyDcuates({ agenda = [], filasZona = [], onAbrirProyecto = () => {} }) {
+export default function HoyDcuates({ agenda = [], filasZona = [], onAbrirProyecto = () => {}, fijo = false }) {
   const hoy = hoyLocal();
   const dia = Math.floor((Date.now() - new Date().getTimezoneOffset() * 60000) / 86400000);
   const retos = useMemo(() => { const r = retosDesdeZona(filasZona); return r.length ? r : RETOS_DIA; }, [filasZona]);
@@ -42,7 +42,8 @@ export default function HoyDcuates({ agenda = [], filasZona = [], onAbrirProyect
   const necesidades = useMemo(() => { const z = necesidadesDesdeZona(filasZona); return z.length ? z : NECESIDADES_BASE; }, [filasZona]);
   const nec = necesidades.length ? necesidades[dia % necesidades.length] : null;
   const fechaTxt = (f) => { const [, m, d] = f.split("-"); return `${Number(d)} ${MESES[Number(m) - 1]}`; };
-  const [abierto, setAbierto] = useState(false);
+  const [abiertoSel, setAbierto] = useState(false);
+  const abierto = fijo || abiertoSel;
   const [nuevo, setNuevo] = useState(() => { try { return localStorage.getItem("dc_hoy_visto") !== hoy; } catch (e) { return false; } });
   const alTocar = () => { setAbierto((v) => !v); if (nuevo) { try { localStorage.setItem("dc_hoy_visto", hoy); } catch (e) {} setNuevo(false); } };
   const faltan = evento ? Math.round((new Date(evento.fecha + "T00:00:00") - new Date(hoy + "T00:00:00")) / 86400000) : null;
@@ -50,10 +51,10 @@ export default function HoyDcuates({ agenda = [], filasZona = [], onAbrirProyect
   return (
     <section className="hy-sec" id="hoy-dcuates" aria-label="Hoy en DCUATES">
       <span className="hy-comp"><BotonCompartir hash="hoy-dcuates" titulo="Hoy en DCUATES" texto="El reto del día, los eventos y lo que se necesita hoy en la comunidad" variante="claro" /></span>
-      <button type="button" className="hy-franja" aria-expanded={abierto} onClick={alTocar}>
-        <span className="hy-fe">☀️{nuevo && <i className="hy-nuevo">NUEVO</i>}</span>
-        <span className="hy-ft"><b>HOY EN DCUATES</b><small>{abierto ? "Toca para cerrar" : (evento ? `${cuando}: ${evento.titulo}` : "Reto, evento y lo que se necesita hoy")}</small></span>
-        <span className={"hy-fl" + (abierto ? " hy-fl-on" : "")} aria-hidden="true">▾</span>
+      <button type="button" className={"hy-franja" + (fijo ? " hy-fija" : "")} aria-expanded={abierto} onClick={fijo ? undefined : alTocar} disabled={false}>
+        <span className="hy-fe">☀️{nuevo && !fijo && <i className="hy-nuevo">NUEVO</i>}</span>
+        <span className="hy-ft"><b>HOY EN DCUATES</b><small>{fijo ? "Lo que pasa hoy en la comunidad" : abierto ? "Toca para cerrar" : (evento ? `${cuando}: ${evento.titulo}` : "Reto, evento y lo que se necesita hoy")}</small></span>
+        {!fijo && <span className={"hy-fl" + (abierto ? " hy-fl-on" : "")} aria-hidden="true">▾</span>}
       </button>
       {abierto && (
       <div className="hy-grid">
@@ -83,6 +84,7 @@ export default function HoyDcuates({ agenda = [], filasZona = [], onAbrirProyect
 .hy-ft b{display:block;white-space:nowrap;font-size:15px;font-weight:900;color:#ffe9a8;letter-spacing:.02em}
 .hy-ft small{display:block;font-size:12.5px;font-weight:700;line-height:1.25;color:#fff}
 .hy-nuevo{position:absolute;top:-8px;left:-6px;padding:1px 5px;border-radius:99px;background:#E5484D;color:#fff;font-size:9px;font-weight:900;line-height:1.2;font-style:normal;letter-spacing:0}
+.hy-fija{cursor:default}
 .hy-fl{font-size:20px;font-weight:900;color:#ffe9a8;transition:transform .2s}.hy-fl-on{transform:rotate(180deg)}
 .hy-grid{margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .hy-c{display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding:10px 10px 10px;min-height:118px;border:2px solid var(--c);border-left-width:7px;border-radius:14px;background:#fff;font-family:inherit;color:#1f2a37;text-align:left;cursor:pointer;box-shadow:0 5px 12px rgba(0,0,0,.25)}
