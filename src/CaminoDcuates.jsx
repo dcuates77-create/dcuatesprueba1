@@ -9,7 +9,8 @@ const abrirZona = (id) => window.dispatchEvent(new CustomEvent("dcuates:abrir-zo
 
 const leerVis = () => { try { return JSON.parse(localStorage.getItem("dc_camino") || "[]"); } catch (e) { return []; } };
 
-export default function CaminoDcuates({ menu = {}, onAbrirProyecto = () => {} }) {
+export default function CaminoDcuates({ menu = {}, onAbrirProyecto = () => {}, compacto = false }) {
+  const [abierto, setAbierto] = useState(false);
   const [vis, setVis] = useState(leerVis);
   const marcar = (n) => setVis((v) => { const x = v.includes(n) ? v : [...v, n]; try { localStorage.setItem("dc_camino", JSON.stringify(x)); } catch (e) {} return x; });
   const sig = ["1", "2", "3", "4"].find((n) => !vis.includes(n));
@@ -26,10 +27,19 @@ export default function CaminoDcuates({ menu = {}, onAbrirProyecto = () => {} })
     ["🎁", "Quiero donar o ayudar", "#BE185D", () => abrirZona("causa")],
     ["🌟", "Quiero ser aliado o patrocinador", "#B7791F", () => window.dispatchEvent(new CustomEvent("dcuates:abrir-acceso-aliados"))]
   ];
+  const extenso = !compacto || abierto;
   return (
-    <section className="cm-sec" id="camino-dcuates" aria-label="Camino DCUATES">
+    <section className={"cm-sec" + (compacto ? " cm-compacto" : "")} id="camino-dcuates" aria-label="Camino DCUATES">
       <span className="cm-comp"><BotonCompartir hash="camino-dcuates" titulo="Camino DCUATES" texto="Conoce, participa, colabora y crece con DCUATES" variante="claro" /></span>
-      <h2 className="cm-tit">🧭 CAMINO DCUATES</h2>
+      {compacto && (
+        <button type="button" className="cm-franja" aria-expanded={abierto} onClick={() => setAbierto((v) => !v)}>
+          <span className="cm-fe">🧭</span>
+          <span className="cm-ft"><b>CAMINO DCUATES</b><small>{sig ? `Llevas ${vis.length} de 4 pasos · te toca el paso ${sig}` : "🎉 ¡Completaste los 4 pasos!"}</small></span>
+          <span className={"cm-fl" + (abierto ? " cm-fl-on" : "")} aria-hidden="true">▾</span>
+        </button>
+      )}
+      {!compacto && <h2 className="cm-tit">🧭 CAMINO DCUATES</h2>}
+      {extenso && <>
       <p className="cm-prog">{sig ? `Llevas ${vis.length} de 4 pasos · ~2 min c/u` : "🎉 ¡Completaste los 4 pasos! Gracias por caminar con nosotros"}</p>
       <ol className="cm-pasos">
         {PASOS.map(([n, e, t, d, c, fn], i) => (
@@ -40,8 +50,18 @@ export default function CaminoDcuates({ menu = {}, onAbrirProyecto = () => {} })
       <div className="cm-grid">
         {SOY.map(([e, t, c, fn]) => <button type="button" key={t} onClick={fn} style={{ background: c }}><span>{e}</span>{t}</button>)}
       </div>
+      </>}
       <style>{`
 .cm-sec{position:relative;max-width:72rem;margin:12px auto 6px;padding:14px 12px 12px;border-radius:20px;background:var(--tc,#1B6F8A);border:2px solid rgba(255,255,255,.35);box-shadow:0 6px 16px rgba(0,0,0,.18)}
+.cm-compacto{padding:10px 10px}
+.cm-compacto .cm-comp{top:20px;right:14px}
+.cm-franja{width:100%;display:flex;align-items:center;gap:10px;min-height:56px;padding:6px 54px 6px 10px;border:2px solid rgba(255,255,255,.85);border-bottom-width:6px;border-radius:18px;background:transparent;font-family:inherit;text-align:left;cursor:pointer;color:#fff}
+.cm-fe{font-size:26px;line-height:1;flex:none}
+.cm-ft{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.cm-ft b{display:block;font-size:15px;font-weight:900;white-space:nowrap}
+.cm-ft small{display:block;font-size:12.5px;font-weight:700;line-height:1.2}
+.cm-fl{font-size:20px;font-weight:900;transition:transform .2s}.cm-fl-on{transform:rotate(180deg)}
+.cm-compacto .cm-pasos{margin-top:10px}
 .cm-comp{position:absolute;top:8px;right:8px;z-index:4}
 .cm-tit{margin:0 38px 10px;font-size:19px;font-weight:900;text-align:center;color:#fff;letter-spacing:.02em}
 .cm-pasos{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 8px}

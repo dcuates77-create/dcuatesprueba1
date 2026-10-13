@@ -619,8 +619,8 @@ export default function BloqueCentral({
             <CarruselPortada items={portadasItems[tab.id] || []} tab={tab} fallback={imgs[tab.id]} cargando={cargando} />
           )}
 
-          <div style={{ "--tc": tab.boton || tab.color }}>{accesosSlot}</div>
-          <nav className="bc-accesos" aria-label="Accesos rápidos">
+          <div style={{ "--tc": tab.boton || tab.color }}>{typeof accesosSlot === "function" ? accesosSlot(tab.id) : accesosSlot}</div>
+          <nav className={"bc-accesos" + (tab.id !== "nosotros" ? " bc-acc-compacto" : "")} aria-label="Accesos rápidos">
             <button
               type="button"
               className="bc-acc bc-acc-largo"
@@ -798,6 +798,10 @@ const CSS = `
 .bc-acc-pro{background:#1B6F8A}
 .bc-acc-largo{grid-column:1/-1;flex-direction:row;gap:10px;min-height:54px;background:#17472d}
 .bc-acc-largo .bc-acc-t{font-size:13px;color:#FFD84D;letter-spacing:.03em}
+.bc-acc-compacto .bc-acc-largo{min-height:38px;padding:4px 8px;border-radius:12px;gap:6px}
+.bc-acc-compacto .bc-acc-largo .bc-acc-t{font-size:11.5px}
+.bc-acc-compacto .bc-mano{font-size:17px}
+.bc-acc-compacto{margin-top:8px}
 .bc-mano{font-size:26px;line-height:1;display:inline-block;animation:bc-mano 1.1s ease-in-out infinite}
 @keyframes bc-mano{0%,100%{transform:translateY(-4px)}50%{transform:translateY(6px)}}
 .bc-ancla{height:0;scroll-margin-top:190px}
