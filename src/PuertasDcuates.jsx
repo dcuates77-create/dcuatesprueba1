@@ -5,6 +5,9 @@ import BotonCompartir from "./BotonCompartir.jsx";
 import CaminoDcuates from "./CaminoDcuates.jsx";
 import { useAtras } from "./atras.js";
 import { abrirDespues } from "./Extras.jsx";
+import { abrirAcceso } from "./Tablero.jsx";
+import HoyDcuates from "./HoyDcuates.jsx";
+import InstalarApp from "./InstalarApp.jsx";
 import { ejecutar } from "./datos/secciones.js";
 import { PUERTAS, PUERTAS_BASE, PUERTAS_MAS, puertaPorId } from "./datos/puertas.js";
 
@@ -14,14 +17,22 @@ const guarda = (k, v) => { try { v == null ? localStorage.removeItem(k) : localS
 const RANGO2 = [0, 1, 7, 2, 6, 3, 5, 4];
 const RANGO4 = [0, 1, 2, 3, 7, 6, 5, 4];
 
+// Acciones que llevan a un punto de la PÁGINA cierran la ventana; las que abren otra ventana la dejan debajo
+// (se oculta y reaparece al cerrar la nueva, así se regresa al punto de partida).
+export const lanza = (a, cerrar, onAbrirProyecto) => {
+  if (a && (a.sec || a.scroll)) abrirDespues(cerrar, () => ejecutar(a, onAbrirProyecto));
+  else ejecutar(a, onAbrirProyecto);
+};
+
 function Guia({ p, onCerrar, onAbrirProyecto, modo, setModo }) {
   const m = p.modos[Math.min(modo, p.modos.length - 1)];
   const grupos = m.grupos || [];
   const des = m.desarrollo || p.desarrollo;
   const aviso = m.aviso || p.aviso;
-  const ir = (a) => abrirDespues(onCerrar, () => ejecutar(a, onAbrirProyecto));
+  const oculta = useAtras(true, onCerrar, { hub: true });
+  const ir = (a) => lanza(a, onCerrar, onAbrirProyecto);
   return (
-    <div className="zj-fondo" role="dialog" aria-modal="true" aria-label={p.titulo} onClick={(e) => { if (e.target === e.currentTarget) onCerrar(); }}>
+    <div className="zj-fondo" style={oculta ? { display: "none" } : undefined} role="dialog" aria-modal="true" aria-label={p.titulo} onClick={(e) => { if (e.target === e.currentTarget) onCerrar(); }}>
       <div className="zj-caja" style={{ "--pc": p.c }}>
         <div className="zj-cab"><b>{p.e} {p.titulo}</b>
           {!p.sensible && <BotonCompartir hash={"puerta-" + p.id} titulo={p.titulo + " — DCUATES"} texto={"Entra a DCUATES por tu puerta: " + p.titulo} variante="circulo" />}
@@ -55,7 +66,7 @@ function Guia({ p, onCerrar, onAbrirProyecto, modo, setModo }) {
         {m.vender && <p className="pu-aviso">{m.nota}</p>}
         <p className="zj-et">¿Prefieres platicarlo?</p>
         <div className="zj-col"><button type="button" onClick={() => ir({ chat: `¡Hola DCUATES! Entré por la puerta «${p.titulo}» y me gustaría que me orienten. Mi nombre es: ___` })} style={{ background: "#25a244" }}>💬 Escríbenos por WhatsApp</button></div>
-        <p className="pu-sig">{p.sensible ? "🔒 Esta puerta no guarda tu elección ni te pide datos." : "👣 Siguiente paso: toca el que dice «TE TOCA» en tu camino, en la página."}</p>
+        <p className="pu-sig">{p.sensible ? "🔒 Esta puerta no guarda tu elección ni te pide datos." : "↩ Al cerrar lo que abras, regresas aquí, a tu puerta."}</p>
       </div>
     </div>
   );
@@ -72,36 +83,62 @@ function usaPuerta() {
   return leerPuerta();
 }
 
-// Se monta UNA vez en App: abre la guía de cualquier puerta y el selector (desde cualquier sección).
+// Ventana base de la ENTRADA (HOY, EXPLORA): se oculta mientras se abre otra encima y reaparece al cerrarla.
+function VentanaEntrada({ titulo, onCerrar, hash, texto, children }) {
+  const oculta = useAtras(true, onCerrar, { hub: true });
+  return (
+    <div className="zj-fondo" style={oculta ? { display: "none" } : undefined} role="dialog" aria-modal="true" aria-label={titulo} onClick={(e) => { if (e.target === e.currentTarget) onCerrar(); }}>
+      <div className="zj-caja">
+        <div className="zj-cab"><b>{titulo}</b>
+          <BotonCompartir hash={hash} titulo={titulo + " — DCUATES"} texto={texto} variante="circulo" />
+          <button type="button" className="zj-x" onClick={onCerrar} aria-label="Cerrar">✕</button></div>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function Selector({ onCerrar, onAbrirProyecto }) {
+  const oculta = useAtras(true, onCerrar, { hub: true });
+  const actual = leerPuerta();
+  const lista = [...PUERTAS_BASE, "dificil", ...PUERTAS_MAS].map(puertaPorId);
+  return (
+    <div className="zj-fondo" style={oculta ? { display: "none" } : undefined} role="dialog" aria-modal="true" aria-label="Puertas" onClick={(e) => { if (e.target === e.currentTarget) onCerrar(); }}>
+      <div className="zj-caja">
+        <div className="zj-cab"><b>🚪 Puertas</b><button type="button" className="zj-x" onClick={onCerrar} aria-label="Cerrar">✕</button></div>
+        <p className="zj-p">Elige cómo quieres participar y te guiamos paso a paso. Puedes cambiarla cuando quieras.</p>
+        <div className="pu-chips pu-chips2">
+          <button type="button" onClick={() => lanza({ z: "empieza" }, onCerrar, onAbrirProyecto)}>👀 Solo vengo a conocer</button>
+          <button type="button" onClick={() => abrirPuerta("invitado")}>💌 Me invitaron</button>
+        </div>
+        <div className="zj-col">
+          {lista.map((x) => <button type="button" key={x.id} style={{ background: x.c }} onClick={() => abrirPuerta(x.id)}>{x.e} {x.t}{actual === x.id ? "  ✅ tu puerta" : ""}</button>)}
+        </div>
+        <p className="pu-sig">↩ Al cerrar una puerta regresas aquí, a la lista de puertas.</p>
+      </div>
+    </div>
+  );
+}
+
+// Se monta UNA vez en App: abre la guía de cualquier puerta y la lista de puertas (desde cualquier sección).
 export function PuertasHost({ onAbrirProyecto = () => {} }) {
   const [abierta, setAbierta] = useState(null);
   const [selector, setSelector] = useState(false);
   const [, tic] = useState(0);
-  useAtras(!!abierta, () => setAbierta(null));
-  useAtras(selector, () => setSelector(false));
   useEffect(() => {
     const h = () => { try { const m = window.location.hash.match(/^#puerta-([a-z]+)$/); if (m && puertaPorId(m[1])) setAbierta(m[1]); } catch (e) {} };
     h();
-    const o = (e) => { const p = puertaPorId(e.detail); if (!p) return; if (!p.sensible && !p.efimera) { guarda("dc_puerta", p.id); avisa(); } setSelector(false); setAbierta(p.id); };
+    const o = (e) => { const p = puertaPorId(e.detail); if (!p) return; if (!p.sensible && !p.efimera) { guarda("dc_puerta", p.id); avisa(); } setAbierta(p.id); };
     const s = () => setSelector(true);
     window.addEventListener("hashchange", h); window.addEventListener("dcuates:abrir-puerta", o); window.addEventListener("dcuates:elegir-puerta", s);
     return () => { window.removeEventListener("hashchange", h); window.removeEventListener("dcuates:abrir-puerta", o); window.removeEventListener("dcuates:elegir-puerta", s); };
   }, []);
   const cerrarGuia = () => { setAbierta(null); try { if (/^#puerta-/.test(window.location.hash)) history.replaceState(null, "", window.location.pathname + window.location.search); } catch (e) {} };
   const p = abierta ? puertaPorId(abierta) : null;
-  const lista = [...PUERTAS_BASE, "dificil", ...PUERTAS_MAS].map(puertaPorId);
   return (
     <>
-      {p && createPortal(<Guia p={p} onCerrar={cerrarGuia} onAbrirProyecto={onAbrirProyecto} modo={Math.min(leerModo(p.id), p.modos.length - 1)} setModo={(i) => { guarda("dc_modo_" + p.id, String(i)); tic((x) => x + 1); avisa(); }} />, document.body)}
-      {selector && createPortal(
-        <div className="zj-fondo" role="dialog" aria-modal="true" aria-label="Elige tu puerta" onClick={(e) => { if (e.target === e.currentTarget) setSelector(false); }}>
-          <div className="zj-caja">
-            <div className="zj-cab"><b>🚪 ¿Cuál es tu puerta?</b><button type="button" className="zj-x" onClick={() => setSelector(false)} aria-label="Cerrar">✕</button></div>
-            <p className="zj-p">Elige cómo quieres participar y te guiamos paso a paso. Puedes cambiarla cuando quieras.</p>
-            <div className="zj-col">{lista.map((x) => <button type="button" key={x.id} style={{ background: x.c }} onClick={() => abrirPuerta(x.id)}>{x.e} {x.t}</button>)}
-              <button type="button" style={{ background: "#BE185D" }} onClick={() => abrirPuerta("invitado")}>💌 Me invitaron</button></div>
-          </div>
-        </div>, document.body)}
+      {selector && createPortal(<Selector onCerrar={() => setSelector(false)} onAbrirProyecto={onAbrirProyecto} />, document.body)}
+      {p && createPortal(<Guia key={p.id} p={p} onCerrar={cerrarGuia} onAbrirProyecto={onAbrirProyecto} modo={Math.min(leerModo(p.id), p.modos.length - 1)} setModo={(i) => { guarda("dc_modo_" + p.id, String(i)); tic((x) => x + 1); avisa(); }} />, document.body)}
     </>
   );
 }
@@ -121,51 +158,59 @@ export function PuertaFranja() {
   );
 }
 
-export default function PuertasDcuates({ onAbrirProyecto = () => {} }) {
+// ENTRADA de NOSOTROS: 4 botones (Puertas · Hoy · Regístrate · Explora) + apoyo/urgencia
+const RANGO_E = [0, 1, 3, 2]; // latido en el sentido de las manecillas en la cuadrícula 2×2
+const EXPLORA = [
+  ["Conoce todo DCUATES", [["🧭 Proyectos y Mapa del sitio", { acc: "mapa" }], ["🎁 Beneficios (Para ti)", { acc: "beneficios" }], ["🗺️ Negocios y mapa", { sec: "negocios" }]]],
+  ["Participa y gana", [["🎮 Juegos y Semillas", { z: "juegos" }], ["🏆 Gana cupones", { z: "gana" }], ["💡 Recomienda y propón", { z: "propon" }], ["🛍️ Compra, vende y dona con causa", { z: "causa" }]]],
+  ["Servicios, logros y agenda", [["💼 Servicios y promociones especiales", { serv: 1 }], ["🏆 Sé parte de nuestros logros", { logros: 1 }], ["📅 Agenda y reuniones", { z: "info:agenda" }], ["📌 Info clave y teléfonos", { z: "info" }]]],
+  ["Confianza y ayuda", [["🌟 Zona de aliados", { aliados: 1 }], ["🛡️ Escudo de seguridad", { legal: "escudo" }], ["❓ Preguntas frecuentes", { faq: 1 }]]]
+];
+const COLOR_E = ["#2E9E5B", "#E5484D", "#C2410C", "#7a5ad8"];
+
+export default function EntradaDcuates({ onAbrirProyecto = () => {}, agenda = [], filasZona = [], negocios = [] }) {
   const puerta = usaPuerta();
-  const [cambiando, setCambiando] = useState(false);
-  const [mas, setMas] = useState(false);
   const actual = puerta ? puertaPorId(puerta) : null;
-  const colapsada = !!actual && !cambiando;
-  const elegir = (id) => { setCambiando(false); abrirPuerta(id); };
-  const botones = (ids, rango) => ids.map((id, i) => {
-    const p = puertaPorId(id);
-    return (
-      <button type="button" key={id} className="pu-d" style={{ background: p.c }} onClick={() => elegir(id)}>
-        <span className="pu-e" style={{ "--r": rango ? RANGO2[i] : 0, "--rd": rango ? RANGO4[i] : 0 }}>{p.e}</span>
-        <b>{p.t}</b>
-      </button>
-    );
-  });
-  const dif = puertaPorId("dificil");
+  const [ven, setVen] = useState(null); // "hoy" | "explora"
   const modoAct = actual ? Math.min(leerModo(actual.id), actual.modos.length - 1) : 0;
+  const dif = puertaPorId("dificil");
+  const T = [
+    ["🚪", "PUERTAS", actual ? "Entraste como: " + actual.t : "Elige cómo participar", elegirPuerta],
+    ["☀️", "HOY", "Lo de la semana y el próximo evento", () => setVen("hoy")],
+    ["📝", "REGÍSTRATE", "Pide o suma", () => abrirAcceso("registros")],
+    ["🧭", "EXPLORA", "Proyectos, juegos, servicios y más", () => setVen("explora")]
+  ];
   return (
-    <section className="pu-sec" id="camino-dcuates" aria-label="Elige tu puerta">
-      {!colapsada && <>
-        <p className="pu-q">¿Cómo quieres participar hoy?</p>
-        <p className="pu-q2">Elige tu puerta y te guiamos paso a paso</p>
-        <div className="pu-grid">{botones(PUERTAS_BASE, true)}</div>
-        <button type="button" className="pu-dif" style={{ background: dif.c }} onClick={() => elegir("dificil")}>
-          <span className="pu-e2">{dif.e}</span><span><b>{dif.t}</b><small>Siempre visible · sin pedir datos</small></span>
-        </button>
-        <button type="button" className="pu-mas" aria-expanded={mas} onClick={() => setMas((v) => !v)}>{mas ? "➖ Ver menos puertas" : "➕ VER 4 PUERTAS MÁS"}</button>
-        {mas && <div className="pu-grid pu-grid2">{botones(PUERTAS_MAS, false)}</div>}
-        <div className="pu-chips">
-          <button type="button" onClick={() => ejecutar({ z: "info" }, onAbrirProyecto)}>🚨 Tengo una urgencia</button>
-          <button type="button" onClick={() => ejecutar({ z: "empieza" }, onAbrirProyecto)}>👀 Solo vengo a conocer</button>
-          <button type="button" onClick={() => elegir("invitado")}>💌 Me invitaron</button>
-        </div>
-      </>}
-      {colapsada && <>
-        <div className="pu-franja">
-          <span className="pu-fe">{actual.e}</span>
-          <span className="pu-ft"><small>Entraste como:</small><b>{actual.t}</b></span>
-          <button type="button" onClick={() => abrirPuerta(actual.id)}>Mi guía</button>
-          <button type="button" onClick={() => setCambiando(true)}>Cambiar</button>
-        </div>
-        <CaminoDcuates key={actual.id + modoAct} seccion={"p_" + actual.id + "_" + modoAct} pasos={actual.modos[modoAct].pasos} titulo={"TU CAMINO · " + actual.t.toUpperCase()} sinSoy menu={{}} onAbrirProyecto={onAbrirProyecto} />
-        <button type="button" className="pu-ayuda" onClick={() => elegir("dificil")}>🤍 ¿Necesitas apoyo o quieres apoyar a alguien?</button>
-      </>}
+    <section className="pu-sec" id="camino-dcuates" aria-label="Tu entrada a DCUATES">
+      <h2 className="en-tit">TU ENTRADA A DCUATES</h2>
+      <p className="pu-q2">¿Por dónde quieres empezar hoy?</p>
+      <div className="pu-grid">
+        {T.map(([e, t, s, f], i) => (
+          <button type="button" key={t} className="pu-d en-d" style={{ background: COLOR_E[i] }} onClick={f}>
+            <span className="pu-e" style={{ "--r": RANGO_E[i], "--rd": RANGO_E[i] }}>{e}</span>
+            <b>{t}</b><small>{s}</small>
+          </button>
+        ))}
+      </div>
+      <button type="button" className="pu-dif" style={{ background: dif.c }} onClick={() => abrirPuerta("dificil")}>
+        <span className="pu-e2">{dif.e}</span><span><b>¿Necesitas apoyo o tienes una urgencia?</b><small>Sin pedir datos · aquí te orientamos</small></span>
+      </button>
+      {actual && <CaminoDcuates key={actual.id + modoAct} compacto seccion={"p_" + actual.id + "_" + modoAct} pasos={actual.modos[modoAct].pasos} titulo={"TU CAMINO · " + actual.t.toUpperCase()} sinSoy menu={{}} onAbrirProyecto={onAbrirProyecto} />}
+      <InstalarApp />
+      {ven === "hoy" && createPortal(
+        <VentanaEntrada titulo="☀️ Hoy en DCUATES" hash="hoy" texto="Lo que pasa hoy y esta semana en DCUATES" onCerrar={() => setVen(null)}>
+          <div style={{ "--tc": "#1B6F8A" }}><HoyDcuates fijo seccion="nosotros" agenda={agenda} filasZona={filasZona} negocios={negocios} onAbrirProyecto={onAbrirProyecto} /></div>
+        </VentanaEntrada>, document.body)}
+      {ven === "explora" && createPortal(
+        <VentanaEntrada titulo="🧭 Explora DCUATES" hash="explora" texto="Proyectos, juegos, servicios y todo lo que hay en DCUATES" onCerrar={() => setVen(null)}>
+          <p className="zj-p">Todo lo que hay en DCUATES, en un solo lugar. Al cerrar lo que abras, regresas aquí.</p>
+          {EXPLORA.map(([titulo, items], gi) => (
+            <div key={titulo}>
+              <p className="zj-et">{titulo}</p>
+              <div className="zj-col">{items.map(([t, a]) => <button type="button" key={t} style={{ background: COLOR_E[(gi + 1) % 4] }} onClick={() => lanza(a, () => setVen(null), onAbrirProyecto)}>{t}</button>)}</div>
+            </div>
+          ))}
+        </VentanaEntrada>, document.body)}
       <style>{`
 .pu-sec{max-width:72rem;margin:12px auto 6px;padding:14px 12px 12px;border-radius:20px;background:var(--tc,#1B6F8A);border:2px solid rgba(255,255,255,.35);box-shadow:0 6px 16px rgba(0,0,0,.18);color:#fff}
 .pu-q{margin:0;text-align:center;font-size:19px;font-weight:900;letter-spacing:.01em}
@@ -206,6 +251,13 @@ export default function PuertasDcuates({ onAbrirProyecto = () => {} }) {
 
 .pu-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 .pu-chips button{flex:1 1 auto;min-height:42px;padding:4px 10px;border:2px solid rgba(255,255,255,.85);border-radius:999px;background:rgba(255,255,255,.16);color:#fff;font-family:inherit;font-size:13px;font-weight:900;cursor:pointer}
+
+.en-tit{margin:0;text-align:center;font-size:19px;font-weight:900;letter-spacing:.03em;color:#fff}
+.en-d{min-height:104px}
+.en-d small{font-size:11.5px;font-weight:700;line-height:1.15;opacity:.95;color:#fff}
+.en-d b{font-size:16px;letter-spacing:.02em}
+.pu-chips2{margin:0 0 6px}
+.pu-chips2 button{background:#f0e9ff;border-color:#7a5ad8;color:#3b2a7a}
 `}</style>
     </section>
   );

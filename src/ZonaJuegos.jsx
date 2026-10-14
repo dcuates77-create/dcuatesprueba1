@@ -293,7 +293,8 @@ export default function ZonaJuegos({ onAbrirProyecto: abrirProy = () => {}, fila
   const necesidades = useMemo(() => necesidadesDesdeZona(filasZona), [filasZona]);
   const niv = nivelDe(semillas);
   const falta = niv.siguiente ? niv.siguiente.min - semillas : 0;
-  useAtras(!!abierto, () => setAbierto(null));
+  const zOculta = useAtras(!!abierto, () => setAbierto(null), { hub: true });
+  const ZW = (n) => <div style={{ display: zOculta ? "none" : "contents" }}>{n}</div>;
   useEffect(() => { if (abierto && NOMBRE_ZONA[abierto]) guardarUltimo("zona", abierto, NOMBRE_ZONA[abierto]); }, [abierto]);
   const [infoSec, setInfoSec] = useState("emergencias");
   const cerrar = () => { setAbierto(null); setSemillas(leerSemillas()); };
@@ -332,10 +333,10 @@ export default function ZonaJuegos({ onAbrirProyecto: abrirProy = () => {}, fila
         />
       )}
       <PasoCtx.Provider value={{ irA }}>
-      {abierto === "juegos" && createPortal(<Marco juegos={juegos} onCerrar={cerrar} onAbrirProyecto={onAbrirProyecto} alSumar={setSemillas} />, document.body)}
-      {abierto === "empieza" && createPortal(<Empieza onCerrar={cerrar} onAbrirProyecto={onAbrirProyecto} alSumar={setSemillas} palabras={palabras} retos={retos} />, document.body)}
-      {abierto === "negocio" && createPortal(<Negocio onCerrar={cerrar} onAbrirProyecto={onAbrirProyecto} />, document.body)}
-      {abierto && !["juegos", "empieza", "negocio"].includes(abierto) && createPortal(sus, document.body)}
+      {abierto === "juegos" && createPortal(ZW(<Marco juegos={juegos} onCerrar={cerrar} onAbrirProyecto={onAbrirProyecto} alSumar={setSemillas} />), document.body)}
+      {abierto === "empieza" && createPortal(ZW(<Empieza onCerrar={cerrar} onAbrirProyecto={onAbrirProyecto} alSumar={setSemillas} palabras={palabras} retos={retos} />), document.body)}
+      {abierto === "negocio" && createPortal(ZW(<Negocio onCerrar={cerrar} onAbrirProyecto={onAbrirProyecto} />), document.body)}
+      {abierto && !["juegos", "empieza", "negocio"].includes(abierto) && createPortal(ZW(sus), document.body)}
       </PasoCtx.Provider>
       <style>{CSS}</style>
     </>

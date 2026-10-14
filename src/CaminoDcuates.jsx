@@ -38,7 +38,7 @@ export default function CaminoDcuates({ menu = {}, onAbrirProyecto = () => {}, c
       {compacto && (
         <button type="button" className="cm-franja" aria-expanded={abierto} onClick={() => setAbierto((v) => !v)}>
           <span className="cm-fe">🧭</span>
-          <span className="cm-ft"><b>CAMINO DCUATES</b><small>{sig ? `Llevas ${vis.length} de 4 pasos · te toca el paso ${sig}` : "🎉 ¡Completaste los 4 pasos!"}</small></span>
+          <span className="cm-ft"><b>{titulo}</b><small>{sig ? `Llevas ${vis.length} de 4 pasos · te toca el paso ${sig}` : "🎉 ¡Completaste los 4 pasos!"}</small></span>
           <span className={"cm-fl" + (abierto ? " cm-fl-on" : "")} aria-hidden="true">▾</span>
         </button>
       )}

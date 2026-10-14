@@ -4,16 +4,16 @@ import { WHATSAPP_NUMERO } from "./datos/config.js";
 import BotonCompartir from "./BotonCompartir.jsx";
 import { identidad } from "./datos/identidad.js";
 import { abrirAcceso } from "./Tablero.jsx";
-import { abrirServicios, abrirLogros, abrirDespues } from "./Extras.jsx";
+import { abrirServicios, abrirLogros } from "./Extras.jsx";
 
 const zona = (id) => window.dispatchEvent(new CustomEvent("dcuates:abrir-zona", { detail: id }));
 
 export default function Negocio({ onCerrar, onAbrirProyecto }) {
-  const proy = (id, t, color) => ({ t, color: color || identidad(id).color, f: () => { onCerrar(); onAbrirProyecto(id); } });
+  const proy = (id, t, color) => ({ t, color: color || identidad(id).color, f: () => onAbrirProyecto(id) });
   const GRUPOS = [
     ["📣 Dar a conocer mi negocio", [
       proy("publicidad-tarjeta", "📣 Publicidad gratuita para mi negocio"),
-      { t: "🗺️ Registrar mi negocio en el mapa", color: "#1F7A46", f: () => abrirDespues(onCerrar, () => abrirAcceso("registros")) },
+      { t: "🗺️ Registrar mi negocio en el mapa", color: "#1F7A46", f: () => abrirAcceso("registros") },
       proy("recomienda-evalua-gana", "👍 Que me recomienden y me evalúen con confianza")
     ]],
     ["🏷️ Atraer más clientes de mi zona", [
@@ -29,9 +29,9 @@ export default function Negocio({ onCerrar, onAbrirProyecto }) {
     ]],
     ["🎓 Aprender y recibir apoyo", [
       proy("asesorias", "🎓 Asesorías gratuitas para emprender"),
-      { t: "💼 Servicios y promociones especiales", color: "#7a5ad8", f: () => abrirDespues(onCerrar, abrirServicios) },
-      { t: "📅 Reuniones y agenda de la comunidad", color: "#1B6F8A", f: () => abrirDespues(onCerrar, () => zona("info:agenda")) },
-      { t: "🏆 Sé parte de nuestros logros", color: "#C2410C", f: () => abrirDespues(onCerrar, abrirLogros) }
+      { t: "💼 Servicios y promociones especiales", color: "#7a5ad8", f: () => abrirServicios() },
+      { t: "📅 Reuniones y agenda de la comunidad", color: "#1B6F8A", f: () => zona("info:agenda") },
+      { t: "🏆 Sé parte de nuestros logros", color: "#C2410C", f: () => abrirLogros() }
     ]]
   ];
   const wa = `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent("¡Hola DCUATES! Tengo un negocio y me gustaría saber cómo pueden apoyarme. Mi negocio es: ___ · Estoy en la colonia: ___")}`;

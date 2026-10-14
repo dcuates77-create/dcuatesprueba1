@@ -24,7 +24,7 @@ import ZonaJuegos from "./ZonaJuegos.jsx";
 import ZonaAliados from "./ZonaAliados.jsx";
 import ZonaRed from "./ZonaRed.jsx";
 import CaminoDcuates from "./CaminoDcuates.jsx";
-import PuertasDcuates, { PuertasHost, PuertaFranja } from "./PuertasDcuates.jsx";
+import EntradaDcuates, { PuertasHost, PuertaFranja } from "./PuertasDcuates.jsx";
 import Temporada from "./Temporada.jsx";
 import TableroConoce from "./TableroConoce.jsx";
 import HoyDcuates, { QueSigue, guardarUltimo, BotonRegistrate } from "./HoyDcuates.jsx";
@@ -66,6 +66,7 @@ export default function App() {
       else if (e.detail === "terminos") setShowTerminos(true);
       else if (e.detail === "seguridad") setShowSeguridad(true);
       else if (e.detail === "escudo") setShowEscudo(true);
+      else if (e.detail === "faq") setShowFAQ(true);
     };
     window.addEventListener("dcuates:abrir-legal", alPedir);
     return () => window.removeEventListener("dcuates:abrir-legal", alPedir);
@@ -477,7 +478,7 @@ export default function App() {
               onAbrirCategoria={(id) => setCategoriaAbierta(id)}
               onAbrirProyecto={(id) => setModalProyecto(id)}
               onAcceso={(t) => (t === "proyectos" ? setShowMapaSitio(true) : setAccesoAbierto(t))}
-              accesosSlot={(tabId) => <>{tabId === "nosotros" ? <PuertasDcuates key="pu" onAbrirProyecto={(id) => setModalProyecto(id)} /> : <><PuertaFranja key={"pf" + tabId} /><CaminoDcuates key={"c" + tabId} seccion={tabId} compacto menu={{}} onAbrirProyecto={(id) => setModalProyecto(id)} /></>}<HoyDcuates key={"h" + tabId} seccion={tabId} negocios={negociosBaserow} fijo={tabId === "nosotros"} agenda={agendaEventos} filasZona={filasZona} onAbrirProyecto={(id) => setModalProyecto(id)} /><BotonRegistrate />{tabId === "nosotros" && <InstalarApp />}</>}
+              accesosSlot={(tabId) => tabId === "nosotros" ? <EntradaDcuates key="pu" agenda={agendaEventos} filasZona={filasZona} negocios={negociosBaserow} onAbrirProyecto={(id) => setModalProyecto(id)} /> : <><PuertaFranja key={"pf" + tabId} /><CaminoDcuates key={"c" + tabId} seccion={tabId} compacto menu={{}} onAbrirProyecto={(id) => setModalProyecto(id)} /><HoyDcuates key={"h" + tabId} seccion={tabId} negocios={negociosBaserow} agenda={agendaEventos} filasZona={filasZona} onAbrirProyecto={(id) => setModalProyecto(id)} /><BotonRegistrate /></>}
               beneficios={<PestanaBeneficios setBusquedaAbierta={setBusquedaAbierta} setModalProyecto={setModalProyecto} setShowFAQ={setShowFAQ} setSolicitudExpandida={setSolicitudExpandida} solicitudExpandida={solicitudExpandida} />}
               valores={<PestanaValores infoAbierta={infoAbierta} librosLinks={librosLinks} musicaLinks={musicaLinks} recomendacionesComunidad={recomendacionesComunidad} recomendacionesDcuates={recomendacionesDcuates} setInfoAbierta={setInfoAbierta} setModalProyecto={setModalProyecto} videosLinks={videosLinks} />}
               negociosSeccion={<PestanaNegocios compraVentaDcuates={compraVentaDcuates} recomendacionesCompra={recomendacionesCompra} recomendacionesVenta={recomendacionesVenta} setVentasResumenAbierto={setVentasResumenAbierto} ventasResumenAbierto={ventasResumenAbierto} />}

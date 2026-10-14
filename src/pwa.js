@@ -14,6 +14,13 @@ export function iniciarPWA() {
   if (iniciada || typeof window === "undefined") return;
   iniciada = true;
   try {
+    // El navegador necesita ver el "manifiesto"; se agrega solo si el index.html no lo trae.
+    if (!document.querySelector('link[rel="manifest"]')) {
+      const l = document.createElement("link"); l.rel = "manifest"; l.href = "/manifest.webmanifest"; document.head.appendChild(l);
+    }
+    if (!document.querySelector('meta[name="theme-color"]')) {
+      const m = document.createElement("meta"); m.name = "theme-color"; m.content = "#14532d"; document.head.appendChild(m);
+    }
     const local = /^(localhost|127\.|\[::1\])/.test(window.location.hostname);
     if ("serviceWorker" in navigator && !local) {
       window.addEventListener("load", () => {
