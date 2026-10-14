@@ -24,9 +24,9 @@ export function temporadaActual(fecha = new Date()) {
   const md = String(fecha.getMonth() + 1).padStart(2, "0") + "-" + String(fecha.getDate()).padStart(2, "0");
   return TEMPORADAS.find((t) => md >= t.d && md <= t.h) || TEMPORADAS[0];
 }
-// Patrón SVG suave (emojis dispersos con poca opacidad) para fondos claros
+// Patrón SVG muy suave (emojis dispersos, 9% de opacidad) para el fondo de cada sección
 export function patronSvg(t) {
   const [a, b, c, d] = t.em;
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150"><g font-size="22" opacity=".16"><text x="10" y="32">${a}</text><text x="88" y="62" font-size="18">${b}</text><text x="34" y="112">${c}</text><text x="108" y="138" font-size="20">${d}</text></g></svg>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="220" height="220"><g font-size="22" opacity=".09"><text x="14" y="40">${a}</text><text x="130" y="86" font-size="18">${b}</text><text x="52" y="168">${c}</text><text x="160" y="204" font-size="20">${d}</text></g></svg>`;
   return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
 }

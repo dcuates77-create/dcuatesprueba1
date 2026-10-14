@@ -23,6 +23,9 @@ export function ejecutar(a, abrirProyecto = () => {}) {
   else if (a.logros) abrirLogros();
   else if (a.acc) ev("dcuates:abrir-acceso", a.acc);
   else if (a.elegir) ev("dcuates:elegir-puerta");
+  else if (a.sec) { ev("dcuates:abrir-seccion", a.sec); setTimeout(() => document.getElementById("mapa-negocios")?.scrollIntoView({ behavior: "smooth", block: "start" }), 400); }
+  else if (a.legal) ev("dcuates:abrir-legal", a.legal);
+  else if (a.faq) ev("dcuates:abrir-legal", "faq");
   else if (a.aliados) ev("dcuates:abrir-acceso-aliados");
   else if (a.chat) window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(a.chat)}`, "_blank", "noopener,noreferrer");
   else if (a.wa) window.open(`https://wa.me/?text=${encodeURIComponent(a.wa)}`, "_blank", "noopener,noreferrer");

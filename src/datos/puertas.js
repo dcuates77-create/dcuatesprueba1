@@ -35,13 +35,13 @@ export const PUERTAS = [
     intro: "Comprar local también es apoyar: encuentra beneficios cerca de ti y ayuda a mejorar los negocios con tu opinión.",
     modos: [
       { n: "🎁 Busco beneficios", pasos: [
-        ["🗺️", "EXPLORA", "Negocios cerca de ti", { acc: "mapa" }],
+        ["🗺️", "EXPLORA", "Negocios cerca de ti", { sec: "negocios" }],
         ["🏷️", "APROVECHA", "Cupones y promos", { p: "cupones-promos" }],
         ["🛍️", "COMPRA CON CAUSA", "Tu compra apoya", { p: "ventas-con-causa" }],
         ["💼", "DESCUBRE MÁS", "Servicios y promos especiales", { serv: 1 }]],
-        grupos: [["Beneficios y oportunidades", [["🏷️ Cupones y promociones", { p: "cupones-promos" }], ["🛍️ Ventas con causa", { p: "ventas-con-causa" }], ["🗺️ Mapa de negocios", { acc: "mapa" }], ["🧺 Bazares", { p: "bazares" }], ["💼 Servicios y promociones especiales", { serv: 1 }]]]] },
+        grupos: [["Beneficios y oportunidades", [["🏷️ Cupones y promociones", { p: "cupones-promos" }], ["🛍️ Ventas con causa", { p: "ventas-con-causa" }], ["🗺️ Mapa de negocios", { sec: "negocios" }], ["🧺 Bazares", { p: "bazares" }], ["💼 Servicios y promociones especiales", { serv: 1 }]]]] },
       { n: "👍 Recomiendo y opino", pasos: [
-        ["🛒", "VISITA", "Compra en el barrio", { acc: "mapa" }],
+        ["🛒", "VISITA", "Compra en el barrio", { sec: "negocios" }],
         ["👍", "RECOMIENDA", "Cuenta tu buena experiencia", { p: "recomienda-evalua-gana" }],
         ["💬", "RETROALIMENTA", "Sugiere cómo mejorar", { chat: "¡Hola DCUATES! Quiero dar una retroalimentación amable sobre un negocio: ___" }],
         ["🏆", "GANA", "Semillas y premios", { z: "gana" }]],
@@ -150,7 +150,7 @@ export const PUERTAS = [
         ["🔎", "ENCUENTRA", "Apoyos que ya existen", { acc: "beneficios" }],
         ["🤝", "ACÉRCATE", "Personas de confianza", { p: "circulo-confianza" }],
         ["🌱", "AVANZA", "Un paso a la vez", { z: "empieza" }]],
-        grupos: [["Apoyos disponibles", [["💬 Escribirle a alguien de DCUATES", { chat: "¡Hola DCUATES! Me gustaría orientación. Prefiero que me escriban por: ___" }], ["📚 Libros y lectura", { p: "libros" }], ["🎓 Asesorías", { p: "asesorias" }], ["🧘 Bienestar y recreación", { p: "bienestar" }], ["🤝 Círculo de Confianza", { p: "circulo-confianza" }]]]],
+        grupos: [["🚨 Tengo una urgencia", [["📞 Ver teléfonos de emergencia", { z: "info" }], ["💬 Avisar a DCUATES por WhatsApp", { chat: "¡Hola DCUATES! Tengo una urgencia y necesito orientación: ___" }]]], ["Apoyos disponibles", [["💬 Escribirle a alguien de DCUATES", { chat: "¡Hola DCUATES! Me gustaría orientación. Prefiero que me escriban por: ___" }], ["📚 Libros y lectura", { p: "libros" }], ["🎓 Asesorías", { p: "asesorias" }], ["🧘 Bienestar y recreación", { p: "bienestar" }], ["🤝 Círculo de Confianza", { p: "circulo-confianza" }]]]],
         aviso: "🚨 Si hay peligro o emergencia, llama al 911. Si necesitas apoyo emocional, la Línea de la Vida atiende al 800 911 2000. DCUATES no sustituye atención médica, psicológica ni legal." },
       { n: "💛 Quiero apoyar", pasos: [
         ["👂", "ESCUCHA", "Sin juzgar ni exponer", { p: "circulo-confianza" }],
