@@ -30,7 +30,7 @@ export default function Negocio({ onCerrar, onAbrirProyecto }) {
     ["🎓 Aprender y recibir apoyo", [
       proy("asesorias", "🎓 Asesorías gratuitas para emprender"),
       { t: "💼 Servicios y promociones especiales", color: "#7a5ad8", f: () => abrirDespues(onCerrar, abrirServicios) },
-      { t: "📅 Reuniones y agenda de la comunidad", color: "#1B6F8A", f: () => abrirDespues(onCerrar, () => zona("info")) },
+      { t: "📅 Reuniones y agenda de la comunidad", color: "#1B6F8A", f: () => abrirDespues(onCerrar, () => zona("info:agenda")) },
       { t: "🏆 Sé parte de nuestros logros", color: "#C2410C", f: () => abrirDespues(onCerrar, abrirLogros) }
     ]]
   ];

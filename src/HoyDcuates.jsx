@@ -70,7 +70,7 @@ export default function HoyDcuates({ agenda = [], filasZona = [], onAbrirProyect
         <button type="button" className="hy-c" style={{ "--c": "#2E9E5B" }} onClick={() => abrirZona("empieza")}>
           <span className="hy-e pz-e" style={{ "--d": "2.4s", "--dd": "2.4s" }}>🎯</span><small>RETO DEL DÍA {hecho ? "· ✅ cumplido" : ""}</small><b>{reto}</b>
         </button>
-        <button type="button" className="hy-c" style={{ "--c": "#1B6F8A" }} onClick={() => abrirZona("info")}>
+        <button type="button" className="hy-c" style={{ "--c": "#1B6F8A" }} onClick={() => abrirZona("info:agenda")}>
           <span className="hy-e pz-e" style={{ "--d": "3s", "--dd": "3s" }}>📅</span>
           <small>{evento ? `PRÓXIMO EVENTO · ${fechaTxt(evento.fecha)}` : "AGENDA"}</small><b>{evento ? evento.titulo : "Mira lo que viene en la comunidad"}</b>
         </button>

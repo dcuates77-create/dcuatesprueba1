@@ -61,28 +61,73 @@ function Guia({ p, onCerrar, onAbrirProyecto, modo, setModo }) {
   );
 }
 
-export default function PuertasDcuates({ onAbrirProyecto = () => {} }) {
-  const [puerta, setPuerta] = useState(() => { const id = lee("dc_puerta"); return id && puertaPorId(id) ? id : null; });
-  const [cambiando, setCambiando] = useState(false);
-  const [mas, setMas] = useState(false);
+export const abrirPuerta = (id) => window.dispatchEvent(new CustomEvent("dcuates:abrir-puerta", { detail: id }));
+export const elegirPuerta = () => window.dispatchEvent(new CustomEvent("dcuates:elegir-puerta"));
+const avisa = () => window.dispatchEvent(new CustomEvent("dcuates:puerta-cambio"));
+const leerPuerta = () => { const id = lee("dc_puerta"); return id && puertaPorId(id) ? id : null; };
+const leerModo = (id) => parseInt(lee("dc_modo_" + id, "0"), 10) || 0;
+function usaPuerta() {
+  const [, tic] = useState(0);
+  useEffect(() => { const f = () => tic((x) => x + 1); window.addEventListener("dcuates:puerta-cambio", f); return () => window.removeEventListener("dcuates:puerta-cambio", f); }, []);
+  return leerPuerta();
+}
+
+// Se monta UNA vez en App: abre la guía de cualquier puerta y el selector (desde cualquier sección).
+export function PuertasHost({ onAbrirProyecto = () => {} }) {
   const [abierta, setAbierta] = useState(null);
-  const [modos, setModos] = useState(() => { const o = {}; PUERTAS.forEach((p) => { o[p.id] = parseInt(lee("dc_modo_" + p.id, "0"), 10) || 0; }); return o; });
+  const [selector, setSelector] = useState(false);
+  const [, tic] = useState(0);
   useAtras(!!abierta, () => setAbierta(null));
+  useAtras(selector, () => setSelector(false));
   useEffect(() => {
     const h = () => { try { const m = window.location.hash.match(/^#puerta-([a-z]+)$/); if (m && puertaPorId(m[1])) setAbierta(m[1]); } catch (e) {} };
-    h(); window.addEventListener("hashchange", h);
-    const o = (e) => { if (puertaPorId(e.detail)) elegir(e.detail); };
-    window.addEventListener("dcuates:abrir-puerta", o);
-    return () => { window.removeEventListener("hashchange", h); window.removeEventListener("dcuates:abrir-puerta", o); };
+    h();
+    const o = (e) => { const p = puertaPorId(e.detail); if (!p) return; if (!p.sensible && !p.efimera) { guarda("dc_puerta", p.id); avisa(); } setSelector(false); setAbierta(p.id); };
+    const s = () => setSelector(true);
+    window.addEventListener("hashchange", h); window.addEventListener("dcuates:abrir-puerta", o); window.addEventListener("dcuates:elegir-puerta", s);
+    return () => { window.removeEventListener("hashchange", h); window.removeEventListener("dcuates:abrir-puerta", o); window.removeEventListener("dcuates:elegir-puerta", s); };
   }, []);
-  const elegir = (id) => {
-    const p = puertaPorId(id);
-    if (!p.sensible) { guarda("dc_puerta", id); setPuerta(id); setCambiando(false); }
-    setAbierta(id);
-  };
-  const setModo = (id, i) => { guarda("dc_modo_" + id, String(i)); setModos((m) => ({ ...m, [id]: i })); };
+  const cerrarGuia = () => { setAbierta(null); try { if (/^#puerta-/.test(window.location.hash)) history.replaceState(null, "", window.location.pathname + window.location.search); } catch (e) {} };
+  const p = abierta ? puertaPorId(abierta) : null;
+  const lista = [...PUERTAS_BASE, "dificil", ...PUERTAS_MAS].map(puertaPorId);
+  return (
+    <>
+      {p && createPortal(<Guia p={p} onCerrar={cerrarGuia} onAbrirProyecto={onAbrirProyecto} modo={Math.min(leerModo(p.id), p.modos.length - 1)} setModo={(i) => { guarda("dc_modo_" + p.id, String(i)); tic((x) => x + 1); avisa(); }} />, document.body)}
+      {selector && createPortal(
+        <div className="zj-fondo" role="dialog" aria-modal="true" aria-label="Elige tu puerta" onClick={(e) => { if (e.target === e.currentTarget) setSelector(false); }}>
+          <div className="zj-caja">
+            <div className="zj-cab"><b>🚪 ¿Cuál es tu puerta?</b><button type="button" className="zj-x" onClick={() => setSelector(false)} aria-label="Cerrar">✕</button></div>
+            <p className="zj-p">Elige cómo quieres participar y te guiamos paso a paso. Puedes cambiarla cuando quieras.</p>
+            <div className="zj-col">{lista.map((x) => <button type="button" key={x.id} style={{ background: x.c }} onClick={() => abrirPuerta(x.id)}>{x.e} {x.t}</button>)}
+              <button type="button" style={{ background: "#BE185D" }} onClick={() => abrirPuerta("invitado")}>💌 Me invitaron</button></div>
+          </div>
+        </div>, document.body)}
+    </>
+  );
+}
+
+// Franja compacta para las demás secciones
+export function PuertaFranja() {
+  const id = usaPuerta();
+  const p = id ? puertaPorId(id) : null;
+  return (
+    <section className="pf-sec" aria-label="Tu puerta">
+      <style>{`.pf-sec{max-width:72rem;margin:10px auto 0;padding:8px 10px;border-radius:18px;background:var(--tc,#1B6F8A);border:2px solid rgba(255,255,255,.35);display:flex;align-items:center;gap:8px;color:#fff}.pf-e{font-size:24px;flex:none}.pf-t{flex:1;min-width:0;display:flex;flex-direction:column;font-size:12px;font-weight:800}.pf-t b{font-size:14px;font-weight:900;line-height:1.15}.pf-sec button{flex:none;min-height:40px;padding:4px 8px;border:2px solid #fff;border-radius:12px;background:rgba(255,255,255,.18);color:#fff;font-family:inherit;font-size:13px;font-weight:900;cursor:pointer}`}</style>
+      <span className="pf-e">{p ? p.e : "🚪"}</span>
+      <span className="pf-t">{p ? <><small>Tu puerta:</small><b>{p.t}</b></> : <b>¿Cuál es tu puerta?</b>}</span>
+      {p && <button type="button" onClick={() => abrirPuerta(p.id)}>Mi guía</button>}
+      <button type="button" onClick={elegirPuerta}>{p ? "Cambiar" : "Elígela"}</button>
+    </section>
+  );
+}
+
+export default function PuertasDcuates({ onAbrirProyecto = () => {} }) {
+  const puerta = usaPuerta();
+  const [cambiando, setCambiando] = useState(false);
+  const [mas, setMas] = useState(false);
   const actual = puerta ? puertaPorId(puerta) : null;
   const colapsada = !!actual && !cambiando;
+  const elegir = (id) => { setCambiando(false); abrirPuerta(id); };
   const botones = (ids, rango) => ids.map((id, i) => {
     const p = puertaPorId(id);
     return (
@@ -93,7 +138,7 @@ export default function PuertasDcuates({ onAbrirProyecto = () => {} }) {
     );
   });
   const dif = puertaPorId("dificil");
-  const modoAct = actual ? Math.min(modos[actual.id] || 0, actual.modos.length - 1) : 0;
+  const modoAct = actual ? Math.min(leerModo(actual.id), actual.modos.length - 1) : 0;
   return (
     <section className="pu-sec" id="camino-dcuates" aria-label="Elige tu puerta">
       {!colapsada && <>
@@ -105,18 +150,22 @@ export default function PuertasDcuates({ onAbrirProyecto = () => {} }) {
         </button>
         <button type="button" className="pu-mas" aria-expanded={mas} onClick={() => setMas((v) => !v)}>{mas ? "➖ Ver menos puertas" : "➕ VER 4 PUERTAS MÁS"}</button>
         {mas && <div className="pu-grid pu-grid2">{botones(PUERTAS_MAS, false)}</div>}
+        <div className="pu-chips">
+          <button type="button" onClick={() => ejecutar({ z: "info" }, onAbrirProyecto)}>🚨 Tengo una urgencia</button>
+          <button type="button" onClick={() => ejecutar({ z: "empieza" }, onAbrirProyecto)}>👀 Solo vengo a conocer</button>
+          <button type="button" onClick={() => elegir("invitado")}>💌 Me invitaron</button>
+        </div>
       </>}
       {colapsada && <>
         <div className="pu-franja">
           <span className="pu-fe">{actual.e}</span>
           <span className="pu-ft"><small>Entraste como:</small><b>{actual.t}</b></span>
-          <button type="button" onClick={() => setAbierta(actual.id)}>Mi guía</button>
+          <button type="button" onClick={() => abrirPuerta(actual.id)}>Mi guía</button>
           <button type="button" onClick={() => setCambiando(true)}>Cambiar</button>
         </div>
         <CaminoDcuates key={actual.id + modoAct} seccion={"p_" + actual.id + "_" + modoAct} pasos={actual.modos[modoAct].pasos} titulo={"TU CAMINO · " + actual.t.toUpperCase()} sinSoy menu={{}} onAbrirProyecto={onAbrirProyecto} />
         <button type="button" className="pu-ayuda" onClick={() => elegir("dificil")}>🤍 ¿Necesitas apoyo o quieres apoyar a alguien?</button>
       </>}
-      {abierta && createPortal(<Guia p={puertaPorId(abierta)} onCerrar={() => { setAbierta(null); try { if (/^#puerta-/.test(window.location.hash)) history.replaceState(null, "", window.location.pathname + window.location.search); } catch (e) {} }} onAbrirProyecto={onAbrirProyecto} modo={Math.min(modos[abierta] || 0, puertaPorId(abierta).modos.length - 1)} setModo={(i) => setModo(abierta, i)} />, document.body)}
       <style>{`
 .pu-sec{max-width:72rem;margin:12px auto 6px;padding:14px 12px 12px;border-radius:20px;background:var(--tc,#1B6F8A);border:2px solid rgba(255,255,255,.35);box-shadow:0 6px 16px rgba(0,0,0,.18);color:#fff}
 .pu-q{margin:0;text-align:center;font-size:19px;font-weight:900;letter-spacing:.01em}
@@ -154,6 +203,9 @@ export default function PuertasDcuates({ onAbrirProyecto = () => {} }) {
 .pu-des{display:flex;flex-direction:column;gap:6px}
 .pu-sig{margin:12px 2px 0;font-size:12.5px;font-weight:700;color:#6b7785;text-align:center}
 @media(min-width:640px){.pu-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.pu-e{animation-delay:calc(var(--rd) * .6s)}.pu-pasos{grid-template-columns:repeat(4,minmax(0,1fr))}}
+
+.pu-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.pu-chips button{flex:1 1 auto;min-height:42px;padding:4px 10px;border:2px solid rgba(255,255,255,.85);border-radius:999px;background:rgba(255,255,255,.16);color:#fff;font-family:inherit;font-size:13px;font-weight:900;cursor:pointer}
 `}</style>
     </section>
   );

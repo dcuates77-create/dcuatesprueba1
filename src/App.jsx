@@ -24,7 +24,8 @@ import ZonaJuegos from "./ZonaJuegos.jsx";
 import ZonaAliados from "./ZonaAliados.jsx";
 import ZonaRed from "./ZonaRed.jsx";
 import CaminoDcuates from "./CaminoDcuates.jsx";
-import PuertasDcuates from "./PuertasDcuates.jsx";
+import PuertasDcuates, { PuertasHost, PuertaFranja } from "./PuertasDcuates.jsx";
+import Temporada from "./Temporada.jsx";
 import TableroConoce from "./TableroConoce.jsx";
 import HoyDcuates, { QueSigue, guardarUltimo, BotonRegistrate } from "./HoyDcuates.jsx";
 import InstalarApp from "./InstalarApp.jsx";
@@ -476,7 +477,7 @@ export default function App() {
               onAbrirCategoria={(id) => setCategoriaAbierta(id)}
               onAbrirProyecto={(id) => setModalProyecto(id)}
               onAcceso={(t) => (t === "proyectos" ? setShowMapaSitio(true) : setAccesoAbierto(t))}
-              accesosSlot={(tabId) => <>{tabId === "nosotros" ? <PuertasDcuates key="pu" onAbrirProyecto={(id) => setModalProyecto(id)} /> : <CaminoDcuates key={"c" + tabId} seccion={tabId} compacto menu={{}} onAbrirProyecto={(id) => setModalProyecto(id)} />}<HoyDcuates key={"h" + tabId} seccion={tabId} negocios={negociosBaserow} fijo={tabId === "nosotros"} agenda={agendaEventos} filasZona={filasZona} onAbrirProyecto={(id) => setModalProyecto(id)} /><BotonRegistrate />{tabId === "nosotros" && <InstalarApp />}</>}
+              accesosSlot={(tabId) => <>{tabId === "nosotros" ? <PuertasDcuates key="pu" onAbrirProyecto={(id) => setModalProyecto(id)} /> : <><PuertaFranja key={"pf" + tabId} /><CaminoDcuates key={"c" + tabId} seccion={tabId} compacto menu={{}} onAbrirProyecto={(id) => setModalProyecto(id)} /></>}<HoyDcuates key={"h" + tabId} seccion={tabId} negocios={negociosBaserow} fijo={tabId === "nosotros"} agenda={agendaEventos} filasZona={filasZona} onAbrirProyecto={(id) => setModalProyecto(id)} /><BotonRegistrate />{tabId === "nosotros" && <InstalarApp />}</>}
               beneficios={<PestanaBeneficios setBusquedaAbierta={setBusquedaAbierta} setModalProyecto={setModalProyecto} setShowFAQ={setShowFAQ} setSolicitudExpandida={setSolicitudExpandida} solicitudExpandida={solicitudExpandida} />}
               valores={<PestanaValores infoAbierta={infoAbierta} librosLinks={librosLinks} musicaLinks={musicaLinks} recomendacionesComunidad={recomendacionesComunidad} recomendacionesDcuates={recomendacionesDcuates} setInfoAbierta={setInfoAbierta} setModalProyecto={setModalProyecto} videosLinks={videosLinks} />}
               negociosSeccion={<PestanaNegocios compraVentaDcuates={compraVentaDcuates} recomendacionesCompra={recomendacionesCompra} recomendacionesVenta={recomendacionesVenta} setVentasResumenAbierto={setVentasResumenAbierto} ventasResumenAbierto={ventasResumenAbierto} />}
@@ -493,6 +494,8 @@ export default function App() {
       {/* Accesos rápidos: Avisos y Beneficios · Compartir Más · Inicio */}
       <TableroConoce />
       <Extras logros={logrosBanda} />
+      <PuertasHost onAbrirProyecto={(id) => setModalProyecto(id)} />
+      <Temporada />
       <ZonaJuegos
         onAbrirProyecto={(id) => setModalProyecto(id)}
         filas={filasEnlaces}

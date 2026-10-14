@@ -295,6 +295,7 @@ export default function ZonaJuegos({ onAbrirProyecto: abrirProy = () => {}, fila
   const falta = niv.siguiente ? niv.siguiente.min - semillas : 0;
   useAtras(!!abierto, () => setAbierto(null));
   useEffect(() => { if (abierto && NOMBRE_ZONA[abierto]) guardarUltimo("zona", abierto, NOMBRE_ZONA[abierto]); }, [abierto]);
+  const [infoSec, setInfoSec] = useState("emergencias");
   const cerrar = () => { setAbierto(null); setSemillas(leerSemillas()); };
   const irA = (id) => {
     setSemillas(leerSemillas());
@@ -302,7 +303,7 @@ export default function ZonaJuegos({ onAbrirProyecto: abrirProy = () => {}, fila
     setAbierto(null); setTablero(false); setTimeout(() => window.dispatchEvent(new CustomEvent("dcuates:abrir-tablero", { detail: "colabora" })), 120);
   };
   useEffect(() => {
-    const oir = (e) => { const id = e.detail; if (["empieza", "juegos", "aprende", "gana", "propon", "causa", "info", "negocio"].includes(id)) setAbierto(id); };
+    const oir = (e) => { let id = e.detail; if (typeof id === "string" && id.startsWith("info:")) { setInfoSec(id.slice(5)); id = "info"; } else if (id === "info") setInfoSec("emergencias"); if (["empieza", "juegos", "aprende", "gana", "propon", "causa", "info", "negocio"].includes(id)) setAbierto(id); };
     const oirT = (e) => { if (e.detail === "participa") setTablero(true); };
     window.addEventListener("dcuates:abrir-zona", oir);
     window.addEventListener("dcuates:abrir-tablero", oirT);
@@ -315,7 +316,7 @@ export default function ZonaJuegos({ onAbrirProyecto: abrirProy = () => {}, fila
     {abierto === "gana" && <VentanaGana premios={premiosZ} onCerrar={cerrar} alSumar={setSemillas} />}
     {abierto === "propon" && <VentanaPropon onCerrar={cerrar} menu={menu} onAbrirProyecto={onAbrirProyecto} alSumar={setSemillas} />}
     {abierto === "causa" && <VentanaCausa onCerrar={cerrar} necesidades={necesidades} onAbrirProyecto={onAbrirProyecto} alSumar={setSemillas} />}
-    {abierto === "info" && <VentanaInfo onCerrar={cerrar} agenda={agendaZ} menu={menu} telefonos={telefonos} />}
+    {abierto === "info" && <VentanaInfo abrir={infoSec} onCerrar={cerrar} agenda={agendaZ} menu={menu} telefonos={telefonos} />}
   </Suspense>;
 
   return (
