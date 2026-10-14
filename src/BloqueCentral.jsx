@@ -26,7 +26,7 @@ const TABS = [
   {
     id: "nosotros", label: "Nosotros", emoji: "🏠", color: "#1B6F8A", pastel: "#E3F3F8",
     boton: "#1B6F8A",
-    cover: { slogan: "Juntos hacemos una mejor comunidad ⭐" }, slot: "nosotros",
+    cover: { slogan: "⭐⭐⭐ JUNTOS HACEMOS UNA MEJOR COMUNIDAD ⭐⭐⭐" }, slot: "nosotros",
     banda: { titulo: "Lo que hemos logrado juntos" }
   },
   {

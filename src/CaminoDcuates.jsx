@@ -12,12 +12,12 @@ const llave = (sec) => (sec && sec !== "nosotros" ? `dc_camino_${sec}` : "dc_cam
 const leerVis = (sec) => { try { return JSON.parse(localStorage.getItem(llave(sec)) || "[]"); } catch (e) { return []; } };
 const COLORES = ["#1B6F8A", "#E5484D", "#C2410C", "#2E9E5B"];
 
-export default function CaminoDcuates({ menu = {}, onAbrirProyecto = () => {}, compacto = false, seccion = "nosotros" }) {
+export default function CaminoDcuates({ menu = {}, onAbrirProyecto = () => {}, compacto = false, seccion = "nosotros", pasos = null, titulo = "CAMINO DCUATES", sinSoy = false }) {
   const [abierto, setAbierto] = useState(false);
   const [vis, setVis] = useState(() => leerVis(seccion));
   const marcar = (n) => setVis((v) => { const x = v.includes(n) ? v : [...v, n]; try { localStorage.setItem(llave(seccion), JSON.stringify(x)); } catch (e) {} return x; });
   const sig = ["1", "2", "3", "4"].find((n) => !vis.includes(n));
-  const propios = CAMINO[seccion];
+  const propios = pasos || CAMINO[seccion];
   const PASOS = propios ? propios.map(([e, t, d, a], i) => [String(i + 1), e, t, d, COLORES[i], () => ejecutar(a, onAbrirProyecto)]) : [
     ["1", "🧭", "CONOCE", "6 secciones para explorar", "#1B6F8A", () => abrirTablero("conoce")],
     ["2", "🎮", "PARTICIPA", "Juega, aprende y gana", "#E5484D", () => abrirTablero("participa")],
@@ -33,7 +33,7 @@ export default function CaminoDcuates({ menu = {}, onAbrirProyecto = () => {}, c
   ];
   const extenso = !compacto || abierto;
   return (
-    <section className={"cm-sec" + (compacto ? " cm-compacto" : "")} id="camino-dcuates" aria-label="Camino DCUATES">
+    <section className={"cm-sec" + (compacto ? " cm-compacto" : "")} id={pasos ? "camino-puerta" : "camino-dcuates"} aria-label="Camino DCUATES">
       <span className="cm-comp"><BotonCompartir hash="camino-dcuates" titulo="Camino DCUATES" texto="Conoce, participa, colabora y crece con DCUATES" variante="claro" /></span>
       {compacto && (
         <button type="button" className="cm-franja" aria-expanded={abierto} onClick={() => setAbierto((v) => !v)}>
@@ -42,7 +42,7 @@ export default function CaminoDcuates({ menu = {}, onAbrirProyecto = () => {}, c
           <span className={"cm-fl" + (abierto ? " cm-fl-on" : "")} aria-hidden="true">▾</span>
         </button>
       )}
-      {!compacto && <h2 className="cm-tit">🧭 CAMINO DCUATES</h2>}
+      {!compacto && <h2 className="cm-tit">🧭 {titulo}</h2>}
       {extenso && <>
       <p className="cm-prog">{sig ? `Llevas ${vis.length} de 4 pasos · ~2 min c/u` : "🎉 ¡Completaste los 4 pasos! Gracias por caminar con nosotros"}</p>
       <ol className="cm-pasos">
@@ -50,10 +50,10 @@ export default function CaminoDcuates({ menu = {}, onAbrirProyecto = () => {}, c
           <li key={n}><button type="button" className={(vis.includes(n) ? "cm-ok " : "") + (n === sig ? "cm-sig" : "")} onClick={() => { marcar(n); fn(); }} style={{ "--c": c }}><span className="cm-e pz-e" style={{ "--d": `${[0, 0.6, 1.8, 1.2][i]}s`, "--dd": `${i * 0.6}s` }}>{e}</span><span className="cm-tx"><span className="cm-n">PASO {n}{vis.includes(n) ? " ✅" : n === sig ? " · TE TOCA" : ""}</span><b>{t}</b><small>{d}</small></span></button></li>
         ))}
       </ol>
-      <p className="cm-soy">¿Cómo quieres sumarte?</p>
+      {!sinSoy && <><p className="cm-soy">¿Cómo quieres sumarte?</p>
       <div className="cm-grid">
         {SOY.map(([e, t, c, fn]) => <button type="button" key={t} onClick={fn} style={{ background: c }}><span>{e}</span>{t}</button>)}
-      </div>
+      </div></>}
       </>}
       <style>{`
 .cm-sec{position:relative;max-width:72rem;margin:12px auto 6px;padding:14px 12px 12px;border-radius:20px;background:var(--tc,#1B6F8A);border:2px solid rgba(255,255,255,.35);box-shadow:0 6px 16px rgba(0,0,0,.18)}
