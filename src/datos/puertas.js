@@ -72,7 +72,7 @@ export const PUERTAS = [
     ]
   },
   {
-    id: "organizacion", e: "🫶", t: "Organización o institución solidaria", c: "#7a5ad8", titulo: "Organización o institución solidaria",
+    id: "organizacion", e: "🏛️", t: "Organización o institución solidaria", c: "#7a5ad8", titulo: "Organización o institución solidaria",
     intro: "Personas, colectivos, escuelas e instituciones: juntos llegamos más lejos. Sumar en DCUATES no quita lo que ya haces en otros espacios: lo multiplica.",
     modos: [
       { n: "🤲 Ya sumo en otros espacios", pasos: [
@@ -80,7 +80,7 @@ export const PUERTAS = [
         ["🗺️", "REGÍSTRATE", "Aparece en el mapa", { acc: "registros" }],
         ["📣", "DIFUNDE", "Tus causas y eventos", { p: "noticias" }],
         ["🤝", "ALÍATE", "Proyectos en común", { aliados: 1 }]],
-        grupos: [["Para tu organización", [["📰 Difundir una causa o evento", { p: "noticias" }], ["📅 Reuniones y agenda", { z: "info" }], ["🌟 Ser aliada de DCUATES", { aliados: 1 }], ["🏆 Ver nuestros logros", { logros: 1 }]]]] },
+        grupos: [["Para tu organización", [["📰 Difundir una causa o evento", { p: "noticias" }], ["📅 Reuniones y agenda", { z: "info:agenda" }], ["🌟 Ser aliada de DCUATES", { aliados: 1 }], ["🏆 Ver nuestros logros", { logros: 1 }]]]] },
       { n: "🌱 Quiero empezar a sumar", pasos: [
         ["👋", "CONÓCENOS", "Lo que ya hacemos", { logros: 1 }],
         ["🙋", "PRUEBA", "Voluntariado de una jornada", { p: "donaciones" }],
@@ -161,6 +161,16 @@ export const PUERTAS = [
         aviso: "Cuida la privacidad de quien apoyas: no compartas su nombre ni su situación sin su permiso." }
     ],
     desarrollo: [DES("Directorio de apoyos y servicios gratuitos", "Teléfonos y lugares de ayuda de la zona."), DES("Despensa y red de ayuda solidaria", "Coordinar apoyos entre vecinos con total discreción.")]
+  },
+  {
+    id: "invitado", e: "💌", t: "Me invitaron", c: "#BE185D", efimera: true, titulo: "Me invitaron a DCUATES",
+    intro: "¡Bienvenido(a)! Alguien que te quiere bien te invitó a conocer una comunidad de apoyo mutuo: libros, asesorías, mascotas, cupones y mucho más. Sin costo y sin compromiso. 💛",
+    modos: [{ n: null, pasos: [
+      ["👋", "CONÓCENOS", "Empieza con un clic", { z: "empieza" }],
+      ["🏆", "MIRA LO QUE LOGRAMOS", "Resultados reales", { logros: 1 }],
+      ["📝", "REGÍSTRATE", "Pide o suma, cuando quieras", { acc: "registros" }],
+      ["🙏", "AGRADECE", "Cuéntale a quien te invitó", { wa: "¡Gracias por invitarme a DCUATES! Ya lo conocí y me gustó 💛 dcuates.com" }]],
+      grupos: [["Para empezar", [["🎮 Juega y gana Semillas", { z: "juegos" }], ["📚 Pedir un libro prestado", { p: "libros" }], ["🏷️ Ver cupones y promos", { p: "cupones-promos" }], ["🚪 Elegir mi puerta", { elegir: 1 }]]]] }]
   },
   // ---- puertas dentro de «Ver 4 puertas más» ----
   {

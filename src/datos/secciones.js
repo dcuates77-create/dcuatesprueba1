@@ -22,6 +22,7 @@ export function ejecutar(a, abrirProyecto = () => {}) {
   else if (a.serv) abrirServicios();
   else if (a.logros) abrirLogros();
   else if (a.acc) ev("dcuates:abrir-acceso", a.acc);
+  else if (a.elegir) ev("dcuates:elegir-puerta");
   else if (a.aliados) ev("dcuates:abrir-acceso-aliados");
   else if (a.chat) window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(a.chat)}`, "_blank", "noopener,noreferrer");
   else if (a.wa) window.open(`https://wa.me/?text=${encodeURIComponent(a.wa)}`, "_blank", "noopener,noreferrer");
@@ -66,7 +67,7 @@ export const CAMINO = {
     ["🏅", "RECONOCE", "Lo que se ha logrado", { logros: 1 }],
     ["💛", "AGRADECE", "Dile gracias a alguien", { wa: "Quiero agradecer públicamente a: ___ por: ___ 💛 (DCUATES)" }],
     ["📲", "COMPARTE", "Una historia que inspira", { scroll: "historias-reflexiones" }],
-    ["🎉", "CELEBRA", "Agenda de la comunidad", { z: "info" }]
+    ["🎉", "CELEBRA", "Agenda de la comunidad", { z: "info:agenda" }]
   ]
 };
 
@@ -123,7 +124,7 @@ export function tarjetasHoy(sec, d = {}) {
     case "gratitud": return [
       { e: "💛", et: "GRACIAS DE LA SEMANA", t: `Da las gracias ${rota(GRACIAS)}`, c: "#92610F", a: { wa: `Quiero agradecer ${rota(GRACIAS)} 💛 (DCUATES)` } },
       { e: "🌟", et: "FRASE DE GRATITUD DE LA SEMANA", t: rota(FRASES_GRATITUD), c: "#C2255C", a: { wa: `${rota(FRASES_GRATITUD)} 💛 dcuates.com` } },
-      { e: "🏅", et: "PRÓXIMO RECONOCIMIENTO", t: evento ? evento.titulo : "Mira lo que viene en la comunidad", s: evento ? "Toca para ver la agenda" : "", c: "#1B6F8A", a: { z: "info" } }
+      { e: "🏅", et: "PRÓXIMO RECONOCIMIENTO", t: evento ? evento.titulo : "Mira lo que viene en la comunidad", s: evento ? "Toca para ver la agenda" : "", c: "#1B6F8A", a: { z: "info:agenda" } }
     ];
     default: return null;
   }
