@@ -6,6 +6,7 @@
 //           {scroll:"id"} baja a un punto de la página
 // =========================================================================
 import { abrirServicios, abrirLogros } from "../Extras.jsx";
+import { WHATSAPP_NUMERO } from "./config.js";
 
 export function semanaActual() {
   const dia = Math.floor((Date.now() - new Date().getTimezoneOffset() * 60000) / 86400000);
@@ -21,6 +22,8 @@ export function ejecutar(a, abrirProyecto = () => {}) {
   else if (a.serv) abrirServicios();
   else if (a.logros) abrirLogros();
   else if (a.acc) ev("dcuates:abrir-acceso", a.acc);
+  else if (a.aliados) ev("dcuates:abrir-acceso-aliados");
+  else if (a.chat) window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(a.chat)}`, "_blank", "noopener,noreferrer");
   else if (a.wa) window.open(`https://wa.me/?text=${encodeURIComponent(a.wa)}`, "_blank", "noopener,noreferrer");
   else if (a.scroll) document.getElementById(a.scroll)?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
