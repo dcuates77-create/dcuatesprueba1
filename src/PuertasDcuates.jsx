@@ -8,6 +8,7 @@ import { abrirDespues } from "./Extras.jsx";
 import { abrirAcceso } from "./Tablero.jsx";
 import HoyDcuates from "./HoyDcuates.jsx";
 import InstalarApp from "./InstalarApp.jsx";
+import { OpcionesLeer } from "./accesibilidad.jsx";
 import { ciclarLetra, leerLetra, NOMBRES_LETRA } from "./tamanoLetra.js";
 import { ejecutar } from "./datos/secciones.js";
 import { PUERTAS, PUERTAS_BASE, PUERTAS_MAS, puertaPorId } from "./datos/puertas.js";
@@ -228,7 +229,7 @@ export default function EntradaDcuates({ onAbrirProyecto = () => {}, agenda = []
             </div>
           ))}
           <p className="zj-et">Para leer mejor</p>
-          <BotonLetraLista />
+          <OpcionesLeer />
         </VentanaEntrada>, document.body)}
       <style>{`
 .pu-sec{max-width:72rem;margin:12px auto 6px;padding:14px 12px 12px;border-radius:20px;background:var(--tc,#1B6F8A);border:2px solid rgba(255,255,255,.35);box-shadow:0 6px 16px rgba(0,0,0,.18);color:#fff}

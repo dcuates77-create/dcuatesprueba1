@@ -27,6 +27,7 @@ import CaminoDcuates from "./CaminoDcuates.jsx";
 import EntradaDcuates, { PuertasHost, PuertaFranja } from "./PuertasDcuates.jsx";
 import Temporada from "./Temporada.jsx";
 import PrimeraVisita from "./PrimeraVisita.jsx";
+import { LeerVoz, aplicarAccesibilidad } from "./accesibilidad.jsx";
 import { aplicarLetra, leerLetra } from "./tamanoLetra.js";
 import TableroConoce from "./TableroConoce.jsx";
 import HoyDcuates, { QueSigue, guardarUltimo, BotonRegistrate } from "./HoyDcuates.jsx";
@@ -102,7 +103,7 @@ export default function App() {
   const [modalProyecto, setModalProyecto] = useState(null);
   useEffect(() => { if (modalProyecto) { const d = identidad(modalProyecto); guardarUltimo("proyecto", modalProyecto, `${d.emoji} ${d.nombre}`); } }, [modalProyecto]);
   // Analítica: cuenta visitas y registra qué proyectos se abren.
-  useEffect(() => { iniciarAnalitica(); iniciarPWA(); aplicarLetra(leerLetra()); }, []);
+  useEffect(() => { iniciarAnalitica(); iniciarPWA(); aplicarLetra(leerLetra()); aplicarAccesibilidad(); }, []);
   useEffect(() => { if (modalProyecto) registrar("proyecto_abrir", { id: String(modalProyecto) }); }, [modalProyecto]);
   // ¿Ya respondió Baserow (bien o mal)? Mientras no, se muestran esqueletos.
   const [baserowListo, setBaserowListo] = useState(() => typeof window !== "undefined" && !!window.__dcuatesBaserow);
@@ -500,6 +501,7 @@ export default function App() {
       <PuertasHost onAbrirProyecto={(id) => setModalProyecto(id)} />
       <Temporada />
       <PrimeraVisita />
+      <LeerVoz />
       <ZonaJuegos
         onAbrirProyecto={(id) => setModalProyecto(id)}
         filas={filasEnlaces}

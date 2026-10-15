@@ -123,7 +123,7 @@ export default function TiraAuto({ children, intervalo = 2000, etiqueta = "Carru
   // Avance automático: un cuadro cada "intervalo" ms.
   useEffect(() => {
     if (continuo || !desborda || pausado || pausaManual) return;
-    const id = setInterval(() => { if (!document.hidden) irPor(1); }, intervalo);
+    const id = setInterval(() => { if (!document.hidden && !document.body.classList.contains("dc-quieto")) irPor(1); }, intervalo);
     return () => clearInterval(id);
   }, [continuo, desborda, pausado, pausaManual, intervalo, n]);
 

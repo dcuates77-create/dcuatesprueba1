@@ -118,7 +118,7 @@ export default function CarruselPortada({ items = [], tab, slogan, fallback, car
   useEffect(() => {
     if (!desborda || pausado || pausaManual) return;
     const id = setInterval(() => {
-      if (document.hidden) return;
+      if (document.hidden || document.body.classList.contains("dc-quieto")) return;
       const pista = pistaRef.current;
       if (!pista) return;
       const sig = inverso ? indiceRef.current - 1 : indiceRef.current + 1;
