@@ -8,6 +8,7 @@ import { abrirDespues } from "./Extras.jsx";
 import { abrirAcceso } from "./Tablero.jsx";
 import HoyDcuates from "./HoyDcuates.jsx";
 import InstalarApp from "./InstalarApp.jsx";
+import { ciclarLetra, leerLetra, NOMBRES_LETRA } from "./tamanoLetra.js";
 import { ejecutar } from "./datos/secciones.js";
 import { PUERTAS, PUERTAS_BASE, PUERTAS_MAS, puertaPorId } from "./datos/puertas.js";
 
@@ -164,9 +165,24 @@ const EXPLORA = [
   ["Conoce todo DCUATES", [["🧭 Proyectos y Mapa del sitio", { acc: "mapa" }], ["🎁 Beneficios (Para ti)", { acc: "beneficios" }], ["🗺️ Negocios y mapa", { sec: "negocios" }]]],
   ["Participa y gana", [["🎮 Juegos y Semillas", { z: "juegos" }], ["🏆 Gana cupones", { z: "gana" }], ["💡 Recomienda y propón", { z: "propon" }], ["🛍️ Compra, vende y dona con causa", { z: "causa" }]]],
   ["Servicios, logros y agenda", [["💼 Servicios y promociones especiales", { serv: 1 }], ["🏆 Sé parte de nuestros logros", { logros: 1 }], ["📅 Agenda y reuniones", { z: "info:agenda" }], ["📌 Info clave y teléfonos", { z: "info" }]]],
-  ["Confianza y ayuda", [["🌟 Zona de aliados", { aliados: 1 }], ["🛡️ Escudo de seguridad", { legal: "escudo" }], ["❓ Preguntas frecuentes", { faq: 1 }]]]
+  ["Confianza y ayuda", [["🌟 Zona de aliados", { aliados: 1 }], ["🛡️ Escudo de seguridad", { legal: "escudo" }], ["❓ Preguntas frecuentes", { faq: 1 }], ["👋 Ver la bienvenida otra vez", { bienvenida: 1 }]]]
 ];
 const COLOR_E = ["#2E9E5B", "#E5484D", "#C2410C", "#7a5ad8"];
+
+// Botón A+ : cambia el tamaño de la letra (Normal → Grande → Muy grande)
+function usaLetra() {
+  const [n, set] = useState(leerLetra());
+  useEffect(() => { const f = () => set(leerLetra()); window.addEventListener("dcuates:letra", f); return () => window.removeEventListener("dcuates:letra", f); }, []);
+  return n;
+}
+function BotonLetra() {
+  const n = usaLetra();
+  return <button type="button" className="en-letra" onClick={ciclarLetra} aria-label={"Tamaño de letra: " + NOMBRES_LETRA[n] + ". Toca para cambiar"} title="Tamaño de letra">{n === 0 ? "A+" : n === 1 ? "A++" : "A−"}</button>;
+}
+function BotonLetraLista() {
+  const n = usaLetra();
+  return <div className="zj-col"><button type="button" style={{ background: "#334155" }} onClick={ciclarLetra}>🔠 Tamaño de letra: {NOMBRES_LETRA[n]} (toca para cambiar)</button></div>;
+}
 
 export default function EntradaDcuates({ onAbrirProyecto = () => {}, agenda = [], filasZona = [], negocios = [] }) {
   const puerta = usaPuerta();
@@ -183,6 +199,7 @@ export default function EntradaDcuates({ onAbrirProyecto = () => {}, agenda = []
   return (
     <section className="pu-sec" id="camino-dcuates" aria-label="Tu entrada a DCUATES">
       <h2 className="en-tit">TU ENTRADA A DCUATES</h2>
+      <BotonLetra />
       <p className="pu-q2">¿Por dónde quieres empezar hoy?</p>
       <div className="pu-grid">
         {T.map(([e, t, s, f], i) => (
@@ -210,6 +227,8 @@ export default function EntradaDcuates({ onAbrirProyecto = () => {}, agenda = []
               <div className="zj-col">{items.map(([t, a]) => <button type="button" key={t} style={{ background: COLOR_E[(gi + 1) % 4] }} onClick={() => lanza(a, () => setVen(null), onAbrirProyecto)}>{t}</button>)}</div>
             </div>
           ))}
+          <p className="zj-et">Para leer mejor</p>
+          <BotonLetraLista />
         </VentanaEntrada>, document.body)}
       <style>{`
 .pu-sec{max-width:72rem;margin:12px auto 6px;padding:14px 12px 12px;border-radius:20px;background:var(--tc,#1B6F8A);border:2px solid rgba(255,255,255,.35);box-shadow:0 6px 16px rgba(0,0,0,.18);color:#fff}
@@ -252,8 +271,12 @@ export default function EntradaDcuates({ onAbrirProyecto = () => {}, agenda = []
 .pu-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 .pu-chips button{flex:1 1 auto;min-height:42px;padding:4px 10px;border:2px solid rgba(255,255,255,.85);border-radius:999px;background:rgba(255,255,255,.16);color:#fff;font-family:inherit;font-size:13px;font-weight:900;cursor:pointer}
 
-.en-tit{margin:0;text-align:center;font-size:19px;font-weight:900;letter-spacing:.03em;color:#fff}
+.en-letra{position:absolute;top:10px;right:10px;min-width:40px;height:34px;padding:0 8px;border:2px solid #fff;border-radius:12px;background:rgba(255,255,255,.2);color:#fff;font-family:inherit;font-size:14px;font-weight:900;cursor:pointer}
+.pu-sec{position:relative}
+.en-tit{margin:0 44px;text-align:center;font-size:19px;font-weight:900;letter-spacing:.03em;color:#fff}
 .en-d{min-height:104px}
+.dc-letra-xl .pu-grid{grid-template-columns:1fr}
+.dc-letra-xl .en-d b{font-size:15px}
 .en-d small{font-size:11.5px;font-weight:700;line-height:1.15;opacity:.95;color:#fff}
 .en-d b{font-size:16px;letter-spacing:.02em}
 .pu-chips2{margin:0 0 6px}
