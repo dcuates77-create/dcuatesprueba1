@@ -36,6 +36,7 @@ export default function TableroConoce() {
       paso="PASO 1 · CONOCE" emoji="🧭" titulo="CONOCE DCUATES" color="#1B6F8A" hash="zona-conoce"
       intro="Aquí empieza todo. Elige una sección para ver sus proyectos y beneficios. Toca cualquier tarjeta para entrar."
       lista
+      lleno
       tarjetas={tarjetas}
       onCerrar={cerrar}
       onRegistros={() => { cerrar(); abrirAcceso("registros"); }}

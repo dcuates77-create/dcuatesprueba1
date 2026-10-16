@@ -4,10 +4,14 @@ import React from "react";
 import { REDES_SOCIALES, WHATSAPP_NUMERO } from "./datos/config.js";
 import { TELEFONOS_EMERGENCIA, TELEFONOS_LOCALES, TIPS_SEGURIDAD } from "./datos/zona.js";
 import { abrirLegal } from "./componentes/legal.jsx";
+import { CIBERNETICA, AYUDA_LOCAL } from "./datos/apoyo.js";
+import { Fila, ESTILO_AP, abrirApoyo } from "./ZonaApoyo.jsx";
 import { irASeccion } from "./utilidades/baserow.js";
 
 const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
 const fmt = (f) => { const [, m, d] = f.split("-").map(Number); return `${d} ${MESES[m - 1]}`; };
+
+const abrirProyectos = (cerrar) => { cerrar(); setTimeout(() => window.dispatchEvent(new CustomEvent("dcuates:abrir-tablero", { detail: "conoce" })), 120); };
 
 export default function ZonaInfo({ abrir = "emergencias", onCerrar, agenda = [], menu = {}, telefonos }) {
   const hoy = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
@@ -22,6 +26,16 @@ export default function ZonaInfo({ abrir = "emergencias", onCerrar, agenda = [],
           <summary>🚨 Teléfonos de emergencia</summary>
           <div className="in-tels">{(telefonos && telefonos.length ? telefonos : TELEFONOS_EMERGENCIA).map(tel)}{TELEFONOS_LOCALES.map(tel)}</div>
           <p className="in-nota">Toca un número para llamar. Verifica los datos locales con las autoridades.</p>
+        </details>
+        <button type="button" className="in-btn" style={{ background: "#2E9E5B", color: "#fff", margin: "6px 0" }} onClick={abrirApoyo}>💚 Apoyo psicológico gratuito y otros apoyos (UNAM, UAM, gobierno)</button>
+        <details className="in-sec">
+          <summary>🛡️ Policía Cibernética y denuncias</summary>
+          {CIBERNETICA.map((f, i) => <Fila key={f[1]} f={f} i={i} />)}
+        </details>
+        <details className="in-sec">
+          <summary>📍 Ayuda en Ecatepec y Edomex</summary>
+          {AYUDA_LOCAL.map((f, i) => <Fila key={f[1]} f={f} i={i + 1} />)}
+          <p className="in-nota">Datos de directorios públicos; verifícalos al llamar.</p>
         </details>
         <details className="in-sec" open={abrir === "agenda"}>
           <summary>📅 Agenda DCUATES</summary>
@@ -46,9 +60,11 @@ export default function ZonaInfo({ abrir = "emergencias", onCerrar, agenda = [],
         </details>
         <details className="in-sec">
           <summary>📍 Cerca de ti</summary>
+          <button type="button" className="in-btn" onClick={() => abrirProyectos(onCerrar)}>📚 Proyectos de DCUATES</button>
           <button type="button" className="in-btn" onClick={() => { onCerrar(); setTimeout(() => irASeccion("mapa-negocios"), 150); }}>🗺️ Mapa de negocios locales</button>
           {menu.faq && <button type="button" className="in-btn in-sec2" onClick={() => { onCerrar(); setTimeout(menu.faq, 150); }}>❓ Preguntas frecuentes</button>}
         </details>
+        <style>{ESTILO_AP}</style>
         <SiguientePaso actual="info" />
       </div>
     </div>

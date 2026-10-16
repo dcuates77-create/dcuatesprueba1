@@ -7,6 +7,7 @@ import BotonCompartir from "./BotonCompartir.jsx";
 import { useAtras } from "./atras.js";
 import { abrirAcceso } from "./Tablero.jsx";
 
+const COLX = ["#2E9E5B", "#7a5ad8", "#C2410C", "#1B6F8A", "#C2255C", "#92610F"];
 export const abrirServicios = () => window.dispatchEvent(new CustomEvent("dcuates:abrir-servicios"));
 export const abrirLogros = () => window.dispatchEvent(new CustomEvent("dcuates:abrir-logros"));
 // Cierra primero la ventana en la que estás (para que la nueva quede encima) y luego abre la otra.
@@ -45,7 +46,7 @@ export default function Extras({ logros = [] }) {
               <button type="button" className="zj-x" onClick={() => setServ(false)} aria-label="Cerrar">✕</button></div>
             <p className="zj-p">Además de los apoyos comunitarios, DCUATES y Conexiones con Causa ofrecen servicios y promociones especiales para personas, negocios y organizaciones. La lista se irá completando; mientras tanto, pide informes y te orientamos.</p>
             <p className="zj-et">Algunas áreas</p>
-            <div className="ex-lista">{SERV.map(([e, t, d]) => <div className="ag-ev" key={t}><b>{e} {t}</b><p>{d}</p></div>)}</div>
+            <div className="ex-lista">{SERV.map(([e, t, d], i) => <div className="ag-ev ex-c" style={{ background: COLX[i % COLX.length] }} key={t}><b>{e} {t}</b><p>{d}</p></div>)}</div>
             <a className="in-btn" href={wa("Hola, me interesa recibir informes de los servicios y promociones especiales de DCUATES (coaching, consultoría y asesoría). Mi nombre es: ___ · Me interesa para: ___")} target="_blank" rel="noopener noreferrer">💬 Pedir informes por WhatsApp</a>
           </div>
         </div>, document.body)}
@@ -58,7 +59,7 @@ export default function Extras({ logros = [] }) {
             <p className="zj-p ex-intro">Cada logro de esta lista lo construyó una persona que dijo «yo me sumo»: un vecino que prestó un libro, un negocio que se alió, un voluntario que dio su tiempo. 💛 <b>El siguiente logro puede llevar tu nombre.</b> Mira lo que hemos hecho juntos y toma tu lugar.</p>
             <p className="zj-et">Lo que hemos logrado juntos</p>
             <div className="ex-lista">
-              {logros.map((l, i) => <div className="ag-ev" key={i}><p>{l.texto}</p></div>)}
+              {logros.map((l, i) => <div className="ag-ev ex-c" style={{ background: COLX[i % COLX.length] }} key={i}><p>{l.texto}</p></div>)}
             </div>
             <button type="button" className="in-btn" onClick={() => abrirDespues(() => setLog(false), () => abrirAcceso("registros"))}>📝 Quiero sumarme al próximo logro</button>
             <a className="in-btn ex-wa" href={wa("¡Hola DCUATES! Quiero ser parte de sus logros y sumarme a la comunidad.")} target="_blank" rel="noopener noreferrer">💬 Escribirnos por WhatsApp</a>
@@ -68,6 +69,7 @@ export default function Extras({ logros = [] }) {
 .ex-lista{display:flex;flex-direction:column;gap:8px;margin-bottom:8px}
 .ex-intro{background:#fff4d6;border-radius:14px;padding:10px 12px}
 .ex-wa{background:#25a244}
+.ex-c{border:2px solid #fff!important;box-shadow:0 2px 6px rgba(0,0,0,.18)}.ex-c,.ex-c b,.ex-c p{color:#fff!important}body.dc-contraste .zj-caja .ex-c p,body.dc-contraste .zj-caja .ex-c b{color:#fff!important}
 `}</style>
     </>
   );

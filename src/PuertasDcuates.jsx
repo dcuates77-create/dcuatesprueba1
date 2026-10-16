@@ -115,6 +115,8 @@ function Selector({ onCerrar, onAbrirProyecto }) {
         </div>
         <div className="zj-col">
           {lista.map((x) => <button type="button" key={x.id} style={{ background: x.c }} onClick={() => abrirPuerta(x.id)}>{x.e} {x.t}{actual === x.id ? "  ✅ tu puerta" : ""}</button>)}
+          <button type="button" style={{ background: "#1B6F8A" }} onClick={() => lanza({ tablero: "conoce" }, onCerrar, onAbrirProyecto)}>📚 Proyectos de DCUATES</button>
+          <button type="button" style={{ background: "#334155" }} onClick={onCerrar}>🌐 Ir a la página (sin elegir puerta)</button>
         </div>
         <p className="pu-sig">↩ Al cerrar una puerta regresas aquí, a la lista de puertas.</p>
       </div>
@@ -146,16 +148,18 @@ export function PuertasHost({ onAbrirProyecto = () => {} }) {
 }
 
 // Franja compacta para las demás secciones
+export const abrirTour = () => window.dispatchEvent(new CustomEvent("dcuates:bienvenida"));
 export function PuertaFranja() {
   const id = usaPuerta();
   const p = id ? puertaPorId(id) : null;
   return (
     <section className="pf-sec" aria-label="Tu puerta">
-      <style>{`.pf-sec{max-width:72rem;margin:10px auto 0;padding:8px 10px;border-radius:18px;background:var(--tc,#1B6F8A);border:2px solid rgba(255,255,255,.35);display:flex;align-items:center;gap:8px;color:#fff}.pf-e{font-size:24px;flex:none}.pf-t{flex:1;min-width:0;display:flex;flex-direction:column;font-size:12px;font-weight:800}.pf-t b{font-size:14px;font-weight:900;line-height:1.15}.pf-sec button{flex:none;min-height:40px;padding:4px 8px;border:2px solid #fff;border-radius:12px;background:rgba(255,255,255,.18);color:#fff;font-family:inherit;font-size:13px;font-weight:900;cursor:pointer}`}</style>
+      <style>{`.pf-sec{max-width:72rem;margin:10px auto 0;padding:8px 10px;border-radius:18px;background:var(--tc,#1B6F8A);border:2px solid rgba(255,255,255,.35);display:flex;flex-wrap:wrap;align-items:center;gap:8px;color:#fff}.pf-e{font-size:24px;flex:none}.pf-t{flex:1;min-width:0;display:flex;flex-direction:column;font-size:12px;font-weight:800}.pf-t b{font-size:14px;font-weight:900;line-height:1.15}.pf-sec .pf-tour{flex:1 1 100%;font-size:12.5px;min-height:36px}.pf-sec button{flex:none;min-height:40px;padding:4px 8px;border:2px solid #fff;border-radius:12px;background:rgba(255,255,255,.18);color:#fff;font-family:inherit;font-size:13px;font-weight:900;cursor:pointer}`}</style>
       <span className="pf-e">{p ? p.e : "🚪"}</span>
       <span className="pf-t">{p ? <><small>Tu puerta:</small><b>{p.t}</b></> : <b>¿Cuál es tu puerta?</b>}</span>
       {p && <button type="button" onClick={() => abrirPuerta(p.id)}>Mi guía</button>}
       <button type="button" onClick={elegirPuerta}>{p ? "Cambiar" : "Elígela"}</button>
+      <button type="button" className="pf-tour" onClick={abrirTour}>🧭 TOUR DE DCUATES · recuerda cómo moverte</button>
     </section>
   );
 }
@@ -165,8 +169,8 @@ const RANGO_E = [0, 1, 3, 2]; // latido en el sentido de las manecillas en la cu
 const EXPLORA = [
   ["Conoce todo DCUATES", [["🧭 Proyectos y Mapa del sitio", { acc: "mapa" }], ["🎁 Beneficios (Para ti)", { acc: "beneficios" }], ["🗺️ Negocios y mapa", { sec: "negocios" }]]],
   ["Participa y gana", [["🎮 Juegos y Semillas", { z: "juegos" }], ["🏆 Gana cupones", { z: "gana" }], ["💡 Recomienda y propón", { z: "propon" }], ["🛍️ Compra, vende y dona con causa", { z: "causa" }]]],
-  ["Servicios, logros y agenda", [["💼 Servicios y promociones especiales", { serv: 1 }], ["🏆 Sé parte de nuestros logros", { logros: 1 }], ["📅 Agenda y reuniones", { z: "info:agenda" }], ["📌 Info clave y teléfonos", { z: "info" }]]],
-  ["Confianza y ayuda", [["🌟 Zona de aliados", { aliados: 1 }], ["🛡️ Escudo de seguridad", { legal: "escudo" }], ["❓ Preguntas frecuentes", { faq: 1 }], ["👋 Ver la bienvenida otra vez", { bienvenida: 1 }]]]
+  ["Servicios, logros y agenda", [["💼 Servicios y promociones especiales", { serv: 1 }], ["🏆 Sé parte de nuestros logros", { logros: 1 }], ["📅 Agenda y reuniones", { z: "info:agenda" }], ["📌 Info clave y teléfonos", { z: "info" }], ["💚 Apoyo psicológico gratuito", { apoyo: 1 }]]],
+  ["Confianza y ayuda", [["🌟 Zona de aliados", { aliados: 1 }], ["🛡️ Escudo de seguridad", { legal: "escudo" }], ["❓ Preguntas frecuentes", { faq: 1 }], ["🧭 Tour de DCUATES (ver otra vez)", { bienvenida: 1 }]]]
 ];
 const COLOR_E = ["#2E9E5B", "#E5484D", "#C2410C", "#7a5ad8"];
 
@@ -212,6 +216,9 @@ export default function EntradaDcuates({ onAbrirProyecto = () => {}, agenda = []
       </div>
       <button type="button" className="pu-dif" style={{ background: dif.c }} onClick={() => abrirPuerta("dificil")}>
         <span className="pu-e2">{dif.e}</span><span><b>¿Necesitas apoyo o tienes una urgencia?</b><small>Sin pedir datos · aquí te orientamos</small></span>
+      </button>
+      <button type="button" className="pu-dif" style={{ background: "#0f4c5c", minHeight: 48 }} onClick={abrirTour}>
+        <span className="pu-e2">🧭</span><span><b>TOUR DE DCUATES</b><small>Recuerda cómo moverte por la página</small></span>
       </button>
       {actual && <CaminoDcuates key={actual.id + modoAct} compacto seccion={"p_" + actual.id + "_" + modoAct} pasos={actual.modos[modoAct].pasos} titulo={"TU CAMINO · " + actual.t.toUpperCase()} sinSoy menu={{}} onAbrirProyecto={onAbrirProyecto} />}
       <InstalarApp />

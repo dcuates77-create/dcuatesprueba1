@@ -28,6 +28,7 @@ import EntradaDcuates, { PuertasHost, PuertaFranja } from "./PuertasDcuates.jsx"
 import Temporada from "./Temporada.jsx";
 import PrimeraVisita from "./PrimeraVisita.jsx";
 import { LeerVoz, aplicarAccesibilidad } from "./accesibilidad.jsx";
+import ApoyoHost from "./ZonaApoyo.jsx";
 import { aplicarLetra, leerLetra } from "./tamanoLetra.js";
 import TableroConoce from "./TableroConoce.jsx";
 import HoyDcuates, { QueSigue, guardarUltimo, BotonRegistrate } from "./HoyDcuates.jsx";
@@ -502,6 +503,7 @@ export default function App() {
       <Temporada />
       <PrimeraVisita />
       <LeerVoz />
+      <ApoyoHost />
       <ZonaJuegos
         onAbrirProyecto={(id) => setModalProyecto(id)}
         filas={filasEnlaces}

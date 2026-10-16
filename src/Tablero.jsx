@@ -9,7 +9,7 @@ export const abrirAcceso = (tipo) => window.dispatchEvent(new CustomEvent("dcuat
 export const abrirTablero = (id) => window.dispatchEvent(new CustomEvent("dcuates:abrir-tablero", { detail: id }));
 export const IDS_TABLERO = ["conoce", "participa", "colabora", "crece"];
 
-export default function Tablero({ paso, emoji, titulo, intro, color = "#1B6F8A", sub = null, tarjetas = [], hash, onCerrar, onRegistros, lista = false }) {
+export default function Tablero({ paso, emoji, titulo, intro, color = "#1B6F8A", sub = null, tarjetas = [], hash, onCerrar, onRegistros, lista = false, lleno = false }) {
   return createPortal(
     <div className="zj-fondo" role="dialog" aria-modal="true" aria-label={titulo} onClick={(e) => { if (e.target === e.currentTarget) onCerrar(); }}>
       <div className="zj-caja tb-caja">
@@ -21,7 +21,7 @@ export default function Tablero({ paso, emoji, titulo, intro, color = "#1B6F8A",
         {paso && <p className="tb-paso" style={{ color }}>{paso}</p>}
         <p className="tb-intro">{intro}</p>
         {sub}
-        <div className={"tb-grid" + (lista ? " tb-lista" : "")}>
+        <div className={"tb-grid" + (lista ? " tb-lista" : "") + (lleno ? " tb-lleno" : "")}>
           {tarjetas.map((c) => (
             <button type="button" key={c.id} className={"tb-card" + (c.bloq ? " tb-bloq" : "")} style={{ "--c": c.color || color }} onClick={c.onClick}>
               <span className="tb-e" aria-hidden="true">{c.bloq ? "🔒" : c.emoji}</span>
@@ -60,6 +60,7 @@ export default function Tablero({ paso, emoji, titulo, intro, color = "#1B6F8A",
 .tb-lista .tb-reg{flex-direction:row;align-items:center;border-bottom-width:6px;background:#1F7A46;color:#fff}
 .tb-lista .tb-reg small{color:#e3f6ea}
 .tb-lista .tb-reg .tb-e{background:#fff}
+.tb-lleno .tb-card{background:var(--c);color:#fff;border-color:rgba(255,255,255,.75);border-left-color:rgba(0,0,0,.28)}.tb-lleno .tb-card:active{background:var(--c);filter:brightness(.92)}.tb-lleno .tb-card small,.tb-lleno .tb-go{color:#fff}.tb-lleno .tb-card .tb-e{background:#fff}.tb-lleno .tb-reg{background:#1F7A46}
 .tb-bloq{opacity:.85}
 .tb-reg{grid-column:1/-1;min-height:84px;background:#eafaf0}
 `}</style>
