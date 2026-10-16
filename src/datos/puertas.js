@@ -150,7 +150,7 @@ export const PUERTAS = [
         ["🔎", "ENCUENTRA", "Apoyos que ya existen", { acc: "beneficios" }],
         ["🤝", "ACÉRCATE", "Personas de confianza", { p: "circulo-confianza" }],
         ["🌱", "AVANZA", "Un paso a la vez", { z: "empieza" }]],
-        grupos: [["🚨 Tengo una urgencia", [["📞 Ver teléfonos de emergencia", { z: "info" }], ["💬 Avisar a DCUATES por WhatsApp", { chat: "¡Hola DCUATES! Tengo una urgencia y necesito orientación: ___" }]]], ["Apoyos disponibles", [["💬 Escribirle a alguien de DCUATES", { chat: "¡Hola DCUATES! Me gustaría orientación. Prefiero que me escriban por: ___" }], ["📚 Libros y lectura", { p: "libros" }], ["🎓 Asesorías", { p: "asesorias" }], ["🧘 Bienestar y recreación", { p: "bienestar" }], ["🤝 Círculo de Confianza", { p: "circulo-confianza" }]]]],
+        grupos: [["🚨 Tengo una urgencia", [["📞 Ver teléfonos de emergencia", { z: "info" }], ["💚 Apoyo psicológico gratuito y más", { apoyo: 1 }], ["💬 Avisar a DCUATES por WhatsApp", { chat: "¡Hola DCUATES! Tengo una urgencia y necesito orientación: ___" }]]], ["Apoyos disponibles", [["💬 Escribirle a alguien de DCUATES", { chat: "¡Hola DCUATES! Me gustaría orientación. Prefiero que me escriban por: ___" }], ["📚 Libros y lectura", { p: "libros" }], ["🎓 Asesorías", { p: "asesorias" }], ["🧘 Bienestar y recreación", { p: "bienestar" }], ["🤝 Círculo de Confianza", { p: "circulo-confianza" }]]]],
         aviso: "🚨 Si hay peligro o emergencia, llama al 911. Si necesitas apoyo emocional, la Línea de la Vida atiende al 800 911 2000. DCUATES no sustituye atención médica, psicológica ni legal." },
       { n: "💛 Quiero apoyar", pasos: [
         ["👂", "ESCUCHA", "Sin juzgar ni exponer", { p: "circulo-confianza" }],
