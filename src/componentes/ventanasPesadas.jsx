@@ -398,6 +398,11 @@ export function ModalDudas({ onCerrar, onBuscarEnPagina }) {
           ))}
         </div>
       </div>
+      <button type="button"
+        onClick={() => { onCerrar(); setTimeout(() => window.dispatchEvent(new CustomEvent("dcuates:abrir-tablero", { detail: "conoce" })), 120); }}
+        className="mb-3 w-full rounded-2xl px-3 py-3 text-sm font-black uppercase" style={{ background: "#1B6F8A", color: "#fff" }}>
+        📚 Ver los proyectos de DCUATES
+      </button>
       <label className="relative block">
         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-base" aria-hidden="true">🔍</span>
         <input
