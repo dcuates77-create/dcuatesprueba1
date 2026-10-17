@@ -169,19 +169,55 @@ export function TickerFrases() {
   }));
   const itemsFrases = frasesBaserow.length > 0 ? frasesBaserow : TICKER_FRASES;
 
+  const cajaRef = useRef(null);
+  const textoRef = useRef(null);
+  const [m, setM] = useState({ cw: 0, tw: 0 });
+  const VEL = 28; // px por segundo: lento (más lento que el ticker de anuncios de abajo)
+  const siguiente = () => setIndex((i) => (i + 1) % itemsFrases.length);
+
+  useLayoutEffect(() => {
+    const c = cajaRef.current, t = textoRef.current;
+    if (c && t) setM({ cw: c.clientWidth, tw: t.scrollWidth });
+  }, [index, itemsFrases.length, visible]);
+
+  const dur = m.cw ? (m.cw + m.tw) / VEL : 6;
+  // La frase entra por la izquierda y avanza hacia la derecha; al salir pasa la siguiente.
+  // El temporizador es el respaldo si el teléfono tiene las animaciones reducidas.
   useEffect(() => {
-    if (!visible) return;
-    const id = setInterval(() => {
-      setIndex((i) => (i + 1) % itemsFrases.length);
-    }, 5000);
-    return () => clearInterval(id);
-  }, [visible, itemsFrases.length]);
+    if (!visible) return undefined;
+    const id = setTimeout(siguiente, Math.max(6, dur) * 1000 + 400);
+    return () => clearTimeout(id);
+  }, [visible, index, dur, itemsFrases.length]);
 
   if (!visible) return null;
 
+  const item = itemsFrases[index % itemsFrases.length];
+  const esExterno = item.enlace && item.enlace.startsWith("http");
+  const quieto = typeof document !== "undefined" && document.body.classList.contains("dc-quieto");
+
   return (
     <div className="bg-[#0f2d1e] border-b-2 border-emerald-700/50">
-      <FilaTicker items={itemsFrases} index={index} onClose={() => setVisible(false)} mostrarCerrar={true} />
+      <div className="mx-auto max-w-6xl flex items-center gap-2 sm:gap-4 px-3 sm:px-4 py-1.5">
+        <span className="hidden sm:flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-emerald-300 shrink-0 border-r border-emerald-700/50 pr-3">
+          <span>{TICKER_ETIQUETAS.frase.emoji}</span> {TICKER_ETIQUETAS.frase.label}
+        </span>
+        <span ref={cajaRef} className="flex-1 min-w-0 overflow-hidden whitespace-nowrap">
+          <a
+            ref={textoRef}
+            key={index}
+            href={item.enlace || "#"}
+            target={esExterno ? "_blank" : undefined}
+            rel={esExterno ? "noopener noreferrer" : undefined}
+            className="inline-block text-xs sm:text-sm font-bold text-white"
+            style={quieto ? undefined : { animation: `tf-der ${dur}s linear 1 forwards`, "--cw": m.cw + "px" }}
+            onAnimationEnd={siguiente}
+          >
+            <span className="sm:hidden">{TICKER_ETIQUETAS.frase.emoji} </span>{item.texto || item.nombre}
+          </a>
+          <style>{"@keyframes tf-der{from{transform:translateX(-100%)}to{transform:translateX(var(--cw))}}"}</style>
+        </span>
+        <button onClick={() => setVisible(false)} className="text-white/50 hover:text-white text-xl leading-none shrink-0 pl-1" title="Cerrar barra">×</button>
+      </div>
     </div>
   );
 }

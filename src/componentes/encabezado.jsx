@@ -373,6 +373,15 @@ export function BotonNecesidades({ onAbrirProyecto, onAccionEspecial, onAbrirFAQ
 
             {!grupo ? (
               <div className="px-5 pb-2 space-y-3">
+                <button
+                  type="button"
+                  onClick={() => { cerrarTodo(); setTimeout(() => window.dispatchEvent(new CustomEvent("dcuates:abrir-puerta", { detail: "dificil" })), 120); }}
+                  className="w-full flex items-center justify-center gap-3 rounded-2xl font-black uppercase text-[13px] sm:text-sm leading-tight px-4 py-4 shadow-md transition-colors text-center"
+                  style={{ background: "#9D174D", color: "#fff" }}
+                >
+                  <span className="text-2xl" aria-hidden="true">🤍</span>
+                  ¿Necesitas apoyo o tienes una urgencia?
+                </button>
                 {/* Las 4 categorías, como tarjetas grandes */}
                 <div className="grid grid-cols-2 gap-3">
                   {NECESIDADES_GRUPOS.map((g) => {

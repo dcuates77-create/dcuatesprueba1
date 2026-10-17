@@ -399,6 +399,11 @@ export function ModalDudas({ onCerrar, onBuscarEnPagina }) {
         </div>
       </div>
       <button type="button"
+        onClick={() => { onCerrar(); setTimeout(() => window.dispatchEvent(new CustomEvent("dcuates:abrir-puerta", { detail: "dificil" })), 120); }}
+        className="mb-3 w-full rounded-2xl px-3 py-3 text-sm font-black uppercase" style={{ background: "#9D174D", color: "#fff" }}>
+        🤍 ¿Necesitas apoyo o tienes una urgencia?
+      </button>
+      <button type="button"
         onClick={() => { onCerrar(); setTimeout(() => window.dispatchEvent(new CustomEvent("dcuates:abrir-tablero", { detail: "conoce" })), 120); }}
         className="mb-3 w-full rounded-2xl px-3 py-3 text-sm font-black uppercase" style={{ background: "#1B6F8A", color: "#fff" }}>
         📚 Ver los proyectos de DCUATES
