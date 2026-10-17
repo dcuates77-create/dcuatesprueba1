@@ -503,7 +503,7 @@ export default function App() {
       <Temporada />
       <PrimeraVisita />
       <LeerVoz />
-      <ApoyoHost />
+      <ApoyoHost onAbrirProyecto={(id) => setModalProyecto(id)} />
       <ZonaJuegos
         onAbrirProyecto={(id) => setModalProyecto(id)}
         filas={filasEnlaces}

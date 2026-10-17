@@ -47,7 +47,7 @@ const TABS = [
   {
     id: "negocios", label: "Negocios", emoji: "🗺️", color: "#2E9E5B", pastel: "#E4F6EB",
     boton: "#23804A",
-    cat: "alianzas-y-negocios", cover: { slogan: "Negocios locales aliados" }, ocultarSinItems: true, mapa: true, fichas: true, ver: true, slot: "negocios",
+    cat: "alianzas-y-negocios", cover: { slogan: "APOYOS Y BENEFICIOS MUTUOS Y COMUNITARIOS" }, ocultarSinItems: true, mapa: true, fichas: true, ver: true, slot: "negocios",
     texto: "Encuentra comercios aliados en Jardines de Morelos o registra el tuyo gratis.",
     banda: { titulo: "Comunidad que mueve el barrio" },
     invitacion: { titulo: "Compra local, crece en comunidad", texto: "Alianzas que mueven la economía del barrio. Descubre cómo participar." },

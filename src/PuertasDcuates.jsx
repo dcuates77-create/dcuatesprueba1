@@ -159,7 +159,7 @@ export function PuertaFranja() {
       <span className="pf-t">{p ? <><small>Tu puerta:</small><b>{p.t}</b></> : <b>¿Cuál es tu puerta?</b>}</span>
       {p && <button type="button" onClick={() => abrirPuerta(p.id)}>Mi guía</button>}
       <button type="button" onClick={elegirPuerta}>{p ? "Cambiar" : "Elígela"}</button>
-      <button type="button" className="pf-tour" onClick={abrirTour}>🧭 TOUR DE DCUATES · recuerda cómo moverte</button>
+      <button type="button" className="pf-tour" onClick={abrirTour}>🧭 TOUR DCUATES · recuerda cómo moverte</button>
     </section>
   );
 }
@@ -170,7 +170,7 @@ const EXPLORA = [
   ["Conoce todo DCUATES", [["🧭 Proyectos y Mapa del sitio", { acc: "mapa" }], ["🎁 Beneficios (Para ti)", { acc: "beneficios" }], ["🗺️ Negocios y mapa", { sec: "negocios" }]]],
   ["Participa y gana", [["🎮 Juegos y Semillas", { z: "juegos" }], ["🏆 Gana cupones", { z: "gana" }], ["💡 Recomienda y propón", { z: "propon" }], ["🛍️ Compra, vende y dona con causa", { z: "causa" }]]],
   ["Servicios, logros y agenda", [["💼 Servicios y promociones especiales", { serv: 1 }], ["🏆 Sé parte de nuestros logros", { logros: 1 }], ["📅 Agenda y reuniones", { z: "info:agenda" }], ["📌 Info clave y teléfonos", { z: "info" }], ["💚 Apoyo psicológico gratuito", { apoyo: 1 }]]],
-  ["Confianza y ayuda", [["🌟 Zona de aliados", { aliados: 1 }], ["🛡️ Escudo de seguridad", { legal: "escudo" }], ["❓ Preguntas frecuentes", { faq: 1 }], ["🧭 Tour de DCUATES (ver otra vez)", { bienvenida: 1 }]]]
+  ["Confianza y ayuda", [["🌟 Zona de aliados", { aliados: 1 }], ["🛡️ Escudo de seguridad", { legal: "escudo" }], ["❓ Preguntas frecuentes", { faq: 1 }], ["🧭 Tour DCUATES (ver otra vez)", { bienvenida: 1 }]]]
 ];
 const COLOR_E = ["#2E9E5B", "#E5484D", "#C2410C", "#7a5ad8"];
 
@@ -218,7 +218,7 @@ export default function EntradaDcuates({ onAbrirProyecto = () => {}, agenda = []
         <span className="pu-e2">{dif.e}</span><span><b>¿Necesitas apoyo o tienes una urgencia?</b><small>Sin pedir datos · aquí te orientamos</small></span>
       </button>
       <button type="button" className="pu-dif" style={{ background: "#0f4c5c", minHeight: 48 }} onClick={abrirTour}>
-        <span className="pu-e2">🧭</span><span><b>TOUR DE DCUATES</b><small>Recuerda cómo moverte por la página</small></span>
+        <span className="pu-e2">🧭</span><span><b>TOUR DCUATES</b><small>Recuerda cómo moverte por la página</small></span>
       </button>
       {actual && <CaminoDcuates key={actual.id + modoAct} compacto seccion={"p_" + actual.id + "_" + modoAct} pasos={actual.modos[modoAct].pasos} titulo={"TU CAMINO · " + actual.t.toUpperCase()} sinSoy menu={{}} onAbrirProyecto={onAbrirProyecto} />}
       <InstalarApp />
