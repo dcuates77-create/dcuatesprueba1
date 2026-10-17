@@ -169,7 +169,7 @@ const RANGO_E = [0, 1, 3, 2]; // latido en el sentido de las manecillas en la cu
 const EXPLORA = [
   ["Conoce todo DCUATES", [["🧭 Proyectos y Mapa del sitio", { acc: "mapa" }], ["🎁 Beneficios (Para ti)", { acc: "beneficios" }], ["🗺️ Negocios y mapa", { sec: "negocios" }]]],
   ["Participa y gana", [["🎮 Juegos y Semillas", { z: "juegos" }], ["🏆 Gana cupones", { z: "gana" }], ["💡 Recomienda y propón", { z: "propon" }], ["🛍️ Compra, vende y dona con causa", { z: "causa" }]]],
-  ["Servicios, logros y agenda", [["💼 Servicios y promociones especiales", { serv: 1 }], ["🏆 Sé parte de nuestros logros", { logros: 1 }], ["📅 Agenda y reuniones", { z: "info:agenda" }], ["📌 Info clave y teléfonos", { z: "info" }], ["💚 Apoyo psicológico gratuito", { apoyo: 1 }]]],
+  ["Servicios, logros y agenda", [["💼 Servicios y promociones especiales", { serv: 1 }], ["🏆 Sé parte de nuestros logros", { logros: 1 }], ["📅 Agenda, clima y recordatorios", { z: "info:agenda" }], ["📌 Info clave y teléfonos", { z: "info" }], ["💚 Apoyo psicológico gratuito", { apoyo: 1 }]]],
   ["Confianza y ayuda", [["🌟 Zona de aliados", { aliados: 1 }], ["🛡️ Escudo de seguridad", { legal: "escudo" }], ["❓ Preguntas frecuentes", { faq: 1 }], ["🧭 Tour DCUATES (ver otra vez)", { bienvenida: 1 }]]]
 ];
 const COLOR_E = ["#2E9E5B", "#E5484D", "#C2410C", "#7a5ad8"];

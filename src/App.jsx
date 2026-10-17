@@ -29,6 +29,8 @@ import Temporada from "./Temporada.jsx";
 import PrimeraVisita from "./PrimeraVisita.jsx";
 import { LeerVoz, aplicarAccesibilidad } from "./accesibilidad.jsx";
 import ApoyoHost from "./ZonaApoyo.jsx";
+import AgendaHost from "./ZonaAgenda.jsx";
+import { useCalendario, mezclarAgenda } from "./utilidades/calendario.js";
 import { aplicarLetra, leerLetra } from "./tamanoLetra.js";
 import TableroConoce from "./TableroConoce.jsx";
 import HoyDcuates, { QueSigue, guardarUltimo, BotonRegistrate } from "./HoyDcuates.jsx";
@@ -315,7 +317,8 @@ export default function App() {
   // Logros para la banda de impacto: los de Baserow ("NOMBRE LOGROS" /
   // "ENLACE LOGROS") o, si no hay, los ejemplos LOGROS_ITEMS (los mismos de
   // la barra de logros de arriba).
-  const agendaEventos = normalizarAgenda(filasEnlaces, AGENDA_EVENTOS);
+  const eventosCalendario = useCalendario();
+  const agendaEventos = mezclarAgenda(normalizarAgenda(filasEnlaces, eventosCalendario.length > 0 ? [] : AGENDA_EVENTOS), eventosCalendario);
   const juegosRegalos = normalizarRegalos(filasEnlaces);
   const logrosBaserow = paresBaserow(filasEnlaces, "NOMBRE LOGROS", "ENLACE LOGROS", 20);
   const logrosBanda = [
@@ -343,6 +346,7 @@ export default function App() {
         zona: textoDe(f, "NEGOCIO ZONA") || "Jardines de Morelos",
         promo: textoDe(f, "NEGOCIO PROMO"),
         tel: textoDe(f, "NEGOCIO TEL").replace(/\D/g, ""),
+        horario: textoDe(f, "NEGOCIO HORARIO"),
         emoji: textoDe(f, "NEGOCIO EMOJI") || "🏪",
         logo: logo ? resolverSrcImagen(logo) : "",
         color: PALETA_NEGOCIOS[i % PALETA_NEGOCIOS.length]
@@ -504,6 +508,7 @@ export default function App() {
       <PrimeraVisita />
       <LeerVoz />
       <ApoyoHost onAbrirProyecto={(id) => setModalProyecto(id)} />
+      <AgendaHost agenda={agendaEventos} negocios={negociosBaserow} />
       <ZonaJuegos
         onAbrirProyecto={(id) => setModalProyecto(id)}
         filas={filasEnlaces}

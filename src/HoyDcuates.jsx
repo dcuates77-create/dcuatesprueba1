@@ -73,6 +73,7 @@ export default function HoyDcuates({ agenda = [], filasZona = [], onAbrirProyect
         <button type="button" className="hy-c" style={{ "--c": "#1B6F8A" }} onClick={() => abrirZona("info:agenda")}>
           <span className="hy-e pz-e" style={{ "--d": "3s", "--dd": "3s" }}>📅</span>
           <small>{evento ? `PRÓXIMO EVENTO · ${fechaTxt(evento.fecha)}` : "AGENDA"}</small><b>{evento ? evento.titulo : "Mira lo que viene en la comunidad"}</b>
+          <em className="hy-sub">Clima · recordatorios · cuenta regresiva</em>
         </button>
         <button type="button" className="hy-c" style={{ "--c": nec ? identidad(nec.proyecto).color : "#E5484D" }} onClick={() => (nec && nec.proyecto && identidad(nec.proyecto).nombre !== "DCUATES" ? onAbrirProyecto(nec.proyecto) : abrirZona("causa"))}>
           <span className="hy-e pz-e" style={{ "--d": "4.2s", "--dd": "3.6s" }}>{nec ? nec.emoji : "🎁"}</span><small>SE NECESITA HOY</small><b>{nec ? nec.titulo : "Mira cómo ayudar"}</b>

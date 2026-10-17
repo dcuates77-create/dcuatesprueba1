@@ -304,7 +304,7 @@ export default function ZonaJuegos({ onAbrirProyecto: abrirProy = () => {}, fila
     setAbierto(null); setTablero(false); setTimeout(() => window.dispatchEvent(new CustomEvent("dcuates:abrir-tablero", { detail: "colabora" })), 120);
   };
   useEffect(() => {
-    const oir = (e) => { let id = e.detail; if (typeof id === "string" && id.startsWith("info:")) { setInfoSec(id.slice(5)); id = "info"; } else if (id === "info") setInfoSec("emergencias"); if (["empieza", "juegos", "aprende", "gana", "propon", "causa", "info", "negocio"].includes(id)) setAbierto(id); };
+    const oir = (e) => { let id = e.detail; if (id === "info:agenda") { window.dispatchEvent(new CustomEvent("dcuates:abrir-agenda")); return; } if (typeof id === "string" && id.startsWith("info:")) { setInfoSec(id.slice(5)); id = "info"; } else if (id === "info") setInfoSec("emergencias"); if (["empieza", "juegos", "aprende", "gana", "propon", "causa", "info", "negocio"].includes(id)) setAbierto(id); };
     const oirT = (e) => { if (e.detail === "participa") setTablero(true); };
     window.addEventListener("dcuates:abrir-zona", oir);
     window.addEventListener("dcuates:abrir-tablero", oirT);
