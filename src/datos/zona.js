@@ -37,7 +37,7 @@ export const TELEFONOS_LOCALES = [
   // { emoji: "🚒", nombre: "Protección Civil Ecatepec", tel: "5500000000", info: "Agrega aquí tus números locales" }
 ];
 export const TIPS_SEGURIDAD = [
-  "Los únicos canales oficiales de DCUATES son los de esta página (WhatsApp 55 2069 6627 y redes verificadas).",
+  "Los únicos canales oficiales de DCUATES son los de esta página (WhatsApp 55 4047 6247 y redes verificadas).",
   "Nunca des claves, códigos ni datos bancarios por mensaje. Los pagos son solo por transferencia a la CLABE oficial.",
   "Si una promoción parece demasiado buena o te presiona, desconfía y pregúntanos antes."
 ];

@@ -274,7 +274,7 @@ export const INTERESES_BENEFICIOS = [
 // acentos y mayúsculas ("asesoria" encuentra "Asesorías").
 export const normalizarBusqueda = (t) => String(t || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
-export const WA_OFICIAL_TXT = "5520696627";
+export const WA_OFICIAL_TXT = "5540476247";
 
 export const WA_OFICIAL_URL = `https://wa.me/${WHATSAPP_NUMERO}`;
 

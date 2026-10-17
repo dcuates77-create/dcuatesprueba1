@@ -40,3 +40,35 @@ export const APOYO = [
     ["🏠", "Red Nacional de Refugios", "8008224460", "800 822 4460", "Sin costo · 24 horas", ""]
   ]]
 ];
+
+// AYUDA CAUSA ANIMAL. Teléfonos de fuentes periodísticas de 2023 (UnoTV, adn40): VERIFÍCALOS cada cierto tiempo.
+// Falta agregar el Centro de Control Canino de Ecatepec cuando tengas su teléfono confirmado.
+export const ANIMAL_SUGERENCIAS = [
+  ["🔎", "Se perdió mi mascota", "#2E9E5B", [
+    "Busca de inmediato en tu calle y colonia, y pregunta a vecinos, tiendas y veterinarias.",
+    "Repórtala en DCUATES para difundirla (botón de abajo).",
+    "Haz un cartel con foto clara, nombre, señas y tu WhatsApp; compártelo en los grupos de tu colonia.",
+    "Pregunta en el Centro de Control Canino del municipio y revisa fotos de animales encontrados."]],
+  ["🏠", "Encontré un animal o quiero adoptar", "#7a5ad8", [
+    "Revisa si tiene collar o placa, y toma fotos para difundirlo en DCUATES como «encontrado».",
+    "Pregunta por su familia antes de darlo en adopción.",
+    "Para adoptar: piensa en tiempo, gastos, vacunas y esterilización. Una adopción es para toda la vida."]],
+  ["🆘", "Animal herido o en riesgo (rescate)", "#C2410C", [
+    "Si hay peligro para personas o tráfico, llama al 911.",
+    "Acércate con calma, no lo muevas bruscamente y no le des medicinas ni comida si está grave.",
+    "Llama cuanto antes a una veterinaria. Un animal herido puede morder aunque sea manso: cuídate."]],
+  ["⚖️", "Maltrato o abandono", "#C2255C", [
+    "Guarda pruebas: fotos o videos con fecha y lugar, sin ponerte en riesgo.",
+    "Denuncia con los teléfonos de abajo; la denuncia anónima es el 089.",
+    "Describe la especie, el lugar exacto y lo que viste."]]
+];
+export const ANIMAL_TELEFONOS = [
+  ["🚨", "Emergencias", "911", "911", "Peligro inmediato", ""],
+  ["🕵️", "Denuncia anónima", "089", "089", "24 horas", ""],
+  ["⚖️", "Fiscalía General de Justicia del Edomex", "7222261600", "722 226 1600", "Lesiones, envenenamiento, muerte o tortura de animales", ""],
+  ["🌿", "PROPAEM (Edomex)", "7222135456", "722 213 5456", "Especies exóticas, comercio y exhibición con fines de lucro · también 55 5366 8253", "http://tramitesyservicios.edomex.gob.mx/dencma/"],
+  ["🦉", "Profepa (fauna silvestre)", "8007763372", "800 776 3372", "Fauna silvestre, cacería y tráfico ilegal", ""],
+  ["🐕", "Brigada de Vigilancia Animal (CDMX)", "5552089898", "55 5208 9898", "Rescates y asesoría en la Ciudad de México", ""],
+  ["🛡️", "Consejo Ciudadano (CDMX)", "5555335533", "55 5533 5533", "24 horas · abuso contra perros y gatos · también *5533", ""],
+  ["📋", "PAOT (CDMX)", "5552650780", "55 5265 0780", "Cualquier maltrato animal en la CDMX", ""]
+];

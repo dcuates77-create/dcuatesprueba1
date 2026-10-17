@@ -138,7 +138,7 @@ export const PUERTAS = [
       ["🔎", "REPORTA", "Extraviados y encontrados", { p: "extraviados-registro" }],
       ["🏠", "ADOPTA O AYUDA", "Hogar temporal y apoyo", { chat: "¡Hola DCUATES! Quiero ayudar a los animales. Puedo: adoptar / dar hogar temporal / donar / ser voluntario(a)." }],
       ["📲", "COMPARTE", "Difunde casos", { wa: "Te comparto casos de mascotas y peluditos que necesitan ayuda en DCUATES: dcuates.com 🐾" }]],
-      grupos: [["Para los peluditos", [["🐾 Ecatepets", { p: "ecatepets" }], ["🔎 Mascotas extraviadas o encontradas", { p: "extraviados-registro" }], ["🎁 Donar alimento o ayuda", { z: "causa" }], ["🙋 Ser voluntario(a)", { p: "donaciones" }]]]],
+      grupos: [["Para los peluditos", [["🐾 Ecatepets", { p: "ecatepets" }], ["🆘 Ayuda causa animal: teléfonos y qué hacer", { apoyo: "animal" }], ["🔎 Mascotas extraviadas o encontradas", { p: "extraviados-registro" }], ["🎁 Donar alimento o ayuda", { z: "causa" }], ["🙋 Ser voluntario(a)", { p: "donaciones" }]]]],
       desarrollo: [DES("Jornadas de esterilización y vacunación", "Aliados veterinarios y fechas cercanas."), DES("Red de hogares temporales", "Vecinos que dan refugio mientras llega una familia."), DES("Directorio de veterinarias aliadas", "Descuentos y apoyo para casos urgentes."), DES("Paseos y cuidados solidarios", "Voluntarios para acompañar a peluditos de adultos mayores.")] }]
   },
   {
@@ -150,7 +150,7 @@ export const PUERTAS = [
         ["🔎", "ENCUENTRA", "Apoyos que ya existen", { acc: "beneficios" }],
         ["🤝", "ACÉRCATE", "Personas de confianza", { p: "circulo-confianza" }],
         ["🌱", "AVANZA", "Un paso a la vez", { z: "empieza" }]],
-        grupos: [["🚨 Tengo una urgencia", [["📞 Ver teléfonos de emergencia", { z: "info" }], ["💚 Apoyo psicológico gratuito y más", { apoyo: 1 }], ["💬 Avisar a DCUATES por WhatsApp", { chat: "¡Hola DCUATES! Tengo una urgencia y necesito orientación: ___" }]]], ["Apoyos disponibles", [["💬 Escribirle a alguien de DCUATES", { chat: "¡Hola DCUATES! Me gustaría orientación. Prefiero que me escriban por: ___" }], ["📚 Libros y lectura", { p: "libros" }], ["🎓 Asesorías", { p: "asesorias" }], ["🧘 Bienestar y recreación", { p: "bienestar" }], ["🤝 Círculo de Confianza", { p: "circulo-confianza" }]]]],
+        grupos: [["🚨 Tengo una urgencia", [["📞 Ver teléfonos de emergencia", { z: "info" }], ["💚 Apoyo psicológico gratuito y más", { apoyo: 1 }], ["💬 Avisar a DCUATES por WhatsApp", { chat: "¡Hola DCUATES! Tengo una urgencia y necesito orientación: ___" }]]], ["🐾 Ayuda causa animal", [["🐾 Extravío, adopción, rescate o maltrato animal", { apoyo: "animal" }], ["🐾 Ecatepets: mascotas y adopción", { p: "ecatepets" }]]], ["Apoyos disponibles", [["💬 Escribirle a alguien de DCUATES", { chat: "¡Hola DCUATES! Me gustaría orientación. Prefiero que me escriban por: ___" }], ["📚 Libros y lectura", { p: "libros" }], ["🎓 Asesorías", { p: "asesorias" }], ["🧘 Bienestar y recreación", { p: "bienestar" }], ["🤝 Círculo de Confianza", { p: "circulo-confianza" }]]]],
         aviso: "🚨 Si hay peligro o emergencia, llama al 911. Si necesitas apoyo emocional, la Línea de la Vida atiende al 800 911 2000. DCUATES no sustituye atención médica, psicológica ni legal." },
       { n: "💛 Quiero apoyar", pasos: [
         ["👂", "ESCUCHA", "Sin juzgar ni exponer", { p: "circulo-confianza" }],
