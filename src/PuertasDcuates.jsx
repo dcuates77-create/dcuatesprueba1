@@ -8,6 +8,7 @@ import { abrirDespues } from "./Extras.jsx";
 import { abrirAcceso } from "./Tablero.jsx";
 import HoyDcuates from "./HoyDcuates.jsx";
 import InstalarApp from "./InstalarApp.jsx";
+import { BotonPlus } from "./AgendaPlus.jsx";
 import { OpcionesLeer } from "./accesibilidad.jsx";
 import { ciclarLetra, leerLetra, NOMBRES_LETRA } from "./tamanoLetra.js";
 import { ejecutar } from "./datos/secciones.js";
@@ -169,7 +170,7 @@ const RANGO_E = [0, 1, 3, 2]; // latido en el sentido de las manecillas en la cu
 const EXPLORA = [
   ["Conoce todo DCUATES", [["🧭 Proyectos y Mapa del sitio", { acc: "mapa" }], ["🎁 Beneficios (Para ti)", { acc: "beneficios" }], ["🗺️ Negocios y mapa", { sec: "negocios" }]]],
   ["Participa y gana", [["🎮 Juegos y Semillas", { z: "juegos" }], ["🏆 Gana cupones", { z: "gana" }], ["💡 Recomienda y propón", { z: "propon" }], ["🛍️ Compra, vende y dona con causa", { z: "causa" }]]],
-  ["Servicios, logros y agenda", [["💼 Servicios y promociones especiales", { serv: 1 }], ["🏆 Sé parte de nuestros logros", { logros: 1 }], ["📅 Agenda, clima y recordatorios", { z: "info:agenda" }], ["📌 Info clave y teléfonos", { z: "info" }], ["💚 Apoyo psicológico gratuito", { apoyo: 1 }]]],
+  ["Servicios, logros y agenda", [["💼 Servicios y promociones especiales", { serv: 1 }], ["🏆 Sé parte de nuestros logros", { logros: 1 }], ["➕ AGENDA PLUS (mapas, tablero, directorio)", { plus: 1 }], ["📅 Agenda, clima y recordatorios", { z: "info:agenda" }], ["📌 Info clave y teléfonos", { z: "info" }], ["💚 Apoyo psicológico gratuito", { apoyo: 1 }]]],
   ["Confianza y ayuda", [["🌟 Zona de aliados", { aliados: 1 }], ["🛡️ Escudo de seguridad", { legal: "escudo" }], ["❓ Preguntas frecuentes", { faq: 1 }], ["🧭 Tour DCUATES (ver otra vez)", { bienvenida: 1 }]]]
 ];
 const COLOR_E = ["#2E9E5B", "#E5484D", "#C2410C", "#7a5ad8"];
@@ -221,6 +222,7 @@ export default function EntradaDcuates({ onAbrirProyecto = () => {}, agenda = []
         <span className="pu-e2">🧭</span><span><b>TOUR DCUATES</b><small>Recuerda cómo moverte por la página</small></span>
       </button>
       {actual && <CaminoDcuates key={actual.id + modoAct} compacto seccion={"p_" + actual.id + "_" + modoAct} pasos={actual.modos[modoAct].pasos} titulo={"TU CAMINO · " + actual.t.toUpperCase()} sinSoy menu={{}} onAbrirProyecto={onAbrirProyecto} />}
+      <BotonPlus />
       <InstalarApp />
       {ven === "hoy" && createPortal(
         <VentanaEntrada titulo="☀️ Hoy en DCUATES" hash="hoy" texto="Lo que pasa hoy y esta semana en DCUATES" onCerrar={() => setVen(null)}>

@@ -1,4 +1,4 @@
-// Botón "Instalar DCUATES como app": Android/PC usan el aviso del navegador; iPhone y otros ven los pasos.
+// Ícono 📲 "Instalar DCUATES como app" (esquina izquierda de TU ENTRADA, opuesto al A+): Android/PC usan el aviso del navegador; iPhone y otros ven los pasos.
 import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { esIOS, instalarApp, puedeInstalar, suscribirPWA, yaInstalada } from "./pwa.js";
@@ -14,7 +14,7 @@ export default function InstalarApp() {
   const ios = esIOS();
   return (
     <>
-      <button type="button" className="ia-btn" onClick={tocar}>📲 Instalar DCUATES como app</button>
+      <button type="button" className="ia-btn" onClick={tocar} aria-label="Instalar DCUATES como app" title="Instalar DCUATES como app">📲</button>
       {guia && createPortal(
         <div className="zj-fondo" role="dialog" aria-modal="true" aria-label="Instalar DCUATES" onClick={(e) => { if (e.target === e.currentTarget) setGuia(false); }}>
           <div className="zj-caja">
@@ -28,7 +28,7 @@ export default function InstalarApp() {
           </div>
         </div>, document.body)}
       <style>{`
-.ia-btn{display:block;width:100%;margin-top:10px;min-height:50px;border:2px solid #14532d;border-radius:14px;background:#fff;color:#14532d;font-family:inherit;font-size:15px;font-weight:900;cursor:pointer}
+.ia-btn{position:absolute;top:10px;left:10px;min-width:40px;height:34px;padding:0 8px;border:2px solid #fff;border-radius:12px;background:rgba(255,255,255,.2);color:#fff;font-family:inherit;font-size:17px;line-height:1;cursor:pointer}
 .ia-pasos{margin:8px 0 4px;padding-left:20px;font-size:15px;font-weight:700;line-height:1.4;display:flex;flex-direction:column;gap:8px;color:#1f2a37}
 `}</style>
     </>
