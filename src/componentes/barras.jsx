@@ -91,57 +91,52 @@ export function BarraLogros() {
   const logrosBaserow = paresBaserow(filasEnlaces, "NOMBRE LOGROS", "ENLACE LOGROS", 20);
   const itemsLogros = [...(logrosBaserow.length > 0 ? logrosBaserow : LOGROS_ITEMS), ...LOGROS_FIJOS];
 
-  // Barra más baja (3/4 de la anterior): el texto se acomoda en 2 renglones y, si es más largo,
-  // se desliza hacia abajo con el dedo. Rota cada 7 s; si la persona la toca o la desliza, se pausa un rato.
+  // Si el texto no cabe, se desplaza hacia la izquierda y al terminar pasa al
+  // siguiente; si cabe, rota cada 5 s como antes.
   const cajaRef = useRef(null);
-  const [sobra, setSobra] = useState(false);
-  const [pausa, setPausa] = useState(false);
-  const pausaId = useRef(null);
+  const textoRef = useRef(null);
+  const [recorrido, setRecorrido] = useState(0); // px que desborda; 0 = cabe
   const siguiente = () => setIndex((i) => (i + 1) % itemsLogros.length);
-  const tocar = () => { setPausa(true); clearTimeout(pausaId.current); pausaId.current = setTimeout(() => setPausa(false), 20000); };
-  useEffect(() => () => clearTimeout(pausaId.current), []);
 
   useEffect(() => {
-    const c = cajaRef.current;
-    if (c) { c.scrollTop = 0; setSobra(c.scrollHeight > c.clientHeight + 3); }
+    const c = cajaRef.current, t = textoRef.current;
+    const sobra = c && t ? t.scrollWidth - c.clientWidth : 0;
+    setRecorrido(sobra > 4 ? t.scrollWidth : 0);
   }, [index, itemsLogros.length]);
 
   useEffect(() => {
-    if (pausa) return undefined;
-    const id = setTimeout(siguiente, 7000);
+    if (recorrido) return undefined;
+    const id = setTimeout(siguiente, 5000);
     return () => clearTimeout(id);
-  }, [index, pausa, itemsLogros.length]);
+  }, [index, recorrido, itemsLogros.length]);
 
   const item = itemsLogros[index];
   const esExterno = item.enlace && item.enlace.startsWith("http");
 
   return (
     <div className="bg-[#0f2d1e] border-b-2 border-emerald-700/50">
-      <div className="mx-auto max-w-6xl flex items-center gap-3 sm:gap-4 px-3 sm:px-4 py-1.5 sm:py-2">
+      <a
+        key={index}
+        href={item.enlace || "#"}
+        target={esExterno ? "_blank" : undefined}
+        rel={esExterno ? "noopener noreferrer" : undefined}
+        className="mx-auto max-w-6xl flex items-center gap-3 sm:gap-4 px-3 sm:px-4 py-4 sm:py-5"
+      >
         <span className="hidden sm:flex items-center gap-1.5 text-sm font-black uppercase tracking-wider text-amber-300 shrink-0 border-r border-emerald-700/50 pr-4">
           🏆 Logros DCUATES
         </span>
-        <div
-          ref={cajaRef}
-          key={index}
-          onTouchStart={tocar}
-          onWheel={tocar}
-          onScroll={tocar}
-          className="bc-logro-caja flex-1 min-w-0 overflow-y-auto"
-          style={{ height: "var(--alto-logro, 42px)" }}
-          tabIndex={0}
-          aria-label="Logro de DCUATES. Desliza hacia abajo si el texto continúa"
-        >
-          <a
-            href={item.enlace || "#"}
-            target={esExterno ? "_blank" : undefined}
-            rel={esExterno ? "noopener noreferrer" : undefined}
-            className="flex min-h-full items-center text-[14px] sm:text-xl font-bold text-white leading-[1.2]"
+        <span ref={cajaRef} className="text-base sm:text-xl font-bold text-white flex-1 min-w-0 overflow-hidden whitespace-nowrap">
+          <span
+            ref={textoRef}
+            key={index}
+            className={recorrido ? "bc-logro-desliza" : ""}
+            style={recorrido ? { display: "inline-block", animation: `bc-logro-desliza ${Math.max(8, (recorrido + 360) / 80)}s linear 1 forwards`, "--w": recorrido + "px" } : { display: "inline-block" }}
+            onAnimationEnd={recorrido ? siguiente : undefined}
           >
             {item.texto || item.nombre}
-          </a>
-        </div>
-        {sobra && <span className="shrink-0 text-amber-300 text-base font-black leading-none" aria-hidden="true" title="Desliza hacia abajo">▾</span>}
+          </span>
+          <style>{"@keyframes bc-logro-desliza{from{transform:translateX(100vw)}to{transform:translateX(calc(-1 * var(--w)))}}"}</style>
+        </span>
         <div className="hidden sm:flex items-center gap-1 shrink-0">
           {itemsLogros.map((_, i) => (
             <span
@@ -150,8 +145,7 @@ export function BarraLogros() {
             />
           ))}
         </div>
-        <style>{".bc-logro-caja{scrollbar-width:thin;scrollbar-color:#fcd34d transparent;overscroll-behavior:contain}@media(min-width:640px){:root{--alto-logro:52px}}"}</style>
-      </div>
+      </a>
     </div>
   );
 }

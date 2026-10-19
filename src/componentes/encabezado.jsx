@@ -442,6 +442,15 @@ export function BotonNecesidades({ onAbrirProyecto, onAccionEspecial, onAbrirFAQ
                 </button>
                 <button
                   type="button"
+                  onClick={() => { cerrarTodo(); setTimeout(() => window.dispatchEvent(new CustomEvent("dcuates:abrir-plus")), 120); }}
+                  className="w-full flex items-center justify-center gap-3 rounded-2xl font-black uppercase text-[13px] sm:text-sm leading-tight px-4 py-4 shadow-md transition-colors text-center"
+                  style={{ background: "#14532d", color: "#fff" }}
+                >
+                  <span className="text-2xl" aria-hidden="true">➕</span>
+                  AGENDA PLUS: agenda, mapas, tablero y directorio
+                </button>
+                <button
+                  type="button"
                   onClick={() => { cerrarTodo(); onAbrirFAQ && onAbrirFAQ(); }}
                   className="w-full flex items-center justify-center gap-2 rounded-2xl bg-emerald-50 hover:bg-emerald-100 text-[#0f2d1e] font-black uppercase text-xs px-4 py-3 border-2 border-emerald-200 transition-colors"
                 >

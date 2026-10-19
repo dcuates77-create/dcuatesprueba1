@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { LogoMarca } from "./encabezado.jsx";
+import BotonCompartir from "../BotonCompartir.jsx";
 import { BotonCerrar, CasillaAcepto, ErrorAcepto, VentanaMarca, abrirLegal, useAceptacion } from "./legal.jsx";
 import { Carrusel, FlechaBlanca, PasarelaVentasConCausa, TarjetaCarrusel } from "./media.jsx";
 import { ACCESOS_BENEFICIOS, ACCESOS_REGISTROS } from "../datos/accesos.js";
@@ -963,7 +964,10 @@ export function ModalAccesoRapido({ tipo, onCerrar, onAbrirProyecto, onAccion })
         aria-label={titulo}
       >
         <div className="p-5 pb-2">
-          <p className="font-black uppercase text-[#0f2d1e] text-xl leading-tight">{titulo}</p>
+          <div className="flex items-start justify-between gap-3">
+            <p className="font-black uppercase text-[#0f2d1e] text-xl leading-tight">{titulo}</p>
+            <BotonCompartir hash={esBen ? "beneficios" : "registros"} titulo={(esBen ? "Para ti" : "Regístrate o participa") + " — DCUATES"} texto={invitacion} variante="circulo" />
+          </div>
           <p className="mt-1 text-sm font-semibold text-slate-600">{invitacion}</p>
         </div>
         <div className="px-5 pb-3 grid grid-cols-2 gap-3">
