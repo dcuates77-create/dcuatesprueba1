@@ -287,7 +287,7 @@ export function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirTerminos, onA
 // NECESIDADES_GRUPOS arriba). Se autogestiona su propio estado — solo
 // necesita los 2 callbacks para abrir el modal de proyecto o una acción
 // especial (por ahora, solo "comparte").
-export function BotonNecesidades({ onAbrirProyecto, onAccionEspecial, onAbrirFAQ }) {
+export function BotonNecesidades({ onAbrirProyecto, onAccionEspecial, onAbrirFAQ, barra = false }) {
   const ac = useAceptacion();
   const [abierto, setAbierto] = useState(false);
   const [grupoAbierto, setGrupoAbierto] = useState(null);
@@ -336,6 +336,18 @@ export function BotonNecesidades({ onAbrirProyecto, onAccionEspecial, onAbrirFAQ
 
   return (
     <>
+      {barra ? (
+        <button
+          type="button"
+          onClick={() => setAbierto((v) => !v)}
+          className="ba-nec"
+          aria-label="¿Qué necesitas hoy?"
+          aria-expanded={abierto}
+        >
+          <span aria-hidden="true" className="ba-ic">?</span>
+          <span>¿Qué necesitas hoy?</span>
+        </button>
+      ) : (
       <div className="flex items-center gap-2">
         <span className="bg-yellow-400 text-[#0f2d1e] text-[10px] sm:text-xs font-black uppercase tracking-wide px-2.5 py-1.5 rounded-full shadow-lg border border-white/30 whitespace-nowrap animate-pulse">
           ¿Qué necesitas hoy?
@@ -351,6 +363,7 @@ export function BotonNecesidades({ onAbrirProyecto, onAccionEspecial, onAbrirFAQ
           <span className="relative z-10 text-2xl font-black drop-shadow">?</span>
         </button>
       </div>
+      )}
 
       {abierto && (
         <div
