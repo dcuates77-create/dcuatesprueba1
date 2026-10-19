@@ -563,7 +563,7 @@ export function SelloVersion() {
   );
 }
 
-export function BarraAccionesFinal({ onAbrirComparte }) {
+export function BarraAccionesFinal({ onAbrirComparte, onInicio }) {
   return (
     <section aria-label="Accesos rápidos" className="bg-[#e8f5e9] px-4 py-5 sm:py-6 border-b-4 border-[#0f2d1e]">
       <div className="mx-auto max-w-2xl md:max-w-4xl xl:max-w-6xl grid grid-cols-3 gap-2 sm:gap-4 items-stretch">
@@ -578,15 +578,13 @@ export function BarraAccionesFinal({ onAbrirComparte }) {
         </button>
         <button
           type="button"
-          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          onClick={() => (onInicio ? onInicio() : window.scrollTo({ top: 0, behavior: "smooth" }))}
           className="w-full min-h-[56px] rounded-2xl bg-[#17472d] hover:bg-[#0f2d1e] text-white shadow-md px-2 py-3 text-[11px] sm:text-sm font-black uppercase tracking-wide transition-colors flex flex-col sm:flex-row items-center justify-center gap-1 text-center leading-tight"
         >
           <span>Inicio</span>
           <span aria-hidden="true">🏠</span>
         </button>
       </div>
-      {/* Aquí aterrizan (en todas las secciones menos NOSOTROS) el texto "lo que somos" y la banda de logros */}
-      <div id="bc-final-slot" className="mt-4 -mx-4" />
       {/* Enlace directo a la barra de videos del final de la página */}
       <div className="mx-auto max-w-2xl md:max-w-4xl xl:max-w-6xl mt-3">
         <button

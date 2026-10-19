@@ -409,7 +409,7 @@ export function BarraTicker() {
   if (!visible) return null;
 
   return (
-    <div ref={barraRef} className="fixed bottom-0 inset-x-0 z-40 bg-[#17472d] border-t-2 border-emerald-700/50 shadow-[0_-4px_12px_rgba(0,0,0,0.25)]">
+    <div ref={barraRef} style={{ bottom: "var(--alto-nav, 0px)" }} className="fixed inset-x-0 z-40 bg-[#17472d] border-t-2 border-emerald-700/50 shadow-[0_-4px_12px_rgba(0,0,0,0.25)]">
       <FilaTicker items={itemsTicker} index={index} onClose={() => setVisible(false)} mostrarCerrar={true} />
     </div>
   );
