@@ -19,7 +19,9 @@ import { AVISO_PRIVACIDAD_INTEGRAL, FAQ_ITEMS, TERMINOS_CONDICIONES } from "./da
 import { TODOS_LOS_PROYECTOS } from "./datos/listas.js";
 import { BOTONES_PORTADA, CATEGORIAS_PROYECTOS, DEGRADADO_SUGERENCIAS, LOGOS_EXTRA_MODAL, RESUMEN_PROYECTO } from "./datos/proyectos.js";
 import { detectarVideo, esPDF, galeriaDesdeColumna, irASeccion, paresBaserow, primerosValores, resolverSrcImagen, tituloProyecto, urlDesdeCeldaBaserow, useCarruselAutomatico, useFilasEnlaces, useFilasZona } from "./utilidades/baserow.js";
-import BloqueCentral, { CarruselFinal } from "./BloqueCentral";
+import BloqueCentral, { CarruselFinal, TABS as TABS_BC, ID_A_TAB } from "./BloqueCentral";
+import InicioNuevo from "./InicioNuevo.jsx";
+import NavInferior from "./NavInferior.jsx";
 import ZonaJuegos from "./ZonaJuegos.jsx";
 import ZonaAliados from "./ZonaAliados.jsx";
 import ZonaRed from "./ZonaRed.jsx";
@@ -154,6 +156,40 @@ export default function App() {
   const [extraviadosResumenAbierto, setExtraviadosResumenAbierto] = useState(false);
   // Botón flotante "Subir" + barra de progreso de lectura (aparecen solo
   // después de bajar un poco en la página).
+  // VISTAS (e34): "inicio" (portada nueva) · "seccion" (pestañas de proyectos) · "contacto" (registro + colofón).
+  // Las tres quedan montadas; solo se muestra una (así los enlaces #… y los eventos siguen funcionando).
+  const [vista, setVista] = useState("inicio");
+  const irVista = (v) => { setVista(v); window.scrollTo({ top: 0, behavior: "auto" }); };
+  useAtras(vista !== "inicio", () => setVista("inicio"));
+  useEffect(() => {
+    // Si un enlace/evento apunta a algo que vive en otra vista, se cambia a esa vista.
+    const vistaDeId = (id) => {
+      if (!id) return null;
+      if (TABS_BC.some((t) => t.id === id) || ID_A_TAB[id]) return "seccion";
+      const el = document.getElementById(id);
+      const c = el && el.closest("[data-vista]");
+      return c ? c.getAttribute("data-vista") : null;
+    };
+    const ir = (id) => { const v = vistaDeId(id); if (v) setVista(v); };
+    const alHash = () => ir(decodeURIComponent(window.location.hash.replace("#", "")));
+    const alEvento = (e) => ir(e.detail);
+    const alClic = (e) => {
+      const a = e.target?.closest?.('a[href^="#"]');
+      if (a) ir(decodeURIComponent(a.getAttribute("href").slice(1)));
+    };
+    const alVista = (e) => irVista(e.detail);
+    setTimeout(alHash, 0);
+    window.addEventListener("hashchange", alHash);
+    window.addEventListener("dcuates:abrir-seccion", alEvento);
+    window.addEventListener("dcuates:vista", alVista);
+    document.addEventListener("click", alClic, true);
+    return () => {
+      window.removeEventListener("hashchange", alHash);
+      window.removeEventListener("dcuates:abrir-seccion", alEvento);
+      window.removeEventListener("dcuates:vista", alVista);
+      document.removeEventListener("click", alClic, true);
+    };
+  }, []);
   const [mostrarSubir, setMostrarSubir] = useState(false);
   const [progresoLectura, setProgresoLectura] = useState(0);
   useEffect(() => {
@@ -385,7 +421,7 @@ export default function App() {
   const compraVentaDcuates = paresBaserow(filasEnlaces, "NOMBRE COMPRA-VENTA DCUATES", "COMPRA-VENTA DCUATES", 5);
 
   return (
-    <div className="min-h-screen bg-[#17472d] font-sans antialiased text-slate-900 selection:bg-emerald-500/30 relative pb-28 sm:pb-24">
+    <div className="min-h-screen bg-[#17472d] font-sans antialiased text-slate-900 selection:bg-emerald-500/30 relative pb-44 sm:pb-40">
 
       {/* Barra de progreso de lectura — línea delgada pegada arriba de todo */}
       <div className="fixed top-0 left-0 right-0 z-[60] h-1 bg-black/10">
@@ -397,6 +433,7 @@ export default function App() {
 
       {/* Barra Ticker Inferior Fija — combina negocios, mascotas, avisos y momentos */}
       <BarraTicker />
+      <NavInferior vista={vista} onVista={irVista} onPlus={() => window.dispatchEvent(new CustomEvent("dcuates:abrir-plus"))} />
 
       {/* Botones flotantes de ayuda — a la derecha, un poco abajo del menú de pestañas; suben cuando el encabezado se esconde al bajar. */}
       <div className="fixed right-2 sm:right-6 z-50 flex flex-col items-end gap-1.5" style={{ top: "calc(var(--alto-header, 0px) + var(--alto-fijo, 200px) - var(--alto-header-real, 160px) + 10px)", transition: "top .3s ease" }}>
@@ -437,7 +474,7 @@ export default function App() {
           aria-label="Subir al inicio de la página"
           title="Subir al menú"
           className="fixed right-3 sm:right-6 z-50 h-12 w-12 flex items-center justify-center rounded-full bg-[#0f2d1e] text-white shadow-lg border-2 border-white/40 hover:bg-emerald-800 transition-colors"
-          style={{ bottom: "calc(var(--alto-ticker, 48px) + 8px)" }}
+          style={{ bottom: "calc(var(--alto-ticker, 48px) + var(--alto-nav, 0px) + 8px)" }}
         >
           <span className="text-2xl leading-none font-black" aria-hidden="true">↑</span>
         </button>
@@ -466,6 +503,18 @@ export default function App() {
 
       </div>
 
+      {/* VISTA 1 · INICIO (portada nueva) */}
+      <div data-vista="inicio" style={vista === "inicio" ? undefined : { display: "none" }}>
+        <InicioNuevo
+          onIr={(id) => { irVista("seccion"); window.dispatchEvent(new CustomEvent("dcuates:abrir-seccion", { detail: id })); }}
+          logros={logrosBanda}
+          cargando={!baserowListo}
+          entrada={{ agenda: agendaEventos, filasZona, negocios: negociosBaserow, onAbrirProyecto: (id) => setModalProyecto(id) }}
+        />
+      </div>
+
+      {/* VISTA 2 · PROYECTOS (pestañas) */}
+      <div data-vista="seccion" style={vista === "seccion" ? undefined : { display: "none" }}>
       {/* SECCIÓN PORTADA / HERO — izquierda: título+texto+Quiénes Somos+Bibliobici a toda altura; derecha: cuadrícula de 12 botones (2 columnas en celular, 3 en escritorio = 3x4) */}
       <section id="inicio" className="scroll-mt-48 md:scroll-mt-36 bg-[#e8f5e9] text-[#0f2d1e] py-4 px-4 sm:py-6">
         <div className="mx-auto max-w-2xl md:max-w-4xl xl:max-w-6xl flex flex-col gap-4">
@@ -500,8 +549,10 @@ export default function App() {
             />
           </div>
         </div>
+        {/* Aquí aterrizan (fuera de NOSOTROS) el texto "lo que somos" y la banda de logros */}
+        <div id="bc-final-slot" className="mt-4 -mx-4" />
       </section>
-
+      </div>
 
       {/* Accesos rápidos: Avisos y Beneficios · Compartir Más · Inicio */}
       <TableroConoce />
@@ -525,7 +576,30 @@ export default function App() {
       <ZonaAliados agenda={agendaEventos} />
       <ZonaRed onAbrirProyecto={(id) => setModalProyecto(id)} />
 
-      <BarraAccionesFinal onAbrirComparte={() => setModalFormulario("comparte")} />
+      {/* VISTA 3 · CONTACTO: registros y colofón (accesos, patrocinadores, historias, créditos) */}
+      <div data-vista="contacto" id="contacto" style={vista === "contacto" ? undefined : { display: "none" }}>
+        <section aria-label="Contacto y registro" className="px-4 pt-5 pb-5 border-b-4 border-[#0f2d1e]" style={{ background: "#fbf7ec" }}>
+          <div className="mx-auto max-w-2xl md:max-w-4xl">
+            <h2 className="text-center font-black uppercase text-xl sm:text-2xl leading-tight" style={{ color: "#0f2d1e" }}>Contacto y registro</h2>
+            <p className="text-center text-sm font-semibold mt-1" style={{ color: "#475569" }}>Regístrate, pide apoyo o escríbenos. Aquí también está todo lo demás: privacidad, seguridad, preguntas y créditos.</p>
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              {[
+                ["📝", "Regístrate o participa", "#2E9E5B", () => setAccesoAbierto("registros")],
+                ["💛", "Para ti", "#E65100", () => setAccesoAbierto("beneficios")],
+                ["💬", "Escríbenos por WhatsApp", "#25a244", () => window.open("https://wa.me/" + WHATSAPP_NUMERO + "?text=" + encodeURIComponent("¡Hola DCUATES! Quisiera más información."), "_blank", "noopener")],
+                ["❓", "Preguntas frecuentes", "#1B6F8A", () => setShowFAQ(true)],
+                ["🗺️", "Mapa del sitio", "#7A5AD8", () => setShowMapaSitio(true)],
+                ["🛡️", "Escudo de seguridad", "#0f4c5c", () => setShowEscudo(true)]
+              ].map(([e, t, c, f]) => (
+                <button key={t} type="button" onClick={f} style={{ background: c }} className="min-h-[88px] rounded-2xl text-white shadow-md border-b-4 border-black/25 px-2 py-3 flex flex-col items-center justify-center gap-1 text-center font-black uppercase text-[12px] leading-tight active:translate-y-0.5 transition-transform">
+                  <span className="text-3xl leading-none" aria-hidden="true">{e}</span>
+                  <span>{t}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </section>
+      <BarraAccionesFinal onAbrirComparte={() => setModalFormulario("comparte")} onInicio={() => irVista("inicio")} />
 
       <div className="mt-[1.5cm] mb-[0.5cm]">
 
@@ -674,6 +748,8 @@ export default function App() {
           Todos los derechos reservados
         </p>
       </footer>
+      </div>
+
 
       {/* VISOR DE VIDEO EN GRANDE — global: lo usan el carrusel superior y el de Historias */}
       {videoEnGrande && (

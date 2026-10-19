@@ -158,7 +158,7 @@ export default function AgendaHost({ agenda = [], negocios = [] }) {
           <span>🔔</span><span><b>Recuerda: {aviso.titulo}</b><small>{cuando}</small></span>
           <button type="button" onClick={() => { cerrarAviso(); setAb(true); }}>Ver</button>
           <button type="button" onClick={cerrarAviso} aria-label="Cerrar aviso">✕</button>
-          <style>{`.ag3-toast{position:fixed;left:8px;right:8px;bottom:calc(var(--alto-ticker,48px) + 64px);z-index:96;display:flex;align-items:center;gap:10px;padding:10px 12px;border:2px solid #fff;border-radius:16px;background:#14532d;color:#fff;box-shadow:0 6px 16px rgba(0,0,0,.35)}.ag3-toast>span:nth-child(2){flex:1;display:flex;flex-direction:column}.ag3-toast b{font-size:14px;font-weight:900}.ag3-toast small{font-size:12.5px;font-weight:700}.ag3-toast button{min-height:36px;padding:4px 10px;border:2px solid #fff;border-radius:10px;background:rgba(255,255,255,.18);color:#fff;font:inherit;font-weight:900;cursor:pointer}`}</style>
+          <style>{`.ag3-toast{position:fixed;left:8px;right:8px;bottom:calc(var(--alto-ticker,48px) + var(--alto-nav,0px) + 64px);z-index:96;display:flex;align-items:center;gap:10px;padding:10px 12px;border:2px solid #fff;border-radius:16px;background:#14532d;color:#fff;box-shadow:0 6px 16px rgba(0,0,0,.35)}.ag3-toast>span:nth-child(2){flex:1;display:flex;flex-direction:column}.ag3-toast b{font-size:14px;font-weight:900}.ag3-toast small{font-size:12.5px;font-weight:700}.ag3-toast button{min-height:36px;padding:4px 10px;border:2px solid #fff;border-radius:10px;background:rgba(255,255,255,.18);color:#fff;font:inherit;font-weight:900;cursor:pointer}`}</style>
         </div>
       )}
     </>

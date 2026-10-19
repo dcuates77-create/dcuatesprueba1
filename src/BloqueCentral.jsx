@@ -22,7 +22,7 @@ import { identidad } from "./datos/identidad.js";
 // Sin Tailwind: el CSS propio va al final (clases "bc-").
 // =========================================================================
 
-const TABS = [
+export const TABS = [
   {
     id: "nosotros", label: "Nosotros", emoji: "🏠", color: "#1B6F8A", pastel: "#E3F3F8",
     boton: "#1B6F8A",
@@ -77,7 +77,7 @@ const TABS = [
 
 // ids de secciones que ahora viven dentro de una pestaña: los enlaces
 // (#donaciones, irASeccion("chuy-video")…) abren la pestaña correcta.
-const ID_A_TAB = {
+export const ID_A_TAB = {
   donaciones: "causas",
   "chuy-video": "causas",
   "extraviados-registro": "causas",
@@ -342,7 +342,7 @@ function PistaLogros({ children }) {
   );
 }
 
-function BandaImpacto({ logros, cargando, tab }) {
+export function BandaImpacto({ logros, cargando, tab }) {
   if (cargando) {
     return (
       <section className="bc-banda" aria-hidden="true">

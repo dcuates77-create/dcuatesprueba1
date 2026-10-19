@@ -4,5 +4,5 @@ import { temporadaActual, patronSvg } from "./datos/temporada.js";
 
 export default function Temporada() {
   const t = temporadaActual();
-  return <style>{`.bc-panel,#inicio,footer{background-image:${patronSvg(t)}!important;background-size:220px 220px}`}</style>;
+  return <style>{`.bc-panel,#inicio,footer,.vi-root{background-image:${patronSvg(t)}!important;background-size:220px 220px}`}</style>;
 }
