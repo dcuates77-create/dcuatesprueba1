@@ -131,7 +131,11 @@ export function PuertasHost({ onAbrirProyecto = () => {} }) {
   const [selector, setSelector] = useState(false);
   const [, tic] = useState(0);
   useEffect(() => {
-    const h = () => { try { const m = window.location.hash.match(/^#puerta-([a-z]+)$/); if (m && puertaPorId(m[1])) setAbierta(m[1]); } catch (e) {} };
+    const h = () => { try {
+      const m = window.location.hash.match(/^#puerta-([a-z]+)$/); if (m && puertaPorId(m[1])) setAbierta(m[1]);
+      const k = window.location.hash.match(/^#(puertas|registros|tour)$/);
+      if (k) setTimeout(() => { if (k[1] === "puertas") elegirPuerta(); else if (k[1] === "registros") abrirAcceso("registros"); else abrirTour(); }, 900);
+    } catch (e) {} };
     h();
     const o = (e) => { const p = puertaPorId(e.detail); if (!p) return; if (!p.sensible && !p.efimera) { guarda("dc_puerta", p.id); avisa(); } setAbierta(p.id); };
     const s = () => setSelector(true);
@@ -173,6 +177,10 @@ const EXPLORA = [
   ["Servicios, logros y agenda", [["💼 Servicios y promociones especiales", { serv: 1 }], ["🏆 Sé parte de nuestros logros", { logros: 1 }], ["➕ AGENDA PLUS (mapas, tablero, directorio)", { plus: 1 }], ["📅 Agenda, clima y recordatorios", { z: "info:agenda" }], ["📌 Info clave y teléfonos", { z: "info" }], ["💚 Apoyo psicológico gratuito", { apoyo: 1 }]]],
   ["Confianza y ayuda", [["🌟 Zona de aliados", { aliados: 1 }], ["🛡️ Escudo de seguridad", { legal: "escudo" }], ["❓ Preguntas frecuentes", { faq: 1 }], ["🧭 Tour DCUATES (ver otra vez)", { bienvenida: 1 }]]]
 ];
+const COMPARTE_T = {
+  PUERTAS: ["puertas", "PUERTAS — DCUATES", "Elige tu puerta y entra a DCUATES por donde te toque"],
+  "REGÍSTRATE": ["registros", "REGÍSTRATE — DCUATES", "Pide apoyo o suma a la comunidad"]
+};
 const COLOR_E = ["#2E9E5B", "#E5484D", "#C2410C", "#7a5ad8"];
 
 // Botón A+ : cambia el tamaño de la letra (Normal → Grande → Muy grande)
@@ -209,18 +217,27 @@ export default function EntradaDcuates({ onAbrirProyecto = () => {}, agenda = []
       <p className="pu-q2">¿Por dónde quieres empezar hoy?</p>
       <div className="pu-grid">
         {T.map(([e, t, s, f], i) => (
-          <button type="button" key={t} className="pu-d en-d" style={{ background: COLOR_E[i] }} onClick={f}>
-            <span className="pu-e" style={{ "--r": RANGO_E[i], "--rd": RANGO_E[i] }}>{e}</span>
-            <b>{t}</b><small>{s}</small>
-          </button>
+          <div className="pu-w" key={t}>
+            <button type="button" className="pu-d en-d" style={{ background: COLOR_E[i] }} onClick={f}>
+              <span className="pu-e" style={{ "--r": RANGO_E[i], "--rd": RANGO_E[i] }}>{e}</span>
+              <b>{t}</b><small>{s}</small>
+            </button>
+            {COMPARTE_T[t] && <span className="pu-sh"><BotonCompartir hash={COMPARTE_T[t][0]} titulo={COMPARTE_T[t][1]} texto={COMPARTE_T[t][2]} variante="claro" /></span>}
+          </div>
         ))}
       </div>
-      <button type="button" className="pu-dif" style={{ background: dif.c }} onClick={() => abrirPuerta("dificil")}>
-        <span className="pu-e2">{dif.e}</span><span><b>¿Necesitas apoyo o tienes una urgencia?</b><small>Sin pedir datos · aquí te orientamos</small></span>
-      </button>
-      <button type="button" className="pu-dif" style={{ background: "#0f4c5c", minHeight: 48 }} onClick={abrirTour}>
-        <span className="pu-e2">🧭</span><span><b>TOUR DCUATES</b><small>Recuerda cómo moverte por la página</small></span>
-      </button>
+      <div className="pu-w pu-w2">
+        <button type="button" className="pu-dif" style={{ background: dif.c }} onClick={() => abrirPuerta("dificil")}>
+          <span className="pu-e2">{dif.e}</span><span><b>¿Necesitas apoyo o tienes una urgencia?</b><small>Sin pedir datos · aquí te orientamos</small></span>
+        </button>
+        <span className="pu-sh pu-sh2"><BotonCompartir hash="puerta-dificil" titulo="¿Necesitas apoyo o tienes una urgencia? — DCUATES" texto="Aquí te orientamos, sin pedir datos" variante="claro" /></span>
+      </div>
+      <div className="pu-w pu-w2">
+        <button type="button" className="pu-dif" style={{ background: "#0f4c5c", minHeight: 48 }} onClick={abrirTour}>
+          <span className="pu-e2">🧭</span><span><b>TOUR DCUATES</b><small>Recuerda cómo moverte por la página</small></span>
+        </button>
+        <span className="pu-sh pu-sh2"><BotonCompartir hash="tour" titulo="TOUR DCUATES" texto="Un recorrido corto para moverte por la página" variante="claro" /></span>
+      </div>
       {actual && <CaminoDcuates key={actual.id + modoAct} compacto seccion={"p_" + actual.id + "_" + modoAct} pasos={actual.modos[modoAct].pasos} titulo={"TU CAMINO · " + actual.t.toUpperCase()} sinSoy menu={{}} onAbrirProyecto={onAbrirProyecto} />}
       <BotonPlus />
       <InstalarApp />
@@ -248,6 +265,7 @@ export default function EntradaDcuates({ onAbrirProyecto = () => {}, agenda = []
 .pu-grid2{margin-top:8px}
 .pu-d{min-height:84px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:3px;padding:8px 10px;border:2px solid #fff;border-radius:16px;color:#fff;font-family:inherit;text-align:left;cursor:pointer;box-shadow:0 5px 12px rgba(0,0,0,.25)}
 .pu-d:active{filter:brightness(.92)}
+.pu-w{position:relative;display:flex;min-width:0}.pu-w>.pu-d{flex:1;min-width:0}.pu-w2{display:block;margin-top:8px}.pu-w2>.pu-dif{margin-top:0;padding-right:52px}.pu-sh{position:absolute;top:6px;right:6px;z-index:2}.pu-sh .cb-btn{width:30px;height:30px}.pu-sh2{top:50%;right:8px;transform:translateY(-50%)}
 .pu-d b{font-size:14.5px;font-weight:900;line-height:1.12;color:#fff}
 .pu-e{display:inline-block;font-size:28px;line-height:1.1;animation:pu-latido 4.8s ease-in-out infinite;animation-delay:calc(var(--r) * .6s)}
 @keyframes pu-latido{0%{transform:scale(1);filter:none}4%{transform:scale(1.45);filter:drop-shadow(0 0 7px #ffd84d)}12%{transform:scale(1);filter:none}100%{transform:scale(1);filter:none}}

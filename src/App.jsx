@@ -161,7 +161,7 @@ export default function App() {
       const alto = document.documentElement.scrollHeight - window.innerHeight;
       const pct = alto > 0 ? Math.min(100, Math.max(0, (window.scrollY / alto) * 100)) : 0;
       setProgresoLectura(pct);
-      setMostrarSubir(window.scrollY > 500);
+      setMostrarSubir(window.scrollY > 300);
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
@@ -398,10 +398,36 @@ export default function App() {
       {/* Barra Ticker Inferior Fija — combina negocios, mascotas, avisos y momentos */}
       <BarraTicker />
 
-      {/* Botón Flotante Permanente de WhatsApp — efecto 3D + anillo parpadeante + etiqueta */}
-      <div className="fixed right-4 sm:right-6 z-50 flex flex-col items-end gap-1.5" style={{ bottom: "calc(var(--alto-ticker, 48px) + 6px)" }}>
-        {/* Flecha "Subir" — a la derecha, arriba de ¿Qué necesitas hoy?; aparece
-            solo después de bajar un poco. */}
+      {/* Botones flotantes de ayuda — a la derecha, un poco abajo del menú de pestañas; suben cuando el encabezado se esconde al bajar. */}
+      <div className="fixed right-2 sm:right-6 z-50 flex flex-col items-end gap-1.5" style={{ top: "calc(var(--alto-header, 0px) + var(--alto-fijo, 200px) - var(--alto-header-real, 160px) + 10px)", transition: "top .3s ease" }}>
+        {/* ¿Qué necesitas hoy? */}
+        <BotonNecesidades
+          onAbrirProyecto={(id) => setModalProyecto(id)}
+          onAccionEspecial={(accion) => setModalFormulario(accion)}
+          onAbrirFAQ={() => setShowFAQ(true)}
+        />
+        <div className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={() => { registrar("dudas_abrir"); setShowDudas(true); }}
+          className="bg-[#25d366] text-white text-[11px] sm:text-sm font-black uppercase tracking-wide px-3 py-2 rounded-full shadow-lg border border-white/30 whitespace-nowrap animate-pulse"
+        >
+          Dudas y Atención
+        </button>
+        <button
+          type="button"
+          onClick={() => { registrar("dudas_abrir"); setShowDudas(true); }}
+          aria-label="Abrir ventana de dudas y atención"
+          className="relative flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[#34e372] to-[#128c7e] text-white shadow-[0_10px_20px_rgba(0,0,0,0.35),inset_0_-3px_6px_rgba(0,0,0,0.25),inset_0_3px_4px_rgba(255,255,255,0.4)] transition-all hover:scale-110 active:scale-95 border-2 border-white/40"
+          title="Dudas y Atención"
+        >
+          <span className="absolute inset-0 rounded-full bg-[#25d366] animate-ping opacity-60"></span>
+          <svg className="relative z-10 h-7 w-7 fill-current drop-shadow" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.503-5.729-1.458L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.965C16.428 1.978 13.96 1.951 12.01 1.951c-5.438 0-9.863 4.374-9.867 9.802 0 1.685.459 3.324 1.333 4.766L2.483 20.3l3.966-.995zM17.15 14.34c-.283-.141-1.674-.824-1.933-.917-.26-.093-.448-.14-.637.142-.188.282-.729.917-.894 1.105-.165.188-.33.212-.613.07a9.23 9.23 0 0 1-2.28-1.401 10.15 10.15 0 0 1-1.579-1.954c-.165-.282-.018-.434.124-.574.127-.127.283-.329.424-.494.141-.165.188-.282.283-.47.094-.188.047-.353-.024-.494-.071-.141-.637-1.53-.873-2.102-.229-.554-.46-.478-.637-.487-.164-.008-.353-.01-.542-.01-.189 0-.495.07-.755.353-.26.282-.99 1.011-.99 2.467 0 1.457 1.06 2.867 1.201 3.056.142.188 2.086 3.178 5.053 4.462.705.305 1.256.488 1.684.624.708.226 1.353.194 1.863.118.568-.085 1.674-.682 1.909-1.34.236-.658.236-1.223.165-1.34-.07-.117-.26-.188-.542-.329z"/>
+          </svg>
+        </button>
+              </div>
+        {/* Flecha "Subir" — debajo de los botones de ayuda; aparece después de bajar un poco. */}
         {mostrarSubir && (
           <button
             type="button"
@@ -435,20 +461,6 @@ export default function App() {
         />
         <TickerFrases />
         <BarraLogros />
-        {/* Ayuda arriba (debajo del menú): ¿Qué necesitas hoy? y Dudas y Atención. Se esconden con el encabezado al bajar y reaparecen al subir. */}
-        <div className="ba-fila">
-          <BotonNecesidades
-            barra
-            onAbrirProyecto={(id) => setModalProyecto(id)}
-            onAccionEspecial={(accion) => setModalFormulario(accion)}
-            onAbrirFAQ={() => setShowFAQ(true)}
-          />
-          <button type="button" className="ba-dud" onClick={() => { registrar("dudas_abrir"); setShowDudas(true); }} aria-label="Abrir ventana de dudas y atención">
-            <svg className="ba-wa" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.503-5.729-1.458L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.965C16.428 1.978 13.96 1.951 12.01 1.951c-5.438 0-9.863 4.374-9.8"/></svg>
-            <span>Dudas y atención</span>
-          </button>
-          <style>{`.ba-fila{display:flex;gap:6px;padding:5px 8px 6px;background:#0f2d1e}.ba-fila>*{flex:1 1 0;min-width:0}.ba-nec,.ba-dud{display:flex;align-items:center;justify-content:center;gap:6px;min-height:40px;padding:4px 8px;border:2px solid rgba(255,255,255,.55);border-radius:999px;font-family:inherit;font-size:12.5px;font-weight:900;letter-spacing:.02em;text-transform:uppercase;line-height:1.05;cursor:pointer;box-shadow:0 3px 8px rgba(0,0,0,.3)}.ba-nec{background:#facc15;color:#0f2d1e}.ba-dud{background:#25d366;color:#fff}.ba-ic{flex:none;display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:#0f2d1e;color:#facc15;font-size:15px}.ba-wa{flex:none;width:20px;height:20px}.ba-nec:active,.ba-dud:active{filter:brightness(.92)}`}</style>
-        </div>
 
       </div>
 
