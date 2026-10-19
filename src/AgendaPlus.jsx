@@ -4,7 +4,10 @@ import React, { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { useAtras } from "./atras.js";
 import BotonCompartir from "./BotonCompartir.jsx";
-import { WHATSAPP_NUMERO } from "./datos/config.js";
+import { GOOGLE_SHEETS_URL, WHATSAPP_NUMERO } from "./datos/config.js";
+import { CasillaAcepto, ErrorAcepto, useAceptacion } from "./componentes/legal.jsx";
+import { LogoMarca } from "./componentes/encabezado.jsx";
+import { registrar } from "./analitica";
 import {
   ANUNCIOS_EJEMPLO, DIRECTORIOS_CLAVE, DIRECTORIO_AREAS, DIRECTORIO_EJEMPLO, MAPAS, REGLAS_TABLERO, TIPOS_ANUNCIO, tipoAnuncio
 } from "./datos/plus.js";
@@ -45,20 +48,24 @@ function Caja({ titulo, hash, onCerrar, children, hub }) {
 /* ---------- Mapas ---------- */
 function Mapas({ onCerrar }) {
   const [abierto, setAbierto] = useState("");
+  // Al abrir un mapa se sube a su título; al cerrarlo se regresa a la lista de mapas (con el mapa cerrado al centro).
+  const ir = (id, bloque) => setTimeout(() => { const e = document.getElementById(id); if (e && e.scrollIntoView) e.scrollIntoView({ block: bloque, behavior: "smooth" }); }, 80);
+  const alternar = (m, ab) => { setAbierto(ab ? "" : m.id); ir("ap-m-" + m.id, ab ? "center" : "start"); };
   return (
     <Caja titulo="🗺️ Mapas de la zona" hash="mapas" onCerrar={onCerrar}>
       <p className="zj-p">Toca una zona y su mapa se abre aquí mismo. Puedes moverlo, acercarlo o abrirlo en Google Maps.</p>
       {MAPAS.map((m, i) => {
         const ab = abierto === m.id;
         return (
-          <div className="ap-card" key={m.id} style={{ borderColor: COL[i % COL.length] }}>
-            <button type="button" className="ap-cab" style={{ background: COL[i % COL.length] }} onClick={() => setAbierto(ab ? "" : m.id)} aria-expanded={ab}>
+          <div className="ap-card" id={"ap-m-" + m.id} key={m.id} style={{ borderColor: COL[i % COL.length] }}>
+            <button type="button" className="ap-cab" style={{ background: COL[i % COL.length] }} onClick={() => alternar(m, ab)} aria-expanded={ab}>
               <span><b>📍 {m.t}</b><small>{m.nota}</small></span><i>{ab ? "−" : "+"}</i>
             </button>
             {ab && (
               <div className="ap-cuerpo">
                 <iframe className="ap-mapa" title={"Mapa de " + m.t} loading="lazy" referrerPolicy="no-referrer-when-downgrade" src={"https://www.google.com/maps?q=" + encodeURIComponent(m.q) + "&hl=es&output=embed"} />
                 <a className="ap-link" href={"https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(m.q)} target="_blank" rel="noopener noreferrer">↗️ Abrir en Google Maps</a>
+                <button type="button" className="ap-volver" onClick={() => alternar(m, true)}>⬆️ Cerrar este mapa y ver los demás</button>
               </div>
             )}
           </div>
@@ -75,10 +82,32 @@ function Tablero({ onCerrar, anuncios }) {
   const [filtro, setFiltro] = useState("todos");
   const [tipo, setTipo] = useState("renta");
   const [tit, setTit] = useState(""); const [txt, setTxt] = useState(""); const [con, setCon] = useState("");
+  const ac = useAceptacion();
+  const [enviado, setEnviado] = useState(false);
+  const [enlace, setEnlace] = useState("");
   const vistos = lista.filter((a) => filtro === "todos" || a.tipo === filtro);
   const listo = tit.trim().length > 2 && txt.trim().length > 5;
   const nombreTipo = (TIPOS_ANUNCIO.find((x) => x[0] === tipo) || TIPOS_ANUNCIO[4])[2];
   const mensaje = "Hola DCUATES, quiero publicar un anuncio en el Tablero.\nTipo: " + nombreTipo + "\nTítulo: " + tit.trim() + "\nAnuncio: " + txt.trim() + (con.trim() ? "\nContacto: " + con.trim() : "");
+  // Envío: valida la casilla de aceptación, guarda en Google Sheets (Tipo "Anuncio"), abre WhatsApp y muestra el acuse.
+  const enviar = (e) => {
+    e.preventDefault();
+    if (!listo) return;
+    if (!ac.validar()) return;
+    registrar("formulario_enviado", { form: "anuncio" });
+    try {
+      fetch(GOOGLE_SHEETS_URL, {
+        method: "POST", mode: "no-cors", keepalive: true,
+        body: new URLSearchParams({ Tipo: "Anuncio", TipoApoyo: nombreTipo, Nombre: con.trim(), Detalle: tit.trim() + " — " + txt.trim(), AceptaTerminos: "Sí (Aviso y Términos, oct-2026)", Fecha: new Date().toLocaleString() })
+      }).catch(() => {});
+    } catch (err) {}
+    const url = wa(mensaje);
+    setEnlace(url);
+    window.open(url, "_blank", "noopener,noreferrer");
+    setEnviado(true);
+    setTimeout(() => { const el = document.getElementById("ap-acuse"); if (el && el.scrollIntoView) el.scrollIntoView({ block: "center", behavior: "smooth" }); }, 80);
+  };
+  const otro = () => { setEnviado(false); setTipo("renta"); setTit(""); setTxt(""); setCon(""); ac.reiniciar(); };
   return (
     <Caja titulo="📌 Tablero de anuncios" hash="tablero" onCerrar={onCerrar}>
       <p className="zj-p">Anuncios de la comunidad: rentas, felicitaciones, recomendaciones, eventos de la zona y avisos.</p>
@@ -99,7 +128,17 @@ function Tablero({ onCerrar, anuncios }) {
         );
       })}
       <p className="zj-et">📝 Registra tu anuncio</p>
-      <div className="ap-form">
+      {enviado ? (
+        <div className="ap-form ap-ok" id="ap-acuse" role="status">
+          <div style={{ display: "flex", justifyContent: "center" }}><LogoMarca tam={84} /></div>
+          <p style={{ fontSize: 18, fontWeight: 900, lineHeight: 1.25 }}>¡Tu anuncio quedó registrado!</p>
+          <p style={{ fontWeight: 700 }}>Lo revisaremos y, si cumple las reglas del tablero, lo publicaremos en la primera oportunidad.</p>
+          <p className="g">¡Gracias y saludos!</p>
+          <p className="ap-peq">¿No se abrió WhatsApp? <a href={enlace} target="_blank" rel="noopener noreferrer" style={{ fontWeight: 900, color: "#128c7e", textDecoration: "underline" }}>Tócalo aquí</a></p>
+          <button type="button" className="ap-volver" onClick={otro}>📝 Registrar otro anuncio</button>
+        </div>
+      ) : (
+      <form className="ap-form" onSubmit={enviar} noValidate>
         <p className="ap-peq" style={{ marginTop: 0 }}>Puedes publicar: {TIPOS_ANUNCIO.map((x) => x[1] + " " + x[2].toLowerCase()).join(", ")} y todo lo que no esté en los demás servicios con registro.</p>
         <label>Tipo de anuncio
           <select value={tipo} onChange={(e) => setTipo(e.target.value)}>{TIPOS_ANUNCIO.map((x) => <option key={x[0]} value={x[0]}>{x[1]} {x[2]}</option>)}</select></label>
@@ -109,11 +148,12 @@ function Tablero({ onCerrar, anuncios }) {
           <textarea value={txt} onChange={(e) => setTxt(e.target.value)} maxLength={400} rows={4} placeholder="Describe lo que quieres publicar" /></label>
         <label>Cómo te contactan (opcional)
           <input value={con} onChange={(e) => setCon(e.target.value)} maxLength={80} placeholder="WhatsApp o nombre" /></label>
-        {listo
-          ? <a className="ap-enviar" href={wa(mensaje)} target="_blank" rel="noopener noreferrer">📲 Enviar por WhatsApp para revisión</a>
-          : <span className="ap-enviar off">Escribe el título y tu anuncio para enviarlo</span>}
+        <CasillaAcepto ac={ac} id="acepta_anuncio" />
+        <button type="submit" className={"ap-enviar" + (listo ? "" : " off")} style={{ border: 0, width: "100%", fontFamily: "inherit", cursor: "pointer" }}>{listo ? "📲 Enviar por WhatsApp para revisión" : "Escribe el título y tu anuncio para enviarlo"}</button>
+        <ErrorAcepto ac={ac} id="acepta_anuncio" />
         <ul className="ap-reglas">{REGLAS_TABLERO.map((r) => <li key={r}>{r}</li>)}</ul>
-      </div>
+      </form>
+      )}
     </Caja>
   );
 }
@@ -208,6 +248,8 @@ const CSS = `
 .ap-cab b{display:block;font-size:16px;font-weight:900;color:#fff}.ap-cab small{display:block;font-size:12.5px;font-weight:700;color:#fff;opacity:.95}.ap-cab i{font-style:normal;font-size:24px;font-weight:900}
 .ap-cuerpo{padding:8px}.ap-mapa{display:block;width:100%;height:min(62vh,420px);min-height:300px;border:0;border-radius:10px;background:#e5e7eb}
 .ap-link{display:block;margin-top:8px;padding:10px;border-radius:12px;background:#eef2ff;color:#1e3a8a;font-size:14.5px;font-weight:800;text-align:center;text-decoration:none}
+.ap-volver{display:block;width:100%;margin-top:8px;min-height:46px;border:2px solid #0f4c5c;border-radius:12px;background:#fff;color:#0f4c5c;font-family:inherit;font-size:14.5px;font-weight:900;cursor:pointer}
+.ap-ok{text-align:center;padding:16px 8px}.ap-ok p{margin:10px 0 0;color:#0f2d1e}.ap-ok .g{font-size:20px;font-weight:900;color:#e65100;text-transform:uppercase}
 .ap-peq{margin:8px 2px;font-size:13px;font-weight:600;color:#475569;line-height:1.35}
 .ap-chips{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px}
 .ap-chips button{min-height:38px;padding:4px 10px;border:2px solid #cbd5e1;border-radius:999px;background:#fff;color:#0f172a;font-family:inherit;font-size:13.5px;font-weight:800;cursor:pointer}
