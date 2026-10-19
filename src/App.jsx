@@ -427,19 +427,21 @@ export default function App() {
           </svg>
         </button>
               </div>
-        {/* Flecha "Subir" — debajo de los botones de ayuda; aparece después de bajar un poco. */}
-        {mostrarSubir && (
-          <button
-            type="button"
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            aria-label="Subir al inicio de la página"
-            title="Subir al menú"
-            className="h-12 w-12 flex items-center justify-center rounded-full bg-[#0f2d1e] text-white shadow-lg border-2 border-white/40 hover:bg-emerald-800 transition-colors"
-          >
-            <span className="text-2xl leading-none font-black" aria-hidden="true">↑</span>
-          </button>
-        )}
       </div>
+
+      {/* Flecha "Subir" — abajo a la derecha, arriba de la barra inferior; aparece después de bajar un poco. */}
+      {mostrarSubir && (
+        <button
+          type="button"
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          aria-label="Subir al inicio de la página"
+          title="Subir al menú"
+          className="fixed right-3 sm:right-6 z-50 h-12 w-12 flex items-center justify-center rounded-full bg-[#0f2d1e] text-white shadow-lg border-2 border-white/40 hover:bg-emerald-800 transition-colors"
+          style={{ bottom: "calc(var(--alto-ticker, 48px) + 8px)" }}
+        >
+          <span className="text-2xl leading-none font-black" aria-hidden="true">↑</span>
+        </button>
+      )}
 
       {/* Encabezado + ticker de frases, pegados juntos como una sola barra fija.
           "relative" para poder anclar el botón de Necesidades justo debajo

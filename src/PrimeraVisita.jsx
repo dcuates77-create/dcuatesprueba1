@@ -4,6 +4,7 @@ import { createPortal } from "react-dom";
 import { useAtras } from "./atras.js";
 import { elegirPuerta } from "./PuertasDcuates.jsx";
 import { OpcionesLeer } from "./accesibilidad.jsx";
+import BotonCompartir from "./BotonCompartir.jsx";
 
 const PASOS = [
   ["👋", "¡Bienvenido(a) a DCUATES!", "Somos una comunidad de apoyo mutuo: libros, asesorías, mascotas, cupones y mucho más. Todo con confianza y sin costo de entrada. 💛", "opciones"],
@@ -34,7 +35,7 @@ export default function PrimeraVisita() {
   return createPortal(
     <div className="zj-fondo" role="dialog" aria-modal="true" aria-label="Bienvenida" onClick={(ev) => { if (ev.target === ev.currentTarget) cerrar(); }}>
       <div className="zj-caja pv-caja">
-        <p className="pv-tour">🧭 TOUR DCUATES · {paso + 1} de {PASOS.length}</p>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}><p className="pv-tour" style={{ margin: 0 }}>🧭 TOUR DCUATES · {paso + 1} de {PASOS.length}</p><BotonCompartir hash="tour" titulo="TOUR DCUATES" texto="Un recorrido corto para moverte por la página" variante="circulo" /></div>
         {paso === 0 && !fallo && <img className="pv-logo" style={{ width: 72, height: 72 }} src="/images/logo-circular.png" alt="Logo DCUATES" onError={() => setFallo(true)} />}
         {(paso !== 0 || fallo) && <div className="pv-e">{e}</div>}
         <h2 className="pv-t">{t}</h2>

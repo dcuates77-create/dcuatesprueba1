@@ -38,7 +38,7 @@ function Guia({ p, onCerrar, onAbrirProyecto, modo, setModo }) {
     <div className="zj-fondo" style={oculta ? { display: "none" } : undefined} role="dialog" aria-modal="true" aria-label={p.titulo} onClick={(e) => { if (e.target === e.currentTarget) onCerrar(); }}>
       <div className="zj-caja" style={{ "--pc": p.c }}>
         <div className="zj-cab"><b>{p.e} {p.titulo}</b>
-          {!p.sensible && <BotonCompartir hash={"puerta-" + p.id} titulo={p.titulo + " — DCUATES"} texto={"Entra a DCUATES por tu puerta: " + p.titulo} variante="circulo" />}
+          {(!p.sensible || p.id === "dificil") && <BotonCompartir hash={"puerta-" + p.id} titulo={p.titulo + " — DCUATES"} texto={"Entra a DCUATES por tu puerta: " + p.titulo} variante="circulo" />}
           <button type="button" className="zj-x" onClick={onCerrar} aria-label="Cerrar">✕</button></div>
         <p className="zj-p">{p.intro}</p>
         {p.modos.length > 1 && (
@@ -108,7 +108,7 @@ function Selector({ onCerrar, onAbrirProyecto }) {
   return (
     <div className="zj-fondo" style={oculta ? { display: "none" } : undefined} role="dialog" aria-modal="true" aria-label="Puertas" onClick={(e) => { if (e.target === e.currentTarget) onCerrar(); }}>
       <div className="zj-caja">
-        <div className="zj-cab"><b>🚪 Puertas</b><button type="button" className="zj-x" onClick={onCerrar} aria-label="Cerrar">✕</button></div>
+        <div className="zj-cab"><b>🚪 Puertas</b><BotonCompartir hash="puertas" titulo="PUERTAS — DCUATES" texto="Elige tu puerta y entra a DCUATES por donde te toque" variante="circulo" /><button type="button" className="zj-x" onClick={onCerrar} aria-label="Cerrar">✕</button></div>
         <p className="zj-p">Elige cómo quieres participar y te guiamos paso a paso. Puedes cambiarla cuando quieras.</p>
         <div className="pu-chips pu-chips2">
           <button type="button" onClick={() => lanza({ z: "empieza" }, onCerrar, onAbrirProyecto)}>👀 Solo vengo a conocer</button>
@@ -177,10 +177,7 @@ const EXPLORA = [
   ["Servicios, logros y agenda", [["💼 Servicios y promociones especiales", { serv: 1 }], ["🏆 Sé parte de nuestros logros", { logros: 1 }], ["➕ AGENDA PLUS (mapas, tablero, directorio)", { plus: 1 }], ["📅 Agenda, clima y recordatorios", { z: "info:agenda" }], ["📌 Info clave y teléfonos", { z: "info" }], ["💚 Apoyo psicológico gratuito", { apoyo: 1 }]]],
   ["Confianza y ayuda", [["🌟 Zona de aliados", { aliados: 1 }], ["🛡️ Escudo de seguridad", { legal: "escudo" }], ["❓ Preguntas frecuentes", { faq: 1 }], ["🧭 Tour DCUATES (ver otra vez)", { bienvenida: 1 }]]]
 ];
-const COMPARTE_T = {
-  PUERTAS: ["puertas", "PUERTAS — DCUATES", "Elige tu puerta y entra a DCUATES por donde te toque"],
-  "REGÍSTRATE": ["registros", "REGÍSTRATE — DCUATES", "Pide apoyo o suma a la comunidad"]
-};
+const COLOR_T = ["#C2410C", "#E5484D", "#2E9E5B", "#7a5ad8"]; // PUERTAS naranja · HOY rojo · REGÍSTRATE verde · EXPLORA morado
 const COLOR_E = ["#2E9E5B", "#E5484D", "#C2410C", "#7a5ad8"];
 
 // Botón A+ : cambia el tamaño de la letra (Normal → Grande → Muy grande)
@@ -217,27 +214,18 @@ export default function EntradaDcuates({ onAbrirProyecto = () => {}, agenda = []
       <p className="pu-q2">¿Por dónde quieres empezar hoy?</p>
       <div className="pu-grid">
         {T.map(([e, t, s, f], i) => (
-          <div className="pu-w" key={t}>
-            <button type="button" className="pu-d en-d" style={{ background: COLOR_E[i] }} onClick={f}>
-              <span className="pu-e" style={{ "--r": RANGO_E[i], "--rd": RANGO_E[i] }}>{e}</span>
-              <b>{t}</b><small>{s}</small>
-            </button>
-            {COMPARTE_T[t] && <span className="pu-sh"><BotonCompartir hash={COMPARTE_T[t][0]} titulo={COMPARTE_T[t][1]} texto={COMPARTE_T[t][2]} variante="claro" /></span>}
-          </div>
+          <button type="button" key={t} className="pu-d en-d" style={{ background: COLOR_T[i] }} onClick={f}>
+            <span className="pu-e" style={{ "--r": RANGO_E[i], "--rd": RANGO_E[i] }}>{e}</span>
+            <b>{t}</b><small>{s}</small>
+          </button>
         ))}
       </div>
-      <div className="pu-w pu-w2">
-        <button type="button" className="pu-dif" style={{ background: dif.c }} onClick={() => abrirPuerta("dificil")}>
-          <span className="pu-e2">{dif.e}</span><span><b>¿Necesitas apoyo o tienes una urgencia?</b><small>Sin pedir datos · aquí te orientamos</small></span>
-        </button>
-        <span className="pu-sh pu-sh2"><BotonCompartir hash="puerta-dificil" titulo="¿Necesitas apoyo o tienes una urgencia? — DCUATES" texto="Aquí te orientamos, sin pedir datos" variante="claro" /></span>
-      </div>
-      <div className="pu-w pu-w2">
-        <button type="button" className="pu-dif" style={{ background: "#0f4c5c", minHeight: 48 }} onClick={abrirTour}>
-          <span className="pu-e2">🧭</span><span><b>TOUR DCUATES</b><small>Recuerda cómo moverte por la página</small></span>
-        </button>
-        <span className="pu-sh pu-sh2"><BotonCompartir hash="tour" titulo="TOUR DCUATES" texto="Un recorrido corto para moverte por la página" variante="claro" /></span>
-      </div>
+      <button type="button" className="pu-dif" style={{ background: dif.c }} onClick={() => abrirPuerta("dificil")}>
+        <span className="pu-e2">{dif.e}</span><span><b>¿Necesitas apoyo o tienes una urgencia?</b><small>Sin pedir datos · aquí te orientamos</small></span>
+      </button>
+      <button type="button" className="pu-dif" style={{ background: "#0f4c5c", minHeight: 48 }} onClick={abrirTour}>
+        <span className="pu-e2">🧭</span><span><b>TOUR DCUATES</b><small>Recuerda cómo moverte por la página</small></span>
+      </button>
       {actual && <CaminoDcuates key={actual.id + modoAct} compacto seccion={"p_" + actual.id + "_" + modoAct} pasos={actual.modos[modoAct].pasos} titulo={"TU CAMINO · " + actual.t.toUpperCase()} sinSoy menu={{}} onAbrirProyecto={onAbrirProyecto} />}
       <BotonPlus />
       <InstalarApp />
@@ -265,7 +253,6 @@ export default function EntradaDcuates({ onAbrirProyecto = () => {}, agenda = []
 .pu-grid2{margin-top:8px}
 .pu-d{min-height:84px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:3px;padding:8px 10px;border:2px solid #fff;border-radius:16px;color:#fff;font-family:inherit;text-align:left;cursor:pointer;box-shadow:0 5px 12px rgba(0,0,0,.25)}
 .pu-d:active{filter:brightness(.92)}
-.pu-w{position:relative;display:flex;min-width:0}.pu-w>.pu-d{flex:1;min-width:0}.pu-w2{display:block;margin-top:8px}.pu-w2>.pu-dif{margin-top:0;padding-right:52px}.pu-sh{position:absolute;top:6px;right:6px;z-index:2}.pu-sh .cb-btn{width:30px;height:30px}.pu-sh2{top:50%;right:8px;transform:translateY(-50%)}
 .pu-d b{font-size:14.5px;font-weight:900;line-height:1.12;color:#fff}
 .pu-e{display:inline-block;font-size:28px;line-height:1.1;animation:pu-latido 4.8s ease-in-out infinite;animation-delay:calc(var(--r) * .6s)}
 @keyframes pu-latido{0%{transform:scale(1);filter:none}4%{transform:scale(1.45);filter:drop-shadow(0 0 7px #ffd84d)}12%{transform:scale(1);filter:none}100%{transform:scale(1);filter:none}}
