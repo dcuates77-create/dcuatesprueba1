@@ -303,7 +303,7 @@ export default function App() {
   // estaba arriba de todo). Si una pestaña no tiene nada, muestra su imagen de
   // respaldo (ver PORTADAS_BASE en BloqueCentral.jsx).
   const portadasItems = {};
-  ["nosotros", "beneficios", "causas", "valores", "negocios", "regalos", "gratitud"].forEach((id) => {
+  ["nosotros", "beneficios", "causas", "valores", "negocios", "regalos", "gratitud", "cierre"].forEach((id) => {
     const K = id.toUpperCase();
     const archivos = filasEnlaces
       .flatMap((f, i) => {
@@ -341,6 +341,7 @@ export default function App() {
       }));
     portadasItems[id] = [...archivos, ...videos];
   });
+  portadasItems.causas = [...(portadasItems.causas || []), ...(portadasItems.valores || [])]; // VALORES se unió a CAUSAS
   portadasItems.causas = [
     ...portadasItems.causas,
     ...videosRetos.map((v, i) => ({
@@ -419,6 +420,49 @@ export default function App() {
   const recomendacionesCompra = paresBaserow(filasEnlaces, "NOMBRE RECOMENDACIONES DE COMPRA", "RECOMENDACIONES DE COMPRA", 5);
   const recomendacionesVenta = paresBaserow(filasEnlaces, "NOMBRE RECOMENDACIONES DE VENTA", "RECOMENDACIONES DE VENTA", 5);
   const compraVentaDcuates = paresBaserow(filasEnlaces, "NOMBRE COMPRA-VENTA DCUATES", "COMPRA-VENTA DCUATES", 5);
+
+  // Carruseles que ahora viven al final de REGALOS (historias) y de GRATITUD (patrocinadores).
+  const finalesSecciones = {
+    regalos: (
+      <div className="rounded-2xl overflow-hidden mt-4">
+      <section id="historias-reflexiones" className="relative scroll-mt-48 md:scroll-mt-36 bg-[#0f2d1e] py-6 px-4 border-b-4 border-[#0f2d1e]">
+        <BotonCompartir variante="claro" className="absolute top-2 right-2 z-10" hash="historias-reflexiones" titulo="Historias y reflexiones que inspiran" texto="Videos y reflexiones de nuestra comunidad" />
+        <div className="mx-auto max-w-6xl">
+          <p className="text-white font-black uppercase text-xs sm:text-sm tracking-wide mb-2 px-1 text-center">
+            Historias y reflexiones DCUATES que INSPIRAN 💡
+            <br className="sm:hidden" />
+            <span className="block sm:inline sm:ml-1">Dales clic para ampliarlos y disfrutarlos 🎥 🍿 😊</span>
+          </p>
+          <div
+            ref={carruselHistorias.scrollRef}
+            onPointerDown={carruselHistorias.onPointerDown}
+            className="flex gap-2 sm:gap-3 overflow-x-auto pb-1"
+          >
+            {videosPortadaFinal.map((v, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => setVideoEnGrande(v.video)}
+                className="group relative rounded-xl overflow-hidden border-2 border-white/10 hover:border-[#e65100] transition-colors bg-black/30 text-left w-40 sm:w-56 shrink-0"
+              >
+                <div className="aspect-video w-full overflow-hidden">
+                  <MiniaturaVideo video={v.video} nombre={v.nombre} />
+                </div>
+                <span className="absolute inset-0 flex items-center justify-center">
+                  <span className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-[#e65100]/90 flex items-center justify-center text-white text-base sm:text-lg shadow-md group-hover:bg-[#e65100]">▶</span>
+                </span>
+                <p className="px-2 py-1.5 text-[10px] sm:text-xs font-black text-white uppercase tracking-tight leading-tight">
+                  {v.nombre}
+                </p>
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+      </div>
+    ),
+    gratitud: <div id="patrocinadores" className="mt-4 rounded-2xl overflow-hidden"><BarraPatrocinadores /></div>
+  };
 
   return (
     <div className="min-h-screen bg-[#17472d] font-sans antialiased text-slate-900 selection:bg-emerald-500/30 relative pb-44 sm:pb-40">
@@ -545,6 +589,7 @@ export default function App() {
               regalos={<PestanaRegalos galeriaRetos={galeriaRetos} />}
               gratitud={<PestanaGratitud setModalProyecto={setModalProyecto} />}
               nosotros={<PestanaNosotros  />}
+              finales={finalesSecciones}
               partes={{ qs: <PNQuienes />, mision: <PNMision />, sumar: <PNSumar /> }}
               causas={<PestanaCausas apoyoCausaAnimalLinks={apoyoCausaAnimalLinks} apoyoCosasCasosLinks={apoyoCosasCasosLinks} apoyoPersonasExtraviadasLinks={apoyoPersonasExtraviadasLinks} extraviadosResumenAbierto={extraviadosResumenAbierto} setExtraviadosResumenAbierto={setExtraviadosResumenAbierto} />}
             />
@@ -599,50 +644,6 @@ export default function App() {
           </div>
         </section>
       <BarraAccionesFinal onAbrirComparte={() => setModalFormulario("comparte")} onInicio={() => irVista("inicio")} />
-
-      <div className="mt-[1.5cm] mb-[0.5cm]">
-
-        <BarraPatrocinadores />
-      </div>
-
-      {/* HISTORIAS Y REFLEXIONES DCUATES — movida aquí (antes vivía dentro
-          del hero); ahora como barra horizontal de 1-2 videos de alto, con
-          scroll lateral para ver más. Sigue tomando sus videos de las
-          columnas "NOMBRE VIDPORT" / "VIDPORT" en Baserow. */}
-      <section id="historias-reflexiones" className="relative scroll-mt-48 md:scroll-mt-36 bg-[#0f2d1e] py-6 px-4 border-b-4 border-[#0f2d1e]">
-        <BotonCompartir variante="claro" className="absolute top-2 right-2 z-10" hash="historias-reflexiones" titulo="Historias y reflexiones que inspiran" texto="Videos y reflexiones de nuestra comunidad" />
-        <div className="mx-auto max-w-6xl">
-          <p className="text-white font-black uppercase text-xs sm:text-sm tracking-wide mb-2 px-1 text-center">
-            Historias y reflexiones DCUATES que INSPIRAN 💡
-            <br className="sm:hidden" />
-            <span className="block sm:inline sm:ml-1">Dales clic para ampliarlos y disfrutarlos 🎥 🍿 😊</span>
-          </p>
-          <div
-            ref={carruselHistorias.scrollRef}
-            onPointerDown={carruselHistorias.onPointerDown}
-            className="flex gap-2 sm:gap-3 overflow-x-auto pb-1"
-          >
-            {videosPortadaFinal.map((v, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => setVideoEnGrande(v.video)}
-                className="group relative rounded-xl overflow-hidden border-2 border-white/10 hover:border-[#e65100] transition-colors bg-black/30 text-left w-40 sm:w-56 shrink-0"
-              >
-                <div className="aspect-video w-full overflow-hidden">
-                  <MiniaturaVideo video={v.video} nombre={v.nombre} />
-                </div>
-                <span className="absolute inset-0 flex items-center justify-center">
-                  <span className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-[#e65100]/90 flex items-center justify-center text-white text-base sm:text-lg shadow-md group-hover:bg-[#e65100]">▶</span>
-                </span>
-                <p className="px-2 py-1.5 text-[10px] sm:text-xs font-black text-white uppercase tracking-tight leading-tight">
-                  {v.nombre}
-                </p>
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* Portada de la pestaña abierta, al final y en sentido contrario a los videos */}
       <CarruselFinal portadasItems={portadasItems} categorias={CATEGORIAS_PROYECTOS} cargando={!baserowListo} />

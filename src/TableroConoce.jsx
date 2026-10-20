@@ -6,11 +6,11 @@ import Tablero, { abrirAcceso } from "./Tablero.jsx";
 // Las 6 secciones (sin Nosotros). Tocar una abre su pestaña en el menú de secciones y baja a ella.
 const SECCIONES = [
   { id: "beneficios", emoji: "🎁", t: "Beneficios", d: "Libros, Bienestar, Asesorías, Ecatepets, Círculo…", color: "#C2410C" },
-  { id: "causas", emoji: "❤️", t: "Causas", d: "Apoyo voluntario, Libros, Ecatepets…", color: "#D1343B" },
-  { id: "negocios", emoji: "🗺️", t: "Negocios", d: "Publicidad gratuita, Alianzas, Ventas con causa…", color: "#1F7A46" },
-  { id: "valores", emoji: "✨", t: "Valores", d: "Noticias de barrio, Alianzas, Círculo de Confianza…", color: "#6D4BC8" },
-  { id: "regalos", emoji: "🎉", t: "Regalos", d: "Juegos, retos y cupones", color: "#C2255C" },
-  { id: "gratitud", emoji: "🙏", t: "Gratitud", d: "Reconocimientos y agradecimientos", color: "#92610F" }
+  { id: "causas", emoji: "❤️", t: "Causas y valores", d: "Apoyo voluntario, Noticias de barrio, Círculo de Confianza…", color: "#D1343B" },
+  { id: "negocios", emoji: "🗺️", t: "Negocios", d: "Emprendimientos que multiplican valor: publicidad, alianzas, ventas con causa…", color: "#1F7A46" },
+    { id: "regalos", emoji: "🎉", t: "Regalos", d: "Juegos, retos y cupones", color: "#C2255C" },
+  { id: "gratitud", emoji: "🙏", t: "Gratitud", d: "Reconocimientos y agradecimientos", color: "#92610F" },
+  { id: "cierre", emoji: "🌻", t: "Súmate", d: "Tu parte hace la diferencia", color: "#E65100" }
 ];
 
 export default function TableroConoce() {

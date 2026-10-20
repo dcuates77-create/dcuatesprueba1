@@ -12,11 +12,12 @@ const FOTOS = ["/images/portada-inicio.jpg", "/images/bibliobici-movil.png"];
 // [id de pestaña, emoji, título, subtítulo, color]
 const TILES = [
   ["nosotros", "👥", "Nosotros", "Quiénes somos", "#1B6F8A"],
-  ["causas", "❤️", "Causas", "Proyectos que generan cambio", "#E5484D"],
-  ["negocios", "🏪", "Negocios", "Emprendimientos locales", "#2E9E5B"],
+  ["causas", "❤️", "Causas", "Causas y valores que nos unen", "#E5484D"],
+  ["negocios", "🏪", "Negocios", "Emprendimientos que MULTIPLICAN VALOR", "#2E9E5B"],
   ["beneficios", "🎁", "Beneficios", "Conoce lo que puedes obtener", "#F07A1A"],
-  ["valores", "✨", "Valores", "Lo que nos guía", "#7A5AD8"],
-  ["regalos", "🎉", "Regalos y gratitud", "Reconocemos tu apoyo", "#D6336C"]
+  
+  ["regalos", "🎉", "Regalos y gratitud", "Reconocemos tu apoyo", "#D6336C"],
+  ["cierre", "🌻", "Súmate", "Tu parte hace la diferencia", "#E65100"]
 ];
 
 function Hoja({ abierta, onCerrar, titulo, children }) {

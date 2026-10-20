@@ -8,7 +8,7 @@ import BotonCompartir from "./BotonCompartir";
 import { registrar } from "./analitica";
 import { identidad } from "./datos/identidad.js";
 import { VISTA } from "./datos/vistaSeccion.js";
-import { Hero, Tarjeta, BandaFinal, CSS_SN } from "./SeccionNueva.jsx";
+import { Hero, Tarjeta, BandaFinal, BloqueSumar, CSS_SN } from "./SeccionNueva.jsx";
 import { irASeccion } from "./utilidades/baserow.js";
 
 // =========================================================================
@@ -43,7 +43,7 @@ export const TABS = [
   {
     id: "causas", label: "Causas", emoji: "❤️", color: "#E5484D", pastel: "#FFE9EB",
     boton: "#CF3338",
-    cat: "apoya-causas", cover: { slogan: "Apoyo Voluntario: tu ayuda cambia vidas" }, slot: "causas",
+    cat: "apoya-causas", cats: ["apoya-causas", "sumando-valores"], cover: { slogan: "Apoyo Voluntario: tu ayuda cambia vidas" }, slot: "causas",
     banda: { titulo: "Lo que tu ayuda ya ha logrado" },
     invitacion: { titulo: "Tu ayuda cambia vidas", texto: "Cada proyecto es una forma concreta de apoyar a alguien de tu comunidad. Elige el que te mueva y conoce cómo sumarte." }
   },
@@ -57,14 +57,6 @@ export const TABS = [
     wa: "¡Hola DCUATES! Quiero registrar mi negocio."
   },
   {
-    id: "valores", label: "Valores", emoji: "✨", color: "#7A5AD8", pastel: "#EFEAFE",
-    boton: "#6A47C9",
-    cat: "sumando-valores", cover: {}, ver: true, slot: "valores",
-    banda: { titulo: "Valores que se multiplican" },
-    invitacion: { titulo: "Los valores que nos unen", texto: "Confianza, alianzas y buenas noticias del barrio. Entra y mira cómo los vivimos." },
-    wa: "¡Hola DCUATES! Quiero saber más sobre sus valores y alianzas."
-  },
-  {
     id: "regalos", label: "Regalos", emoji: "🎉", color: "#D6336C", pastel: "#FDE8F1", boton: "#C2255C",
     cover: { slogan: "Retos y regalos que nos motivan" }, slot: "regalos",
     banda: { titulo: "Lo que hemos logrado juntos" },
@@ -75,6 +67,10 @@ export const TABS = [
     cover: { slogan: "Gracias por hacer el bien" }, slot: "gratitud",
     banda: { titulo: "Gracias a ti, esto hemos logrado" },
     texto: "Reconocemos a quienes hacen el bien en nuestra comunidad. Cuéntanos a quién quieres agradecer."
+  },
+  {
+    id: "cierre", label: "Súmate", emoji: "🌻", color: "#E65100", pastel: "#FFEEDB", boton: "#BF360C",
+    cover: {}, banda: { titulo: "Lo que juntos hemos logrado" }
   }
 ];
 
@@ -86,7 +82,10 @@ export const ID_A_TAB = {
   "extraviados-registro": "causas",
   "quienes-somos": "nosotros",
   solicitudes: "beneficios",
-  recursos: "valores",
+  recursos: "causas",
+  valores: "causas",
+  "historias-reflexiones": "regalos",
+  patrocinadores: "gratitud",
   "mapa-negocios": "negocios",
   "ventas-con-causa": "negocios",
   "registro-ventas": "negocios",
@@ -221,7 +220,6 @@ function parsearLogros(item) {
 const LOGROS_PREFERIDOS = {
   beneficios: ["#libros", "#libros", "#libros", "#asesorias"],
   causas: ["#donaciones", "#donaciones", "#ecatepets", "#circulo-confianza"],
-  valores: ["#circulo-confianza", "#bazares", "#asesorias", "#bienestar"],
   negocios: ["#bazares", "#circulo-confianza", "#iniciativas", "#donaciones"]
 };
 
@@ -404,6 +402,7 @@ export default function BloqueCentral({
   onAbrirProyecto = () => {},
   onAcceso = () => {},
   accesosSlot = null,
+  finales = {},             // JSX que va al final de una sección: { regalos, gratitud }
   partes = {}               // partes de NOSOTROS para tarjetas anidadas { qs, mision, sumar }
 }) {
   const [idx, setIdx] = useState(0);
@@ -583,14 +582,16 @@ export default function BloqueCentral({
     if (top < h) rootRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-  const chips = (cat.proyectos || [])
+  const cats = (tab.cats || [tab.cat]).map((c) => categorias.find((x) => x.id === c)).filter(Boolean);
+  const idsProy = [...new Set(cats.flatMap((c) => c.proyectos || []))];
+  const chips = idsProy
     .map((id) => proyectos.find((p) => p.modal === id))
     .filter(Boolean);
 
   const cfg = VISTA[tab.id] || {};
   let nTarjeta = 0;
   const primeraImagen = ((portadasItems[tab.id] || []).find((x) => x.tipo === "imagen" && x.img) || {}).img;
-  const fotoHero = primeraImagen || imgs[tab.id];
+  const fotoHero = cfg.sinFoto ? null : (primeraImagen || imgs[tab.id]);
   const ejecutar = (a) => {
     if (!a) return;
     const ev = (n, d) => window.dispatchEvent(new CustomEvent(n, { detail: d }));
@@ -600,6 +601,8 @@ export default function BloqueCentral({
     else if (a.zona) ev("dcuates:abrir-zona", a.zona);
     else if (a.ir) irASeccion(a.ir);
     else if (a.wa) window.open(wa(a.wa), "_blank", "noopener");
+    else if (a.tab) { const i = TABS.findIndex((t) => t.id === a.tab); if (i >= 0) cambiar(i); }
+    else if (a.evento) ev(a.evento);
     else if (a.bajar) document.getElementById("sn-tarjetas")?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
   const fichasJsx = tab.fichas ? (
@@ -681,6 +684,7 @@ export default function BloqueCentral({
   const nido = {
     qs: partes.qs, mision: partes.mision, sumar: partes.sumar,
     slot: tab.slot ? slots[tab.slot] : null,
+    valores: tab.id === "causas" ? slots.valores : null,
     fichas: fichasJsx,
     portada: tab.id === "causas" && hayPortada ? <CarruselPortada items={portadasItems[tab.id] || []} tab={tab} fallback={imgs[tab.id]} cargando={cargando} /> : null
   };
@@ -742,19 +746,38 @@ export default function BloqueCentral({
               }
               return <Tarjeta key={x.t} n={nTarjeta++} ico={x.ico} t={x.t} d={x.d} onClick={() => ejecutar(x.a)} />;
             })}
-            {tab.ver && <Tarjeta n={nTarjeta++} ico="📂" t={"Ver todo en " + tab.label} d="Todos los proyectos de esta sección." onClick={() => onAbrirCategoria(tab.cat)} />}
+            {tab.ver && cats.map((c) => (
+              <Tarjeta key={"ver" + c.id} n={nTarjeta++} ico="📂" t={"Ver todo en " + (cats.length > 1 ? (c.id === "sumando-valores" ? "Valores" : "Causas") : tab.label)} d="Todos los proyectos de esta sección." onClick={() => onAbrirCategoria(c.id)} />
+            ))}
             {tab.wa && <Tarjeta n={nTarjeta++} ico="💬" t="Pregúntanos por WhatsApp" d="Resolvemos tus dudas." onClick={() => window.open(wa(tab.wa), "_blank", "noopener")} />}
-            {tab.id !== "nosotros" && typeof accesosSlot === "function" && (
+            {tab.id !== "nosotros" && tab.id !== "cierre" && typeof accesosSlot === "function" && (
               <Tarjeta n={nTarjeta++} ico="🚪" t="Tu puerta, tu camino y Hoy" d="Lo de la semana, tu siguiente paso y registro.">
                 <div style={{ "--tc": tab.boton || tab.color }}>{accesosSlot(tab.id)}</div>
               </Tarjeta>
             )}
           </div>
 
+          {finales[tab.id]}
+
+          {cfg.acciones && (
+            <>
+              <h3 className="sn-p">{cfg.accionesTitulo || "Tu parte, hoy"}</h3>
+              <div className="sn-acc">
+                {cfg.acciones.map((x) => (
+                  <button key={x.t} type="button" onClick={() => ejecutar(x.a)} style={{ background: x.c || "#0e7c4f" }}>
+                    <span aria-hidden="true">{x.ico}</span>{x.t}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+
           {cfg.cta && <BandaFinal tab={tab} titulo={cfg.cta.t} desc={cfg.cta.d} onClick={() => ejecutar(cfg.cta.a)} />}
 
           <div id="bc-detalle" className="bc-ancla" aria-hidden="true" />
           {tab.banda && <BandaImpacto logros={logros} cargando={cargando} tab={tab} />}
+
+          {cfg.sumar && <BloqueSumar tab={tab} cfg={cfg.sumar} onAccion={ejecutar} />}
 
           <div className="bc-compartir-seccion">
             <BotonCompartir variante="bloque" etiqueta="Compartir esta sección" hash={tab.id} titulo={tab.label} texto={tab.invitacion?.texto || tab.texto || "Conoce lo que hacemos por la comunidad"} />

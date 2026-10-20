@@ -63,7 +63,41 @@ export function BandaFinal({ tab, titulo, desc, onClick }) {
   );
 }
 
+// Imagen final de cada sección con llamado a SUMAR y botones de registro.
+export function BloqueSumar({ tab, cfg, onAccion }) {
+  const [fallo, setFallo] = useState(false);
+  return (
+    <section className="sn-sumar" style={{ "--tc": tab.boton || tab.color, borderColor: tab.color }} aria-label={cfg.titulo}>
+      {cfg.img && !fallo && <img className="sn-sumar-img" src={cfg.img} alt="" loading="lazy" onError={() => setFallo(true)} />}
+      <div className="sn-sumar-t">
+        <h3>{cfg.titulo}</h3>
+        <p>{cfg.texto}</p>
+        <div className="sn-sumar-b">
+          {(cfg.botones || []).map((b, i) => (
+            <button key={b.t} type="button" className={i === 0 ? "sn-b1" : "sn-b2"} onClick={() => onAccion(b.a)}>{b.t}</button>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export const CSS_SN = `
+.sn-sumar{margin:16px 0 8px;border:2px solid;border-radius:22px;background:#fff;overflow:hidden;box-shadow:0 4px 0 rgba(15,45,30,.08),0 8px 16px rgba(15,45,30,.1)}
+.sn-sumar-img{display:block;width:100%;max-width:340px;max-height:420px;object-fit:contain;margin:12px auto 0;border-radius:16px}
+.sn-sumar-t{padding:12px 16px 16px;text-align:center}
+.sn-sumar-t h3{font-family:"Fraunces",Georgia,serif;font-weight:700;font-size:22px;line-height:1.15;margin:0 0 6px;color:#0f4a2f}
+.sn-sumar-t p{margin:0 0 12px;font-size:14px;line-height:1.4;font-weight:700;color:#3d5a4a}
+.sn-sumar-b{display:flex;flex-direction:column;gap:8px}
+.sn-sumar-b button{border:0;border-radius:999px;min-height:48px;padding:10px 16px;font-weight:900;font-size:14.5px;cursor:pointer}
+.sn-b1{background:#0e7c4f;color:#fff;box-shadow:0 4px 0 #0a5a39}
+.sn-b2{background:#fff;color:#0f4a2f;border:2px solid #0e7c4f!important}
+.sn-b1:active{transform:translateY(2px);box-shadow:0 2px 0 #0a5a39}
+.sn-acc{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 6px}
+.sn-acc button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:0;border-radius:18px;min-height:92px;padding:10px 8px;color:#fff;font-weight:900;font-size:13.5px;line-height:1.15;text-align:center;box-shadow:0 4px 0 rgba(0,0,0,.25);cursor:pointer}
+.sn-acc button span{font-size:28px;line-height:1}
+.sn-acc button:active{transform:translateY(2px)}
+@media (min-width:768px){.sn-acc{grid-template-columns:repeat(3,1fr)}.sn-sumar{display:grid;grid-template-columns:auto 1fr;align-items:center}.sn-sumar-img{margin:12px}}
 .sn-hero{position:relative;overflow:hidden;border-radius:26px 26px 44px 26px;min-height:250px;box-shadow:0 6px 18px rgba(15,45,30,.2);margin:2px 0 14px}
 .sn-foto{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .sn-gran{position:absolute;right:8px;top:6px;font-size:120px;opacity:.28;line-height:1}
