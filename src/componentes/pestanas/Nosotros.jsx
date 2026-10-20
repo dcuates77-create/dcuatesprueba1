@@ -3,10 +3,10 @@ import { COMO_SUMAR, MISION_VISION, QUIENES_SOMOS } from "../../datos/proyectos.
 import { irASeccion } from "../../utilidades/baserow.js";
 import BotonCompartir from "../../BotonCompartir";
 
-export function PestanaNosotros({  }) {
+// Partes de NOSOTROS (e35): cada una se muestra dentro de una tarjeta anidada.
+export function PNQuienes() {
   return (
-    (
-                <div className="flex flex-col gap-4 min-w-0 lg:grid lg:grid-cols-2 lg:items-start">
+    <div className="flex flex-col gap-4 min-w-0">
             <div>
               <h1 className="sr-only">
                 Juntos hacemos una mejor comunidad ⭐ 😊
@@ -17,13 +17,6 @@ export function PestanaNosotros({  }) {
               <p className="text-sm sm:text-base text-slate-900 leading-relaxed text-justify font-bold mt-3">
                 DESDE HACE 19 AÑOS, <strong className="font-black">CONEXIONES CON CAUSA</strong>, <strong className="font-black">LA BIBLIOBICI</strong> Y <strong className="font-black">DCUATES</strong> CONECTAN, TEJEN E IMPULSAN <strong className="font-black">PROYECTOS, PERSONAS, ORGANIZACIONES Y EMPRENDIMIENTOS</strong> que <strong className="font-black">BENEFICIAN</strong> a las <strong className="font-black">FAMILIAS</strong>: <strong className="font-black">PUBLICIDAD GRATUITA</strong> para tu negocio, préstamo de <strong className="font-black">LIBROS</strong> y materiales <strong className="font-black">EDUCATIVOS</strong>, apoyo a <strong className="font-black">MASCOTAS Y GRUPOS VULNERABLES</strong>, y <strong className="font-black">ALIANZAS GANAR-GANAR</strong> que generan apoyos y beneficios mutuos y comunitarios. <strong className="font-black">SÚMATE</strong> con <strong className="font-black">TU VALIOSA COLABORACIÓN Y TU INVALUABLE APOYO VOLUNTARIO</strong> para lograr nuestros objetivos de forma más efectiva, y forjar <strong className="font-black">LA CADENA DE VALOR Y DE VALORES</strong> que nos liberará de nuestras limitaciones para <strong className="font-black">SER MEJORES, Y MEJORAR TAMBIÉN NUESTRO ENTORNO Y NUESTRO MUNDO</strong> !!!
               </p>
-              <img
-                src="/images/bibliobici-movil.png"
-                alt="Bibliobici móvil DCUATES: la lectura que llega hasta tu colonia"
-                loading="lazy"
-                className="mt-4 w-full max-h-[560px] rounded-2xl object-cover shadow-lg border-4 border-white"
-                onError={(e) => { e.currentTarget.style.display = "none"; }}
-              />
             </div>
 
             {/* QUIÉNES SOMOS — justo debajo de JUNTOS, resumido con "Mostrar más" */}
@@ -54,6 +47,12 @@ export function PestanaNosotros({  }) {
               </div>
             </div>
 
+    </div>
+  );
+}
+export function PNMision() {
+  return (
+    <div className="flex flex-col gap-4 min-w-0">
             {/* NUESTRA MISIÓN — mismo formato que Quiénes Somos, justo debajo */}
             <div className="rounded-2xl bg-[#17472d] text-white p-4 sm:p-5">
               <span className="flex items-center gap-2 text-xl sm:text-2xl font-black uppercase tracking-wider text-emerald-400 mb-2">
@@ -75,6 +74,12 @@ export function PestanaNosotros({  }) {
               </div>
             </div>
 
+    </div>
+  );
+}
+export function PNSumar() {
+  return (
+    <div className="flex flex-col gap-4 min-w-0">
             {/* CÓMO PODEMOS SUMAR — mismo formato, justo debajo de Misión.
                 Sin truncar: el texto se ve siempre completo. */}
             <div className="rounded-2xl bg-[#17472d] text-white p-4 sm:p-5">
@@ -97,7 +102,15 @@ export function PestanaNosotros({  }) {
               </div>
             </div>
 
-                </div>
-              )
+    </div>
+  );
+}
+export function PestanaNosotros() {
+  return (
+    <div className="flex flex-col gap-4 min-w-0">
+      <PNQuienes />
+      <PNMision />
+      <PNSumar />
+    </div>
   );
 }
