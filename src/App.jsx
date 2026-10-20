@@ -7,7 +7,7 @@ import { PestanaBeneficios } from "./componentes/pestanas/Beneficios.jsx";
 import { PestanaCausas } from "./componentes/pestanas/Causas.jsx";
 import { PestanaGratitud } from "./componentes/pestanas/Gratitud.jsx";
 import { PestanaNegocios } from "./componentes/pestanas/Negocios.jsx";
-import { PestanaNosotros } from "./componentes/pestanas/Nosotros.jsx";
+import { PestanaNosotros, PNQuienes, PNMision, PNSumar } from "./componentes/pestanas/Nosotros.jsx";
 import { PestanaRegalos } from "./componentes/pestanas/Regalos.jsx";
 import { PestanaValores } from "./componentes/pestanas/Valores.jsx";
 import { AGENDA_EVENTOS } from "./datos/agenda.js";
@@ -545,12 +545,11 @@ export default function App() {
               regalos={<PestanaRegalos galeriaRetos={galeriaRetos} />}
               gratitud={<PestanaGratitud setModalProyecto={setModalProyecto} />}
               nosotros={<PestanaNosotros  />}
+              partes={{ qs: <PNQuienes />, mision: <PNMision />, sumar: <PNSumar /> }}
               causas={<PestanaCausas apoyoCausaAnimalLinks={apoyoCausaAnimalLinks} apoyoCosasCasosLinks={apoyoCosasCasosLinks} apoyoPersonasExtraviadasLinks={apoyoPersonasExtraviadasLinks} extraviadosResumenAbierto={extraviadosResumenAbierto} setExtraviadosResumenAbierto={setExtraviadosResumenAbierto} />}
             />
           </div>
         </div>
-        {/* Aquí aterrizan (fuera de NOSOTROS) el texto "lo que somos" y la banda de logros */}
-        <div id="bc-final-slot" className="mt-4 -mx-4" />
       </section>
       </div>
 

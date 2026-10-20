@@ -7,6 +7,9 @@ import TiraAuto from "./TiraAuto";
 import BotonCompartir from "./BotonCompartir";
 import { registrar } from "./analitica";
 import { identidad } from "./datos/identidad.js";
+import { VISTA } from "./datos/vistaSeccion.js";
+import { Hero, Tarjeta, BandaFinal, CSS_SN } from "./SeccionNueva.jsx";
+import { irASeccion } from "./utilidades/baserow.js";
 
 // =========================================================================
 // BLOQUE CENTRAL INTERACTIVO — DCUATES (CLON8) · FASE 5
@@ -400,7 +403,8 @@ export default function BloqueCentral({
   onAbrirCategoria = () => {},
   onAbrirProyecto = () => {},
   onAcceso = () => {},
-  accesosSlot = null
+  accesosSlot = null,
+  partes = {}               // partes de NOSOTROS para tarjetas anidadas { qs, mision, sumar }
 }) {
   const [idx, setIdx] = useState(0);
   const [slotFinal, setSlotFinal] = useState(null);
@@ -441,6 +445,7 @@ export default function BloqueCentral({
       const porId = TABS.findIndex((t) => t.id === ID_A_TAB[id]);
       const i = destino >= 0 ? destino : porId;
       if (i < 0) return false;
+      window.__dcDestino = id; setTimeout(() => { window.__dcDestino = null; }, 1500);
       setIdx(i);
       return true;
     };
@@ -582,7 +587,103 @@ export default function BloqueCentral({
     .map((id) => proyectos.find((p) => p.modal === id))
     .filter(Boolean);
 
-  const textoPortada = tab.cover?.slogan || cat.slogan || tab.label;
+  const cfg = VISTA[tab.id] || {};
+  let nTarjeta = 0;
+  const primeraImagen = ((portadasItems[tab.id] || []).find((x) => x.tipo === "imagen" && x.img) || {}).img;
+  const fotoHero = primeraImagen || imgs[tab.id];
+  const ejecutar = (a) => {
+    if (!a) return;
+    const ev = (n, d) => window.dispatchEvent(new CustomEvent(n, { detail: d }));
+    if (a.entrada) ev("dcuates:abrir-entrada");
+    else if (a.acceso) onAcceso(a.acceso);
+    else if (a.proy) onAbrirProyecto(a.proy);
+    else if (a.zona) ev("dcuates:abrir-zona", a.zona);
+    else if (a.ir) irASeccion(a.ir);
+    else if (a.wa) window.open(wa(a.wa), "_blank", "noopener");
+    else if (a.bajar) document.getElementById("sn-tarjetas")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+  const fichasJsx = tab.fichas ? (
+    <>
+            <TiraAuto intervalo={2500} etiqueta="Comercios, cupones, aliados y agenda" fondo={tab.pastel}>
+          <div className="bc-mini-w">
+            <article className="bc-ficha bc-mini bc-ficha-cta" style={{ borderColor: "#C2410C" }}>
+              <span className="bc-ficha-ico" style={{ background: "#C2410C" }} aria-hidden="true">🏪</span>
+              <h3>TENGO UN NEGOCIO</h3>
+              <p>Publicidad, cupones, alianzas y más para ti.</p>
+              <div className="bc-ficha-btns">
+                <button type="button" onClick={() => window.dispatchEvent(new CustomEvent("dcuates:abrir-zona", { detail: "negocio" }))} style={{ background: "#C2410C" }}>Entrar ›</button>
+              </div>
+            </article>
+          </div>
+          <div className="bc-mini-w">
+            <article className="bc-ficha bc-mini bc-ficha-cta" style={{ borderColor: tab.color }}>
+              <span className="bc-ficha-ico" style={{ background: tab.boton || tab.color }} aria-hidden="true">💼</span>
+              <h3>REGISTRA TU NEGOCIO GRATIS</h3>
+              <p>Aparece en el mapa y en la lista.</p>
+              <div className="bc-ficha-btns">
+                <button type="button" onClick={() => document.getElementById("publicidad")?.scrollIntoView({ behavior: "smooth", block: "start" })} style={{ background: "#D1530A" }}>Empezar ›</button>
+              </div>
+            </article>
+          </div>
+          <div className="bc-mini-w">
+            <article className="bc-ficha bc-mini" style={{ borderColor: "#E5484D" }}>
+              <span className="bc-ficha-ico" style={{ background: "#E5484D" }} aria-hidden="true">🏷️</span>
+              <h3>CUPONES, PROMOS Y MÁS</h3>
+              <p>Descuentos en negocios locales.</p>
+              <div className="bc-ficha-btns">
+                <button type="button" onClick={() => onAbrirProyecto("cupones-promos")} style={{ background: "#E5484D" }}>Ver ›</button>
+              </div>
+            </article>
+          </div>
+          <div className="bc-mini-w">
+            <article className="bc-ficha bc-mini" style={{ borderColor: "#7A5AD8" }}>
+              <span className="bc-ficha-ico" style={{ background: "#7A5AD8" }} aria-hidden="true">💼</span>
+              <h3>SERVICIOS Y PROMOS ESPECIALES</h3>
+              <p>Coaching, consultoría y asesoría.</p>
+              <div className="bc-ficha-btns">
+                <button type="button" onClick={() => window.dispatchEvent(new CustomEvent("dcuates:abrir-servicios"))} style={{ background: "#7A5AD8" }}>Ver ›</button>
+              </div>
+            </article>
+          </div>
+          <div className="bc-mini-w">
+            <article className="bc-ficha bc-mini" style={{ borderColor: "#7A5AD8" }}>
+              <span className="bc-ficha-ico" style={{ background: "#7A5AD8" }} aria-hidden="true">🤝</span>
+              <h3>PATROCINADORES Y ALIANZAS</h3>
+              <p>Quienes nos ayudan a crecer.</p>
+              <div className="bc-ficha-btns">
+                <button type="button" onClick={() => onAbrirProyecto("patrocinadores-alianzas")} style={{ background: "#7A5AD8" }}>Ver ›</button>
+              </div>
+            </article>
+          </div>
+          <div className="bc-mini-w"><BloqueAgenda eventos={agenda} color={tab.boton || tab.color} /></div>
+          {negocios.map((n) => (
+            <div className="bc-neg-w" key={n.nombre}>
+              <article className="bc-ficha">
+                <BotonCompartir variante="circulo" className="bc-ficha-share" hash="mapa-negocios" titulo={n.nombre} texto={n.promo || `${n.giro} en ${n.zona}`} />
+                {n.logo
+                  ? <img className="bc-ficha-logo" src={n.logo} alt="" loading="lazy" />
+                  : <span className="bc-ficha-ico" style={{ background: n.color }} aria-hidden="true">{n.emoji}</span>}
+                <h3>{n.nombre}</h3>
+                <p>{n.giro} · {n.zona}</p>
+                {n.promo && <p className="bc-promo">{n.promo}</p>}
+                <div className="bc-ficha-btns">
+                  <a href={n.tel ? `https://wa.me/${n.tel}` : wa(`¡Hola! Vi ${n.nombre} en DCUATES.`)} target="_blank" rel="noopener noreferrer" style={{ background: "#25d366" }}>WhatsApp</a>
+                  <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${n.nombre} ${n.zona} Ecatepec`)}`} target="_blank" rel="noopener noreferrer" style={{ background: tab.boton || tab.color }}>Cómo llegar</a>
+                </div>
+              </article>
+            </div>
+          ))}
+        </TiraAuto>
+      {tab.mapa && <MapaLocal url={mapaUrl} color={tab.color} />}
+    </>
+  ) : null;
+  const hayPortada = cargando || (portadasItems[tab.id] || []).length > 0;
+  const nido = {
+    qs: partes.qs, mision: partes.mision, sumar: partes.sumar,
+    slot: tab.slot ? slots[tab.slot] : null,
+    fichas: fichasJsx,
+    portada: tab.id === "causas" && hayPortada ? <CarruselPortada items={portadasItems[tab.id] || []} tab={tab} fallback={imgs[tab.id]} cargando={cargando} /> : null
+  };
 
   return (
     <section id="mapa-negocios" ref={rootRef} className="bc-root" aria-label="Explora DCUATES">
@@ -613,160 +714,47 @@ export default function BloqueCentral({
           </div>
         </div>
 
-        <div className="bc-panel" id="bc-panel" role="tabpanel" aria-labelledby={`bc-tab-${tab.id}`} key={tab.id} style={{ background: tab.pastel }}>
-          {/* La portada (imágenes, videos, PDF) va arriba solo en CAUSAS; en las demás
-              pestañas se muestra al final de la página (ver CarruselFinal). */}
-          {/* La frase de portada de cada pestaña va arriba de todo, en mayúsculas. */}
-          {textoPortada && <p className="bc-frase" style={{ color: tab.color }}>{textoPortada}</p>}
+        <div className="bc-panel bc-nuevo" id="bc-panel" role="tabpanel" aria-labelledby={`bc-tab-${tab.id}`} key={tab.id} style={{ background: "#fbf7ec", "--tc": tab.boton || tab.color }}>
+          <style>{CSS_SN}</style>
+          <Hero
+            tab={tab}
+            foto={fotoHero}
+            titulo={cfg.titulo || tab.label}
+            texto={cfg.texto || tab.texto || ""}
+            boton={cfg.boton?.t}
+            onBoton={() => ejecutar(cfg.boton?.a)}
+          />
+          <div id="sn-tarjetas" className="bc-ancla" aria-hidden="true" />
+          <h3 className="sn-p">{cfg.pregunta || tab.invitacion?.titulo}</h3>
+          <p className="sn-i">{cfg.intro || tab.invitacion?.texto}</p>
+          <div className="sn-lista">
+            {chips.map((p) => {
+              const nombre = bonito(p.t);
+              return (
+                <Tarjeta key={p.modal} n={nTarjeta++} ico={<Logo src={p.img} emoji={identidad(p.modal).emoji} />} t={nombre} d={resumenes[p.modal]} onClick={() => onAbrirProyecto(p.modal)} />
+              );
+            })}
+            {(cfg.extras || []).map((x) => {
+              if (x.anidada) {
+                const cont = nido[x.anidada];
+                if (!cont) return null;
+                return <Tarjeta key={x.t} n={nTarjeta++} ico={x.ico} t={x.t} d={x.d}>{cont}</Tarjeta>;
+              }
+              return <Tarjeta key={x.t} n={nTarjeta++} ico={x.ico} t={x.t} d={x.d} onClick={() => ejecutar(x.a)} />;
+            })}
+            {tab.ver && <Tarjeta n={nTarjeta++} ico="📂" t={"Ver todo en " + tab.label} d="Todos los proyectos de esta sección." onClick={() => onAbrirCategoria(tab.cat)} />}
+            {tab.wa && <Tarjeta n={nTarjeta++} ico="💬" t="Pregúntanos por WhatsApp" d="Resolvemos tus dudas." onClick={() => window.open(wa(tab.wa), "_blank", "noopener")} />}
+            {tab.id !== "nosotros" && typeof accesosSlot === "function" && (
+              <Tarjeta n={nTarjeta++} ico="🚪" t="Tu puerta, tu camino y Hoy" d="Lo de la semana, tu siguiente paso y registro.">
+                <div style={{ "--tc": tab.boton || tab.color }}>{accesosSlot(tab.id)}</div>
+              </Tarjeta>
+            )}
+          </div>
 
-          {tab.id === "causas" && tab.cover && (cargando || !tab.ocultarSinItems || (portadasItems[tab.id] || []).length > 0 || imgs[tab.id]) && (
-            <CarruselPortada items={portadasItems[tab.id] || []} tab={tab} fallback={imgs[tab.id]} cargando={cargando} />
-          )}
+          {cfg.cta && <BandaFinal tab={tab} titulo={cfg.cta.t} desc={cfg.cta.d} onClick={() => ejecutar(cfg.cta.a)} />}
 
-          <div style={{ "--tc": tab.boton || tab.color }}>{typeof accesosSlot === "function" ? accesosSlot(tab.id) : accesosSlot}</div>
-          <nav className={"bc-accesos" + (tab.id !== "nosotros" ? " bc-acc-compacto" : "")} aria-label="Accesos rápidos">
-            <button
-              type="button"
-              className="bc-acc bc-acc-largo"
-              onClick={() => document.getElementById("bc-detalle")?.scrollIntoView({ behavior: "smooth", block: "start" })}
-            >
-              <span className="bc-mano bc-mano-2" aria-hidden="true">👇</span>
-              <span className="bc-acc-t">Lo que somos y lo que hacemos</span>
-              <span className="bc-mano" aria-hidden="true">👇</span>
-            </button>
-          </nav>
-          {/* En NOSOTROS el texto y la banda de logros van aquí; en las demás secciones se pasan al final de la página (arriba de Historias). */}
-          {(() => {
-            const detalle = (
-              <>
-                <div id="bc-detalle" className="bc-ancla" aria-hidden="true" />
-                {tab.texto && <p className="bc-text">{tab.texto}</p>}
-                {tab.banda && <BandaImpacto logros={logros} cargando={cargando} tab={tab} />}
-              </>
-            );
-            if (tab.id !== "nosotros" && slotFinal) return createPortal(<div className="bc-final" style={{ background: tab.pastel, "--tc": tab.boton || tab.color }}>{detalle}</div>, slotFinal);
-            return detalle;
-          })()}
-
-          {tab.fichas && (
-            <TiraAuto intervalo={2500} etiqueta="Comercios, cupones, aliados y agenda" fondo={tab.pastel}>
-              <div className="bc-mini-w">
-                <article className="bc-ficha bc-mini bc-ficha-cta" style={{ borderColor: "#C2410C" }}>
-                  <span className="bc-ficha-ico" style={{ background: "#C2410C" }} aria-hidden="true">🏪</span>
-                  <h3>TENGO UN NEGOCIO</h3>
-                  <p>Publicidad, cupones, alianzas y más para ti.</p>
-                  <div className="bc-ficha-btns">
-                    <button type="button" onClick={() => window.dispatchEvent(new CustomEvent("dcuates:abrir-zona", { detail: "negocio" }))} style={{ background: "#C2410C" }}>Entrar ›</button>
-                  </div>
-                </article>
-              </div>
-              <div className="bc-mini-w">
-                <article className="bc-ficha bc-mini bc-ficha-cta" style={{ borderColor: tab.color }}>
-                  <span className="bc-ficha-ico" style={{ background: tab.boton || tab.color }} aria-hidden="true">💼</span>
-                  <h3>REGISTRA TU NEGOCIO GRATIS</h3>
-                  <p>Aparece en el mapa y en la lista.</p>
-                  <div className="bc-ficha-btns">
-                    <button type="button" onClick={() => document.getElementById("publicidad")?.scrollIntoView({ behavior: "smooth", block: "start" })} style={{ background: "#D1530A" }}>Empezar ›</button>
-                  </div>
-                </article>
-              </div>
-              <div className="bc-mini-w">
-                <article className="bc-ficha bc-mini" style={{ borderColor: "#E5484D" }}>
-                  <span className="bc-ficha-ico" style={{ background: "#E5484D" }} aria-hidden="true">🏷️</span>
-                  <h3>CUPONES, PROMOS Y MÁS</h3>
-                  <p>Descuentos en negocios locales.</p>
-                  <div className="bc-ficha-btns">
-                    <button type="button" onClick={() => onAbrirProyecto("cupones-promos")} style={{ background: "#E5484D" }}>Ver ›</button>
-                  </div>
-                </article>
-              </div>
-              <div className="bc-mini-w">
-                <article className="bc-ficha bc-mini" style={{ borderColor: "#7A5AD8" }}>
-                  <span className="bc-ficha-ico" style={{ background: "#7A5AD8" }} aria-hidden="true">💼</span>
-                  <h3>SERVICIOS Y PROMOS ESPECIALES</h3>
-                  <p>Coaching, consultoría y asesoría.</p>
-                  <div className="bc-ficha-btns">
-                    <button type="button" onClick={() => window.dispatchEvent(new CustomEvent("dcuates:abrir-servicios"))} style={{ background: "#7A5AD8" }}>Ver ›</button>
-                  </div>
-                </article>
-              </div>
-              <div className="bc-mini-w">
-                <article className="bc-ficha bc-mini" style={{ borderColor: "#7A5AD8" }}>
-                  <span className="bc-ficha-ico" style={{ background: "#7A5AD8" }} aria-hidden="true">🤝</span>
-                  <h3>PATROCINADORES Y ALIANZAS</h3>
-                  <p>Quienes nos ayudan a crecer.</p>
-                  <div className="bc-ficha-btns">
-                    <button type="button" onClick={() => onAbrirProyecto("patrocinadores-alianzas")} style={{ background: "#7A5AD8" }}>Ver ›</button>
-                  </div>
-                </article>
-              </div>
-              <div className="bc-mini-w"><BloqueAgenda eventos={agenda} color={tab.boton || tab.color} /></div>
-              {negocios.map((n) => (
-                <div className="bc-neg-w" key={n.nombre}>
-                  <article className="bc-ficha">
-                    <BotonCompartir variante="circulo" className="bc-ficha-share" hash="mapa-negocios" titulo={n.nombre} texto={n.promo || `${n.giro} en ${n.zona}`} />
-                    {n.logo
-                      ? <img className="bc-ficha-logo" src={n.logo} alt="" loading="lazy" />
-                      : <span className="bc-ficha-ico" style={{ background: n.color }} aria-hidden="true">{n.emoji}</span>}
-                    <h3>{n.nombre}</h3>
-                    <p>{n.giro} · {n.zona}</p>
-                    {n.promo && <p className="bc-promo">{n.promo}</p>}
-                    <div className="bc-ficha-btns">
-                      <a href={n.tel ? `https://wa.me/${n.tel}` : wa(`¡Hola! Vi ${n.nombre} en DCUATES.`)} target="_blank" rel="noopener noreferrer" style={{ background: "#25d366" }}>WhatsApp</a>
-                      <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${n.nombre} ${n.zona} Ecatepec`)}`} target="_blank" rel="noopener noreferrer" style={{ background: tab.boton || tab.color }}>Cómo llegar</a>
-                    </div>
-                  </article>
-                </div>
-              ))}
-            </TiraAuto>
-          )}
-
-          {tab.mapa && <MapaLocal url={mapaUrl} color={tab.color} />}
-
-          {chips.length > 0 && (
-            <section className="bc-proyectos" style={{ "--c": tab.boton || tab.color }} aria-label="Proyectos de esta sección">
-              <h3 className="bc-inv-t" style={{ color: tab.boton || tab.color }}>{tab.invitacion?.titulo || "Conoce los proyectos"}</h3>
-              {tab.invitacion?.texto && <p className="bc-inv-p">{tab.invitacion.texto}</p>}
-              <p className="bc-hint">👇 Toca un proyecto para entrar</p>
-              <TiraAuto intervalo={2000} etiqueta="Proyectos de esta sección" fondo={tab.pastel}>
-                {chips.map((p) => {
-                  const nombre = bonito(p.t);
-                  return (
-                    <div className="bc-card" key={p.modal}>
-                      <button type="button" className="bc-chip" style={{ "--c": identidad(p.modal).color }} onClick={() => onAbrirProyecto(p.modal)} aria-label={`Entrar a ${nombre}`}>
-                        <Logo src={p.img} emoji={identidad(p.modal).emoji} />
-                        <span className="bc-chip-n">{nombre}</span>
-                        {resumenes[p.modal] && <span className="bc-chip-d">{resumenes[p.modal]}</span>}
-                        <span className="bc-chip-go">Entrar ›</span>
-                      </button>
-                      <BotonCompartir variante="circulo" className="bc-share" hash={`proyecto-${p.modal}`} titulo={nombre} texto={resumenes[p.modal] || ""} />
-                    </div>
-                  );
-                })}
-              </TiraAuto>
-            </section>
-          )}
-
-          {tab.slot && <div className="bc-slot">{slots[tab.slot]}</div>}
-
-          {(tab.ver || tab.irA || tab.wa) && (
-            <div className="bc-actions">
-              {tab.ver && (
-                <button type="button" className="bc-btn" style={{ background: tab.color }} onClick={() => onAbrirCategoria(tab.cat)}>
-                  Ver todo en {tab.label}
-                </button>
-              )}
-              {tab.irA && (
-                <button type="button" className="bc-btn" style={{ background: tab.color }}
-                  onClick={() => document.getElementById(tab.irA.id)?.scrollIntoView({ behavior: "smooth", block: "start" })}>
-                  {tab.irA.label}
-                </button>
-              )}
-              {tab.wa && (
-                <a className="bc-btn bc-btn-wa" href={wa(tab.wa)} target="_blank" rel="noopener noreferrer">💬 Preguntar por WhatsApp</a>
-              )}
-            </div>
-          )}
+          <div id="bc-detalle" className="bc-ancla" aria-hidden="true" />
+          {tab.banda && <BandaImpacto logros={logros} cargando={cargando} tab={tab} />}
 
           <div className="bc-compartir-seccion">
             <BotonCompartir variante="bloque" etiqueta="Compartir esta sección" hash={tab.id} titulo={tab.label} texto={tab.invitacion?.texto || tab.texto || "Conoce lo que hacemos por la comunidad"} />
