@@ -84,43 +84,26 @@ export const VISTA = {
       botones: [{ t: "Registra tu negocio", a: { zona: "negocio" } }, { t: "Regístrate o participa", a: { acceso: "registros" } }]
     }
   },
-  regalos: {
-    titulo: "Regalos",
-    portada: "/images/portada-regalos.jpg",
-    texto: "Porque todo lo bueno merece ser compartido. Participa en retos y regalos, y envíanos tus propuestas.",
-    boton: { t: "Ver retos y regalos", a: { bajar: 1 } },
-    pregunta: "¿Qué retos y regalos hay?",
-    intro: "Juega, participa y gana mientras sumas a la comunidad.",
-    extras: [
-      { ico: "🎁", t: "Retos, regalos y reconocimientos", d: "Participa, comparte y envía tus propuestas.", anidada: "slot" },
-      { ico: "🎮", t: "Juega y diviértete", d: "Juegos DCUATES y tableros de regalos.", a: { zona: "juegos" } },
-      { ico: "🏆", t: "Juega y gana", d: "Retos con premio para la comunidad.", a: { zona: "gana" } }
-    ],
-    cta: { t: "¿Tienes una idea de reto o regalo?", d: "Cuéntanosla por WhatsApp.", a: { wa: "¡Hola DCUATES! Tengo una propuesta de reto o regalo." } },
-    sumar: {
-      img: "/images/sumar-regalos.jpg",
-      titulo: "Suma con un reto o un regalo",
-      texto: "Compartir también es sumar. Propón un reto, regala un libro o una sonrisa y haz que más gente se anime.",
-      botones: [{ t: "Propón un reto o regalo", a: { wa: "¡Hola DCUATES! Tengo una propuesta de reto o regalo." } }, { t: "Regístrate o participa", a: { acceso: "registros" } }]
-    }
-  },
   gratitud: {
     titulo: "Gratitud",
-    portada: "/images/portada-gratitud.jpg",
-    texto: "Reconocemos a quienes hacen el bien en nuestra comunidad. Cuéntanos a quién quieres agradecer.",
-    boton: { t: "Conoce los reconocimientos", a: { bajar: 1 } },
-    pregunta: "¿A quién agradecemos?",
-    intro: "Cada gesto cuenta: aquí damos las gracias.",
+    portada: "/images/portada-regalos.jpg",
+    texto: "Retos, regalos y reconocimientos: porque tu apoyo también se celebra. Juega, participa y cuéntanos a quién quieres agradecer.",
+    boton: { t: "Ver retos y reconocimientos", a: { bajar: 1 } },
+    pregunta: "¿Qué celebramos hoy?",
+    intro: "Aquí jugamos, regalamos y damos las gracias: cada gesto cuenta.",
     extras: [
+      { ico: "🎁", t: "Retos, regalos y reconocimientos", d: "Participa, comparte y envía tus propuestas.", anidada: "regalos" },
+      { ico: "🎮", t: "Juega y diviértete", d: "Juegos DCUATES y tableros de regalos.", a: { zona: "juegos" } },
+      { ico: "🏆", t: "Juega y gana", d: "Retos con premio para la comunidad.", a: { zona: "gana" } },
       { ico: "🙏", t: "Reconocimientos", d: "Gracias por hacer el bien.", anidada: "slot" },
       { ico: "🤝", t: "Patrocinadores y alianzas", d: "Quienes nos ayudan a crecer.", a: { proy: "patrocinadores-alianzas" } }
     ],
     cta: { t: "Cuéntanos a quién quieres agradecer", d: "Escríbenos por WhatsApp.", a: { wa: "¡Hola DCUATES! Quiero agradecer a alguien de la comunidad." } },
     sumar: {
       img: "/images/sumar-regalos.jpg",
-      titulo: "Gracias por sumar",
-      texto: "Cada gracias que damos fortalece a la comunidad. Reconoce a alguien, patrocina un proyecto o únete como aliado.",
-      botones: [{ t: "Agradecer a alguien", a: { wa: "¡Hola DCUATES! Quiero agradecer a alguien de la comunidad." } }, { t: "Quiero ser patrocinador", a: { proy: "patrocinadores-alianzas" } }]
+      titulo: "Suma con un reto, un regalo o un gracias",
+      texto: "Compartir también es sumar. Propón un reto, regala una sonrisa, reconoce a alguien o patrocina un proyecto.",
+      botones: [{ t: "Propón un reto o regalo", a: { wa: "¡Hola DCUATES! Tengo una propuesta de reto o regalo." } }, { t: "Quiero ser patrocinador", a: { proy: "patrocinadores-alianzas" } }]
     }
   },
   // SECCIÓN DE CIERRE — sintetiza y conecta todas las demás. Nombre provisional: "Súmate" (cámbialo en BloqueCentral.jsx → TABS, id "cierre").
@@ -136,8 +119,7 @@ export const VISTA = {
       { ico: "🎁", t: "Beneficios", d: "Oportunidades que llegan a tu puerta.", a: { tab: "beneficios" } },
       { ico: "❤️", t: "Causas y valores", d: "Ayudar con los valores que nos unen.", a: { tab: "causas" } },
       { ico: "🏪", t: "Emprendimientos que multiplican valor", d: "Compra local y crece en comunidad.", a: { tab: "negocios" } },
-      { ico: "🎉", t: "Regalos", d: "Compartir también es celebrar.", a: { tab: "regalos" } },
-      { ico: "🙏", t: "Gratitud", d: "Dar las gracias nos hace mejores.", a: { tab: "gratitud" } }
+      { ico: "🎉", t: "Regalos y gratitud", d: "Compartir también es celebrar y agradecer.", a: { tab: "gratitud" } },
     ],
     accionesTitulo: "Tu parte, hoy",
     acciones: [
