@@ -444,7 +444,7 @@ export function BotonNecesidades({ onAbrirProyecto, onAccionEspecial, onAbrirFAQ
                   style={{ background: "#1B6F8A", color: "#fff" }}
                 >
                   <span className="text-2xl" aria-hidden="true">📚</span>
-                  Proyectos de DCUATES
+                  Proyectos DCUATES
                 </button>
                 <button
                   type="button"
