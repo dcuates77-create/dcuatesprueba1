@@ -86,56 +86,41 @@ export function FilaTicker({ items, index, onClose, mostrarCerrar }) {
 // (BarraTicker) — se movió aquí y se le cambió el contenido a logros.
 export function BarraLogros() {
   const [index, setIndex] = useState(0);
+  const [visible, setVisible] = useState(false);   // false = invisible (aparece con fundido)
 
   const filasEnlaces = useFilasEnlaces();
   const logrosBaserow = paresBaserow(filasEnlaces, "NOMBRE LOGROS", "ENLACE LOGROS", 20);
   const itemsLogros = [...(logrosBaserow.length > 0 ? logrosBaserow : LOGROS_ITEMS), ...LOGROS_FIJOS];
 
-  // Si el texto no cabe, se desplaza hacia la izquierda y al terminar pasa al
-  // siguiente; si cabe, rota cada 5 s como antes.
-  const cajaRef = useRef(null);
-  const textoRef = useRef(null);
-  const [recorrido, setRecorrido] = useState(0); // px que desborda; 0 = cabe
-  const siguiente = () => setIndex((i) => (i + 1) % itemsLogros.length);
-
+  // Cada mensaje APARECE con un fundido, se queda el tiempo que lleva leerlo y DESAPARECE;
+  // luego entra el siguiente. (Con temporizadores: funciona igual con "reducir animaciones".)
+  const item = itemsLogros[index % itemsLogros.length];
+  const largo = String(item.texto || item.nombre || "").length;
   useEffect(() => {
-    const c = cajaRef.current, t = textoRef.current;
-    const sobra = c && t ? t.scrollWidth - c.clientWidth : 0;
-    setRecorrido(sobra > 4 ? t.scrollWidth : 0);
-  }, [index, itemsLogros.length]);
+    const entra = setTimeout(() => setVisible(true), 60);
+    const sale = setTimeout(() => setVisible(false), 60 + Math.max(4200, largo * 70));
+    const sig = setTimeout(() => setIndex((i) => (i + 1) % itemsLogros.length), 60 + Math.max(4200, largo * 70) + 600);
+    return () => { clearTimeout(entra); clearTimeout(sale); clearTimeout(sig); };
+  }, [index, largo, itemsLogros.length]);
 
-  useEffect(() => {
-    if (recorrido) return undefined;
-    const id = setTimeout(siguiente, 5000);
-    return () => clearTimeout(id);
-  }, [index, recorrido, itemsLogros.length]);
-
-  const item = itemsLogros[index];
   const esExterno = item.enlace && item.enlace.startsWith("http");
 
   return (
     <div className="bg-[#0f2d1e] border-b-2 border-emerald-700/50">
       <a
-        key={index}
         href={item.enlace || "#"}
         target={esExterno ? "_blank" : undefined}
         rel={esExterno ? "noopener noreferrer" : undefined}
-        className="mx-auto max-w-6xl flex items-center gap-3 sm:gap-4 px-3 sm:px-4 py-4 sm:py-5"
+        className="mx-auto max-w-6xl flex items-center gap-3 sm:gap-4 px-3 sm:px-4 py-3 sm:py-4"
       >
         <span className="hidden sm:flex items-center gap-1.5 text-sm font-black uppercase tracking-wider text-amber-300 shrink-0 border-r border-emerald-700/50 pr-4">
           🏆 Logros DCUATES
         </span>
-        <span ref={cajaRef} className="text-base sm:text-xl font-bold text-white flex-1 min-w-0 overflow-hidden whitespace-nowrap">
-          <span
-            ref={textoRef}
-            key={index}
-            className={recorrido ? "bc-logro-desliza" : ""}
-            style={recorrido ? { display: "inline-block", animation: `bc-logro-desliza ${Math.max(8, (recorrido + 360) / 80)}s linear 1 forwards`, "--w": recorrido + "px" } : { display: "inline-block" }}
-            onAnimationEnd={recorrido ? siguiente : undefined}
-          >
-            {item.texto || item.nombre}
-          </span>
-          <style>{"@keyframes bc-logro-desliza{from{transform:translateX(100vw)}to{transform:translateX(calc(-1 * var(--w)))}}"}</style>
+        <span
+          className="text-[15px] sm:text-xl font-bold text-white flex-1 min-w-0 flex items-center"
+          style={{ minHeight: "2.5em", opacity: visible ? 1 : 0, transition: "opacity .55s ease", lineHeight: 1.25 }}
+        >
+          {item.texto || item.nombre}
         </span>
         <div className="hidden sm:flex items-center gap-1 shrink-0">
           {itemsLogros.map((_, i) => (
