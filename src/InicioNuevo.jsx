@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import EntradaDcuates from "./PuertasDcuates.jsx";
 import { BandaImpacto, TABS } from "./BloqueCentral.jsx";
 import { useAtras } from "./atras.js";
+import { Emo } from "./SeccionNueva.jsx";
 
 // Foto de portada: sube /public/images/portada-inicio.jpg para cambiarla; mientras no exista se usa la de respaldo.
 const FOTOS = ["/images/portada-inicio.jpg", "/images/bibliobici-movil.png"];
@@ -17,7 +18,7 @@ const TILES = [
   ["beneficios", "🎁", "Beneficios", "Conoce lo que puedes obtener", "#F07A1A"],
   
   ["regalos", "🎉", "Regalos y gratitud", "Reconocemos tu apoyo", "#D6336C"],
-  ["cierre", "🌻", "Súmate", "Tu parte hace la diferencia", "#E65100"]
+  ["cierre", "/images/eclipse.svg", "Súmate", "Tu parte hace la diferencia", "#E65100"]
 ];
 
 function Hoja({ abierta, onCerrar, titulo, children }) {
@@ -58,8 +59,8 @@ export default function InicioNuevo({ onIr, logros = [], cargando = false, entra
     <div className="vi-root">
       <style>{CSS}</style>
       <section className="vi-hero" aria-label="Bienvenida">
-        {src && <img className="vi-foto" src={src} alt="" onError={() => setFoto((f) => f + 1)} />}
-        <div className="vi-vela" aria-hidden="true" />
+        {src && <img className="vi-foto" src={src} alt="Conectando: más oportunidades para crecer, aprender y compartir" onError={() => setFoto((f) => f + 1)} />}
+        {!src && <div className="vi-sinfoto" aria-hidden="true" />}
         <div className="vi-hero-t">
           <h1>Juntos hacemos comunidad</h1>
           <p>Personas, ideas y recursos para impulsar proyectos que generan un impacto real en sus territorios.</p>
@@ -72,7 +73,7 @@ export default function InicioNuevo({ onIr, logros = [], cargando = false, entra
       <nav className="vi-grid" aria-label="Secciones de DCUATES">
         {TILES.map(([id, e, t, s, c]) => (
           <button key={id} type="button" className="vi-tile" onClick={() => onIr(id)}>
-            <span className="vi-ico" style={{ background: c }} aria-hidden="true">{e}</span>
+            <span className="vi-ico" style={{ background: c }} aria-hidden="true"><Emo e={e} /></span>
             <b>{t}</b>
             <small>{s}</small>
           </button>
@@ -95,17 +96,18 @@ export default function InicioNuevo({ onIr, logros = [], cargando = false, entra
 const CSS = `
 .vi-root{background:#fbf7ec;color:#0f2d1e;font-family:"Nunito",ui-rounded,system-ui,sans-serif;padding:12px 12px 20px;border-radius:0 0 24px 24px}
 .vi-root *{font-family:inherit}
-.vi-hero{position:relative;overflow:hidden;border-radius:28px 28px 44px 28px;min-height:330px;background:linear-gradient(135deg,#1f6b45,#3f9d6a);box-shadow:0 8px 22px rgba(15,45,30,.22)}
-.vi-foto{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.vi-vela{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.05) 0%,rgba(10,40,25,.55) 55%,rgba(10,40,25,.86) 100%)}
-.vi-hero-t{position:relative;display:flex;flex-direction:column;justify-content:flex-end;min-height:330px;padding:22px 18px 20px;color:#fff}
-.vi-hero-t h1{font-family:"Fraunces",Georgia,serif;font-weight:700;font-size:34px;line-height:1.05;margin:0 0 8px;text-shadow:0 2px 8px rgba(0,0,0,.4)}
-.vi-hero-t p{margin:0 0 14px;font-size:15px;line-height:1.35;font-weight:600;max-width:30em;text-shadow:0 1px 4px rgba(0,0,0,.45)}
+.vi-hero{position:relative;overflow:hidden;border-radius:26px;background:#14532d;box-shadow:0 8px 22px rgba(15,45,30,.22)}
+.vi-foto{display:block;width:100%;height:auto}
+.vi-sinfoto{height:150px;background:linear-gradient(135deg,#1f6b45,#3f9d6a)}
+.vi-hero-t{position:relative;display:flex;flex-direction:column;padding:16px 16px 18px;color:#fff;background:linear-gradient(180deg,#14532d,#0f3d22)}
+.vi-hero-t h1{font-family:"Fraunces",Georgia,serif;font-weight:700;font-size:30px;line-height:1.05;margin:0 0 8px}
+.vi-hero-t p{margin:0 0 14px;font-size:15px;line-height:1.35;font-weight:600;max-width:30em}
 .vi-cta{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;border:0;border-radius:999px;background:#0e7c4f;color:#fff;font-weight:900;font-size:15px;padding:12px 18px;min-height:48px;box-shadow:0 4px 0 #0a5a39,0 6px 14px rgba(0,0,0,.3);cursor:pointer}
 .vi-cta:active{transform:translateY(2px);box-shadow:0 2px 0 #0a5a39}
 .vi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0 14px}
 .vi-tile{display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;border:1.5px solid rgba(15,45,30,.12);border-radius:20px;background:#fff;padding:12px 6px 12px;min-height:128px;box-shadow:0 3px 0 rgba(15,45,30,.08),0 6px 12px rgba(15,45,30,.08);cursor:pointer;color:#0f2d1e}
 .vi-tile:active{transform:translateY(2px)}
+.vi-ico .emo-img{width:1.35em;height:1.35em}
 .vi-ico{display:flex;align-items:center;justify-content:center;width:46px;height:46px;border-radius:50%;font-size:24px;box-shadow:inset 0 -3px 0 rgba(0,0,0,.18)}
 .vi-tile b{font-size:14px;line-height:1.1;font-weight:900}
 .vi-tile small{font-size:11px;line-height:1.2;font-weight:700;color:#3d5a4a}
@@ -116,6 +118,6 @@ const CSS = `
 .vi-hoja-cab button{border:0;border-radius:50%;width:40px;height:40px;background:#0f2d1e;color:#fff;font-size:18px;font-weight:900;cursor:pointer}
 .vi-hoja-cuerpo{overflow-y:auto;padding:10px 12px 22px;overscroll-behavior:contain}
 @keyframes vi-sube{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
-@media (min-width:768px){.vi-hero,.vi-hero-t{min-height:420px}.vi-hero-t h1{font-size:46px}.vi-hero-t{padding:32px 30px}.vi-fondo{align-items:center}.vi-hoja{border-radius:26px;max-height:86dvh}}
+@media (min-width:768px){.vi-hero-t h1{font-size:42px}.vi-hero-t{padding:26px 30px}.vi-fondo{align-items:center}.vi-hoja{border-radius:26px;max-height:86dvh}}
 @media (prefers-reduced-motion:reduce){.vi-hoja{animation:none}}
 `;

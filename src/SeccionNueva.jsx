@@ -1,13 +1,35 @@
 // SECCIÓN NUEVA (e35) — piezas del formato minimalista: portada, tarjetas (con tarjetas anidadas) y banda final.
 import React, { useEffect, useRef, useState } from "react";
 
+// Emoji o imagen: si el "emoji" empieza con "/" es una imagen (por ejemplo el eclipse de Súmate).
+export function Emo({ e }) {
+  if (typeof e === "string" && e.startsWith("/")) return <img className="emo-img" src={e} alt="" />;
+  return e;
+}
+
+// Portada ya diseñada (trae título y logo): se muestra completa, y el texto y el botón van debajo.
+export function HeroBanner({ tab, portada, titulo, texto, boton, onBoton }) {
+  return (
+    <section className="sn-banner" style={{ "--tc": tab.boton || tab.color }} aria-label={titulo}>
+      <h2 className="sr-only" style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0 0 0 0)" }}>{titulo}</h2>
+      <img className="sn-banner-img" src={portada} alt={titulo} />
+      {(texto || boton) && (
+        <div className="sn-banner-t">
+          {texto && <p>{texto}</p>}
+          {boton && <button type="button" className="sn-cta-b" onClick={onBoton}>{boton} <span aria-hidden="true">→</span></button>}
+        </div>
+      )}
+    </section>
+  );
+}
+
 export function Hero({ tab, foto, titulo, texto, boton, onBoton }) {
   const [fallo, setFallo] = useState(!foto);
   useEffect(() => { setFallo(!foto); }, [foto]);
   return (
     <section className="sn-hero" style={{ "--tc": tab.boton || tab.color, background: `linear-gradient(135deg, ${tab.boton || tab.color}, ${tab.color})` }} aria-label={titulo}>
       {!fallo && <img className="sn-foto" src={foto} alt="" onError={() => setFallo(true)} />}
-      {fallo && <span className="sn-gran" aria-hidden="true">{tab.emoji}</span>}
+      {fallo && <span className="sn-gran" aria-hidden="true"><Emo e={tab.emoji} /></span>}
       <div className="sn-vela" aria-hidden="true" />
       <div className="sn-hero-t">
         <h2>{titulo}</h2>
@@ -83,6 +105,11 @@ export function BloqueSumar({ tab, cfg, onAccion }) {
 }
 
 export const CSS_SN = `
+.emo-img{display:inline-block;width:1.2em;height:1.2em;vertical-align:-0.2em}
+.sn-banner{margin:2px 0 14px;border-radius:22px;overflow:hidden;background:#fff;box-shadow:0 6px 18px rgba(15,45,30,.2)}
+.sn-banner-img{display:block;width:100%;height:auto}
+.sn-banner-t{padding:12px 14px 14px;background:#fff}
+.sn-banner-t p{margin:0 0 10px;font-size:14.5px;line-height:1.4;font-weight:700;color:#2b4a3a}
 .sn-sumar{margin:16px 0 8px;border:2px solid;border-radius:22px;background:#fff;overflow:hidden;box-shadow:0 4px 0 rgba(15,45,30,.08),0 8px 16px rgba(15,45,30,.1)}
 .sn-sumar-img{display:block;width:100%;max-width:340px;max-height:420px;object-fit:contain;margin:12px auto 0;border-radius:16px}
 .sn-sumar-t{padding:12px 16px 16px;text-align:center}

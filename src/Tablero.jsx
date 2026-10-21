@@ -24,7 +24,7 @@ export default function Tablero({ paso, emoji, titulo, intro, color = "#1B6F8A",
         <div className={"tb-grid" + (lista ? " tb-lista" : "") + (lleno ? " tb-lleno" : "")}>
           {tarjetas.map((c) => (
             <button type="button" key={c.id} className={"tb-card" + (c.bloq ? " tb-bloq" : "")} style={{ "--c": c.color || color }} onClick={c.onClick}>
-              <span className="tb-e" aria-hidden="true">{c.bloq ? "🔒" : c.emoji}</span>
+              <span className="tb-e" aria-hidden="true">{c.bloq ? "🔒" : (typeof c.emoji === "string" && c.emoji.startsWith("/") ? <img src={c.emoji} alt="" style={{ width: "1.2em", height: "1.2em", verticalAlign: "-0.2em" }} /> : c.emoji)}</span>
               <span className="tb-t"><b>{c.t}</b><small>{c.d}</small></span>
               {lista && <span className="tb-go" aria-hidden="true">›</span>}
             </button>

@@ -8,7 +8,7 @@ import BotonCompartir from "./BotonCompartir";
 import { registrar } from "./analitica";
 import { identidad } from "./datos/identidad.js";
 import { VISTA } from "./datos/vistaSeccion.js";
-import { Hero, Tarjeta, BandaFinal, BloqueSumar, CSS_SN } from "./SeccionNueva.jsx";
+import { Hero, HeroBanner, Emo, Tarjeta, BandaFinal, BloqueSumar, CSS_SN } from "./SeccionNueva.jsx";
 import { irASeccion } from "./utilidades/baserow.js";
 
 // =========================================================================
@@ -69,7 +69,7 @@ export const TABS = [
     texto: "Reconocemos a quienes hacen el bien en nuestra comunidad. Cuéntanos a quién quieres agradecer."
   },
   {
-    id: "cierre", label: "Súmate", emoji: "🌻", color: "#E65100", pastel: "#FFEEDB", boton: "#BF360C",
+    id: "cierre", label: "Súmate", emoji: "/images/eclipse.svg", color: "#E65100", pastel: "#FFEEDB", boton: "#BF360C",
     cover: {}, banda: { titulo: "Lo que juntos hemos logrado" }
   }
 ];
@@ -706,7 +706,7 @@ export default function BloqueCentral({
                 className="bc-tab" onClick={() => cambiar(i)}
                 style={i === idx ? { background: t.color, color: "#fff" } : undefined}
               >
-                <span className="bc-ico" style={{ background: i === idx ? "#fff" : t.color }} aria-hidden="true">{t.emoji}</span>
+                <span className="bc-ico" style={{ background: i === idx ? "#fff" : t.color }} aria-hidden="true"><Emo e={t.emoji} /></span>
                 <span className="bc-tab-t">{t.label}</span>
               </button>
             ))}
@@ -720,14 +720,18 @@ export default function BloqueCentral({
 
         <div className="bc-panel bc-nuevo" id="bc-panel" role="tabpanel" aria-labelledby={`bc-tab-${tab.id}`} key={tab.id} style={{ background: "#fbf7ec", "--tc": tab.boton || tab.color }}>
           <style>{CSS_SN}</style>
-          <Hero
-            tab={tab}
-            foto={fotoHero}
-            titulo={cfg.titulo || tab.label}
-            texto={cfg.texto || tab.texto || ""}
-            boton={cfg.boton?.t}
-            onBoton={() => ejecutar(cfg.boton?.a)}
-          />
+          {cfg.portada && !primeraImagen ? (
+            <HeroBanner tab={tab} portada={cfg.portada} titulo={cfg.titulo || tab.label} texto={cfg.texto || tab.texto || ""} boton={cfg.boton?.t} onBoton={() => ejecutar(cfg.boton?.a)} />
+          ) : (
+            <Hero
+              tab={tab}
+              foto={fotoHero}
+              titulo={cfg.titulo || tab.label}
+              texto={cfg.texto || tab.texto || ""}
+              boton={cfg.boton?.t}
+              onBoton={() => ejecutar(cfg.boton?.a)}
+            />
+          )}
           <div id="sn-tarjetas" className="bc-ancla" aria-hidden="true" />
           <h3 className="sn-p">{cfg.pregunta || tab.invitacion?.titulo}</h3>
           <p className="sn-i">{cfg.intro || tab.invitacion?.texto}</p>
@@ -790,7 +794,7 @@ export default function BloqueCentral({
               <div className="bc-mira" style={{ "--c": sg.boton || sg.color }}>
                 {fr && <p className="bc-mira-f">💬 Frase de la semana: «{fr}»</p>}
                 <button type="button" onClick={() => cambiar((idx + 1) % TABS.length)}>
-                  <span className="bc-mira-e" aria-hidden="true">{sg.emoji}</span>
+                  <span className="bc-mira-e" aria-hidden="true"><Emo e={sg.emoji} /></span>
                   <span className="bc-mira-t"><small>MIRA TAMBIÉN</small><b>{sg.label}</b></span>
                   <span className="bc-mira-go" aria-hidden="true">›</span>
                 </button>

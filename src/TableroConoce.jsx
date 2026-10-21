@@ -10,7 +10,7 @@ const SECCIONES = [
   { id: "negocios", emoji: "🗺️", t: "Negocios", d: "Emprendimientos que multiplican valor: publicidad, alianzas, ventas con causa…", color: "#1F7A46" },
     { id: "regalos", emoji: "🎉", t: "Regalos", d: "Juegos, retos y cupones", color: "#C2255C" },
   { id: "gratitud", emoji: "🙏", t: "Gratitud", d: "Reconocimientos y agradecimientos", color: "#92610F" },
-  { id: "cierre", emoji: "🌻", t: "Súmate", d: "Tu parte hace la diferencia", color: "#E65100" }
+  { id: "cierre", emoji: "/images/eclipse.svg", t: "Súmate", d: "Tu parte hace la diferencia", color: "#E65100" }
 ];
 
 export default function TableroConoce() {
