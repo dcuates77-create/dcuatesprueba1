@@ -26,10 +26,17 @@ export function PNQuienes() {
                 <span className="text-3xl sm:text-4xl">✅</span> Quiénes Somos
               </span>
               <div>
+                <img
+                  src="/images/bibliobici-movil.png"
+                  alt="Bibliobici móvil DCUATES: la lectura que llega hasta tu colonia"
+                  loading="lazy"
+                  className="float-right ml-3 mb-2 w-[46%] max-w-[260px] rounded-xl object-cover shadow-lg border-2 border-white/70"
+                  onError={(e) => { e.currentTarget.style.display = "none"; }}
+                />
                 <p className="text-sm sm:text-base text-emerald-50 leading-relaxed font-medium">
                   {QUIENES_SOMOS.idea}
                 </p>
-                <div className="grid gap-2 text-left pt-3">
+                <div className="grid gap-2 text-left pt-3 clear-both">
                   {QUIENES_SOMOS.objetivos.map((obj, i) => (
                     <div key={i} className="flex items-start gap-2 bg-emerald-900/40 rounded-xl px-3 py-2">
                       <span className="h-2 w-2 mt-1.5 rounded-full bg-[#00c853] flex-shrink-0" />
