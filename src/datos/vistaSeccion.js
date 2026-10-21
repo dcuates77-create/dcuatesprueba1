@@ -7,6 +7,7 @@
 export const VISTA = {
   nosotros: {
     titulo: "Nosotros",
+    portada: "/images/portada-nosotros.jpg",
     texto: "Somos una comunidad que teje confianza, suma voluntades y cosecha logros desde hace más de 19 años.",
     boton: { t: "Conoce cómo participar", a: { entrada: 1 } },
     pregunta: "¿Quiénes somos?",
@@ -28,6 +29,7 @@ export const VISTA = {
   },
   beneficios: {
     titulo: "Beneficios",
+    portada: "/images/portada-beneficios.jpg",
     texto: "Ser parte de DCUATES te da más oportunidades: libros, asesorías, bienestar y apoyo para tus mascotas, sin costo.",
     boton: { t: "Conoce todos los beneficios", a: { bajar: 1 } },
     pregunta: "¿Qué beneficios puedes obtener?",
@@ -45,6 +47,7 @@ export const VISTA = {
   },
   causas: {
     titulo: "Causas y valores",
+    portada: "/images/portada-causas.jpg",
     texto: "Proyectos que generan cambio, guiados por los valores que nos unen: confianza, solidaridad y gratitud.",
     boton: { t: "Conoce cómo ayudar", a: { bajar: 1 } },
     pregunta: "¿Por qué van juntas las causas y los valores?",
@@ -64,6 +67,7 @@ export const VISTA = {
   },
   negocios: {
     titulo: "Negocios",
+    portada: "/images/portada-negocios.jpg",
     texto: "Emprendimientos que MULTIPLICAN VALOR: generan ingresos, fortalecen comunidades y promueven el desarrollo sostenible.",
     boton: { t: "Conoce nuestros negocios", a: { bajar: 1 } },
     pregunta: "¿Qué ofrecemos?",
@@ -82,6 +86,7 @@ export const VISTA = {
   },
   regalos: {
     titulo: "Regalos",
+    portada: "/images/portada-regalos.jpg",
     texto: "Porque todo lo bueno merece ser compartido. Participa en retos y regalos, y envíanos tus propuestas.",
     boton: { t: "Ver retos y regalos", a: { bajar: 1 } },
     pregunta: "¿Qué retos y regalos hay?",
@@ -101,6 +106,7 @@ export const VISTA = {
   },
   gratitud: {
     titulo: "Gratitud",
+    portada: "/images/portada-regalos.jpg",
     texto: "Reconocemos a quienes hacen el bien en nuestra comunidad. Cuéntanos a quién quieres agradecer.",
     boton: { t: "Conoce los reconocimientos", a: { bajar: 1 } },
     pregunta: "¿A quién agradecemos?",
@@ -120,7 +126,7 @@ export const VISTA = {
   // SECCIÓN DE CIERRE — sintetiza y conecta todas las demás. Nombre provisional: "Súmate" (cámbialo en BloqueCentral.jsx → TABS, id "cierre").
   cierre: {
     titulo: "Súmate",
-    sinFoto: true,
+    portada: "/images/portada-cierre.jpg",
     texto: "Todo lo que hacemos se une aquí. Tu parte, grande o pequeña, completa la historia.",
     boton: { t: "Elige tu parte", a: { bajar: 1 } },
     pregunta: "Todo lo que hacemos se conecta",
