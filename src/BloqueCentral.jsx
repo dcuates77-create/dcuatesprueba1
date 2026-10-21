@@ -57,16 +57,10 @@ export const TABS = [
     wa: "¡Hola DCUATES! Quiero registrar mi negocio."
   },
   {
-    id: "regalos", label: "Regalos", emoji: "🎉", color: "#D6336C", pastel: "#FDE8F1", boton: "#C2255C",
-    cover: { slogan: "Retos y regalos que nos motivan" }, slot: "regalos",
-    banda: { titulo: "Lo que hemos logrado juntos" },
-    texto: "Porque todo lo bueno merece ser compartido. Envíanos tus propuestas de retos y regalos."
-  },
-  {
     id: "gratitud", label: "Gratitud", emoji: "🙏", color: "#B7791F", pastel: "#FFF4D6", boton: "#92610F",
-    cover: { slogan: "Gracias por hacer el bien" }, slot: "gratitud",
+    cover: { slogan: "Regalos, retos y reconocimientos" }, slot: "gratitud",
     banda: { titulo: "Gracias a ti, esto hemos logrado" },
-    texto: "Reconocemos a quienes hacen el bien en nuestra comunidad. Cuéntanos a quién quieres agradecer."
+    texto: "Retos, regalos y reconocimientos: porque tu apoyo también se celebra. Cuéntanos a quién quieres agradecer."
   },
   {
     id: "cierre", label: "Súmate", emoji: "/images/eclipse.svg", color: "#E65100", pastel: "#FFEEDB", boton: "#BF360C",
@@ -84,14 +78,15 @@ export const ID_A_TAB = {
   solicitudes: "beneficios",
   recursos: "causas",
   valores: "causas",
-  "historias-reflexiones": "regalos",
+  "historias-reflexiones": "gratitud",
+  regalos: "gratitud",
   patrocinadores: "gratitud",
   "mapa-negocios": "negocios",
   "ventas-con-causa": "negocios",
   "registro-ventas": "negocios",
   "registro-extraviados": "causas",
   publicidad: "negocios",
-  "retos-regalos": "regalos"
+  "retos-regalos": "gratitud"
 };
 
 
@@ -730,6 +725,7 @@ export default function BloqueCentral({
   const nido = {
     qs: partes.qs, mision: partes.mision, sumar: partes.sumar,
     slot: tab.slot ? slots[tab.slot] : null,
+    regalos: tab.id === "gratitud" ? slots.regalos : null,
     valores: tab.id === "causas" ? slots.valores : null,
     fichas: fichasJsx,
     portada: tab.id === "causas" && hayPortada ? <CarruselPortada items={portadasItems[tab.id] || []} tab={tab} fallback={imgs[tab.id]} cargando={cargando} /> : null
@@ -745,6 +741,10 @@ export default function BloqueCentral({
           style={compensa ? { marginBottom: compensa } : undefined}
         >
           <div className="bc-tabs" role="tablist" ref={barraRef}>
+            <button type="button" className="bc-tab bc-tab-inicio" aria-label="Inicio" onClick={() => window.dispatchEvent(new CustomEvent("dcuates:vista", { detail: "inicio" }))}>
+              <span className="bc-ico" style={{ background: "#17472d" }} aria-hidden="true"><Emo e="🏠" /></span>
+              <span className="bc-tab-t">Inicio</span>
+            </button>
             {TABS.map((t, i) => (
               <button
                 key={t.id} type="button" role="tab" id={`bc-tab-${t.id}`}
@@ -848,8 +848,15 @@ export default function BloqueCentral({
             );
           })()}
 
+          <div className="bc-puntos" role="group" aria-label="Ir a otra sección">
+            <button type="button" className="bc-punto" aria-label="Inicio" title="Inicio" onClick={() => window.dispatchEvent(new CustomEvent("dcuates:vista", { detail: "inicio" }))}>⌂</button>
+            {TABS.map((t, i) => (
+              <button key={t.id} type="button" className={"bc-punto" + (i === idx ? " bc-punto-on" : "")} aria-label={t.label} aria-current={i === idx ? "true" : undefined} title={t.label} onClick={() => cambiar(i)} style={i === idx ? { background: t.color } : undefined} />
+            ))}
+          </div>
+
           <div className="bc-nav">
-            <button type="button" disabled={idx === 0} onClick={() => cambiar(idx - 1)}>‹ {idx > 0 ? TABS[idx - 1].label : "Anterior"}</button>
+            <button type="button" onClick={() => (idx === 0 ? window.dispatchEvent(new CustomEvent("dcuates:vista", { detail: "inicio" })) : cambiar(idx - 1))}>‹ {idx > 0 ? TABS[idx - 1].label : "Inicio"}</button>
             <button type="button" onClick={() => cambiar(idx < TABS.length - 1 ? idx + 1 : 0)}>{idx < TABS.length - 1 ? TABS[idx + 1].label : "Volver a " + TABS[0].label + " (inicio)"} {idx < TABS.length - 1 ? "›" : "↺"}</button>
           </div>
         </div>
@@ -961,6 +968,12 @@ const CSS = `
 .bc-actions{display:grid;gap:10px;margin-top:10px}
 .bc-btn{display:grid;place-items:center;min-height:48px;padding:10px 16px;border:0;border-radius:14px;color:#fff;font-family:inherit;font-weight:900;font-size:15px;text-decoration:none;cursor:pointer}
 .bc-btn-wa{background:#25d366}
+.bc-puntos{display:flex;justify-content:center;align-items:center;gap:6px;margin:16px 0 2px}
+.bc-punto{width:14px;height:14px;padding:0;border:0;border-radius:50%;background:#cfd8d3;cursor:pointer;position:relative;font-size:12px;line-height:14px;color:#17472d;font-weight:900;transition:width .2s}
+.bc-punto::after{content:"";position:absolute;inset:-12px -6px}
+.bc-punto-on{width:28px;border-radius:9px}
+.bc-tab-inicio{flex:0 0 72px}
+.bc-pegado .bc-tab-inicio .bc-tab-t{display:none}
 .bc-nav{display:flex;justify-content:space-between;gap:10px;margin-top:14px}
 .bc-nav button{flex:1;min-height:44px;border:2px solid rgba(31,42,55,.12);border-radius:14px;background:rgba(255,255,255,.7);color:var(--ink);font-family:inherit;font-weight:800;font-size:14px;cursor:pointer}
 .bc-nav button:disabled{opacity:.35;cursor:default}

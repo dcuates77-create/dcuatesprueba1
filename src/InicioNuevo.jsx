@@ -17,7 +17,7 @@ const TILES = [
   ["negocios", "🏪", "Negocios", "Emprendimientos que MULTIPLICAN VALOR", "#2E9E5B"],
   ["beneficios", "🎁", "Beneficios", "Conoce lo que puedes obtener", "#F07A1A"],
   
-  ["regalos", "🎉", "Regalos y gratitud", "Reconocemos tu apoyo", "#D6336C"],
+  ["gratitud", "🙏", "Gratitud", "Regalos, retos y reconocimientos", "#B7791F"],
   ["cierre", "/images/eclipse.svg", "Súmate", "Tu parte hace la diferencia", "#E65100"]
 ];
 
@@ -102,12 +102,12 @@ const CSS = `
 .vi-cta{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;border:0;border-radius:999px;background:#0e7c4f;color:#fff;font-weight:900;font-size:15px;padding:12px 18px;min-height:48px;box-shadow:0 4px 0 #0a5a39,0 6px 14px rgba(0,0,0,.3);cursor:pointer}
 .vi-cta:active{transform:translateY(2px);box-shadow:0 2px 0 #0a5a39}
 .vi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0 14px}
-.vi-tile{display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;border:1.5px solid rgba(15,45,30,.12);border-radius:20px;background:#fff;padding:12px 6px 12px;min-height:128px;box-shadow:0 3px 0 rgba(15,45,30,.08),0 6px 12px rgba(15,45,30,.08);cursor:pointer;color:#0f2d1e}
+.vi-tile{display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;border:1.5px solid rgba(15,45,30,.12);border-radius:20px;background:#fff;padding:12px 6px 12px;min-height:136px;box-shadow:0 3px 0 rgba(15,45,30,.08),0 6px 12px rgba(15,45,30,.08);cursor:pointer;color:#0f2d1e}
 .vi-tile:active{transform:translateY(2px)}
 .vi-ico .emo-img{width:1.35em;height:1.35em}
 .vi-ico{display:flex;align-items:center;justify-content:center;width:46px;height:46px;border-radius:50%;font-size:24px;box-shadow:inset 0 -3px 0 rgba(0,0,0,.18)}
-.vi-tile b{font-size:14px;line-height:1.1;font-weight:900}
-.vi-tile small{font-size:11px;line-height:1.2;font-weight:700;color:#3d5a4a}
+.vi-tile b{font-size:15.5px;line-height:1.1;font-weight:900}
+.vi-tile small{font-size:12.5px;line-height:1.2;font-weight:700;color:#2f4d3f}
 .vi-logros .bc-banda{margin:0}
 .vi-fondo{position:fixed;inset:0;z-index:52;background:rgba(0,0,0,.55);display:flex;align-items:flex-end;justify-content:center}
 .vi-part{margin:6px 0 16px;background:#fff;border-radius:22px;padding:14px 10px 12px;box-shadow:0 4px 14px rgba(15,45,30,.12)}

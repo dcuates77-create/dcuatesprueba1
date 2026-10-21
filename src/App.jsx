@@ -343,6 +343,7 @@ export default function App() {
     portadasItems[id] = [...archivos, ...videos];
   });
   portadasItems.causas = [...(portadasItems.causas || []), ...(portadasItems.valores || [])]; // VALORES se unió a CAUSAS
+  portadasItems.gratitud = [...(portadasItems.regalos || []), ...(portadasItems.gratitud || [])]; // REGALOS se unió a GRATITUD
   portadasItems.causas = [
     ...portadasItems.causas,
     ...videosRetos.map((v, i) => ({
@@ -526,8 +527,7 @@ export default function App() {
       </footer>
   );
 
-  const finalesSecciones = {
-    regalos: (
+  const historiasFinal = (
       <div className="rounded-2xl overflow-hidden mt-4">
       <section id="historias-reflexiones" className="relative scroll-mt-48 md:scroll-mt-36 bg-[#0f2d1e] py-6 px-4 border-b-4 border-[#0f2d1e]">
         <BotonCompartir variante="claro" className="absolute top-2 right-2 z-10" hash="historias-reflexiones" titulo="Historias y reflexiones que inspiran" texto="Videos y reflexiones de nuestra comunidad" />
@@ -564,8 +564,14 @@ export default function App() {
         </div>
       </section>
       </div>
-    ),
-    gratitud: <div id="patrocinadores" className="mt-4 rounded-2xl overflow-hidden"><BarraPatrocinadores /></div>
+  );
+  const finalesSecciones = {
+    gratitud: (
+      <>
+        {historiasFinal}
+        <div id="patrocinadores" className="mt-4 rounded-2xl overflow-hidden"><BarraPatrocinadores /></div>
+      </>
+    )
   };
 
   return (
