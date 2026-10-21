@@ -60,7 +60,7 @@ export default function ZonaInfo({ abrir = "emergencias", onCerrar, agenda = [],
         </details>
         <details className="in-sec">
           <summary>📍 Cerca de ti</summary>
-          <button type="button" className="in-btn" onClick={() => abrirProyectos(onCerrar)}>📚 Proyectos de DCUATES</button>
+          <button type="button" className="in-btn" onClick={() => abrirProyectos(onCerrar)}>📚 Proyectos DCUATES</button>
           <button type="button" className="in-btn" onClick={() => { onCerrar(); setTimeout(() => irASeccion("mapa-negocios"), 150); }}>🗺️ Mapa de negocios locales</button>
           {menu.faq && <button type="button" className="in-btn in-sec2" onClick={() => { onCerrar(); setTimeout(menu.faq, 150); }}>❓ Preguntas frecuentes</button>}
         </details>

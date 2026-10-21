@@ -13,10 +13,9 @@ export function HeroBanner({ tab, portada, titulo, texto, boton, onBoton }) {
     <section className="sn-banner" style={{ "--tc": tab.boton || tab.color }} aria-label={titulo}>
       <h2 className="sr-only" style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0 0 0 0)" }}>{titulo}</h2>
       <img className="sn-banner-img" src={portada} alt={titulo} />
-      {(texto || boton) && (
+      {texto && (
         <div className="sn-banner-t">
           {texto && <p>{texto}</p>}
-          {boton && <button type="button" className="sn-cta-b" onClick={onBoton}>{boton} <span aria-hidden="true">→</span></button>}
         </div>
       )}
     </section>
@@ -106,7 +105,7 @@ export function BloqueSumar({ tab, cfg, onAccion }) {
 
 export const CSS_SN = `
 .emo-img{display:inline-block;width:1.2em;height:1.2em;vertical-align:-0.2em}
-.sn-banner{margin:2px 0 14px;border-radius:22px;overflow:hidden;background:#fff;box-shadow:0 6px 18px rgba(15,45,30,.2)}
+.sn-banner{margin:-6px calc(-1 * var(--pad,16px)) 14px;border-radius:0;overflow:hidden;background:#fff;box-shadow:0 6px 18px rgba(15,45,30,.2)}
 .sn-banner-img{display:block;width:100%;height:auto}
 .sn-banner-t{padding:12px 14px 14px;background:#fff}
 .sn-banner-t p{margin:0 0 10px;font-size:14.5px;line-height:1.4;font-weight:700;color:#2b4a3a}

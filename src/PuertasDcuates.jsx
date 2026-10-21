@@ -116,7 +116,7 @@ function Selector({ onCerrar, onAbrirProyecto }) {
         </div>
         <div className="zj-col">
           {lista.map((x) => <button type="button" key={x.id} style={{ background: x.c }} onClick={() => abrirPuerta(x.id)}>{x.e} {x.t}{actual === x.id ? "  ✅ tu puerta" : ""}</button>)}
-          <button type="button" style={{ background: "#1B6F8A" }} onClick={() => lanza({ tablero: "conoce" }, onCerrar, onAbrirProyecto)}>📚 Proyectos de DCUATES</button>
+          <button type="button" style={{ background: "#1B6F8A" }} onClick={() => lanza({ tablero: "conoce" }, onCerrar, onAbrirProyecto)}>📚 Proyectos DCUATES</button>
           <button type="button" style={{ background: "#334155" }} onClick={onCerrar}>🌐 Ir a la página (sin elegir puerta)</button>
         </div>
         <p className="pu-sig">↩ Al cerrar una puerta regresas aquí, a la lista de puertas.</p>

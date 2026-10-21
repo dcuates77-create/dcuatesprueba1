@@ -21,7 +21,7 @@ import { BOTONES_PORTADA, CATEGORIAS_PROYECTOS, DEGRADADO_SUGERENCIAS, LOGOS_EXT
 import { detectarVideo, esPDF, galeriaDesdeColumna, irASeccion, paresBaserow, primerosValores, resolverSrcImagen, tituloProyecto, urlDesdeCeldaBaserow, useCarruselAutomatico, useFilasEnlaces, useFilasZona } from "./utilidades/baserow.js";
 import BloqueCentral, { CarruselFinal, TABS as TABS_BC, ID_A_TAB } from "./BloqueCentral";
 import InicioNuevo from "./InicioNuevo.jsx";
-import AyudaFlotante from "./AyudaFlotante.jsx";
+import AyudaFlotante, { PistaDeslizar } from "./AyudaFlotante.jsx";
 import NavInferior from "./NavInferior.jsx";
 import ZonaJuegos from "./ZonaJuegos.jsx";
 import ZonaAliados from "./ZonaAliados.jsx";
@@ -581,7 +581,7 @@ export default function App() {
 
       {/* Barra Ticker Inferior Fija — combina negocios, mascotas, avisos y momentos */}
       <BarraTicker />
-      <NavInferior vista={vista} onVista={irVista} onPlus={() => window.dispatchEvent(new CustomEvent("dcuates:abrir-plus"))} />
+      <NavInferior vista={vista} onVista={irVista} onPlus={() => window.dispatchEvent(new CustomEvent("dcuates:abrir-plus"))} onProyectos={() => window.dispatchEvent(new CustomEvent("dcuates:abrir-tablero", { detail: "conoce" }))} onLogros={() => window.dispatchEvent(new CustomEvent("dcuates:abrir-logros"))} />
 
       {/* Ayuda flotante única: ¿Necesitas algo? → ¿Qué necesitas hoy? · Dudas y atención · Contacto */}
       <BotonNecesidades
@@ -590,6 +590,7 @@ export default function App() {
         onAccionEspecial={(accion) => setModalFormulario(accion)}
         onAbrirFAQ={() => setShowFAQ(true)}
       />
+      <PistaDeslizar vista={vista} />
       <AyudaFlotante
         onDudas={() => { registrar("dudas_abrir"); setShowDudas(true); }}
         onContacto={() => irVista("contacto")}

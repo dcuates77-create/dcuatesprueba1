@@ -59,3 +59,24 @@ export default function AyudaFlotante({ onDudas, onContacto }) {
     </>
   );
 }
+
+// Pista de deslizamiento lateral: aparece unos segundos al entrar a Inicio o a una sección (máx. 3 veces por pantalla).
+export function PistaDeslizar({ vista }) {
+  const [txt, setTxt] = useState("");
+  useEffect(() => {
+    if (vista !== "inicio" && vista !== "seccion") { setTxt(""); return; }
+    let veces = 0;
+    const clave = "dc_pista_" + vista;
+    try { veces = parseInt(localStorage.getItem(clave) || "0", 10) || 0; } catch {}
+    const tactil = typeof matchMedia === "function" && matchMedia("(pointer:coarse)").matches;
+    if (veces >= 3 || !tactil) return;
+    try { localStorage.setItem(clave, String(veces + 1)); } catch {}
+    setTxt(vista === "inicio" ? "Desliza el dedo ‹ para ver las secciones" : "‹ Desliza para cambiar de sección ›");
+    const t = setTimeout(() => setTxt(""), 5200);
+    return () => clearTimeout(t);
+  }, [vista]);
+  if (!txt) return null;
+  return (
+    <div role="status" style={{ position: "fixed", left: "50%", transform: "translateX(-50%)", bottom: "calc(var(--alto-ticker, 48px) + var(--alto-nav, 0px) + 74px)", zIndex: 48, background: "rgba(15,45,30,.92)", color: "#fff", padding: "9px 16px", borderRadius: 999, fontWeight: 900, fontSize: 13.5, fontFamily: "Nunito,system-ui,sans-serif", boxShadow: "0 4px 12px rgba(0,0,0,.35)", whiteSpace: "nowrap", pointerEvents: "none" }}>{txt}</div>
+  );
+}

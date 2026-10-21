@@ -589,7 +589,7 @@ export default function BloqueCentral({
   const idxRef = useRef(idx);
   idxRef.current = idx;
   useEffect(() => {
-    let x0 = 0, y0 = 0, t0 = 0, valido = false;
+    let x0 = 0, y0 = 0, t0 = 0, valido = false, enVista = "seccion";
     const esLateral = (el) => {
       for (let n = el; n && n !== document.body; n = n.parentElement) {
         if (n.matches?.("input,textarea,select,iframe,[data-noswipe],[role=dialog]")) return true;
@@ -603,8 +603,9 @@ export default function BloqueCentral({
     const ini = (e) => {
       valido = false;
       if (e.touches.length !== 1) return;
-      const cont = document.querySelector('[data-vista="seccion"]');
-      if (!cont || cont.offsetParent === null || !cont.contains(e.target) || esLateral(e.target)) return;
+      const cont = [...document.querySelectorAll("[data-vista]")].find((c) => c.offsetParent !== null);
+      if (!cont || cont.dataset.vista === "contacto" || !cont.contains(e.target) || esLateral(e.target)) return;
+      enVista = cont.dataset.vista;
       if (document.body.style.overflow === "hidden") return;
       x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; t0 = Date.now(); valido = true;
     };
@@ -614,8 +615,12 @@ export default function BloqueCentral({
       const t = e.changedTouches[0];
       const dx = t.clientX - x0, dy = t.clientY - y0;
       if (Date.now() - t0 > 700 || Math.abs(dx) < 80 || Math.abs(dx) < Math.abs(dy) * 2) return;
+      const ev = (n, d) => window.dispatchEvent(new CustomEvent(n, { detail: d }));
+      // Inicio → (izquierda) primera sección · primera sección → (derecha) Inicio
+      if (enVista === "inicio") { if (dx < 0) ev("dcuates:abrir-seccion", TABS[0].id); return; }
       const i = idxRef.current + (dx < 0 ? 1 : -1);
-      if (i < 0 || i >= TABS.length) return;
+      if (i < 0) { ev("dcuates:vista", "inicio"); return; }
+      if (i >= TABS.length) return;
       cambiarRef.current(i);
     };
     document.addEventListener("touchstart", ini, { passive: true });

@@ -39,7 +39,6 @@ function Hoja({ abierta, onCerrar, titulo, children }) {
 }
 
 export default function InicioNuevo({ onIr, logros = [], cargando = false, entrada = {} }) {
-  const [hoja, setHoja] = useState(false);
   const [foto, setFoto] = useState(0);
   useEffect(() => {
     if (document.getElementById("vi-font")) return;
@@ -49,9 +48,9 @@ export default function InicioNuevo({ onIr, logros = [], cargando = false, entra
     document.head.appendChild(l);
   }, []);
   useEffect(() => {
-    const abrir = () => setHoja(true);
+    const abrir = () => document.getElementById("vi-participar")?.scrollIntoView({ behavior: "smooth", block: "start" });
     window.addEventListener("dcuates:abrir-entrada", abrir);
-    return () => window.removeEventListener("dcuates:abrir-entrada", abrir);
+    return () => { window.removeEventListener("dcuates:abrir-entrada", abrir); };
   }, []);
   const src = FOTOS[foto];
   const tabNosotros = TABS[0];
@@ -64,9 +63,6 @@ export default function InicioNuevo({ onIr, logros = [], cargando = false, entra
         <div className="vi-hero-t">
           <h1>Juntos hacemos comunidad</h1>
           <p>Personas, ideas y recursos para impulsar proyectos que generan un impacto real en sus territorios.</p>
-          <button type="button" className="vi-cta" onClick={() => setHoja(true)}>
-            Conoce cómo participar <span aria-hidden="true">→</span>
-          </button>
         </div>
       </section>
 
@@ -80,15 +76,16 @@ export default function InicioNuevo({ onIr, logros = [], cargando = false, entra
         ))}
       </nav>
 
+      <section id="vi-participar" className="vi-part" aria-label="Conoce cómo participar" style={{ "--tc": "#1B6F8A" }}>
+        <h2 className="vi-h2">🌱 Conoce cómo participar</h2>
+        <p className="vi-h2p">Elige por dónde empezar: cada puerta te lleva paso a paso.</p>
+        <EntradaDcuates {...entrada} />
+      </section>
+
       <div className="vi-logros bc-root" style={{ "--tc": "#17472d" }}>
-        <BandaImpacto logros={logros} cargando={cargando} tab={{ ...tabNosotros, banda: { titulo: "Nuestra comunidad en cifras" } }} />
+        <BandaImpacto logros={logros} cargando={cargando} tab={{ ...tabNosotros, banda: { titulo: "NUESTROS LOGROS" } }} />
       </div>
 
-      <Hoja abierta={hoja} onCerrar={() => setHoja(false)} titulo="🌱 ENTRADA DCUATES">
-        <div style={{ "--tc": "#1B6F8A" }}>
-          <EntradaDcuates {...entrada} />
-        </div>
-      </Hoja>
     </div>
   );
 }
@@ -97,7 +94,7 @@ const CSS = `
 .vi-root{background:#fbf7ec;color:#0f2d1e;font-family:"Nunito",ui-rounded,system-ui,sans-serif;padding:12px 12px 20px;border-radius:0 0 24px 24px}
 .vi-root *{font-family:inherit}
 .vi-hero{position:relative;overflow:hidden;border-radius:26px;background:#14532d;box-shadow:0 8px 22px rgba(15,45,30,.22)}
-.vi-foto{display:block;width:75%;height:auto;margin:14px auto 0;border-radius:16px}
+.vi-foto{display:block;width:100%;height:auto}
 .vi-sinfoto{height:150px;background:linear-gradient(135deg,#1f6b45,#3f9d6a)}
 .vi-hero-t{position:relative;display:flex;flex-direction:column;padding:16px 16px 18px;color:#fff;background:linear-gradient(180deg,#14532d,#0f3d22)}
 .vi-hero-t h1{font-family:"Fraunces",Georgia,serif;font-weight:700;font-size:30px;line-height:1.05;margin:0 0 8px}
@@ -113,6 +110,14 @@ const CSS = `
 .vi-tile small{font-size:11px;line-height:1.2;font-weight:700;color:#3d5a4a}
 .vi-logros .bc-banda{margin:0}
 .vi-fondo{position:fixed;inset:0;z-index:52;background:rgba(0,0,0,.55);display:flex;align-items:flex-end;justify-content:center}
+.vi-part{margin:6px 0 16px;background:#fff;border-radius:22px;padding:14px 10px 12px;box-shadow:0 4px 14px rgba(15,45,30,.12)}
+.vi-h2{margin:0 0 4px;font-family:"Fraunces",Georgia,serif;font-weight:700;font-size:22px;color:#0f2d1e;text-align:center}
+.vi-h2p{margin:0 0 10px;font-size:14px;font-weight:700;color:#35564a;text-align:center;line-height:1.35}
+.vi-lista{margin:10px 0;padding:0;list-style:none;display:grid;gap:6px}
+.vi-lista li{background:#fff;border-radius:12px;padding:9px 12px;font-weight:800;font-size:14px;box-shadow:0 1px 4px rgba(0,0,0,.1)}
+.vi-lista a{color:#0e7c4f}
+.vi-lg-b{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.vi-lg-b button{min-height:48px;border:0;border-radius:14px;background:#0e7c4f;color:#fff;font:inherit;font-weight:900;cursor:pointer}
 .vi-hoja{width:100%;max-width:640px;max-height:90dvh;display:flex;flex-direction:column;background:#fbf7ec;border-radius:26px 26px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.35);animation:vi-sube .28s ease-out}
 .vi-hoja-cab{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;font-weight:900;font-size:15px;letter-spacing:.02em;color:#0f2d1e;border-bottom:1px solid rgba(15,45,30,.12)}
 .vi-hoja-cab button{border:0;border-radius:50%;width:40px;height:40px;background:#0f2d1e;color:#fff;font-size:18px;font-weight:900;cursor:pointer}
