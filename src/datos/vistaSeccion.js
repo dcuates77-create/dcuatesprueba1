@@ -106,7 +106,7 @@ export const VISTA = {
   },
   gratitud: {
     titulo: "Gratitud",
-    portada: "/images/portada-regalos.jpg",
+    portada: "/images/portada-gratitud.jpg",
     texto: "Reconocemos a quienes hacen el bien en nuestra comunidad. Cuéntanos a quién quieres agradecer.",
     boton: { t: "Conoce los reconocimientos", a: { bajar: 1 } },
     pregunta: "¿A quién agradecemos?",
