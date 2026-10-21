@@ -720,7 +720,7 @@ export default function BloqueCentral({
 
         <div className="bc-panel bc-nuevo" id="bc-panel" role="tabpanel" aria-labelledby={`bc-tab-${tab.id}`} key={tab.id} style={{ background: "#fbf7ec", "--tc": tab.boton || tab.color }}>
           <style>{CSS_SN}</style>
-          {cfg.portada && !primeraImagen ? (
+          {cfg.portada ? (
             <HeroBanner tab={tab} portada={cfg.portada} titulo={cfg.titulo || tab.label} texto={cfg.texto || tab.texto || ""} boton={cfg.boton?.t} onBoton={() => ejecutar(cfg.boton?.a)} />
           ) : (
             <Hero
