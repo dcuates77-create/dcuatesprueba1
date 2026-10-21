@@ -287,9 +287,15 @@ export function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirTerminos, onA
 // NECESIDADES_GRUPOS arriba). Se autogestiona su propio estado — solo
 // necesita los 2 callbacks para abrir el modal de proyecto o una acción
 // especial (por ahora, solo "comparte").
-export function BotonNecesidades({ onAbrirProyecto, onAccionEspecial, onAbrirFAQ, barra = false }) {
+export function BotonNecesidades({ onAbrirProyecto, onAccionEspecial, onAbrirFAQ, barra = false, sinBoton = false }) {
   const ac = useAceptacion();
   const [abierto, setAbierto] = useState(false);
+  // La ayuda flotante única abre esta ventana con un evento.
+  useEffect(() => {
+    const abre = () => setAbierto(true);
+    window.addEventListener("dcuates:abrir-necesitas", abre);
+    return () => window.removeEventListener("dcuates:abrir-necesitas", abre);
+  }, []);
   const [grupoAbierto, setGrupoAbierto] = useState(null);
   // Texto libre para la opción "Otro(s)" — al final de la ventana, para lo
   // que no encaje en ninguna categoría.
@@ -336,7 +342,7 @@ export function BotonNecesidades({ onAbrirProyecto, onAccionEspecial, onAbrirFAQ
 
   return (
     <>
-      {barra ? (
+      {sinBoton ? null : barra ? (
         <button
           type="button"
           onClick={() => setAbierto((v) => !v)}
