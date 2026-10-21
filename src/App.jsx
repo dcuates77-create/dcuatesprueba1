@@ -21,6 +21,7 @@ import { BOTONES_PORTADA, CATEGORIAS_PROYECTOS, DEGRADADO_SUGERENCIAS, LOGOS_EXT
 import { detectarVideo, esPDF, galeriaDesdeColumna, irASeccion, paresBaserow, primerosValores, resolverSrcImagen, tituloProyecto, urlDesdeCeldaBaserow, useCarruselAutomatico, useFilasEnlaces, useFilasZona } from "./utilidades/baserow.js";
 import BloqueCentral, { CarruselFinal, TABS as TABS_BC, ID_A_TAB } from "./BloqueCentral";
 import InicioNuevo from "./InicioNuevo.jsx";
+import AyudaFlotante from "./AyudaFlotante.jsx";
 import NavInferior from "./NavInferior.jsx";
 import ZonaJuegos from "./ZonaJuegos.jsx";
 import ZonaAliados from "./ZonaAliados.jsx";
@@ -422,234 +423,9 @@ export default function App() {
   const compraVentaDcuates = paresBaserow(filasEnlaces, "NOMBRE COMPRA-VENTA DCUATES", "COMPRA-VENTA DCUATES", 5);
 
   // Carruseles que ahora viven al final de REGALOS (historias) y de GRATITUD (patrocinadores).
-  const finalesSecciones = {
-    regalos: (
-      <div className="rounded-2xl overflow-hidden mt-4">
-      <section id="historias-reflexiones" className="relative scroll-mt-48 md:scroll-mt-36 bg-[#0f2d1e] py-6 px-4 border-b-4 border-[#0f2d1e]">
-        <BotonCompartir variante="claro" className="absolute top-2 right-2 z-10" hash="historias-reflexiones" titulo="Historias y reflexiones que inspiran" texto="Videos y reflexiones de nuestra comunidad" />
-        <div className="mx-auto max-w-6xl">
-          <p className="text-white font-black uppercase text-xs sm:text-sm tracking-wide mb-2 px-1 text-center">
-            Historias y reflexiones DCUATES que INSPIRAN 💡
-            <br className="sm:hidden" />
-            <span className="block sm:inline sm:ml-1">Dales clic para ampliarlos y disfrutarlos 🎥 🍿 😊</span>
-          </p>
-          <div
-            ref={carruselHistorias.scrollRef}
-            onPointerDown={carruselHistorias.onPointerDown}
-            className="flex gap-2 sm:gap-3 overflow-x-auto pb-1"
-          >
-            {videosPortadaFinal.map((v, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => setVideoEnGrande(v.video)}
-                className="group relative rounded-xl overflow-hidden border-2 border-white/10 hover:border-[#e65100] transition-colors bg-black/30 text-left w-40 sm:w-56 shrink-0"
-              >
-                <div className="aspect-video w-full overflow-hidden">
-                  <MiniaturaVideo video={v.video} nombre={v.nombre} />
-                </div>
-                <span className="absolute inset-0 flex items-center justify-center">
-                  <span className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-[#e65100]/90 flex items-center justify-center text-white text-base sm:text-lg shadow-md group-hover:bg-[#e65100]">▶</span>
-                </span>
-                <p className="px-2 py-1.5 text-[10px] sm:text-xs font-black text-white uppercase tracking-tight leading-tight">
-                  {v.nombre}
-                </p>
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
-      </div>
-    ),
-    gratitud: <div id="patrocinadores" className="mt-4 rounded-2xl overflow-hidden"><BarraPatrocinadores /></div>
-  };
-
-  return (
-    <div className="min-h-screen bg-[#17472d] font-sans antialiased text-slate-900 selection:bg-emerald-500/30 relative pb-44 sm:pb-40">
-
-      {/* Barra de progreso de lectura — línea delgada pegada arriba de todo */}
-      <div className="fixed top-0 left-0 right-0 z-[60] h-1 bg-black/10">
-        <div
-          className="h-full bg-[#e65100] transition-[width] duration-150"
-          style={{ width: `${progresoLectura}%` }}
-        />
-      </div>
-
-      {/* Barra Ticker Inferior Fija — combina negocios, mascotas, avisos y momentos */}
-      <BarraTicker />
-      <NavInferior vista={vista} onVista={irVista} onPlus={() => window.dispatchEvent(new CustomEvent("dcuates:abrir-plus"))} />
-
-      {/* Botones flotantes de ayuda — a la derecha, un poco abajo del menú de pestañas; suben cuando el encabezado se esconde al bajar. */}
-      <div className="fixed right-2 sm:right-6 z-50 flex flex-col items-end gap-1.5" style={{ top: "calc(var(--alto-header, 0px) + var(--alto-fijo, 200px) - var(--alto-header-real, 160px) + 10px)", transition: "top .3s ease" }}>
-        {/* ¿Qué necesitas hoy? */}
-        <BotonNecesidades
-          onAbrirProyecto={(id) => setModalProyecto(id)}
-          onAccionEspecial={(accion) => setModalFormulario(accion)}
-          onAbrirFAQ={() => setShowFAQ(true)}
-        />
-        <div className="flex items-center gap-3">
-        <button
-          type="button"
-          onClick={() => { registrar("dudas_abrir"); setShowDudas(true); }}
-          className="bg-[#25d366] text-white text-[11px] sm:text-sm font-black uppercase tracking-wide px-3 py-2 rounded-full shadow-lg border border-white/30 whitespace-nowrap animate-pulse"
-        >
-          Dudas y Atención
-        </button>
-        <button
-          type="button"
-          onClick={() => { registrar("dudas_abrir"); setShowDudas(true); }}
-          aria-label="Abrir ventana de dudas y atención"
-          className="relative flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[#34e372] to-[#128c7e] text-white shadow-[0_10px_20px_rgba(0,0,0,0.35),inset_0_-3px_6px_rgba(0,0,0,0.25),inset_0_3px_4px_rgba(255,255,255,0.4)] transition-all hover:scale-110 active:scale-95 border-2 border-white/40"
-          title="Dudas y Atención"
-        >
-          <span className="absolute inset-0 rounded-full bg-[#25d366] animate-ping opacity-60"></span>
-          <svg className="relative z-10 h-7 w-7 fill-current drop-shadow" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.503-5.729-1.458L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.965C16.428 1.978 13.96 1.951 12.01 1.951c-5.438 0-9.863 4.374-9.867 9.802 0 1.685.459 3.324 1.333 4.766L2.483 20.3l3.966-.995zM17.15 14.34c-.283-.141-1.674-.824-1.933-.917-.26-.093-.448-.14-.637.142-.188.282-.729.917-.894 1.105-.165.188-.33.212-.613.07a9.23 9.23 0 0 1-2.28-1.401 10.15 10.15 0 0 1-1.579-1.954c-.165-.282-.018-.434.124-.574.127-.127.283-.329.424-.494.141-.165.188-.282.283-.47.094-.188.047-.353-.024-.494-.071-.141-.637-1.53-.873-2.102-.229-.554-.46-.478-.637-.487-.164-.008-.353-.01-.542-.01-.189 0-.495.07-.755.353-.26.282-.99 1.011-.99 2.467 0 1.457 1.06 2.867 1.201 3.056.142.188 2.086 3.178 5.053 4.462.705.305 1.256.488 1.684.624.708.226 1.353.194 1.863.118.568-.085 1.674-.682 1.909-1.34.236-.658.236-1.223.165-1.34-.07-.117-.26-.188-.542-.329z"/>
-          </svg>
-        </button>
-              </div>
-      </div>
-
-      {/* Flecha "Subir" — abajo a la derecha, arriba de la barra inferior; aparece después de bajar un poco. */}
-      {mostrarSubir && (
-        <button
-          type="button"
-          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          aria-label="Subir al inicio de la página"
-          title="Subir al menú"
-          className="fixed right-3 sm:right-6 z-50 h-12 w-12 flex items-center justify-center rounded-full bg-[#0f2d1e] text-white shadow-lg border-2 border-white/40 hover:bg-emerald-800 transition-colors"
-          style={{ bottom: "calc(var(--alto-ticker, 48px) + var(--alto-nav, 0px) + 8px)" }}
-        >
-          <span className="text-2xl leading-none font-black" aria-hidden="true">↑</span>
-        </button>
-      )}
-
-      {/* Encabezado + ticker de frases, pegados juntos como una sola barra fija.
-          "relative" para poder anclar el botón de Necesidades justo debajo
-          (top-full), pegado al borde inferior, y que se mueva junto con todo
-          el bloque al hacer scroll (igual que el header, que es sticky). */}
-      <div id="encabezado-fijo" className="sticky top-0 z-40 relative">
-        <SiteHeader
-          onAbrirFAQ={() => setShowFAQ(true)}
-          onAbrirPrivacidad={() => setShowPrivacy(true)}
-          onAbrirTerminos={() => setShowTerminos(true)}
-          onAbrirSeguridad={() => setShowSeguridad(true)}
-          onAbrirEscudo={() => setShowEscudo(true)}
-          onAbrirProyecto={(id) => setModalProyecto(id)}
-          onAbrirSugerencias={() => setModalFormulario("sugerencias")}
-          onAbrirMapaSitio={() => setShowMapaSitio(true)}
-          onAbrirCategoria={(id) => setCategoriaAbierta(id)}
-          busquedaAbierta={busquedaAbierta}
-          setBusquedaAbierta={setBusquedaAbierta}
-        />
-        <TickerFrases />
-        <BarraLogros />
-
-      </div>
-
-      {/* VISTA 1 · INICIO (portada nueva) */}
-      <div data-vista="inicio" style={vista === "inicio" ? undefined : { display: "none" }}>
-        <InicioNuevo
-          onIr={(id) => { irVista("seccion"); window.dispatchEvent(new CustomEvent("dcuates:abrir-seccion", { detail: id })); }}
-          logros={logrosBanda}
-          cargando={!baserowListo}
-          entrada={{ agenda: agendaEventos, filasZona, negocios: negociosBaserow, onAbrirProyecto: (id) => setModalProyecto(id) }}
-        />
-      </div>
-
-      {/* VISTA 2 · PROYECTOS (pestañas) */}
-      <div data-vista="seccion" style={vista === "seccion" ? undefined : { display: "none" }}>
-      {/* SECCIÓN PORTADA / HERO — izquierda: título+texto+Quiénes Somos+Bibliobici a toda altura; derecha: cuadrícula de 12 botones (2 columnas en celular, 3 en escritorio = 3x4) */}
-      <section id="inicio" className="scroll-mt-48 md:scroll-mt-36 bg-[#e8f5e9] text-[#0f2d1e] py-4 px-4 sm:py-6">
-        <div className="mx-auto max-w-2xl md:max-w-4xl xl:max-w-6xl flex flex-col gap-4">
-
-          {/* Banner de avisos + bloque central de 7 pestañas (BloqueCentral).
-              Nosotros y Causas reciben aquí su contenido; lo que sigue
-              debajo (Retos, Historias, Solicitudes, etc.) se migrará a
-              su pestaña en la fase 2. */}
-          <div className="min-w-0">
-            <BloqueCentral
-              categorias={CATEGORIAS_PROYECTOS}
-              proyectos={BOTONES_PORTADA}
-              mapaUrl={MAPA_NEGOCIOS_EMBED_URL}
-              whatsappNumero={WHATSAPP_NUMERO}
-              portadasItems={portadasItems}
-              resumenes={RESUMEN_PROYECTO}
-              logros={logrosBanda}
-              agenda={agendaEventos}
-              cargando={!baserowListo}
-              negocios={negociosBaserow}
-              onAbrirCategoria={(id) => setCategoriaAbierta(id)}
-              onAbrirProyecto={(id) => setModalProyecto(id)}
-              onAcceso={(t) => (t === "proyectos" ? setShowMapaSitio(true) : setAccesoAbierto(t))}
-              accesosSlot={(tabId) => tabId === "nosotros" ? <EntradaDcuates key="pu" agenda={agendaEventos} filasZona={filasZona} negocios={negociosBaserow} onAbrirProyecto={(id) => setModalProyecto(id)} /> : <><PuertaFranja key={"pf" + tabId} /><CaminoDcuates key={"c" + tabId} seccion={tabId} compacto menu={{}} onAbrirProyecto={(id) => setModalProyecto(id)} /><HoyDcuates key={"h" + tabId} seccion={tabId} negocios={negociosBaserow} agenda={agendaEventos} filasZona={filasZona} onAbrirProyecto={(id) => setModalProyecto(id)} /><BotonRegistrate /><BotonPlus key={"plus" + tabId} /></>}
-              beneficios={<PestanaBeneficios setBusquedaAbierta={setBusquedaAbierta} setModalProyecto={setModalProyecto} setShowFAQ={setShowFAQ} setSolicitudExpandida={setSolicitudExpandida} solicitudExpandida={solicitudExpandida} />}
-              valores={<PestanaValores infoAbierta={infoAbierta} librosLinks={librosLinks} musicaLinks={musicaLinks} recomendacionesComunidad={recomendacionesComunidad} recomendacionesDcuates={recomendacionesDcuates} setInfoAbierta={setInfoAbierta} setModalProyecto={setModalProyecto} videosLinks={videosLinks} />}
-              negociosSeccion={<PestanaNegocios compraVentaDcuates={compraVentaDcuates} recomendacionesCompra={recomendacionesCompra} recomendacionesVenta={recomendacionesVenta} setVentasResumenAbierto={setVentasResumenAbierto} ventasResumenAbierto={ventasResumenAbierto} />}
-              regalos={<PestanaRegalos galeriaRetos={galeriaRetos} />}
-              gratitud={<PestanaGratitud setModalProyecto={setModalProyecto} />}
-              nosotros={<PestanaNosotros  />}
-              finales={finalesSecciones}
-              partes={{ qs: <PNQuienes />, mision: <PNMision />, sumar: <PNSumar /> }}
-              causas={<PestanaCausas apoyoCausaAnimalLinks={apoyoCausaAnimalLinks} apoyoCosasCasosLinks={apoyoCosasCasosLinks} apoyoPersonasExtraviadasLinks={apoyoPersonasExtraviadasLinks} extraviadosResumenAbierto={extraviadosResumenAbierto} setExtraviadosResumenAbierto={setExtraviadosResumenAbierto} />}
-            />
-          </div>
-        </div>
-      </section>
-      </div>
-
-      {/* Accesos rápidos: Avisos y Beneficios · Compartir Más · Inicio */}
-      <TableroConoce />
-      <Extras logros={logrosBanda} />
-      <PuertasHost onAbrirProyecto={(id) => setModalProyecto(id)} />
-      <Temporada />
-      <PrimeraVisita />
-      <LeerVoz />
-      <ApoyoHost onAbrirProyecto={(id) => setModalProyecto(id)} />
-      <AgendaHost agenda={agendaEventos} negocios={negociosBaserow} />
-      <PlusHost anuncios={normalizarAnuncios(filasEnlaces)} directorio={normalizarDirectorio(filasEnlaces)} />
-      <ZonaJuegos
-        onAbrirProyecto={(id) => setModalProyecto(id)}
-        filas={filasEnlaces}
-        filasZona={filasZona}
-        temasAprende={juegosRegalos}
-        premios={normalizarPremios(filasEnlaces)}
-        agenda={agendaEventos}
-        menu={{ mapa: () => setShowMapaSitio(true), faq: () => setShowFAQ(true), sugerencias: () => setModalFormulario("sugerencias") }}
-      />
-      <ZonaAliados agenda={agendaEventos} />
-      <ZonaRed onAbrirProyecto={(id) => setModalProyecto(id)} />
-
-      {/* VISTA 3 · CONTACTO: registros y colofón (accesos, patrocinadores, historias, créditos) */}
-      <div data-vista="contacto" id="contacto" style={vista === "contacto" ? undefined : { display: "none" }}>
-        <section aria-label="Contacto y registro" className="px-4 pt-5 pb-5 border-b-4 border-[#0f2d1e]" style={{ background: "#fbf7ec" }}>
-          <div className="mx-auto max-w-2xl md:max-w-4xl">
-            <h2 className="text-center font-black uppercase text-xl sm:text-2xl leading-tight" style={{ color: "#0f2d1e" }}>Contacto y registro</h2>
-            <p className="text-center text-sm font-semibold mt-1" style={{ color: "#475569" }}>Regístrate, pide apoyo o escríbenos. Aquí también está todo lo demás: privacidad, seguridad, preguntas y créditos.</p>
-            <div className="mt-4 grid grid-cols-2 gap-3">
-              {[
-                ["📝", "Regístrate o participa", "#2E9E5B", () => setAccesoAbierto("registros")],
-                ["💛", "Para ti", "#E65100", () => setAccesoAbierto("beneficios")],
-                ["💬", "Escríbenos por WhatsApp", "#25a244", () => window.open("https://wa.me/" + WHATSAPP_NUMERO + "?text=" + encodeURIComponent("¡Hola DCUATES! Quisiera más información."), "_blank", "noopener")],
-                ["❓", "Preguntas frecuentes", "#1B6F8A", () => setShowFAQ(true)],
-                ["🗺️", "Mapa del sitio", "#7A5AD8", () => setShowMapaSitio(true)],
-                ["🛡️", "Escudo de seguridad", "#0f4c5c", () => setShowEscudo(true)]
-              ].map(([e, t, c, f]) => (
-                <button key={t} type="button" onClick={f} style={{ background: c }} className="min-h-[88px] rounded-2xl text-white shadow-md border-b-4 border-black/25 px-2 py-3 flex flex-col items-center justify-center gap-1 text-center font-black uppercase text-[12px] leading-tight active:translate-y-0.5 transition-transform">
-                  <span className="text-3xl leading-none" aria-hidden="true">{e}</span>
-                  <span>{t}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        </section>
-      <BarraAccionesFinal onAbrirComparte={() => setModalFormulario("comparte")} onInicio={() => irVista("inicio")} />
-
-      {/* Portada de la pestaña abierta, al final y en sentido contrario a los videos */}
-      <CarruselFinal portadasItems={portadasItems} categorias={CATEGORIAS_PROYECTOS} cargando={!baserowListo} />
-
-      {/* FOOTER */}
-      <footer className="bg-[#e8f5e9] text-[#0f2d1e] py-12 px-4 text-center space-y-8 border-t-4 border-[#0f2d1e]">
+  // Colofón: marca, redes, avisos y créditos (va al final de Súmate y de Contacto)
+  const colofon = (
+    <footer className="bg-[#e8f5e9] text-[#0f2d1e] pt-12 pb-28 px-4 text-center space-y-8 border-t-4 border-[#0f2d1e]">
 
         <div className="flex items-center justify-center gap-3">
           <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#0f2d1e] font-black text-white text-lg shrink-0">DC</span>
@@ -748,6 +524,218 @@ export default function App() {
           Todos los derechos reservados
         </p>
       </footer>
+  );
+
+  const finalesSecciones = {
+    regalos: (
+      <div className="rounded-2xl overflow-hidden mt-4">
+      <section id="historias-reflexiones" className="relative scroll-mt-48 md:scroll-mt-36 bg-[#0f2d1e] py-6 px-4 border-b-4 border-[#0f2d1e]">
+        <BotonCompartir variante="claro" className="absolute top-2 right-2 z-10" hash="historias-reflexiones" titulo="Historias y reflexiones que inspiran" texto="Videos y reflexiones de nuestra comunidad" />
+        <div className="mx-auto max-w-6xl">
+          <p className="text-white font-black uppercase text-xs sm:text-sm tracking-wide mb-2 px-1 text-center">
+            Historias y reflexiones DCUATES que INSPIRAN 💡
+            <br className="sm:hidden" />
+            <span className="block sm:inline sm:ml-1">Dales clic para ampliarlos y disfrutarlos 🎥 🍿 😊</span>
+          </p>
+          <div
+            ref={carruselHistorias.scrollRef}
+            onPointerDown={carruselHistorias.onPointerDown}
+            className="flex gap-2 sm:gap-3 overflow-x-auto pb-1"
+          >
+            {videosPortadaFinal.map((v, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => setVideoEnGrande(v.video)}
+                className="group relative rounded-xl overflow-hidden border-2 border-white/10 hover:border-[#e65100] transition-colors bg-black/30 text-left w-40 sm:w-56 shrink-0"
+              >
+                <div className="aspect-video w-full overflow-hidden">
+                  <MiniaturaVideo video={v.video} nombre={v.nombre} />
+                </div>
+                <span className="absolute inset-0 flex items-center justify-center">
+                  <span className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-[#e65100]/90 flex items-center justify-center text-white text-base sm:text-lg shadow-md group-hover:bg-[#e65100]">▶</span>
+                </span>
+                <p className="px-2 py-1.5 text-[10px] sm:text-xs font-black text-white uppercase tracking-tight leading-tight">
+                  {v.nombre}
+                </p>
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+      </div>
+    ),
+    gratitud: <div id="patrocinadores" className="mt-4 rounded-2xl overflow-hidden"><BarraPatrocinadores /></div>
+  };
+
+  return (
+    <div className="min-h-screen bg-[#17472d] font-sans antialiased text-slate-900 selection:bg-emerald-500/30 relative pb-44 sm:pb-40">
+
+      {/* Barra de progreso de lectura — línea delgada pegada arriba de todo */}
+      <div className="fixed top-0 left-0 right-0 z-[60] h-1 bg-black/10">
+        <div
+          className="h-full bg-[#e65100] transition-[width] duration-150"
+          style={{ width: `${progresoLectura}%` }}
+        />
+      </div>
+
+      {/* Barra Ticker Inferior Fija — combina negocios, mascotas, avisos y momentos */}
+      <BarraTicker />
+      <NavInferior vista={vista} onVista={irVista} onPlus={() => window.dispatchEvent(new CustomEvent("dcuates:abrir-plus"))} />
+
+      {/* Ayuda flotante única: ¿Necesitas algo? → ¿Qué necesitas hoy? · Dudas y atención · Contacto */}
+      <BotonNecesidades
+        sinBoton
+        onAbrirProyecto={(id) => setModalProyecto(id)}
+        onAccionEspecial={(accion) => setModalFormulario(accion)}
+        onAbrirFAQ={() => setShowFAQ(true)}
+      />
+      <AyudaFlotante
+        onDudas={() => { registrar("dudas_abrir"); setShowDudas(true); }}
+        onContacto={() => irVista("contacto")}
+      />
+
+      {/* Flecha "Subir" — abajo a la derecha, arriba de la barra inferior; aparece después de bajar un poco. */}
+      {mostrarSubir && (
+        <button
+          type="button"
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          aria-label="Subir al inicio de la página"
+          title="Subir al menú"
+          className="fixed right-3 sm:right-6 z-50 h-12 w-12 flex items-center justify-center rounded-full bg-[#0f2d1e] text-white shadow-lg border-2 border-white/40 hover:bg-emerald-800 transition-colors"
+          style={{ bottom: "calc(var(--alto-ticker, 48px) + var(--alto-nav, 0px) + 66px)" }}
+        >
+          <span className="text-2xl leading-none font-black" aria-hidden="true">↑</span>
+        </button>
+      )}
+
+      {/* Encabezado + ticker de frases, pegados juntos como una sola barra fija.
+          "relative" para poder anclar el botón de Necesidades justo debajo
+          (top-full), pegado al borde inferior, y que se mueva junto con todo
+          el bloque al hacer scroll (igual que el header, que es sticky). */}
+      <div id="encabezado-fijo" className="sticky top-0 z-40 relative">
+        <SiteHeader
+          onAbrirFAQ={() => setShowFAQ(true)}
+          onAbrirPrivacidad={() => setShowPrivacy(true)}
+          onAbrirTerminos={() => setShowTerminos(true)}
+          onAbrirSeguridad={() => setShowSeguridad(true)}
+          onAbrirEscudo={() => setShowEscudo(true)}
+          onAbrirProyecto={(id) => setModalProyecto(id)}
+          onAbrirSugerencias={() => setModalFormulario("sugerencias")}
+          onAbrirMapaSitio={() => setShowMapaSitio(true)}
+          onAbrirCategoria={(id) => setCategoriaAbierta(id)}
+          busquedaAbierta={busquedaAbierta}
+          setBusquedaAbierta={setBusquedaAbierta}
+        />
+        <TickerFrases />
+        <BarraLogros />
+
+      </div>
+
+      {/* VISTA 1 · INICIO (portada nueva) */}
+      <div data-vista="inicio" style={vista === "inicio" ? undefined : { display: "none" }}>
+        <InicioNuevo
+          onIr={(id) => { irVista("seccion"); window.dispatchEvent(new CustomEvent("dcuates:abrir-seccion", { detail: id })); }}
+          logros={logrosBanda}
+          cargando={!baserowListo}
+          entrada={{ agenda: agendaEventos, filasZona, negocios: negociosBaserow, onAbrirProyecto: (id) => setModalProyecto(id) }}
+        />
+      </div>
+
+      {/* VISTA 2 · PROYECTOS (pestañas) */}
+      <div data-vista="seccion" style={vista === "seccion" ? undefined : { display: "none" }}>
+      {/* SECCIÓN PORTADA / HERO — izquierda: título+texto+Quiénes Somos+Bibliobici a toda altura; derecha: cuadrícula de 12 botones (2 columnas en celular, 3 en escritorio = 3x4) */}
+      <section id="inicio" className="scroll-mt-48 md:scroll-mt-36 bg-[#e8f5e9] text-[#0f2d1e] py-4 px-4 sm:py-6">
+        <div className="mx-auto max-w-2xl md:max-w-4xl xl:max-w-6xl flex flex-col gap-4">
+
+          {/* Banner de avisos + bloque central de 7 pestañas (BloqueCentral).
+              Nosotros y Causas reciben aquí su contenido; lo que sigue
+              debajo (Retos, Historias, Solicitudes, etc.) se migrará a
+              su pestaña en la fase 2. */}
+          <div className="min-w-0">
+            <BloqueCentral
+              categorias={CATEGORIAS_PROYECTOS}
+              proyectos={BOTONES_PORTADA}
+              mapaUrl={MAPA_NEGOCIOS_EMBED_URL}
+              whatsappNumero={WHATSAPP_NUMERO}
+              portadasItems={portadasItems}
+              resumenes={RESUMEN_PROYECTO}
+              logros={logrosBanda}
+              agenda={agendaEventos}
+              cargando={!baserowListo}
+              negocios={negociosBaserow}
+              onAbrirCategoria={(id) => setCategoriaAbierta(id)}
+              onAbrirProyecto={(id) => setModalProyecto(id)}
+              onAcceso={(t) => (t === "proyectos" ? setShowMapaSitio(true) : setAccesoAbierto(t))}
+              accesosSlot={(tabId) => tabId === "nosotros" ? <EntradaDcuates key="pu" agenda={agendaEventos} filasZona={filasZona} negocios={negociosBaserow} onAbrirProyecto={(id) => setModalProyecto(id)} /> : <><PuertaFranja key={"pf" + tabId} /><CaminoDcuates key={"c" + tabId} seccion={tabId} compacto menu={{}} onAbrirProyecto={(id) => setModalProyecto(id)} /><HoyDcuates key={"h" + tabId} seccion={tabId} negocios={negociosBaserow} agenda={agendaEventos} filasZona={filasZona} onAbrirProyecto={(id) => setModalProyecto(id)} /><BotonRegistrate /><BotonPlus key={"plus" + tabId} /></>}
+              beneficios={<PestanaBeneficios setBusquedaAbierta={setBusquedaAbierta} setModalProyecto={setModalProyecto} setShowFAQ={setShowFAQ} setSolicitudExpandida={setSolicitudExpandida} solicitudExpandida={solicitudExpandida} />}
+              valores={<PestanaValores infoAbierta={infoAbierta} librosLinks={librosLinks} musicaLinks={musicaLinks} recomendacionesComunidad={recomendacionesComunidad} recomendacionesDcuates={recomendacionesDcuates} setInfoAbierta={setInfoAbierta} setModalProyecto={setModalProyecto} videosLinks={videosLinks} />}
+              negociosSeccion={<PestanaNegocios compraVentaDcuates={compraVentaDcuates} recomendacionesCompra={recomendacionesCompra} recomendacionesVenta={recomendacionesVenta} setVentasResumenAbierto={setVentasResumenAbierto} ventasResumenAbierto={ventasResumenAbierto} />}
+              regalos={<PestanaRegalos galeriaRetos={galeriaRetos} />}
+              gratitud={<PestanaGratitud setModalProyecto={setModalProyecto} />}
+              nosotros={<PestanaNosotros  />}
+              finales={finalesSecciones}
+              colofon={colofon}
+              partes={{ qs: <PNQuienes />, mision: <PNMision />, sumar: <PNSumar /> }}
+              causas={<PestanaCausas apoyoCausaAnimalLinks={apoyoCausaAnimalLinks} apoyoCosasCasosLinks={apoyoCosasCasosLinks} apoyoPersonasExtraviadasLinks={apoyoPersonasExtraviadasLinks} extraviadosResumenAbierto={extraviadosResumenAbierto} setExtraviadosResumenAbierto={setExtraviadosResumenAbierto} />}
+            />
+          </div>
+        </div>
+      </section>
+      </div>
+
+      {/* Accesos rápidos: Avisos y Beneficios · Compartir Más · Inicio */}
+      <TableroConoce />
+      <Extras logros={logrosBanda} />
+      <PuertasHost onAbrirProyecto={(id) => setModalProyecto(id)} />
+      <Temporada />
+      <PrimeraVisita />
+      <LeerVoz />
+      <ApoyoHost onAbrirProyecto={(id) => setModalProyecto(id)} />
+      <AgendaHost agenda={agendaEventos} negocios={negociosBaserow} />
+      <PlusHost anuncios={normalizarAnuncios(filasEnlaces)} directorio={normalizarDirectorio(filasEnlaces)} />
+      <ZonaJuegos
+        onAbrirProyecto={(id) => setModalProyecto(id)}
+        filas={filasEnlaces}
+        filasZona={filasZona}
+        temasAprende={juegosRegalos}
+        premios={normalizarPremios(filasEnlaces)}
+        agenda={agendaEventos}
+        menu={{ mapa: () => setShowMapaSitio(true), faq: () => setShowFAQ(true), sugerencias: () => setModalFormulario("sugerencias") }}
+      />
+      <ZonaAliados agenda={agendaEventos} />
+      <ZonaRed onAbrirProyecto={(id) => setModalProyecto(id)} />
+
+      {/* VISTA 3 · CONTACTO: registros y colofón (accesos, patrocinadores, historias, créditos) */}
+      <div data-vista="contacto" id="contacto" style={vista === "contacto" ? undefined : { display: "none" }}>
+        <section aria-label="Contacto y registro" className="px-4 pt-5 pb-5 border-b-4 border-[#0f2d1e]" style={{ background: "#fbf7ec" }}>
+          <div className="mx-auto max-w-2xl md:max-w-4xl">
+            <h2 className="text-center font-black uppercase text-xl sm:text-2xl leading-tight" style={{ color: "#0f2d1e" }}>Contacto y registro</h2>
+            <p className="text-center text-sm font-semibold mt-1" style={{ color: "#475569" }}>Regístrate, pide apoyo o escríbenos. Aquí también está todo lo demás: privacidad, seguridad, preguntas y créditos.</p>
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              {[
+                ["📝", "Regístrate o participa", "#2E9E5B", () => setAccesoAbierto("registros")],
+                ["💛", "Para ti", "#E65100", () => setAccesoAbierto("beneficios")],
+                ["💬", "Dudas y atención por WhatsApp", "#25a244", () => { registrar("dudas_abrir"); setShowDudas(true); }],
+                ["❓", "Preguntas frecuentes", "#1B6F8A", () => setShowFAQ(true)],
+                ["🗺️", "Mapa del sitio", "#7A5AD8", () => setShowMapaSitio(true)],
+                ["🛡️", "Escudo de seguridad", "#0f4c5c", () => setShowEscudo(true)]
+              ].map(([e, t, c, f]) => (
+                <button key={t} type="button" onClick={f} style={{ background: c }} className="min-h-[88px] rounded-2xl text-white shadow-md border-b-4 border-black/25 px-2 py-3 flex flex-col items-center justify-center gap-1 text-center font-black uppercase text-[12px] leading-tight active:translate-y-0.5 transition-transform">
+                  <span className="text-3xl leading-none" aria-hidden="true">{e}</span>
+                  <span>{t}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </section>
+      <BarraAccionesFinal onAbrirComparte={() => setModalFormulario("comparte")} onInicio={() => irVista("inicio")} />
+
+      {/* Portada de la pestaña abierta, al final y en sentido contrario a los videos */}
+      <CarruselFinal portadasItems={portadasItems} categorias={CATEGORIAS_PROYECTOS} cargando={!baserowListo} />
+
+      {/* FOOTER */}
+      {colofon}
       </div>
 
 

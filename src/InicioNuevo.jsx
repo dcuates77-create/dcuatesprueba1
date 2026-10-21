@@ -97,7 +97,7 @@ const CSS = `
 .vi-root{background:#fbf7ec;color:#0f2d1e;font-family:"Nunito",ui-rounded,system-ui,sans-serif;padding:12px 12px 20px;border-radius:0 0 24px 24px}
 .vi-root *{font-family:inherit}
 .vi-hero{position:relative;overflow:hidden;border-radius:26px;background:#14532d;box-shadow:0 8px 22px rgba(15,45,30,.22)}
-.vi-foto{display:block;width:100%;height:auto}
+.vi-foto{display:block;width:75%;height:auto;margin:14px auto 0;border-radius:16px}
 .vi-sinfoto{height:150px;background:linear-gradient(135deg,#1f6b45,#3f9d6a)}
 .vi-hero-t{position:relative;display:flex;flex-direction:column;padding:16px 16px 18px;color:#fff;background:linear-gradient(180deg,#14532d,#0f3d22)}
 .vi-hero-t h1{font-family:"Fraunces",Georgia,serif;font-weight:700;font-size:30px;line-height:1.05;margin:0 0 8px}

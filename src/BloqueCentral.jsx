@@ -403,7 +403,8 @@ export default function BloqueCentral({
   onAcceso = () => {},
   accesosSlot = null,
   finales = {},             // JSX que va al final de una sección: { regalos, gratitud }
-  partes = {}               // partes de NOSOTROS para tarjetas anidadas { qs, mision, sumar }
+  partes = {},              // partes de NOSOTROS para tarjetas anidadas { qs, mision, sumar }
+  colofon = null            // pie con marca, privacidad y avisos: va al final de Súmate
 }) {
   const [idx, setIdx] = useState(0);
   const [slotFinal, setSlotFinal] = useState(null);
@@ -581,6 +582,46 @@ export default function BloqueCentral({
     const top = rootRef.current?.getBoundingClientRect().top ?? 0;
     if (top < h) rootRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
   };
+
+  // Deslizar el dedo a los lados cambia de sección (solo en celular y solo si la sección está a la vista).
+  const cambiarRef = useRef(cambiar);
+  cambiarRef.current = cambiar;
+  const idxRef = useRef(idx);
+  idxRef.current = idx;
+  useEffect(() => {
+    let x0 = 0, y0 = 0, t0 = 0, valido = false;
+    const esLateral = (el) => {
+      for (let n = el; n && n !== document.body; n = n.parentElement) {
+        if (n.matches?.("input,textarea,select,iframe,[data-noswipe],[role=dialog]")) return true;
+        if (n.scrollWidth > n.clientWidth + 6) {
+          const ox = getComputedStyle(n).overflowX;
+          if (ox === "auto" || ox === "scroll") return true;
+        }
+      }
+      return false;
+    };
+    const ini = (e) => {
+      valido = false;
+      if (e.touches.length !== 1) return;
+      const cont = document.querySelector('[data-vista="seccion"]');
+      if (!cont || cont.offsetParent === null || !cont.contains(e.target) || esLateral(e.target)) return;
+      if (document.body.style.overflow === "hidden") return;
+      x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; t0 = Date.now(); valido = true;
+    };
+    const fin = (e) => {
+      if (!valido) return;
+      valido = false;
+      const t = e.changedTouches[0];
+      const dx = t.clientX - x0, dy = t.clientY - y0;
+      if (Date.now() - t0 > 700 || Math.abs(dx) < 80 || Math.abs(dx) < Math.abs(dy) * 2) return;
+      const i = idxRef.current + (dx < 0 ? 1 : -1);
+      if (i < 0 || i >= TABS.length) return;
+      cambiarRef.current(i);
+    };
+    document.addEventListener("touchstart", ini, { passive: true });
+    document.addEventListener("touchend", fin, { passive: true });
+    return () => { document.removeEventListener("touchstart", ini); document.removeEventListener("touchend", fin); };
+  }, []);
 
   const cats = (tab.cats || [tab.cat]).map((c) => categorias.find((x) => x.id === c)).filter(Boolean);
   const idsProy = [...new Set(cats.flatMap((c) => c.proyectos || []))];
@@ -808,6 +849,7 @@ export default function BloqueCentral({
           </div>
         </div>
       </div>
+      {tab.id === "cierre" && colofon}
     </section>
   );
 }
