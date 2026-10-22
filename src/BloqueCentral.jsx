@@ -399,7 +399,9 @@ export default function BloqueCentral({
   accesosSlot = null,
   finales = {},             // JSX que va al final de una sección: { regalos, gratitud }
   partes = {},              // partes de NOSOTROS para tarjetas anidadas { qs, mision, sumar }
-  colofon = null            // pie con marca, privacidad y avisos: va al final de Súmate
+  colofon = null,           // pie con marca (abajo)
+  muro = null               // muro de gratitud
+  // pie con marca, privacidad y avisos: va al final de Súmate
 }) {
   const [idx, setIdx] = useState(0);
   const [slotFinal, setSlotFinal] = useState(null);
@@ -729,6 +731,7 @@ export default function BloqueCentral({
     qs: partes.qs, mision: partes.mision, sumar: partes.sumar,
     slot: tab.slot ? slots[tab.slot] : null,
     regalos: tab.id === "gratitud" ? slots.regalos : null,
+    muro: tab.id === "gratitud" ? muro : null,
     valores: tab.id === "causas" ? slots.valores : null,
     fichas: fichasJsx,
     portada: tab.id === "causas" && hayPortada ? <CarruselPortada items={portadasItems[tab.id] || []} tab={tab} fallback={imgs[tab.id]} cargando={cargando} /> : null

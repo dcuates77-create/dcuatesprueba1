@@ -1,7 +1,6 @@
 // Ayuda flotante única: "¿Necesitas algo?" abre tres opciones (¿Qué necesitas hoy?, Dudas y atención, Contacto).
 // Abajo a la derecha, arriba del cintillo inferior; la flecha de subir queda encima (ver App.jsx).
 import React, { useEffect, useState } from "react";
-import BotonCompartir from "./BotonCompartir.jsx";
 
 // Parpadeo con temporizador (funciona aunque el celular tenga "reducir animaciones").
 function useParpadeo(activo, ms = 900) {
@@ -66,9 +65,6 @@ export default function AyudaFlotante({ onDudas, onContacto }) {
           </div>
         </>
       )}
-      <div className="af-comp" style={{ bottom: `calc(${base} + 5px)`, right: 236, opacity: abierta ? 1 : alto ? 0.9 : 0.5 }}>
-        <BotonCompartir variante="circulo" hash="" titulo="DCUATES — ¡Comparte y Gana!" texto="Conoce DCUATES: una comunidad que suma. Entra y participa" />
-      </div>
       <button type="button" className="af-pill" style={{ bottom: base, opacity: abierta ? 1 : alto ? 0.88 : 0.5 }} aria-expanded={abierta} onClick={() => setAbierta((v) => !v)}>
         <span>¿Necesitas algo?</span>
         <span className="af-q" aria-hidden="true">{abierta ? "×" : "?"}</span>

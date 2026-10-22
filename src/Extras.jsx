@@ -24,8 +24,8 @@ const SERV = [
   ["🏷️", "Promociones especiales para la comunidad", "Descuentos y beneficios de aliados y patrocinadores."]
 ];
 
-// Primero los de 25 años y los de 19 años; después, de mayor a menor alcance.
-const ORDEN_LOGROS = [/25 A[ÑN]OS/i, /19 A[ÑN]OS.*PROYECTOS|PROYECTOS SOCIALES/i, /19 A[ÑN]OS/i, /recomendaciones/i, /mill[oó]n/i, /1,?000 libros/i, /500 libros/i, /200 libros/i, /asesor[ií]as/i, /adopciones/i, /500 cursos|talleres/i, /100 reuniones/i, /formaci[oó]n/i, /sinergia/i];
+// Primero los de 30 años, luego 25 y 19 años; después, de mayor a menor alcance.
+const ORDEN_LOGROS = [/30 A[ÑN]OS/i, /25 A[ÑN]OS/i, /19 A[ÑN]OS.*PROYECTOS|PROYECTOS SOCIALES/i, /19 A[ÑN]OS/i, /recomendaciones/i, /mill[oó]n/i, /1,?000 libros/i, /500 libros/i, /200 libros/i, /asesor[ií]as/i, /adopciones/i, /500 cursos|talleres/i, /100 reuniones/i, /formaci[oó]n/i, /sinergia/i];
 const rangoLogro = (l) => { const i = ORDEN_LOGROS.findIndex((r) => r.test(l.texto || "")); return i < 0 ? 99 : i; };
 const ordenarLogros = (lista) => lista.map((l, i) => [l, i]).sort((a, b) => rangoLogro(a[0]) - rangoLogro(b[0]) || a[1] - b[1]).map((x) => x[0]);
 

@@ -21,6 +21,8 @@ import { BOTONES_PORTADA, CATEGORIAS_PROYECTOS, DEGRADADO_SUGERENCIAS, LOGOS_EXT
 import { detectarVideo, esPDF, galeriaDesdeColumna, irASeccion, paresBaserow, primerosValores, resolverSrcImagen, tituloProyecto, urlDesdeCeldaBaserow, useCarruselAutomatico, useFilasEnlaces, useFilasZona } from "./utilidades/baserow.js";
 import BloqueCentral, { CarruselFinal, TABS as TABS_BC, ID_A_TAB } from "./BloqueCentral";
 import InicioNuevo from "./InicioNuevo.jsx";
+import MuroGratitud from "./MuroGratitud.jsx";
+import OpinionRapida from "./OpinionRapida.jsx";
 import AyudaFlotante, { PistaDeslizar } from "./AyudaFlotante.jsx";
 import NavInferior from "./NavInferior.jsx";
 import ZonaJuegos from "./ZonaJuegos.jsx";
@@ -683,6 +685,7 @@ export default function App() {
               nosotros={<PestanaNosotros  />}
               finales={finalesSecciones}
               colofon={colofon}
+              muro={<MuroGratitud filas={filasEnlaces} />}
               partes={{ qs: <PNQuienes />, mision: <PNMision />, sumar: <PNSumar /> }}
               causas={<PestanaCausas apoyoCausaAnimalLinks={apoyoCausaAnimalLinks} apoyoCosasCasosLinks={apoyoCosasCasosLinks} apoyoPersonasExtraviadasLinks={apoyoPersonasExtraviadasLinks} extraviadosResumenAbierto={extraviadosResumenAbierto} setExtraviadosResumenAbierto={setExtraviadosResumenAbierto} />}
             />
@@ -736,6 +739,7 @@ export default function App() {
             </div>
           </div>
         </section>
+      <OpinionRapida />
       <BarraAccionesFinal onAbrirComparte={() => setModalFormulario("comparte")} onInicio={() => irVista("inicio")} />
 
       {/* Portada de la pestaña abierta, al final y en sentido contrario a los videos */}

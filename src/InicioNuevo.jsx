@@ -6,6 +6,8 @@ import EntradaDcuates from "./PuertasDcuates.jsx";
 import { BandaImpacto, TABS } from "./BloqueCentral.jsx";
 import { useAtras } from "./atras.js";
 import { Emo } from "./SeccionNueva.jsx";
+import { VISTA } from "./datos/vistaSeccion.js";
+import { WHATSAPP_NUMERO } from "./datos/config.js";
 
 // Foto de portada: sube /public/images/portada-inicio.jpg para cambiarla; mientras no exista se usa la de respaldo.
 const FOTOS = ["/images/portada-inicio.jpg", "/images/bibliobici-movil.png"];
@@ -38,16 +40,31 @@ function Hoja({ abierta, onCerrar, titulo, children }) {
   );
 }
 
+// Imagen a un lado y botones al otro (como el cierre de cada sección).
+function BloqueLado({ img, titulo, texto, botones = [], sinBorde = false }) {
+  const [fallo, setFallo] = useState(false);
+  return (
+    <section className={"vi-llama" + (sinBorde ? " vi-sinb" : "")} aria-label={titulo}>
+      <div className="vi-llama-t">
+        <h2>{titulo}</h2>
+        <p>{texto}</p>
+      </div>
+      <div className="vi-lado">
+        {img && !fallo && <img className="vi-llama-img" src={img} alt="" loading="lazy" onError={() => setFallo(true)} />}
+        <div className="vi-lado-b">
+          {botones.map(([t, f, k], i) => (
+            <button key={t + i} type="button" className={k === "ir" ? "vi-l1" : k === "mas" ? "vi-l3" : "vi-l2"} onClick={f}>{t}</button>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function InicioNuevo({ onIr, logros = [], cargando = false, entrada = {} }) {
   const [foto, setFoto] = useState(0);
-  const [ultima, setUltima] = useState(null);
-  useEffect(() => {
-    const leer = () => { try { setUltima(localStorage.getItem("dc_ultima_seccion")); } catch (e) {} };
-    leer();
-    window.addEventListener("dcuates:tab-activa", leer);
-    return () => window.removeEventListener("dcuates:tab-activa", leer);
-  }, []);
-  const tabUltima = TABS.find((t) => t.id === ultima);
+  const [prev, setPrev] = useState(null);
+
   useEffect(() => {
     if (document.getElementById("vi-font")) return;
     const l = document.createElement("link");
@@ -74,17 +91,15 @@ export default function InicioNuevo({ onIr, logros = [], cargando = false, entra
         </div>
       </section>
 
-      {tabUltima && (
-        <button type="button" className="vi-sigue" onClick={() => onIr(tabUltima.id)}>
-          <span aria-hidden="true">▶</span>
-          <span><small>SEGUIR DONDE TE QUEDASTE</small><b>{tabUltima.label}</b></span>
-          <span aria-hidden="true">›</span>
-        </button>
-      )}
+      <section id="vi-participar" className="vi-part" aria-label="Conoce cómo participar" style={{ "--tc": "#1B6F8A" }}>
+        <h2 className="vi-h2">🌱 Conoce cómo participar</h2>
+        <p className="vi-h2p">Elige por dónde empezar: cada puerta te lleva paso a paso.</p>
+        <EntradaDcuates {...entrada} />
+      </section>
 
       <nav className="vi-grid" aria-label="Secciones de DCUATES">
         {TILES.map(([id, e, t, s, c]) => (
-          <button key={id} type="button" className="vi-tile" onClick={() => onIr(id)}>
+          <button key={id} type="button" className="vi-tile" onClick={() => setPrev(id)}>
             <span className="vi-ico" style={{ background: c }} aria-hidden="true"><Emo e={e} /></span>
             <b>{t}</b>
             <small>{s}</small>
@@ -92,27 +107,52 @@ export default function InicioNuevo({ onIr, logros = [], cargando = false, entra
         ))}
       </nav>
 
-      <section id="vi-participar" className="vi-part" aria-label="Conoce cómo participar" style={{ "--tc": "#1B6F8A" }}>
-        <h2 className="vi-h2">🌱 Conoce cómo participar</h2>
-        <p className="vi-h2p">Elige por dónde empezar: cada puerta te lleva paso a paso.</p>
-        <EntradaDcuates {...entrada} />
-      </section>
-
       <div className="vi-logros bc-root" style={{ "--tc": "#17472d" }}>
         <BandaImpacto logros={logros} cargando={cargando} tab={{ ...tabNosotros, banda: { titulo: "NUESTROS LOGROS" } }} />
       </div>
 
-      <section className="vi-llama" aria-label="Conoce DCUATES y suma tu parte">
-        <img className="vi-llama-img" src="/images/sumar-cierre.jpg" alt="" loading="lazy" onError={(e) => { e.currentTarget.style.display = "none"; }} />
-        <div className="vi-llama-t">
-          <h2>Conoce DCUATES y suma tu parte</h2>
-          <p>Somos una comunidad que teje confianza, suma voluntades y cosecha logros. Descubre qué es DCUATES, lo que te brinda y cómo puedes sumarte.</p>
-          <button type="button" className="vi-l1" onClick={() => onIr("nosotros")}>Qué es DCUATES</button>
-          <button type="button" className="vi-l2" onClick={() => onIr("beneficios")}>Lo que te brindamos</button>
-          <button type="button" className="vi-l3" onClick={() => onIr("cierre")}>Cómo sumarte</button>
-        </div>
-      </section>
+      <BloqueLado
+        img="/images/inicio-llama.jpg"
+        titulo="Conoce DCUATES y suma tu parte"
+        texto="Somos una comunidad que teje confianza, suma voluntades y cosecha logros. Descubre qué es DCUATES, lo que te brinda y cómo puedes sumarte."
+        botones={[["Qué es DCUATES", () => onIr("nosotros")], ["Lo que te brindamos", () => onIr("beneficios")], ["Cómo sumarte", () => onIr("cierre")]]}
+      />
 
+      <Hoja abierta={!!prev} onCerrar={() => setPrev(null)} titulo="Vista previa">
+        {prev && (() => {
+          const t = TABS.find((x) => x.id === prev);
+          const sm = (VISTA[prev] || {}).sumar || {};
+          const acc = (a) => {
+            if (!a) return;
+            const ev = (n, d) => window.dispatchEvent(new CustomEvent(n, { detail: d }));
+            if (a.acceso) { setPrev(null); setTimeout(() => ev("dcuates:abrir-acceso", a.acceso), 150); }
+            else if (a.proy) { entrada.onAbrirProyecto && entrada.onAbrirProyecto(a.proy); }
+            else if (a.zona) { setPrev(null); setTimeout(() => ev("dcuates:abrir-zona", a.zona), 150); }
+            else if (a.wa) window.open("https://wa.me/" + WHATSAPP_NUMERO + "?text=" + encodeURIComponent(a.wa), "_blank", "noopener");
+            else if (a.tab) { setPrev(null); onIr(a.tab); }
+          };
+          return (
+            <div>
+              <div className="vi-chips" role="tablist" aria-label="Elige un proyecto">
+                {TILES.map(([id, e, tt, , c]) => (
+                  <button key={id} type="button" role="tab" aria-selected={id === prev} aria-label={tt} onClick={() => setPrev(id)} className={id === prev ? "vi-ch-on" : ""} style={id === prev ? { background: c } : undefined}><Emo e={e} /></button>
+                ))}
+              </div>
+              <BloqueLado
+                img={sm.img}
+                titulo={sm.titulo || t?.label}
+                texto={sm.texto || t?.texto}
+                botones={[
+                  ["Ir a la sección ›", () => { setPrev(null); onIr(prev); }, "ir"],
+                  ...(sm.botones || []).map((b) => [b.t, () => acc(b.a)]),
+                  ["Ver los demás proyectos", () => { setPrev(null); setTimeout(() => window.dispatchEvent(new CustomEvent("dcuates:abrir-tablero", { detail: "conoce" })), 150); }, "mas"]
+                ]}
+                sinBorde
+              />
+            </div>
+          );
+        })()}
+      </Hoja>
     </div>
   );
 }
@@ -143,11 +183,17 @@ const CSS = `
 .vi-sigue b{font-size:17px;font-weight:900}
 .vi-sigue>span:first-child,.vi-sigue>span:last-child{font-size:20px;font-weight:900;color:#0e7c4f}
 .vi-llama{margin:16px 0 6px;border:2px solid #0e7c4f;border-radius:22px;background:#fff;overflow:hidden;box-shadow:0 4px 0 rgba(15,45,30,.08),0 8px 16px rgba(15,45,30,.1)}
-.vi-llama-img{display:block;width:100%;max-height:340px;object-fit:contain;margin:0 auto;background:#fbf7ec}
+.vi-llama-img{display:block;width:46%;max-height:300px;object-fit:contain;border-radius:14px;align-self:flex-start;background:#fbf7ec}
+.vi-lado{display:flex;gap:10px;align-items:center;padding:0 12px 14px}
+.vi-lado-b{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
+.vi-sinb{border:0;box-shadow:none;margin:6px 0 0}
+.vi-chips{display:flex;gap:6px;justify-content:center;margin:0 0 6px;flex-wrap:wrap}
+.vi-chips button{width:44px;height:44px;border-radius:50%;border:2px solid #cfe5d6;background:#fff;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.vi-chips .vi-ch-on{border-color:transparent;box-shadow:0 2px 6px rgba(0,0,0,.25)}
 .vi-llama-t{padding:12px 16px 16px;text-align:center}
 .vi-llama-t h2{font-family:"Fraunces",Georgia,serif;font-weight:700;font-size:24px;line-height:1.15;margin:0 0 6px;color:#0f4a2f}
 .vi-llama-t p{margin:0 0 12px;font-size:15.5px;line-height:1.4;font-weight:700;color:#2f4d3f}
-.vi-llama-t button{display:block;width:100%;min-height:50px;margin-top:8px;border-radius:999px;font:inherit;font-weight:900;font-size:15.5px;cursor:pointer}
+.vi-lado-b button{display:block;width:100%;min-height:48px;padding:8px 10px;border-radius:999px;font:inherit;font-weight:900;font-size:14.5px;line-height:1.15;cursor:pointer}
 .vi-l1{border:0;background:#0e7c4f;color:#fff}.vi-l2{border:2px solid #0e7c4f;background:#fff;color:#0e7c4f}.vi-l3{border:0;background:#E65100;color:#fff}
 .vi-part{margin:6px 0 16px;background:#fff;border-radius:22px;padding:14px 10px 12px;box-shadow:0 4px 14px rgba(15,45,30,.12)}
 .vi-h2{margin:0 0 4px;font-family:"Fraunces",Georgia,serif;font-weight:700;font-size:22px;color:#0f2d1e;text-align:center}
