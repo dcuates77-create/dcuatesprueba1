@@ -19,7 +19,8 @@ export function irASeccion(id) {
     return;
   }
   const el = document.getElementById(id);
-  if (el) {
+  // Si existe pero está dentro de una tarjeta cerrada u oculta, se pide que se abra (abajo).
+  if (el && el.offsetParent !== null && el.getBoundingClientRect().height > 0) {
     el.scrollIntoView({ behavior: "smooth", block: "start" });
     return;
   }
@@ -27,7 +28,7 @@ export function irASeccion(id) {
   // Voluntario en Causas): se le pide al bloque de pestañas que la abra y
   // después se baja hasta ella.
   window.dispatchEvent(new CustomEvent("dcuates:abrir-seccion", { detail: id }));
-  setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" }), 300);
+  setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" }), 500);
 }
 
 // Nombre "bonito" de un proyecto (para los mensajes al compartir).
