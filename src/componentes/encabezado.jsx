@@ -181,6 +181,7 @@ export function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirTerminos, onA
 
           <div className="flex items-center gap-1.5 sm:gap-3">
             {/* Búsqueda: ícono de lupa; abre una ventana de búsqueda al tocarlo. */}
+            <span className="shrink-0 flex items-center"><BotonCompartir variante="circulo" hash="" titulo="DCUATES — ¡Comparte y Gana!" texto="Conoce DCUATES: una comunidad que suma. Entra y participa" /></span>
             <BarraBusqueda onAbrirProyecto={onAbrirProyecto} onAbrirCategoria={onAbrirCategoria} onAbrirFAQ={onAbrirFAQ} abierta={busquedaAbierta} setAbierta={setBusquedaAbierta} />
 
             {/* Menú de tres rayas — antes botón "Más". */}

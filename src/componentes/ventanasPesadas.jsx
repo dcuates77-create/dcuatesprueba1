@@ -416,9 +416,10 @@ export function ModalDudas({ onCerrar, onBuscarEnPagina }) {
           value={consulta}
           onChange={(e) => { setConsulta(e.target.value); setAbierta(null); }}
           placeholder="Ej. libros, mascota, negocio, donar…"
-          className="w-full rounded-2xl border-2 border-slate-200 pl-10 pr-3 py-2.5 text-sm font-semibold text-slate-800 focus:outline-none focus:border-[#128c7e]"
+          className="w-full rounded-2xl border-2 border-slate-200 pl-10 pr-12 py-2.5 text-sm font-semibold text-slate-800 focus:outline-none focus:border-[#128c7e]"
           aria-label="Buscar en las preguntas frecuentes"
         />
+        <button type="button" aria-label="Buscar en toda la página" title="Buscar en toda la página" onClick={() => { onCerrar(); onBuscarEnPagina && onBuscarEnPagina(); }} className="absolute right-1.5 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-[#128c7e] text-white text-base">🔍</button>
       </label>
 
       <div className="mt-3 space-y-2">
