@@ -723,10 +723,10 @@ export default function App() {
               {[
                 ["📝", "Regístrate o participa", "#2E9E5B", () => setAccesoAbierto("registros")],
                 ["💛", "Para ti", "#E65100", () => setAccesoAbierto("beneficios")],
-                ["💬", "Dudas y atención por WhatsApp", "#25a244", () => { registrar("dudas_abrir"); setShowDudas(true); }],
+                ["🛡️", "Escudo de seguridad", "#0f4c5c", () => setShowEscudo(true)],
                 ["❓", "Preguntas frecuentes", "#1B6F8A", () => setShowFAQ(true)],
                 ["🗺️", "Mapa del sitio", "#7A5AD8", () => setShowMapaSitio(true)],
-                ["🛡️", "Escudo de seguridad", "#0f4c5c", () => setShowEscudo(true)]
+                ["💬", "Dudas y atención por WhatsApp", "#25a244", () => { registrar("dudas_abrir"); setShowDudas(true); }]
               ].map(([e, t, c, f]) => (
                 <button key={t} type="button" onClick={f} style={{ background: c }} className="min-h-[88px] rounded-2xl text-white shadow-md border-b-4 border-black/25 px-2 py-3 flex flex-col items-center justify-center gap-1 text-center font-black uppercase text-[12px] leading-tight active:translate-y-0.5 transition-transform">
                   <span className="text-3xl leading-none" aria-hidden="true">{e}</span>

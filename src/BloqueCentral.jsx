@@ -419,7 +419,10 @@ export default function BloqueCentral({
   const imgs = { ...PORTADAS_BASE, ...portadas };
 
   // Avisa qué pestaña está abierta (la usa el carrusel del final de la página).
+  const primeraVez = useRef(true);
   useEffect(() => {
+    if (primeraVez.current) { primeraVez.current = false; }
+    else { try { localStorage.setItem("dc_ultima_seccion", tab.id); } catch (e) {} }
     window.__dcuatesTab = tab.id;
     window.dispatchEvent(new CustomEvent("dcuates:tab-activa", { detail: tab.id }));
   }, [tab.id]);
@@ -853,6 +856,7 @@ export default function BloqueCentral({
             {TABS.map((t, i) => (
               <button key={t.id} type="button" className={"bc-punto" + (i === idx ? " bc-punto-on" : "")} aria-label={t.label} aria-current={i === idx ? "true" : undefined} title={t.label} onClick={() => cambiar(i)} style={i === idx ? { background: t.color } : undefined} />
             ))}
+            <span className="bc-cuenta" aria-hidden="true">{idx + 2} / {TABS.length + 1}</span>
           </div>
 
           <div className="bc-nav">
@@ -971,6 +975,7 @@ const CSS = `
 .bc-puntos{display:flex;justify-content:center;align-items:center;gap:6px;margin:16px 0 2px}
 .bc-punto{width:14px;height:14px;padding:0;border:0;border-radius:50%;background:#cfd8d3;cursor:pointer;position:relative;font-size:12px;line-height:14px;color:#17472d;font-weight:900;transition:width .2s}
 .bc-punto::after{content:"";position:absolute;inset:-12px -6px}
+.bc-cuenta{margin-left:8px;font-size:13px;font-weight:900;color:#3d5a4a}
 .bc-punto-on{width:28px;border-radius:9px}
 .bc-tab-inicio{flex:0 0 72px}
 .bc-pegado .bc-tab-inicio .bc-tab-t{display:none}

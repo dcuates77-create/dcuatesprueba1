@@ -1,6 +1,18 @@
 // Ayuda flotante única: "¿Necesitas algo?" abre tres opciones (¿Qué necesitas hoy?, Dudas y atención, Contacto).
 // Abajo a la derecha, arriba del cintillo inferior; la flecha de subir queda encima (ver App.jsx).
 import React, { useEffect, useState } from "react";
+import BotonCompartir from "./BotonCompartir.jsx";
+
+// Parpadeo con temporizador (funciona aunque el celular tenga "reducir animaciones").
+function useParpadeo(activo, ms = 900) {
+  const [alto, setAlto] = useState(true);
+  useEffect(() => {
+    if (!activo) { setAlto(true); return; }
+    const t = setInterval(() => setAlto((v) => !v), ms);
+    return () => clearInterval(t);
+  }, [activo, ms]);
+  return alto;
+}
 
 const OPCIONES = [
   { id: "hoy", ico: "?", t: "¿Qué necesitas hoy?", d: "Apoyos, libros, mascotas, negocios y servicios", bg: "#facc15", color: "#0f2d1e" },
@@ -10,6 +22,7 @@ const OPCIONES = [
 
 export default function AyudaFlotante({ onDudas, onContacto }) {
   const [abierta, setAbierta] = useState(false);
+  const alto = useParpadeo(!abierta);
   useEffect(() => {
     if (!abierta) return;
     const tecla = (e) => e.key === "Escape" && setAbierta(false);
@@ -28,9 +41,10 @@ export default function AyudaFlotante({ onDudas, onContacto }) {
   return (
     <>
       <style>{`
-.af-pill{position:fixed;right:10px;z-index:50;display:flex;align-items:center;gap:8px;min-height:48px;padding:0 16px 0 8px;border:0;border-radius:999px;background:#facc15;color:#0f2d1e;font:inherit;font-weight:900;font-size:13.5px;text-transform:uppercase;letter-spacing:.02em;box-shadow:0 10px 20px rgba(0,0,0,.35),inset 0 -3px 6px rgba(0,0,0,.2),inset 0 3px 4px rgba(255,255,255,.5);cursor:pointer;font-family:"Nunito",system-ui,sans-serif}
+.af-pill{position:fixed;right:10px;z-index:50;display:flex;align-items:center;gap:10px;min-height:54px;padding:0 6px 0 18px;transition:opacity .5s;border:0;border-radius:999px;background:#facc15;color:#0f2d1e;font:inherit;font-weight:900;font-size:13.5px;text-transform:uppercase;letter-spacing:.02em;box-shadow:0 10px 20px rgba(0,0,0,.35),inset 0 -3px 6px rgba(0,0,0,.2),inset 0 3px 4px rgba(255,255,255,.5);cursor:pointer;font-family:"Nunito",system-ui,sans-serif}
 .af-pill:active{transform:scale(.96)}
-.af-q{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:#0f2d1e;color:#facc15;font-size:20px;font-weight:900}
+.af-q{display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;background:#0f2d1e;color:#facc15;font-size:30px;font-weight:900;line-height:1}
+.af-comp{position:fixed;z-index:50;transition:opacity .5s}
 .af-fondo{position:fixed;inset:0;z-index:49;background:rgba(0,0,0,.35);border:0;padding:0}
 .af-menu{position:fixed;right:10px;z-index:51;display:flex;flex-direction:column;gap:8px;width:min(300px,calc(100vw - 20px))}
 .af-op{display:flex;align-items:center;gap:10px;min-height:60px;padding:8px 12px;border:2px solid #fff;border-radius:16px;text-align:left;font:inherit;cursor:pointer;box-shadow:0 6px 14px rgba(0,0,0,.3);font-family:"Nunito",system-ui,sans-serif}
@@ -52,31 +66,26 @@ export default function AyudaFlotante({ onDudas, onContacto }) {
           </div>
         </>
       )}
-      <button type="button" className="af-pill" style={{ bottom: base }} aria-expanded={abierta} onClick={() => setAbierta((v) => !v)}>
-        <span className="af-q" aria-hidden="true">{abierta ? "×" : "?"}</span>
+      <div className="af-comp" style={{ bottom: `calc(${base} + 5px)`, right: 236, opacity: abierta ? 1 : alto ? 0.9 : 0.5 }}>
+        <BotonCompartir variante="circulo" hash="" titulo="DCUATES — ¡Comparte y Gana!" texto="Conoce DCUATES: una comunidad que suma. Entra y participa" />
+      </div>
+      <button type="button" className="af-pill" style={{ bottom: base, opacity: abierta ? 1 : alto ? 0.88 : 0.5 }} aria-expanded={abierta} onClick={() => setAbierta((v) => !v)}>
         <span>¿Necesitas algo?</span>
+        <span className="af-q" aria-hidden="true">{abierta ? "×" : "?"}</span>
       </button>
     </>
   );
 }
 
-// Pista de deslizamiento lateral: aparece unos segundos al entrar a Inicio o a una sección (máx. 3 veces por pantalla).
+// Señal de deslizamiento lateral: abajo a la izquierda, semitransparente y parpadeante (solo en Inicio y secciones, en pantallas táctiles).
 export function PistaDeslizar({ vista }) {
-  const [txt, setTxt] = useState("");
-  useEffect(() => {
-    if (vista !== "inicio" && vista !== "seccion") { setTxt(""); return; }
-    let veces = 0;
-    const clave = "dc_pista_" + vista;
-    try { veces = parseInt(localStorage.getItem(clave) || "0", 10) || 0; } catch {}
-    const tactil = typeof matchMedia === "function" && matchMedia("(pointer:coarse)").matches;
-    if (veces >= 3 || !tactil) return;
-    try { localStorage.setItem(clave, String(veces + 1)); } catch {}
-    setTxt(vista === "inicio" ? "Desliza el dedo ‹ para ver las secciones" : "‹ Desliza para cambiar de sección ›");
-    const t = setTimeout(() => setTxt(""), 5200);
-    return () => clearTimeout(t);
-  }, [vista]);
-  if (!txt) return null;
+  const tactil = typeof matchMedia === "function" && matchMedia("(pointer:coarse)").matches;
+  const visible = tactil && (vista === "inicio" || vista === "seccion");
+  const alto = useParpadeo(visible, 900);
+  if (!visible) return null;
   return (
-    <div role="status" style={{ position: "fixed", left: "50%", transform: "translateX(-50%)", bottom: "calc(var(--alto-ticker, 48px) + var(--alto-nav, 0px) + 74px)", zIndex: 48, background: "rgba(15,45,30,.92)", color: "#fff", padding: "9px 16px", borderRadius: 999, fontWeight: 900, fontSize: 13.5, fontFamily: "Nunito,system-ui,sans-serif", boxShadow: "0 4px 12px rgba(0,0,0,.35)", whiteSpace: "nowrap", pointerEvents: "none" }}>{txt}</div>
+    <div aria-hidden="true" style={{ position: "fixed", left: 8, bottom: "calc(var(--alto-ticker, 48px) + var(--alto-nav, 0px) + 62px)", zIndex: 48, background: "rgba(15,45,30,.85)", color: "#fff", padding: "6px 12px", borderRadius: 999, fontWeight: 900, fontSize: 15, fontFamily: "Nunito,system-ui,sans-serif", opacity: alto ? 0.85 : 0.35, transition: "opacity .5s", pointerEvents: "none", display: "flex", alignItems: "center", gap: 6 }}>
+      <span style={{ fontSize: 20 }}>‹</span><span style={{ fontSize: 12, textTransform: "uppercase" }}>desliza</span><span style={{ fontSize: 20 }}>›</span>
+    </div>
   );
 }

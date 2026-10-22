@@ -24,6 +24,11 @@ const SERV = [
   ["🏷️", "Promociones especiales para la comunidad", "Descuentos y beneficios de aliados y patrocinadores."]
 ];
 
+// Primero los de 25 años y los de 19 años; después, de mayor a menor alcance.
+const ORDEN_LOGROS = [/25 A[ÑN]OS/i, /19 A[ÑN]OS.*PROYECTOS|PROYECTOS SOCIALES/i, /19 A[ÑN]OS/i, /recomendaciones/i, /mill[oó]n/i, /1,?000 libros/i, /500 libros/i, /200 libros/i, /asesor[ií]as/i, /adopciones/i, /500 cursos|talleres/i, /100 reuniones/i, /formaci[oó]n/i, /sinergia/i];
+const rangoLogro = (l) => { const i = ORDEN_LOGROS.findIndex((r) => r.test(l.texto || "")); return i < 0 ? 99 : i; };
+const ordenarLogros = (lista) => lista.map((l, i) => [l, i]).sort((a, b) => rangoLogro(a[0]) - rangoLogro(b[0]) || a[1] - b[1]).map((x) => x[0]);
+
 export default function Extras({ logros = [] }) {
   const [serv, setServ] = useState(false);
   const [log, setLog] = useState(false);
@@ -59,7 +64,7 @@ export default function Extras({ logros = [] }) {
             <p className="zj-p ex-intro">Cada logro de esta lista lo construyó una persona que dijo «yo me sumo»: un vecino que prestó un libro, un negocio que se alió, un voluntario que dio su tiempo. 💛 <b>El siguiente logro puede llevar tu nombre.</b> Mira lo que hemos hecho juntos y toma tu lugar.</p>
             <p className="zj-et">Lo que hemos logrado juntos</p>
             <div className="ex-lista">
-              {logros.map((l, i) => <div className="ag-ev ex-c" style={{ background: COLX[i % COLX.length] }} key={i}><p>{l.texto}</p></div>)}
+              {ordenarLogros(logros).map((l, i) => <div className="ag-ev ex-c" style={{ background: COLX[i % COLX.length] }} key={i}><p>{l.texto}</p></div>)}
             </div>
             <button type="button" className="in-btn" onClick={() => abrirDespues(() => setLog(false), () => abrirAcceso("registros"))}>📝 Quiero sumarme al próximo logro</button>
             <a className="in-btn ex-wa" href={wa("¡Hola DCUATES! Quiero ser parte de sus logros y sumarme a la comunidad.")} target="_blank" rel="noopener noreferrer">💬 Escribirnos por WhatsApp</a>
