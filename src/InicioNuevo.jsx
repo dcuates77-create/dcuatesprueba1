@@ -113,9 +113,9 @@ export default function InicioNuevo({ onIr, logros = [], cargando = false, entra
 
       <BloqueLado
         img="/images/inicio-llama.jpg"
-        titulo="Conoce DCUATES y suma tu parte"
+        titulo="Conoce DCUATES y las oportunidades para SUMAR"
         texto="Somos una comunidad que teje confianza, suma voluntades y cosecha logros. Descubre qué es DCUATES, lo que te brinda y cómo puedes sumarte."
-        botones={[["Qué es DCUATES", () => onIr("nosotros")], ["Lo que te brindamos", () => onIr("beneficios")], ["Cómo sumarte", () => onIr("cierre")]]}
+        botones={[["Qué es DCUATES", () => onIr("nosotros")], ["Lo que te brindamos", () => onIr("beneficios")], ["Nuestras causas", () => onIr("causas")], ["Apoyos para tu emprendimiento", () => onIr("negocios")], ["Cómo sumarte", () => onIr("cierre")]]}
       />
 
       <Hoja abierta={!!prev} onCerrar={() => setPrev(null)} titulo="Vista previa">
