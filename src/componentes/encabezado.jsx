@@ -12,6 +12,12 @@ import BotonCompartir from "../BotonCompartir.jsx";
 export function BarraBusqueda({ onAbrirProyecto, onAbrirCategoria, onAbrirFAQ, abierta, setAbierta }) {
   const [texto, setTexto] = useState("");
   const inputRef = React.useRef(null);
+  // Los atajos y el buscador de Inicio abren esta ventana con un texto.
+  useEffect(() => {
+    const abre = (e) => { setTexto(String(e.detail || "")); setAbierta && setAbierta(true); };
+    window.addEventListener("dcuates:buscar", abre);
+    return () => window.removeEventListener("dcuates:buscar", abre);
+  }, [setAbierta]);
 
   const indice = React.useMemo(() => {
     const lista = [];
