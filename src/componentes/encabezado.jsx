@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { expandirBusqueda } from "../datos/sinonimos.js";
 import { BotonCerrar, CasillaAcepto, ErrorAcepto, abrirLegal, useAceptacion } from "./legal.jsx";
 import { BotonRecibeBeneficios } from "./ventanas.jsx";
 import { NAV_LINKS_MAS, REDES_SOCIALES, SECCIONES_BUSCABLES, VERSION_BUILD } from "../datos/config.js";
@@ -46,7 +47,13 @@ export function BarraBusqueda({ onAbrirProyecto, onAbrirCategoria, onAbrirFAQ, a
 
   const palabras = normalizarBusqueda(texto).split(/\s+/).filter(Boolean);
   const resultados = palabras.length && normalizarBusqueda(texto).length >= 2
-    ? indice.filter((it) => palabras.every((w) => it._n.includes(w))).slice(0, 8)
+    ? (() => {
+        const alt = expandirBusqueda(palabras);
+        // Puntaje: más palabras escritas exactas = mejor; los sinónimos también cuentan.
+        const exactas = indice.filter((it) => palabras.every((w) => it._n.includes(w)));
+        const amplias = indice.filter((it) => !exactas.includes(it) && alt.every((a) => a.some((w) => it._n.includes(w))));
+        return [...exactas, ...amplias].slice(0, 8);
+      })()
     : [];
 
   const elegir = (it) => { setTexto(""); setAbierta(false); it.accion(); };
