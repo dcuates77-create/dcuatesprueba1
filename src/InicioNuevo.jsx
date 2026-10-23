@@ -1,6 +1,6 @@
 // INICIO NUEVO (e34) — portada estilo minimalista: foto + título + botón "Conoce cómo participar"
 // (abre ENTRADA DCUATES en una hoja), cuadrícula de 6 secciones y el carrusel de logros.
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import EntradaDcuates from "./PuertasDcuates.jsx";
 import { BandaImpacto, TABS } from "./BloqueCentral.jsx";
@@ -38,6 +38,38 @@ function Hoja({ abierta, onCerrar, titulo, children }) {
       </div>
     </div>,
     document.body
+  );
+}
+
+const ATAJOS = ["Libros", "Mascotas", "Asesorías", "Negocios", "Apoyo", "Eventos", "Voluntariado", "Donar", "Cursos", "Empleo", "Cupones", "Seguridad"];
+
+// Atajos que avanzan solos (como carrusel); al tocar o deslizar con el dedo se detienen unos segundos.
+function Atajos() {
+  const ref = useRef(null);
+  const pausa = useRef(0);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return undefined;
+    const id = setInterval(() => {
+      if (Date.now() < pausa.current || el.offsetParent === null) return;
+      el.scrollLeft += 1;
+    }, 30);
+    return () => clearInterval(id);
+  }, []);
+  const parar = () => { pausa.current = Date.now() + 4500; };
+  const alScroll = () => {
+    const el = ref.current; if (!el) return;
+    const mitad = el.scrollWidth / 2;
+    if (el.scrollLeft >= mitad) el.scrollLeft -= mitad;
+    else if (el.scrollLeft <= 0) el.scrollLeft = mitad;
+  };
+  const buscar = (t) => { registrar("atajo_inicio", { q: t }); window.dispatchEvent(new CustomEvent("dcuates:buscar", { detail: t })); };
+  return (
+    <div className="vi-atajos" ref={ref} onTouchStart={parar} onTouchMove={parar} onTouchEnd={parar} onPointerDown={parar} onWheel={parar} onScroll={alScroll} aria-label="Atajos de búsqueda">
+      {[0, 1].map((c) => ATAJOS.map((t) => (
+        <button key={c + t} type="button" tabIndex={c ? -1 : 0} aria-hidden={c ? "true" : undefined} onClick={() => buscar(t)}>{t}</button>
+      )))}
+    </div>
   );
 }
 
@@ -97,11 +129,7 @@ export default function InicioNuevo({ onIr, logros = [], cargando = false, entra
         <input name="q" type="search" placeholder="¿Qué buscas?" aria-label="Buscar en DCUATES" enterKeyHint="search" />
         <button type="submit">Buscar</button>
       </form>
-      <div className="vi-atajos" aria-label="Atajos de búsqueda">
-        {["Libros", "Mascotas", "Asesorías", "Negocios", "Apoyo", "Eventos"].map((t) => (
-          <button key={t} type="button" onClick={() => { registrar("atajo_inicio", { q: t }); window.dispatchEvent(new CustomEvent("dcuates:buscar", { detail: t })); }}>{t}</button>
-        ))}
-      </div>
+      <Atajos />
 
       <section id="vi-participar" className="vi-part" aria-label="Conoce cómo participar" style={{ "--tc": "#17472d" }}>
         <h2 className="vi-h2">🌱 Conoce cómo participar</h2>
@@ -186,12 +214,12 @@ const CSS = `
 .vi-ico .emo-img{width:1.35em;height:1.35em}
 .vi-ico{display:flex;align-items:center;justify-content:center;width:46px;height:46px;border-radius:50%;font-size:24px;box-shadow:inset 0 -3px 0 rgba(0,0,0,.18)}
 .vi-tile b{font-size:15.5px;line-height:1.1;font-weight:900}
-.vi-tile small{font-size:12.5px;line-height:1.2;font-weight:700;color:#2f4d3f}
+.vi-tile small{font-size:13px;line-height:1.2;font-weight:700;color:#2f4d3f}
 .vi-logros .bc-banda{margin:0}
 .vi-fondo{position:fixed;inset:0;z-index:52;background:rgba(0,0,0,.55);display:flex;align-items:flex-end;justify-content:center}
 .vi-sigue{display:flex;align-items:center;gap:12px;width:100%;margin:14px 0 0;border:2px solid #0e7c4f;border-radius:16px;background:#e3f3e9;padding:10px 14px;min-height:54px;color:#0f2d1e;font:inherit;text-align:left;cursor:pointer}
 .vi-sigue>span:nth-child(2){flex:1;display:flex;flex-direction:column}
-.vi-sigue small{font-size:11px;font-weight:900;letter-spacing:.04em;color:#0e7c4f}
+.vi-sigue small{font-size:13px;font-weight:900;letter-spacing:.04em;color:#0e7c4f}
 .vi-sigue b{font-size:17px;font-weight:900}
 .vi-sigue>span:first-child,.vi-sigue>span:last-child{font-size:20px;font-weight:900;color:#0e7c4f}
 .vi-llama{margin:16px 0 6px;border:2px solid #0e7c4f;border-radius:22px;background:#fff;overflow:hidden;box-shadow:0 4px 0 rgba(15,45,30,.08),0 8px 16px rgba(15,45,30,.1)}
@@ -214,8 +242,10 @@ const CSS = `
 .vi-atajos button{flex:0 0 auto;min-height:38px;padding:0 14px;border:2px solid #17472d;border-radius:999px;background:#fff;color:#17472d;font:inherit;font-weight:900;font-size:14px;cursor:pointer}
 .vi-part{margin:6px 0 16px;background:#17472d;border:2px solid rgba(255,255,255,.35);border-radius:22px;padding:14px 10px 12px;box-shadow:0 6px 16px rgba(0,0,0,.2)}
 .vi-part .pu-sec{background:transparent;border:0;box-shadow:none;margin:0;padding:4px 0 0}
-.vi-part .pu-grid .en-d:nth-child(3){background:#2F6FDB !important}
-.vi-part .pu-dif[style*="15, 76, 92"],.vi-part .pu-dif[style*="0f4c5c"]{background:#4338CA !important}
+.vi-part .pu-grid .en-d:nth-child(3){background:#9BE3B4 !important}
+.vi-part .pu-grid .en-d:nth-child(3) b,.vi-part .pu-grid .en-d:nth-child(3) small{color:#0f2d1e !important}
+.vi-part .pu-dif[style*="15, 76, 92"],.vi-part .pu-dif[style*="0f4c5c"]{background:#F8B4D0 !important}
+.vi-part .pu-dif[style*="15, 76, 92"] b,.vi-part .pu-dif[style*="15, 76, 92"] small,.vi-part .pu-dif[style*="0f4c5c"] b,.vi-part .pu-dif[style*="0f4c5c"] small{color:#4a0f2a !important}
 .vi-part .ap-btn{background:#B7791F !important}
 .vi-h2{margin:0 0 4px;font-family:"Fraunces",Georgia,serif;font-weight:700;font-size:22px;color:#fff;text-align:center}
 .vi-h2p{margin:0 0 10px;font-size:14px;font-weight:700;color:#35564a;text-align:center;line-height:1.35}

@@ -28,7 +28,7 @@ export default function InstalarApp() {
           </div>
         </div>, document.body)}
       <style>{`
-.ia-btn{position:absolute;top:10px;left:10px;min-width:40px;height:34px;padding:0 8px;border:2px solid #fff;border-radius:12px;background:rgba(255,255,255,.2);color:#fff;font-family:inherit;font-size:17px;line-height:1;cursor:pointer}
+.ia-btn{position:absolute;top:10px;left:10px;min-width:40px;height:34px;padding:0 8px;border:2px solid #fff;border-radius:12px;background:#facc15;color:#0f2d1e;font-family:inherit;font-size:17px;line-height:1;cursor:pointer}
 .ia-pasos{margin:8px 0 4px;padding-left:20px;font-size:15px;font-weight:700;line-height:1.4;display:flex;flex-direction:column;gap:8px;color:#1f2a37}
 `}</style>
     </>

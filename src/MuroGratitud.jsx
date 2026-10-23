@@ -53,7 +53,7 @@ const CSS = `
 .mg-lista{list-style:none;margin:0 0 12px;padding:0;display:grid;gap:8px}
 .mg-n{border-radius:14px;padding:10px 12px;box-shadow:0 1px 4px rgba(0,0,0,.1)}
 .mg-n p{margin:0 0 4px;font-size:15.5px;font-weight:800;line-height:1.35;color:#0f2d1e}
-.mg-n small{font-size:12.5px;font-weight:800;color:#5a4a16}
+.mg-n small{font-size:13px;font-weight:800;color:#5a4a16}
 .mg-b{display:block;text-align:center;min-height:48px;line-height:48px;border-radius:999px;background:#B7791F;color:#fff;font-weight:900;text-decoration:none;font-size:15px}
 .mg-nota{display:block;text-align:center;margin-top:6px;font-weight:700;color:#5b6b62}
 `;

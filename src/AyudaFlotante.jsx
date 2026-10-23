@@ -82,8 +82,8 @@ export function PistaDeslizar({ vista }) {
   const alto = useParpadeo(visible, 900);
   if (!visible) return null;
   return (
-    <div aria-hidden="true" style={{ position: "fixed", left: 8, bottom: "calc(var(--alto-ticker, 48px) + var(--alto-nav, 0px) + 62px)", zIndex: 48, background: "rgba(15,45,30,.85)", color: "#fff", padding: "6px 12px", borderRadius: 999, fontWeight: 900, fontSize: 15, fontFamily: "Nunito,system-ui,sans-serif", opacity: alto ? 0.85 : 0.35, transition: "opacity .5s", pointerEvents: "none", display: "flex", alignItems: "center", gap: 6 }}>
-      <span style={{ fontSize: 20 }}>‹</span><span style={{ fontSize: 12, textTransform: "uppercase" }}>desliza</span><span style={{ fontSize: 20 }}>›</span>
+    <div aria-hidden="true" style={{ position: "fixed", left: 58, bottom: "calc(var(--alto-ticker, 48px) + var(--alto-nav, 0px) + 20px)", zIndex: 48, background: "rgba(15,45,30,.85)", color: "#fff", padding: "5px 8px", borderRadius: 999, fontWeight: 900, fontSize: 14, fontFamily: "Nunito,system-ui,sans-serif", opacity: alto ? 0.85 : 0.35, transition: "opacity .5s", pointerEvents: "none", display: "flex", alignItems: "center", gap: 4 }}>
+      <span style={{ fontSize: 18 }}>‹</span><span style={{ fontSize: 11, textTransform: "uppercase" }}>desliza</span><span style={{ fontSize: 18 }}>›</span>
     </div>
   );
 }

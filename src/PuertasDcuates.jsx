@@ -159,7 +159,7 @@ export function PuertaFranja() {
   const p = id ? puertaPorId(id) : null;
   return (
     <section className="pf-sec" aria-label="Tu puerta">
-      <style>{`.pf-sec{max-width:72rem;margin:10px auto 0;padding:8px 10px;border-radius:18px;background:var(--tc,#1B6F8A);border:2px solid rgba(255,255,255,.35);display:flex;flex-wrap:wrap;align-items:center;gap:8px;color:#fff}.pf-e{font-size:24px;flex:none}.pf-t{flex:1;min-width:0;display:flex;flex-direction:column;font-size:12px;font-weight:800}.pf-t b{font-size:14px;font-weight:900;line-height:1.15}.pf-sec .pf-tour{flex:1 1 100%;font-size:12.5px;min-height:36px}.pf-sec button{flex:none;min-height:40px;padding:4px 8px;border:2px solid #fff;border-radius:12px;background:rgba(255,255,255,.18);color:#fff;font-family:inherit;font-size:13px;font-weight:900;cursor:pointer}`}</style>
+      <style>{`.pf-sec{max-width:72rem;margin:10px auto 0;padding:8px 10px;border-radius:18px;background:var(--tc,#1B6F8A);border:2px solid rgba(255,255,255,.35);display:flex;flex-wrap:wrap;align-items:center;gap:8px;color:#fff}.pf-e{font-size:24px;flex:none}.pf-t{flex:1;min-width:0;display:flex;flex-direction:column;font-size:13px;font-weight:800}.pf-t b{font-size:14px;font-weight:900;line-height:1.15}.pf-sec .pf-tour{flex:1 1 100%;font-size:13px;min-height:36px}.pf-sec button{flex:none;min-height:40px;padding:4px 8px;border:2px solid #fff;border-radius:12px;background:rgba(255,255,255,.18);color:#fff;font-family:inherit;font-size:13px;font-weight:900;cursor:pointer}`}</style>
       <span className="pf-e">{p ? p.e : "🚪"}</span>
       <span className="pf-t">{p ? <><small>Tu puerta:</small><b>{p.t}</b></> : <b>¿Cuál es tu puerta?</b>}</span>
       {p && <button type="button" onClick={() => abrirPuerta(p.id)}>Mi guía</button>}
@@ -258,13 +258,13 @@ export default function EntradaDcuates({ onAbrirProyecto = () => {}, agenda = []
 @keyframes pu-latido{0%{transform:scale(1);filter:none}4%{transform:scale(1.45);filter:drop-shadow(0 0 7px #ffd84d)}12%{transform:scale(1);filter:none}100%{transform:scale(1);filter:none}}
 .pu-dif{width:100%;margin-top:8px;display:flex;align-items:center;gap:10px;min-height:64px;padding:8px 12px;border:2px solid #fff;border-radius:16px;color:#fff;font-family:inherit;text-align:left;cursor:pointer;box-shadow:0 5px 12px rgba(0,0,0,.25)}
 .pu-dif b{display:block;font-size:14.5px;font-weight:900;line-height:1.15;color:#fff}
-.pu-dif small{display:block;margin-top:2px;font-size:12px;font-weight:700;opacity:.95}
+.pu-dif small{display:block;margin-top:2px;font-size:13px;font-weight:700;opacity:.95}
 .pu-e2{font-size:28px;flex:none}
 .pu-mas{width:100%;margin-top:10px;min-height:50px;border:2px solid #fff;border-radius:16px;background:#F5C518;color:#111;font-family:inherit;font-size:15px;font-weight:900;letter-spacing:.03em;cursor:pointer;box-shadow:0 5px 12px rgba(0,0,0,.25)}
 .pu-franja{display:flex;align-items:center;gap:8px;padding:8px 10px;border:2px solid rgba(255,255,255,.85);border-radius:16px}
 .pu-fe{font-size:26px;flex:none}
 .pu-ft{flex:1;min-width:0;display:flex;flex-direction:column}
-.pu-ft small{font-size:11.5px;font-weight:800;opacity:.9}
+.pu-ft small{font-size:13px;font-weight:800;opacity:.9}
 .pu-ft b{font-size:14px;font-weight:900;line-height:1.15;color:#fff}
 .pu-franja button{flex:none;min-height:40px;padding:4px 10px;border:2px solid #fff;border-radius:12px;background:rgba(255,255,255,.18);color:#fff;font-family:inherit;font-size:13px;font-weight:900;cursor:pointer}
 .pu-sec .cm-sec{margin:10px 0 0;padding:10px 0 4px;background:transparent;border:0;box-shadow:none}
@@ -274,25 +274,25 @@ export default function EntradaDcuates({ onAbrirProyecto = () => {}, agenda = []
 .pu-modos .pu-on{color:#fff!important}
 .pu-pasos{list-style:none;margin:0 0 4px;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 .pu-pasos button{width:100%;height:100%;min-height:104px;display:flex;flex-direction:column;align-items:flex-start;gap:1px;padding:8px 9px;border:2px solid;border-left-width:7px;border-radius:14px;background:#fff;font-family:inherit;color:#1f2a37;text-align:left;cursor:pointer;box-shadow:0 3px 8px rgba(0,0,0,.15)}
-.pu-n{font-size:11px;font-weight:900;letter-spacing:.06em}
+.pu-n{font-size:13px;font-weight:900;letter-spacing:.06em}
 .pu-pe{font-size:24px;line-height:1.1}
 .pu-pasos b{font-size:13.5px;font-weight:900;line-height:1.1}
-.pu-pasos small{font-size:11.5px;font-weight:700;line-height:1.15;color:#4a5564}
-.pu-nota,.pu-aviso{margin:8px 2px;padding:8px 10px;border-radius:12px;background:#fff4d6;font-size:12.5px;font-weight:700;line-height:1.35;color:#5b4300}
+.pu-pasos small{font-size:13px;font-weight:700;line-height:1.15;color:#4a5564}
+.pu-nota,.pu-aviso{margin:8px 2px;padding:8px 10px;border-radius:12px;background:#fff4d6;font-size:13px;font-weight:700;line-height:1.35;color:#5b4300}
 .pu-des{display:flex;flex-direction:column;gap:6px}
-.pu-sig{margin:12px 2px 0;font-size:12.5px;font-weight:700;color:#6b7785;text-align:center}
+.pu-sig{margin:12px 2px 0;font-size:13px;font-weight:700;color:#6b7785;text-align:center}
 @media(min-width:640px){.pu-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.pu-e{animation-delay:calc(var(--rd) * .6s)}.pu-pasos{grid-template-columns:repeat(4,minmax(0,1fr))}}
 
 .pu-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 .pu-chips button{flex:1 1 auto;min-height:42px;padding:4px 10px;border:2px solid rgba(255,255,255,.85);border-radius:999px;background:rgba(255,255,255,.16);color:#fff;font-family:inherit;font-size:13px;font-weight:900;cursor:pointer}
 
-.en-letra{position:absolute;top:10px;right:10px;min-width:40px;height:34px;padding:0 8px;border:2px solid #fff;border-radius:12px;background:rgba(255,255,255,.2);color:#fff;font-family:inherit;font-size:14px;font-weight:900;cursor:pointer}
+.en-letra{position:absolute;top:10px;right:10px;min-width:40px;height:34px;padding:0 8px;border:2px solid #fff;border-radius:12px;background:#facc15;color:#0f2d1e;font-family:inherit;font-size:14px;font-weight:900;cursor:pointer}
 .pu-sec{position:relative}
 .en-tit{margin:0 44px;text-align:center;font-size:19px;font-weight:900;letter-spacing:.03em;color:#fff}
 .en-d{min-height:104px}
 .dc-letra-xl .pu-grid{grid-template-columns:1fr}
 .dc-letra-xl .en-d b{font-size:15px}
-.en-d small{font-size:11.5px;font-weight:700;line-height:1.15;opacity:.95;color:#fff}
+.en-d small{font-size:13px;font-weight:700;line-height:1.15;opacity:.95;color:#fff}
 .en-d b{font-size:16px;letter-spacing:.02em}
 .pu-chips2{margin:0 0 6px}
 .pu-chips2 button{background:#f0e9ff;border-color:#7a5ad8;color:#3b2a7a}
