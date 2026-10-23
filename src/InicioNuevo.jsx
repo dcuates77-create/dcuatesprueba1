@@ -8,6 +8,7 @@ import { useAtras } from "./atras.js";
 import { Emo } from "./SeccionNueva.jsx";
 import { VISTA } from "./datos/vistaSeccion.js";
 import { WHATSAPP_NUMERO } from "./datos/config.js";
+import { registrar } from "./analitica.js";
 
 // Foto de portada: sube /public/images/portada-inicio.jpg para cambiarla; mientras no exista se usa la de respaldo.
 const FOTOS = ["/images/portada-inicio.jpg", "/images/bibliobici-movil.png"];
@@ -91,7 +92,18 @@ export default function InicioNuevo({ onIr, logros = [], cargando = false, entra
         </div>
       </section>
 
-      <section id="vi-participar" className="vi-part" aria-label="Conoce cómo participar" style={{ "--tc": "#1B6F8A" }}>
+      <form className="vi-busca" role="search" onSubmit={(e) => { e.preventDefault(); const q = (e.currentTarget.elements.q.value || "").trim(); registrar("buscar_inicio", { q: q.slice(0, 30) }); window.dispatchEvent(new CustomEvent("dcuates:buscar", { detail: q })); }}>
+        <span aria-hidden="true">🔍</span>
+        <input name="q" type="search" placeholder="¿Qué buscas?" aria-label="Buscar en DCUATES" enterKeyHint="search" />
+        <button type="submit">Buscar</button>
+      </form>
+      <div className="vi-atajos" aria-label="Atajos de búsqueda">
+        {["Libros", "Mascotas", "Asesorías", "Negocios", "Apoyo", "Eventos"].map((t) => (
+          <button key={t} type="button" onClick={() => { registrar("atajo_inicio", { q: t }); window.dispatchEvent(new CustomEvent("dcuates:buscar", { detail: t })); }}>{t}</button>
+        ))}
+      </div>
+
+      <section id="vi-participar" className="vi-part" aria-label="Conoce cómo participar" style={{ "--tc": "#17472d" }}>
         <h2 className="vi-h2">🌱 Conoce cómo participar</h2>
         <p className="vi-h2p">Elige por dónde empezar: cada puerta te lleva paso a paso.</p>
         <EntradaDcuates {...entrada} />
@@ -99,7 +111,7 @@ export default function InicioNuevo({ onIr, logros = [], cargando = false, entra
 
       <nav className="vi-grid" aria-label="Secciones de DCUATES">
         {TILES.map(([id, e, t, s, c]) => (
-          <button key={id} type="button" className="vi-tile" onClick={() => setPrev(id)}>
+          <button key={id} type="button" className="vi-tile" onClick={() => { registrar("inicio_vista_previa", { id }); setPrev(id); }}>
             <span className="vi-ico" style={{ background: c }} aria-hidden="true"><Emo e={e} /></span>
             <b>{t}</b>
             <small>{s}</small>
@@ -195,9 +207,19 @@ const CSS = `
 .vi-llama-t p{margin:0 0 12px;font-size:15.5px;line-height:1.4;font-weight:700;color:#2f4d3f}
 .vi-lado-b button{display:block;width:100%;min-height:48px;padding:8px 10px;border-radius:999px;font:inherit;font-weight:900;font-size:14.5px;line-height:1.15;cursor:pointer}
 .vi-l1{border:0;background:#0e7c4f;color:#fff}.vi-l2{border:2px solid #0e7c4f;background:#fff;color:#0e7c4f}.vi-l3{border:0;background:#E65100;color:#fff}
-.vi-part{margin:6px 0 16px;background:#fff;border-radius:22px;padding:14px 10px 12px;box-shadow:0 4px 14px rgba(15,45,30,.12)}
-.vi-h2{margin:0 0 4px;font-family:"Fraunces",Georgia,serif;font-weight:700;font-size:22px;color:#0f2d1e;text-align:center}
+.vi-busca{display:flex;align-items:center;gap:8px;margin:14px 0 8px;background:#fff;border:2px solid #17472d;border-radius:999px;padding:4px 4px 4px 14px;box-shadow:0 3px 10px rgba(15,45,30,.15)}
+.vi-busca input{flex:1;min-width:0;border:0;outline:0;background:transparent;font:inherit;font-size:15.5px;font-weight:700;color:#0f2d1e;min-height:42px}
+.vi-busca button{border:0;border-radius:999px;min-height:42px;padding:0 16px;background:#E65100;color:#fff;font:inherit;font-weight:900;font-size:14.5px;cursor:pointer}
+.vi-atajos{display:flex;gap:6px;overflow-x:auto;padding:0 0 6px;margin-bottom:4px;scrollbar-width:none}
+.vi-atajos button{flex:0 0 auto;min-height:38px;padding:0 14px;border:2px solid #17472d;border-radius:999px;background:#fff;color:#17472d;font:inherit;font-weight:900;font-size:14px;cursor:pointer}
+.vi-part{margin:6px 0 16px;background:#17472d;border:2px solid rgba(255,255,255,.35);border-radius:22px;padding:14px 10px 12px;box-shadow:0 6px 16px rgba(0,0,0,.2)}
+.vi-part .pu-sec{background:transparent;border:0;box-shadow:none;margin:0;padding:4px 0 0}
+.vi-part .pu-grid .en-d:nth-child(3){background:#2F6FDB !important}
+.vi-part .pu-dif[style*="15, 76, 92"],.vi-part .pu-dif[style*="0f4c5c"]{background:#4338CA !important}
+.vi-part .ap-btn{background:#B7791F !important}
+.vi-h2{margin:0 0 4px;font-family:"Fraunces",Georgia,serif;font-weight:700;font-size:22px;color:#fff;text-align:center}
 .vi-h2p{margin:0 0 10px;font-size:14px;font-weight:700;color:#35564a;text-align:center;line-height:1.35}
+.vi-part .vi-h2p{color:#e6f4ea}
 .vi-lista{margin:10px 0;padding:0;list-style:none;display:grid;gap:6px}
 .vi-lista li{background:#fff;border-radius:12px;padding:9px 12px;font-weight:800;font-size:14px;box-shadow:0 1px 4px rgba(0,0,0,.1)}
 .vi-lista a{color:#0e7c4f}

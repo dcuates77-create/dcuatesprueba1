@@ -1,6 +1,7 @@
 // Ayuda flotante única: "¿Necesitas algo?" abre tres opciones (¿Qué necesitas hoy?, Dudas y atención, Contacto).
 // Abajo a la derecha, arriba del cintillo inferior; la flecha de subir queda encima (ver App.jsx).
 import React, { useEffect, useState } from "react";
+import { registrar } from "./analitica.js";
 
 // Parpadeo con temporizador (funciona aunque el celular tenga "reducir animaciones").
 function useParpadeo(activo, ms = 900) {
@@ -30,6 +31,7 @@ export default function AyudaFlotante({ onDudas, onContacto }) {
   }, [abierta]);
 
   const elegir = (id) => {
+    registrar("ayuda_opcion", { id });
     setAbierta(false);
     if (id === "hoy") setTimeout(() => window.dispatchEvent(new CustomEvent("dcuates:abrir-necesitas")), 60);
     else if (id === "dudas") onDudas && onDudas();
@@ -65,7 +67,7 @@ export default function AyudaFlotante({ onDudas, onContacto }) {
           </div>
         </>
       )}
-      <button type="button" className="af-pill" style={{ bottom: base, opacity: abierta ? 1 : alto ? 0.88 : 0.5 }} aria-expanded={abierta} onClick={() => setAbierta((v) => !v)}>
+      <button type="button" className="af-pill" style={{ bottom: base, opacity: abierta ? 1 : alto ? 0.88 : 0.5 }} aria-expanded={abierta} onClick={() => { if (!abierta) registrar("ayuda_abrir"); setAbierta((v) => !v); }}>
         <span>¿Necesitas algo?</span>
         <span className="af-q" aria-hidden="true">{abierta ? "×" : "?"}</span>
       </button>

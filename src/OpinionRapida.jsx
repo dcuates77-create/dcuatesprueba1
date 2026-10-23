@@ -1,6 +1,7 @@
 // TU OPINIÓN CUENTA (e43) — valoración rápida y anónima; se guarda en la hoja de Google (Tipo "Opinión").
 import React, { useState } from "react";
 import { GOOGLE_SHEETS_URL } from "./datos/config.js";
+import { registrar } from "./analitica.js";
 
 const CARAS = [["😍", "Me encantó"], ["🙂", "Bien"], ["😐", "Regular"], ["🙁", "Mal"], ["😡", "Muy mal"]];
 
@@ -12,6 +13,7 @@ export default function OpinionRapida() {
     if (cara === null) return;
     const d = new URLSearchParams({ Tipo: "Opinión", Nombre: "Anónimo", Contacto: "", Mensaje: `${CARAS[cara][0]} ${CARAS[cara][1]}${texto.trim() ? " — " + texto.trim() : ""}`, Estado: "Recibido", Fecha: new Date().toLocaleString("es-MX") });
     try { await fetch(GOOGLE_SHEETS_URL, { method: "POST", mode: "no-cors", body: d }); } catch (e) { /* sin conexión: se ignora */ }
+    registrar("opinion_enviada", { v: cara + 1 });
     setOk(true);
   };
   return (

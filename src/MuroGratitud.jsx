@@ -3,15 +3,22 @@
 //   MURO MENSAJE  (obligatoria: el texto de gratitud)
 //   MURO DE       (quién agradece; opcional, si está vacío sale "Alguien de la comunidad")
 //   MURO PARA     (a quién se agradece; opcional)
+//   MURO APROBADO (casilla, opcional): si existe, solo se publican los mensajes con la casilla marcada
 // Tú revisas y apruebas: solo sale lo que tú capturas en Baserow (no se publica nada automáticamente).
 import React from "react";
 import { WHATSAPP_NUMERO } from "./datos/config.js";
+import { registrar } from "./analitica.js";
 
 const COLORES = ["#FFF4D6", "#FDE8F1", "#E3F3E9", "#E6F0FA", "#F3EFFF"];
 
+// Casilla de aprobación: si creas la columna MURO APROBADO (tipo casilla/Boolean) en Baserow,
+// solo salen los mensajes con la casilla marcada. Si la columna no existe, salen todos.
+const aprobado = (v) => v === true || /^(true|s[ií]|1|x)$/i.test(String(v || "").trim());
+
 export default function MuroGratitud({ filas = [] }) {
+  const usaAprobacion = filas.some((f) => f && Object.prototype.hasOwnProperty.call(f, "MURO APROBADO"));
   const lista = filas
-    .filter((f) => f && f["MURO MENSAJE"] && String(f["MURO MENSAJE"]).trim() !== "")
+    .filter((f) => f && f["MURO MENSAJE"] && String(f["MURO MENSAJE"]).trim() !== "" && (!usaAprobacion || aprobado(f["MURO APROBADO"])))
     .slice(0, 30)
     .map((f) => ({
       msg: String(f["MURO MENSAJE"]).trim(),
@@ -34,7 +41,7 @@ export default function MuroGratitud({ filas = [] }) {
           ))}
         </ul>
       )}
-      <a className="mg-b" href={wa} target="_blank" rel="noopener noreferrer">💛 Dejar un mensaje de gratitud</a>
+      <a className="mg-b" onClick={() => registrar("muro_dejar_mensaje")} href={wa} target="_blank" rel="noopener noreferrer">💛 Dejar un mensaje de gratitud</a>
       <small className="mg-nota">Revisamos cada mensaje antes de publicarlo.</small>
     </div>
   );
