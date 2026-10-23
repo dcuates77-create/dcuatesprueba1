@@ -66,7 +66,7 @@ const ModalMapaSitio = lazy(() => cargarVentanas().then((m) => ({ default: m.Mod
 if (typeof console !== "undefined") console.info("[DCUATES] versión", VERSION_BUILD);
 
 // =========================================================================
-// 2. COMPONENTE PRINCIPAL (INICIO DEL RENDERIZADO)
+// 2. COMPONENTE PRINCIPAL (INICIO DEL RENDERIZADO) CLON12
 // =========================================================================
 export default function App() {
   const [showPrivacy, setShowPrivacy] = useState(false);
