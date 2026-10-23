@@ -50,10 +50,19 @@ function Atajos() {
   useEffect(() => {
     const el = ref.current;
     if (!el) return undefined;
+    let pos = el.scrollLeft;
+    let ultimo = el.scrollLeft;
     const id = setInterval(() => {
-      if (Date.now() < pausa.current || el.offsetParent === null) return;
-      el.scrollLeft += 1;
-    }, 30);
+      if (el.offsetParent === null) return;
+      if (Date.now() < pausa.current) { pos = el.scrollLeft; ultimo = pos; return; }
+      // Si el usuario movió el carrusel a mano, partir de donde lo dejó.
+      if (Math.abs(el.scrollLeft - ultimo) > 3) pos = el.scrollLeft;
+      pos += 1.2;
+      const mitad = el.scrollWidth / 2;
+      if (mitad > 0 && pos >= mitad) pos -= mitad;
+      el.scrollLeft = pos;
+      ultimo = el.scrollLeft;
+    }, 40);
     return () => clearInterval(id);
   }, []);
   const parar = () => { pausa.current = Date.now() + 4500; };
@@ -63,7 +72,7 @@ function Atajos() {
     if (el.scrollLeft >= mitad) el.scrollLeft -= mitad;
     else if (el.scrollLeft <= 0) el.scrollLeft = mitad;
   };
-  const buscar = (t) => { registrar("atajo_inicio", { q: t }); window.dispatchEvent(new CustomEvent("dcuates:buscar", { detail: t })); };
+  const buscar = (t) => { registrar("atajo_inicio", { q: t }); window.dispatchEvent(new CustomEvent("dcuates:buscar", { detail: { q: t, inline: true } })); };
   return (
     <div className="vi-atajos" ref={ref} onTouchStart={parar} onTouchMove={parar} onTouchEnd={parar} onPointerDown={parar} onWheel={parar} onScroll={alScroll} aria-label="Atajos de búsqueda">
       {[0, 1].map((c) => ATAJOS.map((t) => (
@@ -124,12 +133,13 @@ export default function InicioNuevo({ onIr, logros = [], cargando = false, entra
         </div>
       </section>
 
-      <form className="vi-busca" role="search" onSubmit={(e) => { e.preventDefault(); const q = (e.currentTarget.elements.q.value || "").trim(); registrar("buscar_inicio", { q: q.slice(0, 30) }); window.dispatchEvent(new CustomEvent("dcuates:buscar", { detail: q })); }}>
+      <form className="vi-busca" role="search" onSubmit={(e) => { e.preventDefault(); const q = (e.currentTarget.elements.q.value || "").trim(); registrar("buscar_inicio", { q: q.slice(0, 30) }); if (q) window.dispatchEvent(new CustomEvent("dcuates:buscar", { detail: { q, inline: true } })); }}>
         <span aria-hidden="true">🔍</span>
         <input name="q" type="search" placeholder="¿Qué buscas?" aria-label="Buscar en DCUATES" enterKeyHint="search" />
         <button type="submit">Buscar</button>
       </form>
       <Atajos />
+      <div id="vi-resultados" />
 
       <section id="vi-participar" className="vi-part" aria-label="Conoce cómo participar" style={{ "--tc": "#17472d" }}>
         <h2 className="vi-h2">🌱 Conoce cómo participar</h2>
