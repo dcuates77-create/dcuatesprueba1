@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { expandirBusqueda } from "../datos/sinonimos.js";
 import { BotonCerrar, CasillaAcepto, ErrorAcepto, abrirLegal, useAceptacion } from "./legal.jsx";
 import { BotonRecibeBeneficios } from "./ventanas.jsx";
@@ -13,9 +14,20 @@ import BotonCompartir from "../BotonCompartir.jsx";
 export function BarraBusqueda({ onAbrirProyecto, onAbrirCategoria, onAbrirFAQ, abierta, setAbierta }) {
   const [texto, setTexto] = useState("");
   const inputRef = React.useRef(null);
+  const [enLinea, setEnLinea] = useState(false);
   // Los atajos y el buscador de Inicio abren esta ventana con un texto.
   useEffect(() => {
-    const abre = (e) => { setTexto(String(e.detail || "")); setAbierta && setAbierta(true); };
+    const abre = (e) => {
+      const d = e.detail;
+      const q = d && typeof d === "object" ? String(d.q || "") : String(d || "");
+      // Desde Inicio: los resultados salen debajo de los atajos, no arriba.
+      if (d && typeof d === "object" && d.inline && document.getElementById("vi-resultados")) {
+        setTexto(q); setEnLinea(true);
+        setTimeout(() => { const t = document.getElementById("vi-resultados"); if (t) t.scrollIntoView({ block: "nearest", behavior: "smooth" }); }, 80);
+        return;
+      }
+      setTexto(q); setAbierta && setAbierta(true);
+    };
     window.addEventListener("dcuates:buscar", abre);
     return () => window.removeEventListener("dcuates:buscar", abre);
   }, [setAbierta]);
@@ -56,7 +68,7 @@ export function BarraBusqueda({ onAbrirProyecto, onAbrirCategoria, onAbrirFAQ, a
       })()
     : [];
 
-  const elegir = (it) => { setTexto(""); setAbierta(false); it.accion(); };
+  const elegir = (it) => { setTexto(""); setEnLinea(false); setAbierta(false); it.accion(); };
   const abrirBusqueda = () => {
     setAbierta(true);
     setTimeout(() => inputRef.current && inputRef.current.focus(), 50);
@@ -65,8 +77,30 @@ export function BarraBusqueda({ onAbrirProyecto, onAbrirCategoria, onAbrirFAQ, a
   // Botón pequeño (mismo tamaño y estilo que Inicio/Apoyo Voluntario/Más):
   // solo despliega la ventana de búsqueda al tocarlo, en vez de ocupar su
   // propio renglón todo el tiempo.
+  const destino = typeof document !== "undefined" ? document.getElementById("vi-resultados") : null;
+  const panelEnLinea = enLinea && !abierta && destino && palabras.length > 0 ? createPortal(
+    <div style={{ background: "#fff", border: "2px solid #17472d", borderRadius: 16, padding: "6px 0", margin: "4px 0 10px", boxShadow: "0 3px 10px rgba(15,45,30,.15)" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "2px 12px 4px", fontWeight: 900, fontSize: 13, color: "#17472d" }}>
+        <span>Resultados para “{texto}”</span>
+        <button type="button" onClick={() => { setEnLinea(false); setTexto(""); }} aria-label="Cerrar resultados" style={{ border: 0, background: "#eef5f0", borderRadius: 999, width: 32, height: 32, fontWeight: 900, fontSize: 16, cursor: "pointer" }}>✕</button>
+      </div>
+      {resultados.length === 0 ? (
+        <p style={{ padding: "6px 14px", fontSize: 13, fontWeight: 700, color: "#64748b" }}>Sin resultados. Prueba con otra palabra.</p>
+      ) : resultados.map((it, i) => (
+        <button key={i} type="button" onClick={() => elegir(it)} style={{ display: "flex", gap: 8, width: "100%", textAlign: "left", padding: "9px 14px", border: 0, background: "transparent", cursor: "pointer", font: "inherit" }}>
+          <span aria-hidden="true">{it.emoji}</span>
+          <span style={{ flex: 1, minWidth: 0 }}>
+            <span style={{ display: "block", fontSize: 14, fontWeight: 900, color: "#0f2d1e", lineHeight: 1.15 }}>{it.t}</span>
+            <span style={{ display: "block", fontSize: 13, fontWeight: 800, color: "#e65100", textTransform: "uppercase" }}>{it.tipo}</span>
+          </span>
+        </button>
+      ))}
+    </div>, destino) : null;
+
   if (!abierta) {
     return (
+      <>
+      {panelEnLinea}
       <button
         type="button"
         onClick={abrirBusqueda}
@@ -79,6 +113,7 @@ export function BarraBusqueda({ onAbrirProyecto, onAbrirCategoria, onAbrirFAQ, a
           <line x1="16.5" y1="16.5" x2="21" y2="21" strokeLinecap="round" />
         </svg>
       </button>
+      </>
     );
   }
 
