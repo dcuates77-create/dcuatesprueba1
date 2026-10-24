@@ -3,12 +3,12 @@ import { createPortal } from "react-dom";
 import { expandirBusqueda } from "../datos/sinonimos.js";
 import { BotonCerrar, CasillaAcepto, ErrorAcepto, abrirLegal, useAceptacion } from "./legal.jsx";
 import { BotonRecibeBeneficios } from "./ventanas.jsx";
-import { NAV_LINKS_MAS, REDES_SOCIALES, SECCIONES_BUSCABLES, VERSION_BUILD } from "../datos/config.js";
+import { NAV_LINKS_MAS, REDES_SOCIALES, SECCIONES_BUSCABLES, VERSION_BUILD, esAdmin } from "../datos/config.js";
 import { FAQ_ITEMS } from "../datos/legal.js";
 import { NECESIDADES_GRUPOS, TODOS_LOS_PROYECTOS } from "../datos/listas.js";
 import { BOTONES_PORTADA, CATEGORIAS_PROYECTOS, normalizarBusqueda } from "../datos/proyectos.js";
 import { enlaceWhatsApp, irASeccion } from "../utilidades/baserow.js";
-import { registrar } from "../analitica";
+import { registrar, registrarBusquedaVacia } from "../analitica";
 import BotonCompartir from "../BotonCompartir.jsx";
 
 export function BarraBusqueda({ onAbrirProyecto, onAbrirCategoria, onAbrirFAQ, abierta, setAbierta }) {
@@ -67,6 +67,13 @@ export function BarraBusqueda({ onAbrirProyecto, onAbrirCategoria, onAbrirFAQ, a
         return [...exactas, ...amplias].slice(0, 8);
       })()
     : [];
+
+  // e48: si la persona deja de escribir y no hubo resultados, se guarda la palabra para ampliar los sinónimos.
+  useEffect(() => {
+    if (!(abierta || enLinea) || resultados.length > 0 || normalizarBusqueda(texto).length < 3) return undefined;
+    const t = setTimeout(() => registrarBusquedaVacia(texto, enLinea && !abierta ? "inicio" : "menu"), 1800);
+    return () => clearTimeout(t);
+  }, [texto, abierta, enLinea, resultados.length]);
 
   const elegir = (it) => { setTexto(""); setEnLinea(false); setAbierta(false); it.accion(); };
   const abrirBusqueda = () => {
@@ -183,7 +190,7 @@ export function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirTerminos, onA
         <a href="#inicio" className="flex items-center gap-2 sm:gap-3 shrink-0">
           <span className="flex h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 items-center justify-center rounded-full overflow-hidden bg-[#0f2d1e] border-2 border-[#0f2d1e]/20 shadow-sm shrink-0">
             <img
-              src="/images/logo-circular.png"
+              src="/images/logo-circular.webp"
               alt="Logo DCUATES"
               className="w-full h-full object-contain"
               onError={(e) => {
@@ -606,11 +613,13 @@ export function SelloVersion() {
     window.addEventListener("dcuates:baserow-estado", alCambiar);
     return () => window.removeEventListener("dcuates:baserow-estado", alCambiar);
   }, []);
+  const [admin] = useState(() => esAdmin());
   const texto = !estado
     ? "conectando…"
     : estado.ok
       ? `✓ ${estado.filas} filas`
       : `✗ ${String(estado.mensaje).slice(0, 90)}`;
+  if (!admin) return null; // e48: solo el administrador ve el sello (dcuates.com/?admin=1)
   return (
     <p className="mt-3 text-center text-[10px] font-bold text-emerald-900/60 break-words">
       Versión {VERSION_BUILD} · Baserow: {texto}
@@ -669,7 +678,7 @@ export function LogoMarca({ tam = 64 }) {
       {fallo ? (
         <span className="text-white font-black" style={{ fontSize: tam * 0.36 }}>DC</span>
       ) : (
-        <img src="/images/logo-circular.png" alt="Logo DCUATES" className="w-full h-full object-contain" onError={() => setFallo(true)} />
+        <img src="/images/logo-circular.webp" alt="Logo DCUATES" className="w-full h-full object-contain" onError={() => setFallo(true)} />
       )}
     </span>
   );
