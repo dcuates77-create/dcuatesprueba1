@@ -56,3 +56,10 @@ img[src*="hero-comunidad.png"] {
   height: auto !important;
   min-height: initial !important;
 }
+
+/* e48 · Teléfono: campos con letra de 16 px (el iPhone no amplía la pantalla al tocarlos) y botones de cierre de 44 px. */
+@media (pointer: coarse) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea { font-size: 16px; }
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select { min-height: 44px; }
+  .zj-x { width: 44px; height: 44px; }
+}

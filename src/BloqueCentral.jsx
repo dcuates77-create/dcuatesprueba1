@@ -95,8 +95,8 @@ export const ID_A_TAB = {
 // hay, la imagen local /public/images/portada-<pestaña>.png; y si tampoco
 // existe, un degradado de color con el emoji de la pestaña.
 const PORTADAS_BASE = {
-  nosotros: "/images/bibliobici-movil.png",
-  beneficios: "/images/bibliobici-movil.png",
+  nosotros: "/images/bibliobici-movil.webp",
+  beneficios: "/images/bibliobici-movil.webp",
   causas: "/images/portada-causas.png",
   valores: "/images/portada-valores.png",
   regalos: "/images/portada-regalos.png",
@@ -233,29 +233,38 @@ function elegirLogros(todos, tabId) {
 
 function Contador({ valor, prefijo }) {
   const ref = useRef(null);
-  const [n, setN] = useState(0);
+  // e48: con «reducir animaciones» (o sin IntersectionObserver) la cifra final se ve desde el primer momento.
+  const sinAnimar = typeof window !== "undefined" && (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches || typeof IntersectionObserver === "undefined");
+  const [n, setN] = useState(sinAnimar ? valor : 0);
   useEffect(() => {
     const el = ref.current;
-    if (!el) return;
-    const reducir = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-    let raf = 0, iniciado = false;
+    if (!el) return undefined;
+    if (sinAnimar) { setN(valor); return undefined; }
+    let raf = 0, iniciado = false, seguro = 0;
     const correr = () => {
       if (iniciado) return;
       iniciado = true;
-      if (reducir) { setN(valor); return; }
+      clearTimeout(seguro);
       const t0 = performance.now(), dur = 1500;
       const paso = (t) => {
         const k = Math.min(1, (t - t0) / dur);
-        setN(Math.round(valor * (1 - Math.pow(1 - k, 3))));
+        setN(k >= 1 ? valor : Math.round(valor * (1 - Math.pow(1 - k, 3))));
         if (k < 1) raf = requestAnimationFrame(paso);
       };
       raf = requestAnimationFrame(paso);
     };
-    if (typeof IntersectionObserver === "undefined") { setN(valor); return; }
+    // Red de seguridad: si la cifra ya está a la vista y la animación no arrancó en 5 s, se muestra la cifra final.
+    const vigilar = () => {
+      seguro = setTimeout(() => {
+        if (iniciado) return;
+        if (el.offsetParent !== null) { iniciado = true; setN(valor); } else vigilar();
+      }, 5000);
+    };
+    vigilar();
     const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) { correr(); obs.disconnect(); } }, { threshold: 0.4 });
     obs.observe(el);
-    return () => { obs.disconnect(); cancelAnimationFrame(raf); };
-  }, [valor]);
+    return () => { obs.disconnect(); cancelAnimationFrame(raf); clearTimeout(seguro); };
+  }, [valor, sinAnimar]);
   return <span ref={ref}>{prefijo}{n.toLocaleString("es-MX")}+</span>;
 }
 
@@ -717,6 +726,7 @@ export default function BloqueCentral({
                 {n.promo && <p className="bc-promo">{n.promo}</p>}
                 <div className="bc-ficha-btns">
                   <a href={n.tel ? `https://wa.me/${n.tel}` : wa(`¡Hola! Vi ${n.nombre} en DCUATES.`)} target="_blank" rel="noopener noreferrer" style={{ background: "#25d366" }}>WhatsApp</a>
+                  {n.tel && <a href={`tel:${n.tel.length === 10 ? "+52" + n.tel : "+" + n.tel}`} onClick={() => registrar("negocio_llamar", { n: String(n.nombre).slice(0, 30) })} style={{ background: "#0f4c5c" }}>Llamar</a>}
                   <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${n.nombre} ${n.zona} Ecatepec`)}`} target="_blank" rel="noopener noreferrer" style={{ background: tab.boton || tab.color }}>Cómo llegar</a>
                 </div>
               </article>
@@ -950,7 +960,7 @@ const CSS = `
 .bc-ficha .bc-promo{color:var(--ink);background:#fff7d6;border-radius:8px;padding:4px 8px;margin-top:4px}
 .bc-ficha-ico{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-size:24px}
 .bc-ficha-btns{display:flex;gap:6px;margin-top:auto;padding-top:10px}
-.bc-ficha-btns a,.bc-ficha-btns button{flex:1;min-height:40px;display:grid;place-items:center;border:0;border-radius:12px;color:#fff;font-family:inherit;font-weight:900;font-size:13px;text-decoration:none;cursor:pointer}
+.bc-ficha-btns a,.bc-ficha-btns button{flex:1;min-height:44px;display:grid;place-items:center;border:0;border-radius:12px;color:#fff;font-family:inherit;font-weight:900;font-size:13px;text-decoration:none;cursor:pointer}
 .bc-ficha-cta{border-style:dashed}
 .bc-agenda-card{border-style:solid}
 .bc-mini-w{width:150px;display:flex}

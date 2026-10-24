@@ -15,6 +15,7 @@ import { normalizarAgenda } from "./BloqueAgenda.jsx";
 import { normalizarRegalos } from "./BloqueRegalos.jsx";
 import { LOGROS_ITEMS, LOGROS_FIJOS, RECOMENDACIONES_ESTRELLA } from "./datos/cintas.js";
 import { MAPA_NEGOCIOS_EMBED_URL, REDES_SOCIALES, VERSION_BUILD, WHATSAPP_NUMERO, YOUTUBE_VIDEO_ID } from "./datos/config.js";
+import { LINEAS_AYUDA_VIDEO, PALABRAS_VIDEO_AYUDA } from "./datos/apoyo.js";
 import { AVISO_PRIVACIDAD_INTEGRAL, FAQ_ITEMS, TERMINOS_CONDICIONES } from "./datos/legal.js";
 import { TODOS_LOS_PROYECTOS } from "./datos/listas.js";
 import { BOTONES_PORTADA, CATEGORIAS_PROYECTOS, DEGRADADO_SUGERENCIAS, LOGOS_EXTRA_MODAL, RESUMEN_PROYECTO } from "./datos/proyectos.js";
@@ -23,6 +24,8 @@ import BloqueCentral, { CarruselFinal, TABS as TABS_BC, ID_A_TAB } from "./Bloqu
 import InicioNuevo from "./InicioNuevo.jsx";
 import MuroGratitud from "./MuroGratitud.jsx";
 import OpinionRapida from "./OpinionRapida.jsx";
+import InvitaVecino from "./InvitaVecino.jsx";
+import AvisoSinConexion from "./AvisoSinConexion.jsx";
 import AyudaFlotante, { PistaDeslizar } from "./AyudaFlotante.jsx";
 import NavInferior from "./NavInferior.jsx";
 import ZonaJuegos from "./ZonaJuegos.jsx";
@@ -340,7 +343,7 @@ export default function App() {
         tipo: "video",
         nombre: v.nombre,
         media: <MiniaturaVideo video={v.video} nombre={v.nombre} />,
-        onClick: () => setVideoEnGrande(v.video)
+        onClick: () => setVideoEnGrande({ ...v.video, nombre: v.nombre })
       }));
     portadasItems[id] = [...archivos, ...videos];
   });
@@ -353,7 +356,7 @@ export default function App() {
       tipo: "video",
       nombre: v.nombre,
       media: <MiniaturaVideo video={v.video} nombre={v.nombre} />,
-      onClick: () => setVideoEnGrande(v.video)
+      onClick: () => setVideoEnGrande({ ...v.video, nombre: v.nombre })
     }))
   ];
 
@@ -548,7 +551,7 @@ export default function App() {
               <button
                 key={i}
                 type="button"
-                onClick={() => setVideoEnGrande(v.video)}
+                onClick={() => setVideoEnGrande({ ...v.video, nombre: v.nombre })}
                 className="group relative rounded-xl overflow-hidden border-2 border-white/10 hover:border-[#e65100] transition-colors bg-black/30 text-left w-40 sm:w-56 shrink-0"
               >
                 <div className="aspect-video w-full overflow-hidden">
@@ -599,6 +602,7 @@ export default function App() {
         onAbrirFAQ={() => setShowFAQ(true)}
       />
       <PistaDeslizar vista={vista} />
+      <AvisoSinConexion />
       <AyudaFlotante
         onDudas={() => { registrar("dudas_abrir"); setShowDudas(true); }}
         onContacto={() => irVista("contacto")}
@@ -649,6 +653,7 @@ export default function App() {
           cargando={!baserowListo}
           entrada={{ agenda: agendaEventos, filasZona, negocios: negociosBaserow, onAbrirProyecto: (id) => setModalProyecto(id) }}
         />
+        <InvitaVecino />
       </div>
 
       {/* VISTA 2 · PROYECTOS (pestañas) */}
@@ -739,6 +744,7 @@ export default function App() {
             </div>
           </div>
         </section>
+      <InvitaVecino />
       <OpinionRapida />
       <BarraAccionesFinal onAbrirComparte={() => setModalFormulario("comparte")} onInicio={() => irVista("inicio")} />
 
@@ -760,6 +766,20 @@ export default function App() {
             <div className="rounded-2xl overflow-hidden border-4 border-white/20 shadow-2xl aspect-video bg-black">
               <IframeVideo video={videoEnGrande} className="w-full h-full" />
             </div>
+            {PALABRAS_VIDEO_AYUDA.test(videoEnGrande.nombre || "") && (
+              <div role="note" aria-label="Líneas de ayuda" className="mt-3 rounded-2xl bg-white p-3 text-[#0f2d1e]">
+                <p className="text-sm font-black leading-snug">💚 Si tú o alguien cercano necesita hablar con alguien, hay ayuda gratuita:</p>
+                <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                  {LINEAS_AYUDA_VIDEO.map(([nombre, marcar, mostrar, nota]) => (
+                    <a key={nombre} href={`tel:${marcar}`} onClick={() => registrar("linea_ayuda_video", { linea: nombre })} className="flex min-h-[52px] flex-col justify-center rounded-xl bg-[#0e7c4f] px-3 py-2 text-white no-underline">
+                      <b className="text-sm font-black uppercase leading-tight">📞 {nombre} · {mostrar}</b>
+                      <span className="text-xs font-bold opacity-95">{nota}</span>
+                    </a>
+                  ))}
+                </div>
+                <p className="mt-2 text-xs font-bold text-slate-600">En una emergencia llama al 911.</p>
+              </div>
+            )}
           
             <div className="mt-3 flex justify-end">
               <BotonCerrar claro onClick={() => setVideoEnGrande(null)} label="Cerrar video" />

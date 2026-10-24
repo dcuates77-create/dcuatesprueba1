@@ -60,7 +60,7 @@ export default function ZonaPropon({ onCerrar, menu = {}, onAbrirProyecto = () =
             <p className="pr-nota">{cfg.nota}</p>
             <label>Tu nombre o apodo (opcional)<input value={nombre} onChange={(e) => setNombre(e.target.value)} placeholder="Ej. Vecina de la Calle 5" /></label>
             <label>Tu mensaje<textarea rows={4} value={texto} onChange={(e) => setTexto(e.target.value)} placeholder={cfg.ph} /></label>
-            <label>WhatsApp o correo para avisarte (opcional)<input value={contacto} onChange={(e) => setContacto(e.target.value)} placeholder="Solo si quieres respuesta" /></label>
+            <label>WhatsApp o correo para avisarte (opcional)<input inputMode="email" autoCapitalize="none" value={contacto} onChange={(e) => setContacto(e.target.value)} placeholder="Solo si quieres respuesta" /></label>
             <CasillaAcepto ac={ac} id="acepta_propon" />
             {error && <p className="pr-err" role="alert">{error}</p>}
             <button type="submit" className="pr-enviar">{cfg.emoji} Enviar</button>

@@ -14,6 +14,8 @@
 // Uso en el código:  registrar("proyecto_abrir", { id: "libros" })
 // =========================================================================
 
+import { GOOGLE_SHEETS_URL } from "./datos/config.js";
+
 export const GOATCOUNTER_CODIGO = "";
 
 let iniciada = false;
@@ -73,5 +75,28 @@ export function registrar(nombre, datos) {
     }
   } catch {
     /* ignorar */
+  }
+}
+
+// BÚSQUEDAS SIN RESULTADO (e48): guarda la palabra que la gente buscó y no encontró, para ampliar sinonimos.js.
+// - Se guarda en tu hoja de Google (pestaña «Búsquedas», Tipo «Busqueda») y, si hay GoatCounter, también ahí.
+// - Solo guarda la palabra (máx. 40 letras): nada de nombre, teléfono ni datos del visitante.
+// - Máximo 5 distintas por visita, y no guarda desde localhost.
+export function registrarBusquedaVacia(texto, desde) {
+  try {
+    if (typeof window === "undefined") return;
+    const q = String(texto || "").trim().toLowerCase().replace(/\s+/g, " ").slice(0, 40);
+    if (q.length < 3) return;
+    registrar("busqueda_sin_resultado", { q });
+    if (/^(localhost|127\.|\[::1\])/.test(window.location.hostname)) return;
+    let vistas = [];
+    try { vistas = JSON.parse(window.sessionStorage.getItem("dcuates_bq") || "[]"); } catch { vistas = []; }
+    if (vistas.includes(q) || vistas.length >= 5) return;
+    vistas.push(q);
+    try { window.sessionStorage.setItem("dcuates_bq", JSON.stringify(vistas)); } catch { /* ignorar */ }
+    const d = new URLSearchParams({ Tipo: "Busqueda", Busqueda: q, Resultados: "0", Desde: desde || "" });
+    fetch(GOOGLE_SHEETS_URL, { method: "POST", mode: "no-cors", keepalive: true, body: d }).catch(() => {});
+  } catch {
+    /* la analítica nunca debe romper la página */
   }
 }

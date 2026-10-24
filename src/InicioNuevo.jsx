@@ -10,8 +10,8 @@ import { VISTA } from "./datos/vistaSeccion.js";
 import { WHATSAPP_NUMERO } from "./datos/config.js";
 import { registrar } from "./analitica.js";
 
-// Foto de portada: sube /public/images/portada-inicio.jpg para cambiarla; mientras no exista se usa la de respaldo.
-const FOTOS = ["/images/portada-inicio.jpg", "/images/bibliobici-movil.png"];
+// Foto de portada: sube /public/images/portada-inicio.webp para cambiarla; mientras no exista se usa la de respaldo.
+const FOTOS = ["/images/portada-inicio.webp", "/images/bibliobici-movil.webp"];
 
 // [id de pestaña, emoji, título, subtítulo, color]
 const TILES = [

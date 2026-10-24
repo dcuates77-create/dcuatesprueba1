@@ -2,6 +2,7 @@
 // Abajo a la derecha, arriba del cintillo inferior; la flecha de subir queda encima (ver App.jsx).
 import React, { useEffect, useState } from "react";
 import { registrar } from "./analitica.js";
+import { enlaceReporteProblema } from "./utilidades/reporte.js";
 
 // Parpadeo con temporizador (funciona aunque el celular tenga "reducir animaciones").
 function useParpadeo(activo, ms = 900) {
@@ -17,7 +18,8 @@ function useParpadeo(activo, ms = 900) {
 const OPCIONES = [
   { id: "hoy", ico: "?", t: "¿Qué necesitas hoy?", d: "Apoyos, libros, mascotas, negocios y servicios", bg: "#facc15", color: "#0f2d1e" },
   { id: "dudas", ico: "💬", t: "Dudas y atención", d: "Pregúntanos por WhatsApp", bg: "#25a244", color: "#fff" },
-  { id: "contacto", ico: "📝", t: "Contacto", d: "Regístrate, pide apoyo y avisos", bg: "#0f4c5c", color: "#fff" }
+  { id: "contacto", ico: "📝", t: "Contacto", d: "Regístrate, pide apoyo y avisos", bg: "#0f4c5c", color: "#fff" },
+  { id: "problema", ico: "🛠️", t: "Algo no funciona", d: "Avísanos por WhatsApp; se manda solo lo necesario", bg: "#e2e8f0", color: "#0f2d1e" }
 ];
 
 export default function AyudaFlotante({ onDudas, onContacto }) {
@@ -35,6 +37,7 @@ export default function AyudaFlotante({ onDudas, onContacto }) {
     setAbierta(false);
     if (id === "hoy") setTimeout(() => window.dispatchEvent(new CustomEvent("dcuates:abrir-necesitas")), 60);
     else if (id === "dudas") onDudas && onDudas();
+    else if (id === "problema") window.open(enlaceReporteProblema(), "_blank", "noopener");
     else onContacto && onContacto();
   };
 

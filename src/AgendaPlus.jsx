@@ -8,6 +8,7 @@ import { GOOGLE_SHEETS_URL, WHATSAPP_NUMERO } from "./datos/config.js";
 import { CasillaAcepto, ErrorAcepto, useAceptacion } from "./componentes/legal.jsx";
 import { LogoMarca } from "./componentes/encabezado.jsx";
 import { registrar } from "./analitica";
+import { enlaceReporteAnuncio } from "./utilidades/reporte.js";
 import {
   ANUNCIOS_EJEMPLO, DIRECTORIOS_CLAVE, DIRECTORIO_AREAS, DIRECTORIO_EJEMPLO, MAPAS, REGLAS_TABLERO, TIPOS_ANUNCIO, tipoAnuncio
 } from "./datos/plus.js";
@@ -124,6 +125,7 @@ function Tablero({ onCerrar, anuncios }) {
             <b>{a.titulo}</b>
             {a.texto && <p>{a.texto}</p>}
             {a.tel && <a className="ap-link" href={wa("Hola, vi su anuncio en el Tablero DCUATES: " + a.titulo, a.tel)} target="_blank" rel="noopener noreferrer">💬 Escribir por WhatsApp</a>}
+            {!a.ejemplo && <a className="ap-rep" href={enlaceReporteAnuncio(a.titulo)} target="_blank" rel="noopener noreferrer" onClick={() => registrar("anuncio_reportar")}>🚩 Reportar este anuncio</a>}
           </article>
         );
       })}
@@ -247,6 +249,7 @@ const CSS = `
 .ap-cab{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:52px;padding:8px 12px;border:0;color:#fff;font-family:inherit;text-align:left;cursor:pointer}
 .ap-cab b{display:block;font-size:16px;font-weight:900;color:#fff}.ap-cab small{display:block;font-size:12.5px;font-weight:700;color:#fff;opacity:.95}.ap-cab i{font-style:normal;font-size:24px;font-weight:900}
 .ap-cuerpo{padding:8px}.ap-mapa{display:block;width:100%;height:min(62vh,420px);min-height:300px;border:0;border-radius:10px;background:#e5e7eb}
+.ap-rep{display:block;margin-top:6px;padding:10px 6px;min-height:44px;box-sizing:border-box;color:#7f1d1d;font-size:13.5px;font-weight:800;text-align:center;text-decoration:underline}
 .ap-link{display:block;margin-top:8px;padding:10px;border-radius:12px;background:#eef2ff;color:#1e3a8a;font-size:14.5px;font-weight:800;text-align:center;text-decoration:none}
 .ap-volver{display:block;width:100%;margin-top:8px;min-height:46px;border:2px solid #0f4c5c;border-radius:12px;background:#fff;color:#0f4c5c;font-family:inherit;font-size:14.5px;font-weight:900;cursor:pointer}
 .ap-ok{text-align:center;padding:16px 8px}.ap-ok p{margin:10px 0 0;color:#0f2d1e}.ap-ok .g{font-size:20px;font-weight:900;color:#e65100;text-transform:uppercase}
