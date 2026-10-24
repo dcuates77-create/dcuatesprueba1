@@ -22,7 +22,25 @@ export const YOUTUBE_VIDEO_ID = "SUnE27QnnyI";
 // iframe); no hace falta tocar nada más en el código.
 // Sello de versión: se ve en pequeño al final de los accesos rápidos y en la
 // consola del navegador. Sirve para comprobar que el celular ya cargó lo último.
-export const VERSION_BUILD = "CLON11 · e47";
+export const VERSION_BUILD = "CLON12 · e48";
+
+// Modo administrador (e48): el sello de versión y el estado de Baserow solo se ven aquí.
+// Para activarlo en un teléfono: abre dcuates.com/?admin=1 (queda guardado en ese teléfono).
+// Para apagarlo: dcuates.com/?admin=0. En tu computadora (localhost) siempre se ve.
+export function esAdmin() {
+  try {
+    const q = new URLSearchParams(window.location.search).get("admin");
+    if (q === "1") window.localStorage.setItem("dcuates_admin", "1");
+    if (q === "0") window.localStorage.removeItem("dcuates_admin");
+    return window.localStorage.getItem("dcuates_admin") === "1" || /^(localhost|127\.)/.test(window.location.hostname);
+  } catch {
+    return false;
+  }
+}
+
+// Botón «Invita a un vecino» (e48): texto que se manda por WhatsApp. Edítalo aquí.
+export const URL_SITIO = "https://dcuates.com";
+export const MENSAJE_INVITACION = "Hola, te invito a conocer DCUATES, la comunidad de Jardines de Morelos: libros, asesorías, mascotas y apoyos gratis. Entra aquí:";
 
 export const MAPA_NEGOCIOS_EMBED_URL = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15034.541076557625!2d-99.00223799999999!3d19.600120500000003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1ee234c038987%3A0x4b578513910d8103!2sJardines%20de%20Morelos%2C%20Ecatepec%20de%20Morelos%2C%20M%C3%A9x.!5e0!3m2!1ses!2smx!4v1790129394750!5m2!1ses!2smx";
 

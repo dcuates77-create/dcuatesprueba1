@@ -7,7 +7,7 @@
 export const VISTA = {
   nosotros: {
     titulo: "Nosotros",
-    portada: "/images/portada-nosotros.jpg",
+    portada: "/images/portada-nosotros.webp",
     texto: "Somos una comunidad que teje confianza, suma voluntades y cosecha logros desde hace más de 19 años.",
     boton: { t: "Conoce cómo participar", a: { entrada: 1 } },
     pregunta: "¿Quiénes somos?",
@@ -21,7 +21,7 @@ export const VISTA = {
     ],
     cta: { t: "¿Quieres sumarte?", d: "Conoce cómo apoyar como voluntario.", a: { ir: "donaciones" } },
     sumar: {
-      img: "/images/sumar-nosotros.jpg",
+      img: "/images/sumar-nosotros.webp",
       titulo: "Tu participación suma",
       texto: "Una comunidad se construye con personas como tú. Hoy puedes dar el primer paso: regístrate, cuéntanos cómo quieres participar y sumemos voluntades.",
       botones: [{ t: "Regístrate o participa", a: { acceso: "registros" } }, { t: "Quiero ser voluntario", a: { ir: "donaciones" } }]
@@ -29,7 +29,7 @@ export const VISTA = {
   },
   beneficios: {
     titulo: "Beneficios",
-    portada: "/images/portada-beneficios.jpg",
+    portada: "/images/portada-beneficios.webp",
     texto: "Ser parte de DCUATES te da más oportunidades: libros, asesorías, bienestar y apoyo para tus mascotas, sin costo.",
     boton: { t: "Conoce todos los beneficios", a: { bajar: 1 } },
     pregunta: "¿Qué beneficios puedes obtener?",
@@ -47,7 +47,7 @@ export const VISTA = {
   },
   causas: {
     titulo: "Causas y valores",
-    portada: "/images/portada-causas.jpg",
+    portada: "/images/portada-causas.webp",
     texto: "Proyectos que generan cambio, guiados por los valores que nos unen: confianza, solidaridad y gratitud.",
     boton: { t: "Conoce cómo ayudar", a: { bajar: 1 } },
     pregunta: "¿Por qué van juntas las causas y los valores?",
@@ -59,7 +59,7 @@ export const VISTA = {
     ],
     cta: { t: "¿Quieres ayudar hoy?", d: "Regístrate como voluntario o donante.", a: { ir: "donaciones" } },
     sumar: {
-      img: "/images/sumar-causas.jpg",
+      img: "/images/sumar-causas.webp",
       titulo: "Tu ayuda cambia vidas",
       texto: "Un poco de tu tiempo, talento o recursos puede cambiar la historia de alguien. Elige cómo ayudar y hazlo visible: tu ejemplo invita a otros.",
       botones: [{ t: "Quiero ser voluntario", a: { ir: "donaciones" } }, { t: "Reporta un caso", a: { ir: "extraviados-registro" } }]
@@ -86,7 +86,7 @@ export const VISTA = {
   },
   gratitud: {
     titulo: "Gratitud",
-    portada: "/images/portada-regalos.jpg",
+    portada: "/images/portada-regalos.webp",
     texto: "Retos, regalos y reconocimientos: porque tu apoyo también se celebra. Juega, participa y cuéntanos a quién quieres agradecer.",
     boton: { t: "Ver retos y reconocimientos", a: { bajar: 1 } },
     pregunta: "¿Qué celebramos hoy?",
@@ -110,7 +110,7 @@ export const VISTA = {
   // SECCIÓN DE CIERRE — sintetiza y conecta todas las demás. Nombre provisional: "Súmate" (cámbialo en BloqueCentral.jsx → TABS, id "cierre").
   cierre: {
     titulo: "Súmate",
-    portada: "/images/portada-cierre.jpg",
+    portada: "/images/portada-cierre.webp",
     texto: "Todo lo que hacemos se une aquí. Tu parte, grande o pequeña, completa la historia.",
     boton: { t: "Elige tu parte", a: { bajar: 1 } },
     pregunta: "Todo lo que hacemos se conecta",

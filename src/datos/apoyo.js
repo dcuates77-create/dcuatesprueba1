@@ -72,3 +72,13 @@ export const ANIMAL_TELEFONOS = [
   ["🛡️", "Consejo Ciudadano (CDMX)", "5555335533", "55 5533 5533", "24 horas · abuso contra perros y gatos · también *5533", ""],
   ["📋", "PAOT (CDMX)", "5552650780", "55 5265 0780", "Cualquier maltrato animal en la CDMX", ""]
 ];
+
+// LÍNEAS DE AYUDA JUNTO A VIDEOS SENSIBLES (e48). Si el NOMBRE del video (en Baserow) contiene alguna de estas
+// palabras, debajo del video se muestran las líneas de ayuda. Para que un video muestre las líneas, basta con
+// escribir una de estas palabras en su nombre (por ejemplo «Salud mental: hablar a tiempo»).
+export const PALABRAS_VIDEO_AYUDA = /salud mental|ansiedad|depresi|emocional|suicid|autoestima|duelo|adicci|estr[eé]s|terapia|psicol|bienestar|soledad|tristeza/i;
+// Números confirmados por Abel el 23-oct-2026. Verifícalos cada cierto tiempo.
+export const LINEAS_AYUDA_VIDEO = [
+  ["Línea de la Vida", "8009112000", "800 911 2000", "24 horas · gratis"],
+  ["SAPTEL", "5552598121", "55 5259 8121", "24 horas · apoyo emocional"]
+];

@@ -130,18 +130,18 @@ export const GALERIAS_PROYECTOS = {
 // usan el Mapa de Sitio (ModalMapaSitio) y las tarjetas de cada categoría
 // (ModalCategoria), así que reordenarlo aquí los reordena a ambos.
 export const BOTONES_PORTADA = [
-  { t: "ECATEPETS MASCOTAS", h: "#ecatepets", modal: "ecatepets", img: "/images/Ecatepets.png" },
-  { t: "PUBLICIDAD GRATUITA", h: "#publicidad", modal: "publicidad-tarjeta", img: "/images/Publicidad2.png" },
-  { t: "APOYO VOLUNTARIO", h: "#donaciones", modal: "donaciones", img: "/images/ApoyoVoluntario.png" },
-  { t: "RECOMIENDA, EVALÚA Y GANA", h: "#recomienda-evalua-gana", modal: "recomienda-evalua-gana", img: "/images/Recomienda.png" },
-  { t: "ALIANZAS SOLIDARIAS", h: "#iniciativas", modal: "alianzas-tarjeta", img: "/images/Alianzas.png" },
+  { t: "ECATEPETS MASCOTAS", h: "#ecatepets", modal: "ecatepets", img: "/images/Ecatepets.webp" },
+  { t: "PUBLICIDAD GRATUITA", h: "#publicidad", modal: "publicidad-tarjeta", img: "/images/Publicidad2.webp" },
+  { t: "APOYO VOLUNTARIO", h: "#donaciones", modal: "donaciones", img: "/images/ApoyoVoluntario.webp" },
+  { t: "RECOMIENDA, EVALÚA Y GANA", h: "#recomienda-evalua-gana", modal: "recomienda-evalua-gana", img: "/images/Recomienda.webp" },
+  { t: "ALIANZAS SOLIDARIAS", h: "#iniciativas", modal: "alianzas-tarjeta", img: "/images/Alianzas.webp" },
   { t: "CÍRCULO DE CONFIANZA", h: "#circulo-confianza", modal: "circulo-confianza", img: "/images/Círculo.png" },
   { t: "ASESORÍAS GRATUITAS", h: "#asesorias", modal: "asesorias", img: "/images/Asesorías.png" },
-  { t: "BAZAR Y COMERCIO", h: "#bazares", modal: "bazares", img: "/images/Bazar.png" },
-  { t: "VENTAS CON CAUSA", h: "#ventas-con-causa", modal: "ventas-con-causa", img: "/images/VentasConCausa.png" },
-  { t: "NOTICIAS DE BARRIO", h: "#noticias", modal: "noticias", img: "/images/Noticias.png" },
-  { t: "BIENESTAR Y RECREACIÓN", h: "#bienestar", modal: "bienestar", img: "/images/Bienestar.png" },
-  { t: "PRÉSTAMO GRATUITO DE LIBROS", h: "#libros", modal: "libros", img: "/images/bb.png" }
+  { t: "BAZAR Y COMERCIO", h: "#bazares", modal: "bazares", img: "/images/Bazar.webp" },
+  { t: "VENTAS CON CAUSA", h: "#ventas-con-causa", modal: "ventas-con-causa", img: "/images/VentasConCausa.webp" },
+  { t: "NOTICIAS DE BARRIO", h: "#noticias", modal: "noticias", img: "/images/Noticias.webp" },
+  { t: "BIENESTAR Y RECREACIÓN", h: "#bienestar", modal: "bienestar", img: "/images/Bienestar.webp" },
+  { t: "PRÉSTAMO GRATUITO DE LIBROS", h: "#libros", modal: "libros", img: "/images/bb.webp" }
 ];
 
 // Una línea que explica cada proyecto: aparece en su tarjeta y en el mensaje
@@ -165,7 +165,7 @@ export const RESUMEN_PROYECTO = {
 // de abajo: Historias, Cupones, Patrocinadores). Ajusta las rutas si tus
 // archivos se llaman distinto.
 export const LOGOS_EXTRA_MODAL = {
-  "historias-dcuates": "/images/HistoriasDCUATES.png"
+  "historias-dcuates": "/images/HistoriasDCUATES.webp"
 };
 
 // Portada simplificada: en vez de los 12 botones de proyecto, se muestran
@@ -314,7 +314,11 @@ export const CACHE_ENLACES_MS = 5 * 60 * 1000;
 export const TIPOS_DE_APOYO = [
   "Libros o materiales educativos",
   "Asesoría gratuita",
+  "Cursos o talleres",
+  "Empleo o capacitación",
   "Mascotas (adopción, extravío o rescate)",
+  "Cupones o promociones",
+  "Trueque solidario",
   "Apoyo en especie o económico",
   "Publicidad para mi negocio",
   "Apoyo voluntario",
