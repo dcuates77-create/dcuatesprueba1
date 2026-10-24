@@ -27,7 +27,7 @@ export function PNQuienes() {
               </span>
               <div>
                 <img
-                  src="/images/bibliobici-movil.png"
+                  src="/images/bibliobici-movil.webp"
                   alt="Bibliobici móvil DCUATES: la lectura que llega hasta tu colonia"
                   loading="lazy"
                   className="float-right ml-3 mb-2 w-[46%] max-w-[260px] rounded-xl object-cover shadow-lg border-2 border-white/70"
