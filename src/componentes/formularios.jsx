@@ -264,7 +264,7 @@ export function FormularioSolicitud() {
       <div className="text-center py-6 px-4">
         <div className="flex justify-center"><LogoMarca tam={88} /></div>
         <p className="mt-4 text-lg font-black text-[#0f2d1e] leading-snug">¡Tu solicitud quedó registrada!</p>
-        <p className="mt-2 text-base font-bold text-slate-700">En la primera oportunidad atenderemos tu solicitud…</p>
+        <p className="mt-2 text-base font-bold text-slate-700">Te respondemos por WhatsApp en máximo 24 h.</p>
         <p className="mt-3 text-xl font-black text-[#e65100] uppercase tracking-wide">¡Gracias y saludos!</p>
         <p className="mt-4 text-[11px] text-slate-500 font-medium">
           ¿No se abrió WhatsApp?{" "}
