@@ -216,7 +216,7 @@ export default function EntradaDcuates({ onAbrirProyecto = () => {}, agenda = []
         {T.map(([e, t, s, f], i) => (
           <button type="button" key={t} className="pu-d en-d" style={{ background: COLOR_T[i] }} onClick={f}>
             <span className="pu-e" style={{ "--r": RANGO_E[i], "--rd": RANGO_E[i] }}>{e}</span>
-            <b>{t}</b><small>{s}</small>
+            <b><span className="pu-n" aria-hidden="true">{i + 1}</span>{t}</b><small>{s}</small>
           </button>
         ))}
       </div>
@@ -253,6 +253,7 @@ export default function EntradaDcuates({ onAbrirProyecto = () => {}, agenda = []
 .pu-grid2{margin-top:8px}
 .pu-d{min-height:84px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:3px;padding:8px 10px;border:2px solid #fff;border-radius:16px;color:#fff;font-family:inherit;text-align:left;cursor:pointer;box-shadow:0 5px 12px rgba(0,0,0,.25)}
 .pu-d:active{filter:brightness(.92)}
+.pu-n{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;margin-right:6px;border-radius:50%;background:#fff;color:#0f2d1e;font-size:12px;font-weight:900;vertical-align:1px}
 .pu-d b{font-size:14.5px;font-weight:900;line-height:1.12;color:#fff}
 .pu-e{display:inline-block;font-size:28px;line-height:1.1;animation:pu-latido 4.8s ease-in-out infinite;animation-delay:calc(var(--r) * .6s)}
 @keyframes pu-latido{0%{transform:scale(1);filter:none}4%{transform:scale(1.45);filter:drop-shadow(0 0 7px #ffd84d)}12%{transform:scale(1);filter:none}100%{transform:scale(1);filter:none}}

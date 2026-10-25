@@ -25,6 +25,7 @@ import InicioNuevo from "./InicioNuevo.jsx";
 import MuroGratitud from "./MuroGratitud.jsx";
 import OpinionRapida from "./OpinionRapida.jsx";
 import InvitaVecino from "./InvitaVecino.jsx";
+import FlechaBajar from "./FlechaBajar.jsx";
 import AvisoSinConexion from "./AvisoSinConexion.jsx";
 import AyudaFlotante, { PistaDeslizar } from "./AyudaFlotante.jsx";
 import NavInferior from "./NavInferior.jsx";
@@ -603,6 +604,7 @@ export default function App() {
       />
       <PistaDeslizar vista={vista} />
       <AvisoSinConexion />
+      <FlechaBajar />
       <AyudaFlotante
         onDudas={() => { registrar("dudas_abrir"); setShowDudas(true); }}
         onContacto={() => irVista("contacto")}

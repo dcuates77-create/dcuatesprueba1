@@ -103,7 +103,51 @@ export function BloqueSumar({ tab, cfg, onAccion }) {
   );
 }
 
-export const CSS_SN = `
+// MICRO-ACCIONES y RETO DEL MES (e49) — tarjetas con el tiempo que toma cada acción. Los textos viven en src/datos/vistaSeccion.js (cierre.micro / cierre.reto).
+export function MicroAcciones({ cfg, onAccion }) {
+  return (
+    <section className="sn-micro" aria-label={cfg.titulo}>
+      <h3 className="sn-p">{cfg.titulo}</h3>
+      {cfg.intro && <p className="sn-i">{cfg.intro}</p>}
+      <div className="sn-micro-l">
+        {cfg.items.map((x) => (
+          <button key={x.t} type="button" className="sn-micro-i" onClick={() => onAccion(x.a)}>
+            <span className="sn-micro-e" aria-hidden="true">{x.ico}</span>
+            <span className="sn-tx">
+              <span className="sn-micro-min" aria-label={x.min + (x.min === 1 ? " minuto" : " minutos")}>⏱ {x.min} min</span>
+              <b>{x.t}</b>{x.d && <small>{x.d}</small>}
+            </span>
+          </button>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+export function RetoMes({ cfg, onAccion }) {
+  return (
+    <section className="sn-reto" aria-label={cfg.titulo}>
+      <small className="sn-reto-k"><span aria-hidden="true">{cfg.ico}</span> {cfg.titulo.toUpperCase()}</small>
+      <b className="sn-reto-t">{cfg.t}</b>
+      {cfg.d && <p>{cfg.d}</p>}
+      <div className="sn-reto-b">
+        {cfg.botones.map((b, i) => (
+          <button key={b.t} type="button" className={i === 0 ? "sn-b1" : "sn-b2"} onClick={() => onAccion(b.a)}>{b.t}</button>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+export const CSS_SN = `.sn-micro{margin:6px 0 10px}.sn-micro-l{display:flex;flex-direction:column;gap:8px}
+.sn-micro-i{display:flex;align-items:flex-start;gap:10px;width:100%;text-align:left;background:#fff;border:2px solid #f1d9b8;border-radius:16px;padding:10px;min-height:64px;cursor:pointer;font-family:inherit;box-shadow:0 2px 6px rgba(15,45,30,.1)}
+.sn-micro-i:active{transform:translateY(1px)}.sn-micro-e{flex:none;font-size:30px;line-height:1;width:40px;text-align:center;padding-top:20px}
+.sn-micro-i .sn-tx{flex:1;min-width:0;display:flex;flex-direction:column}.sn-micro-i b{font-size:14.5px;font-weight:900;color:#0f2d1e;line-height:1.2}.sn-micro-i small{font-size:12.5px;font-weight:700;color:#4a5f53;line-height:1.3;margin-top:2px}
+.sn-micro-min{align-self:flex-start;margin-bottom:4px;background:var(--tc,#BF360C);color:#fff;border-radius:999px;padding:4px 9px;font-size:12px;font-weight:900;white-space:nowrap}
+.sn-reto{margin:10px 0;background:linear-gradient(135deg,#fff4d6,#ffe3b8);border:3px solid #E65100;border-radius:20px;padding:14px;text-align:center;font-family:inherit}
+.sn-reto-k{display:block;font-size:12.5px;font-weight:900;letter-spacing:.06em;color:#BF360C}.sn-reto-t{display:block;margin:4px 0 6px;font-size:19px;font-weight:900;line-height:1.2;color:#0f2d1e}.sn-reto p{margin:0 0 10px;font-size:14px;font-weight:700;color:#3d3a2a}.sn-reto-b{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}.sn-reto-b button{min-height:46px;padding:0 18px;border-radius:999px;font-weight:900;font-size:14.5px;cursor:pointer;font-family:inherit}
+.sn-reto-b .sn-b1{background:#BF360C;color:#fff;border:0}.sn-reto-b .sn-b2{background:#fff;color:#BF360C;border:2px solid #BF360C}
+
 .emo-img{display:inline-block;width:1.2em;height:1.2em;vertical-align:-0.2em}
 .sn-banner{margin:-6px calc(-1 * var(--pad,16px)) 14px;border-radius:0;overflow:hidden;background:#fff;box-shadow:0 6px 18px rgba(15,45,30,.2)}
 .sn-banner-img{display:block;width:100%;height:auto}

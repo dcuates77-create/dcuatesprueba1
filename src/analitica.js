@@ -14,9 +14,10 @@
 // Uso en el código:  registrar("proyecto_abrir", { id: "libros" })
 // =========================================================================
 
-import { GOOGLE_SHEETS_URL } from "./datos/config.js";
+import { GOOGLE_SHEETS_URL, esAdmin } from "./datos/config.js";
 
-export const GOATCOUNTER_CODIGO = "";
+// e49: tu cuenta de GoatCounter (dcuates2.goatcounter.com). La página carga sola el script: NO pegues <script> en index.html.
+export const GOATCOUNTER_CODIGO = "dcuates2";
 
 let iniciada = false;
 
@@ -52,7 +53,8 @@ export function iniciarAnalitica() {
       /* ignorar */
     }
 
-    if (GOATCOUNTER_CODIGO) {
+    // Los dispositivos de administración (?admin=1) no se cuentan.
+    if (GOATCOUNTER_CODIGO && !esAdmin()) {
       const g = document.createElement("script");
       g.async = true;
       g.src = "//gc.zgo.at/count.js";
@@ -69,7 +71,7 @@ export function registrar(nombre, datos) {
   try {
     if (typeof window === "undefined") return;
     if (typeof window.va === "function") window.va("event", { name: nombre, data: datos });
-    if (GOATCOUNTER_CODIGO && window.goatcounter && typeof window.goatcounter.count === "function") {
+    if (GOATCOUNTER_CODIGO && !esAdmin() && window.goatcounter && typeof window.goatcounter.count === "function") {
       const partes = datos ? Object.values(datos).join("/") : "";
       window.goatcounter.count({ path: `evento/${nombre}${partes ? "/" + partes : ""}`, title: nombre, event: true });
     }

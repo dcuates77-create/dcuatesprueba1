@@ -9,6 +9,8 @@ import { Emo } from "./SeccionNueva.jsx";
 import { VISTA } from "./datos/vistaSeccion.js";
 import { WHATSAPP_NUMERO } from "./datos/config.js";
 import { registrar } from "./analitica.js";
+import CosasSemana from "./CosasSemana.jsx";
+import ComoFunciona from "./ComoFunciona.jsx";
 
 // Foto de portada: sube /public/images/portada-inicio.webp para cambiarla; mientras no exista se usa la de respaldo.
 const FOTOS = ["/images/portada-inicio.webp", "/images/bibliobici-movil.webp"];
@@ -106,6 +108,7 @@ function BloqueLado({ img, titulo, texto, botones = [], sinBorde = false }) {
 export default function InicioNuevo({ onIr, logros = [], cargando = false, entrada = {} }) {
   const [foto, setFoto] = useState(0);
   const [prev, setPrev] = useState(null);
+  const [como, setComo] = useState(false);
 
   useEffect(() => {
     if (document.getElementById("vi-font")) return;
@@ -142,7 +145,10 @@ export default function InicioNuevo({ onIr, logros = [], cargando = false, entra
       <div id="vi-resultados" />
 
       <section id="vi-participar" className="vi-part" aria-label="Conoce cómo participar" style={{ "--tc": "#17472d" }}>
-        <h2 className="vi-h2">🌱 Conoce cómo participar</h2>
+        <div className="vi-h2fila">
+          <h2 className="vi-h2">🌱 Conoce cómo participar</h2>
+          <button type="button" className="vi-como" onClick={() => { registrar("como_funciona"); setComo(true); }}>❓ Cómo funciona</button>
+        </div>
         <p className="vi-h2p">Elige por dónde empezar: cada puerta te lleva paso a paso.</p>
         <EntradaDcuates {...entrada} />
       </section>
@@ -157,6 +163,8 @@ export default function InicioNuevo({ onIr, logros = [], cargando = false, entra
         ))}
       </nav>
 
+      <CosasSemana agenda={entrada.agenda} filasZona={entrada.filasZona} />
+
       <div className="vi-logros bc-root" style={{ "--tc": "#17472d" }}>
         <BandaImpacto logros={logros} cargando={cargando} tab={{ ...tabNosotros, banda: { titulo: "NUESTROS LOGROS" } }} />
       </div>
@@ -167,6 +175,10 @@ export default function InicioNuevo({ onIr, logros = [], cargando = false, entra
         texto="Somos una comunidad que teje confianza, suma voluntades y cosecha logros. Descubre qué es DCUATES, lo que te brinda y cómo puedes sumarte."
         botones={[["Qué es DCUATES", () => onIr("nosotros")], ["Lo que te brindamos", () => onIr("beneficios")], ["Nuestras causas", () => onIr("causas")], ["Apoyos para tu emprendimiento", () => onIr("negocios")], ["Cómo sumarte", () => onIr("cierre")]]}
       />
+
+      <Hoja abierta={como} onCerrar={() => setComo(false)} titulo="Cómo funciona DCUATES">
+        <ComoFunciona onCerrar={() => setComo(false)} />
+      </Hoja>
 
       <Hoja abierta={!!prev} onCerrar={() => setPrev(null)} titulo="Vista previa">
         {prev && (() => {
@@ -257,7 +269,10 @@ const CSS = `
 .vi-part .pu-dif[style*="15, 76, 92"],.vi-part .pu-dif[style*="0f4c5c"]{background:#F8B4D0 !important}
 .vi-part .pu-dif[style*="15, 76, 92"] b,.vi-part .pu-dif[style*="15, 76, 92"] small,.vi-part .pu-dif[style*="0f4c5c"] b,.vi-part .pu-dif[style*="0f4c5c"] small{color:#4a0f2a !important}
 .vi-part .ap-btn{background:#B7791F !important}
-.vi-h2{margin:0 0 4px;font-family:"Fraunces",Georgia,serif;font-weight:700;font-size:22px;color:#fff;text-align:center}
+.vi-h2fila{display:flex;flex-direction:column;align-items:center;gap:8px;margin:0 0 6px}
+.vi-h2{margin:0;font-family:"Fraunces",Georgia,serif;font-weight:700;font-size:28px;line-height:1.1;color:#fff;text-align:center}
+.vi-como{display:inline-flex;align-items:center;gap:6px;border:2px solid #fff;border-radius:999px;background:#ffd84d;color:#0f2d1e;font-weight:900;font-size:15px;padding:0 16px;min-height:44px;cursor:pointer;font-family:inherit;box-shadow:0 3px 0 rgba(0,0,0,.25)}
+.vi-como:active{transform:translateY(2px)}
 .vi-h2p{margin:0 0 10px;font-size:14px;font-weight:700;color:#35564a;text-align:center;line-height:1.35}
 .vi-part .vi-h2p{color:#e6f4ea}
 .vi-lista{margin:10px 0;padding:0;list-style:none;display:grid;gap:6px}

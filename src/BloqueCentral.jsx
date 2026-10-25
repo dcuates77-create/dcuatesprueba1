@@ -8,8 +8,10 @@ import BotonCompartir from "./BotonCompartir";
 import { registrar } from "./analitica";
 import { identidad } from "./datos/identidad.js";
 import { VISTA } from "./datos/vistaSeccion.js";
-import { Hero, HeroBanner, Emo, Tarjeta, BandaFinal, BloqueSumar, CSS_SN } from "./SeccionNueva.jsx";
+import { Hero, HeroBanner, Emo, Tarjeta, BandaFinal, BloqueSumar, MicroAcciones, RetoMes, CSS_SN } from "./SeccionNueva.jsx";
 import { irASeccion } from "./utilidades/baserow.js";
+import Manifiesto from "./Manifiesto.jsx";
+import { MENSAJE_INVITACION, URL_SITIO } from "./datos/config.js";
 
 // =========================================================================
 // BLOQUE CENTRAL INTERACTIVO — DCUATES (CLON8) · FASE 5
@@ -86,7 +88,9 @@ export const ID_A_TAB = {
   "registro-ventas": "negocios",
   "registro-extraviados": "causas",
   publicidad: "negocios",
-  "retos-regalos": "gratitud"
+  "retos-regalos": "gratitud",
+  manifiesto: "nosotros",
+  "muro-gratitud": "gratitud"
 };
 
 
@@ -658,6 +662,16 @@ export default function BloqueCentral({
     else if (a.wa) window.open(wa(a.wa), "_blank", "noopener");
     else if (a.tab) { const i = TABS.findIndex((t) => t.id === a.tab); if (i >= 0) cambiar(i); }
     else if (a.evento) ev(a.evento);
+    else if (a.invitar) {
+      registrar("invitar_vecino", { desde: "sumate" });
+      window.open("https://wa.me/?text=" + encodeURIComponent(`${MENSAJE_INVITACION} ${URL_SITIO}/?origen=invitacion`), "_blank", "noopener");
+    }
+    else if (a.compartir) {
+      registrar("compartir", { desde: "sumate" });
+      const url = `${URL_SITIO}/?origen=compartir`;
+      if (navigator.share) navigator.share({ title: "DCUATES", text: MENSAJE_INVITACION, url }).catch(() => {});
+      else window.open("https://wa.me/?text=" + encodeURIComponent(`${MENSAJE_INVITACION} ${url}`), "_blank", "noopener");
+    }
     else if (a.bajar) document.getElementById("sn-tarjetas")?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
   const fichasJsx = tab.fichas ? (
@@ -744,6 +758,7 @@ export default function BloqueCentral({
     muro: tab.id === "gratitud" ? muro : null,
     valores: tab.id === "causas" ? slots.valores : null,
     fichas: fichasJsx,
+    manifiesto: <Manifiesto />,
     portada: tab.id === "causas" && hayPortada ? <CarruselPortada items={portadasItems[tab.id] || []} tab={tab} fallback={imgs[tab.id]} cargando={cargando} /> : null
   };
 
@@ -838,10 +853,23 @@ export default function BloqueCentral({
             </>
           )}
 
-          {cfg.cta && <BandaFinal tab={tab} titulo={cfg.cta.t} desc={cfg.cta.d} onClick={() => ejecutar(cfg.cta.a)} />}
+          {cfg.micro && <MicroAcciones cfg={cfg.micro} onAccion={ejecutar} />}
+          {cfg.reto && <RetoMes cfg={cfg.reto} onAccion={ejecutar} />}
+
+          {cfg.cta && !cfg.ctaAlFinal && <BandaFinal tab={tab} titulo={cfg.cta.t} desc={cfg.cta.d} onClick={() => ejecutar(cfg.cta.a)} />}
 
           <div id="bc-detalle" className="bc-ancla" aria-hidden="true" />
           {tab.banda && <BandaImpacto logros={logros} cargando={cargando} tab={tab} />}
+
+          {cfg.extrasFinal && (
+            <>
+              <h3 className="sn-p">{cfg.extrasFinalTitulo || "Más para explorar"}</h3>
+              <div className="sn-lista">
+                {cfg.extrasFinal.map((x) => <Tarjeta key={x.t} n={nTarjeta++} ico={x.ico} t={x.t} d={x.d} onClick={() => ejecutar(x.a)} />)}
+              </div>
+            </>
+          )}
+          {cfg.cta && cfg.ctaAlFinal && <BandaFinal tab={tab} titulo={cfg.cta.t} desc={cfg.cta.d} onClick={() => ejecutar(cfg.cta.a)} />}
 
           {cfg.sumar && <BloqueSumar tab={tab} cfg={cfg.sumar} onAccion={ejecutar} />}
 

@@ -11,13 +11,13 @@ export default function OpinionRapida() {
   const [ok, setOk] = useState(false);
   const enviar = async () => {
     if (cara === null) return;
-    const d = new URLSearchParams({ Tipo: "Opinión", Nombre: "Anónimo", Contacto: "", Mensaje: `${CARAS[cara][0]} ${CARAS[cara][1]}${texto.trim() ? " — " + texto.trim() : ""}`, Estado: "Recibido", Fecha: new Date().toLocaleString("es-MX") });
+    const d = new URLSearchParams({ Tipo: "Opinión", Nombre: "Anónimo", Contacto: "", Calificacion: String(5 - cara), Comentario: texto.trim(), Mensaje: `${CARAS[cara][0]} ${CARAS[cara][1]}${texto.trim() ? " — " + texto.trim() : ""}`, Estado: "Recibido", Fecha: new Date().toLocaleString("es-MX") });
     try { await fetch(GOOGLE_SHEETS_URL, { method: "POST", mode: "no-cors", body: d }); } catch (e) { /* sin conexión: se ignora */ }
     registrar("opinion_enviada", { v: cara + 1 });
     setOk(true);
   };
   return (
-    <section aria-label="Tu opinión cuenta" style={{ background: "#fff", borderRadius: 22, margin: "14px 16px", padding: "14px 14px 16px", boxShadow: "0 4px 14px rgba(15,45,30,.12)", textAlign: "center", fontFamily: "Nunito,system-ui,sans-serif" }}>
+    <section id="opinion-rapida" aria-label="Tu opinión cuenta" style={{ background: "#fff", borderRadius: 22, margin: "14px 16px", padding: "14px 14px 16px", boxShadow: "0 4px 14px rgba(15,45,30,.12)", textAlign: "center", fontFamily: "Nunito,system-ui,sans-serif" }}>
       <h2 style={{ margin: "0 0 4px", fontSize: 20, fontWeight: 900, color: "#0f2d1e" }}>⭐ Tu opinión cuenta</h2>
       {ok ? (
         <p style={{ margin: "10px 0 0", fontSize: 16, fontWeight: 800, color: "#0e7c4f" }}>¡Gracias! Tu opinión nos ayuda a mejorar. 💚</p>
