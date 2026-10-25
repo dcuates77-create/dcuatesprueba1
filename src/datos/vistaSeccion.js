@@ -1,9 +1,9 @@
 // VISTA DE SECCIONES (e35) — textos y tarjetas de cada pestaña. Edita aquí sin tocar el código.
 // Los proyectos de cada sección (Libros, Ecatepets…) salen solos de su categoría y van PRIMERO;
 // después van las tarjetas "extras" de abajo.
-//   anidada: "qs" | "mision" | "sumar" (Nosotros) · "slot" (contenido de la pestaña) · "fichas" (comercios y mapa) · "portada" (videos/galería)
+//   anidada: "qs" | "mision" | "sumar" | "manifiesto" (Nosotros) · "slot" (contenido de la pestaña) · "fichas" (comercios y mapa) · "portada" (videos/galería)
 //   a: acción al tocar → { entrada:1 } abre ENTRADA DCUATES · { acceso:"proyectos" } mapa del sitio · { proy:"id" } ventana de proyecto
-//      { zona:"juegos" } ventana de zona · { ir:"id" } baja a una sección · { wa:"texto" } WhatsApp · { bajar:1 } baja a las tarjetas
+//      { zona:"juegos" } ventana de zona · { invitar:1 } invitar a un vecino por WhatsApp · { compartir:1 } compartir DCUATES (menú del teléfono) · { ir:"id" } baja a una sección · { wa:"texto" } WhatsApp · { bajar:1 } baja a las tarjetas
 export const VISTA = {
   nosotros: {
     titulo: "Nosotros",
@@ -16,7 +16,7 @@ export const VISTA = {
       { ico: "✅", t: "Quiénes somos", d: "Nuestra idea, objetivos y filosofía.", anidada: "qs" },
       { ico: "🎯", t: "Misión y visión", d: "Hacia dónde vamos y por qué.", anidada: "mision" },
       { ico: "🤝", t: "Cómo podemos sumar", d: "Las ventajas de trabajar en comunidad.", anidada: "sumar" },
-      { ico: "🚪", t: "Tu entrada a DCUATES", d: "Puertas, Hoy, Regístrate y Explora.", a: { entrada: 1 } },
+      { ico: "📜", t: "Manifiesto DCUATES", d: "Lo que nos une y nos da identidad y más valor.", anidada: "manifiesto" },
       { ico: "🗺️", t: "Mapa del sitio", d: "Todos los proyectos en un vistazo.", a: { acceso: "proyectos" } }
     ],
     cta: { t: "¿Quieres sumarte?", d: "Conoce cómo apoyar como voluntario.", a: { ir: "donaciones" } },
@@ -115,13 +115,42 @@ export const VISTA = {
     boton: { t: "Elige tu parte", a: { bajar: 1 } },
     pregunta: "Todo lo que hacemos se conecta",
     intro: "Nosotros tejemos confianza, los beneficios llegan a tu puerta, las causas y los valores nos mueven, los emprendimientos multiplican valor, los regalos celebran y la gratitud cierra el círculo. Pero nada de esto existe sin ti.",
-    extras: [
+    extras: [],
+    // MICRO-ACCIONES (e49): cosas pequeñas que cualquiera hace desde el celular. min = minutos que toma. Quita o reordena a tu gusto.
+    micro: {
+      titulo: "Micro-acciones: suma en pocos minutos",
+      intro: "Toca la que puedas hacer ahora. Cada una suma.",
+      items: [
+        { min: 1, ico: "💚", t: "Invita a un vecino", d: "Le mandas un WhatsApp con la invitación lista.", a: { invitar: 1 } },
+        { min: 1, ico: "📣", t: "Comparte DCUATES en tu estado y/o redes sociales", d: "Comparte tus capturas y GANA MAYORES BENEFICIOS MIENTRAS MÁS DIFUSIÓN DCUATES REALICES.", a: { compartir: 1 } },
+        { min: 1, ico: "📸", t: "Envíanos tus capturas", d: "Mándanos por WhatsApp la captura de lo que compartiste.", a: { wa: "¡Hola DCUATES! Comparto la captura de mi difusión de DCUATES." } },
+        { min: 2, ico: "🙏", t: "Deja un agradecimiento en el Muro", d: "Un gracias que otros vecinos podrán leer.", a: { ir: "muro-gratitud" } },
+        { min: 2, ico: "🏪", t: "Registra tu negocio gratis", d: "Aparece en el mapa y en la lista.", a: { ir: "publicidad" } },
+        { min: 3, ico: "📚", t: "Dona o presta un libro", d: "Dinos qué libro y lo coordinamos por WhatsApp.", a: { wa: "¡Hola DCUATES! Quiero donar un libro." } },
+        { min: 5, ico: "⭐", t: "Cuéntanos tu opinión", d: "Dinos cómo te fue y qué mejorarías.", a: { ir: "opinion-rapida" } }
+      ]
+    },
+    // RETO DEL MES (e49): cámbialo cada mes. El aviso llega por WhatsApp y tú pones el nombre en el Muro (con permiso).
+    reto: {
+      ico: "🏆",
+      titulo: "Reto del mes",
+      t: "Invita a 3 vecinos y sale tu nombre en el Muro",
+      d: "Cuando lo logres, avísanos por WhatsApp y, con tu permiso, ponemos tu nombre en el Muro de gratitud.",
+      botones: [
+        { t: "Invitar ahora", a: { invitar: 1 } },
+        { t: "Ya invité a 3", a: { wa: "¡Hola DCUATES! Ya invité a 3 vecinos para el reto del mes. Pueden poner mi nombre en el Muro." } }
+      ]
+    },
+    extrasFinalTitulo: "Explora las secciones",
+    extrasFinal: [
       { ico: "👥", t: "Nosotros", d: "Tejemos confianza y sumamos voluntades.", a: { tab: "nosotros" } },
       { ico: "🎁", t: "Beneficios", d: "Oportunidades que llegan a tu puerta.", a: { tab: "beneficios" } },
       { ico: "❤️", t: "Causas y valores", d: "Ayudar con los valores que nos unen.", a: { tab: "causas" } },
       { ico: "🏪", t: "Emprendimientos que multiplican valor", d: "Compra local y crece en comunidad.", a: { tab: "negocios" } },
       { ico: "🎉", t: "Regalos y gratitud", d: "Compartir también es celebrar y agradecer.", a: { tab: "gratitud" } },
+      { ico: "🗺️", t: "Ver todos los proyectos", d: "El mapa del sitio, en un vistazo.", a: { acceso: "proyectos" } }
     ],
+    ctaAlFinal: true,
     accionesTitulo: "Tu parte, hoy",
     acciones: [
       { ico: "🙋", t: "Quiero ser voluntario", a: { ir: "donaciones" }, c: "#2E9E5B" },

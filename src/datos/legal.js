@@ -41,7 +41,8 @@ export const AVISO_PRIVACIDAD_INTEGRAL = {
         "Descripción detallada de la necesidad o aportación."
       ],
       despues: [
-        "DCUATES no recaba, almacena ni trata bajo ninguna circunstancia datos personales sensibles (como ideología, religión, política, estado de salud o datos financieros)."
+        "DCUATES no recaba, almacena ni trata bajo ninguna circunstancia datos personales sensibles (como ideología, religión, política, estado de salud o datos financieros).",
+        "Estadísticas de uso: para saber qué secciones se usan más y mejorar el sitio, contamos visitas y toques en botones de forma anónima, con herramientas que no usan cookies de seguimiento ni guardan su nombre, teléfono o identidad."
       ]
     },
     {
