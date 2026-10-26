@@ -16,7 +16,7 @@ import { normalizarRegalos } from "./BloqueRegalos.jsx";
 import { LOGROS_ITEMS, LOGROS_FIJOS, RECOMENDACIONES_ESTRELLA } from "./datos/cintas.js";
 import { MAPA_NEGOCIOS_EMBED_URL, REDES_SOCIALES, VERSION_BUILD, WHATSAPP_NUMERO, YOUTUBE_VIDEO_ID } from "./datos/config.js";
 import { LINEAS_AYUDA_VIDEO, PALABRAS_VIDEO_AYUDA } from "./datos/apoyo.js";
-import { AVISO_PRIVACIDAD_INTEGRAL, FAQ_ITEMS, FAQ_TEMAS, TERMINOS_CONDICIONES } from "./datos/legal.js";
+import { AVISO_PRIVACIDAD_INTEGRAL, TERMINOS_CONDICIONES } from "./datos/legal.js";
 import { TODOS_LOS_PROYECTOS } from "./datos/listas.js";
 import { BOTONES_PORTADA, CATEGORIAS_PROYECTOS, DEGRADADO_SUGERENCIAS, LOGOS_EXTRA_MODAL, RESUMEN_PROYECTO } from "./datos/proyectos.js";
 import { detectarVideo, esPDF, galeriaDesdeColumna, irASeccion, paresBaserow, primerosValores, resolverSrcImagen, tituloProyecto, urlDesdeCeldaBaserow, useCarruselAutomatico, useFilasEnlaces, useFilasZona } from "./utilidades/baserow.js";
@@ -62,6 +62,7 @@ const ModalAccesoRapido = lazy(() => cargarVentanas().then((m) => ({ default: m.
 const ModalAvisoSeguridad = lazy(() => cargarVentanas().then((m) => ({ default: m.ModalAvisoSeguridad })));
 const ModalCategoria = lazy(() => cargarVentanas().then((m) => ({ default: m.ModalCategoria })));
 const ModalCompartirMas = lazy(() => cargarVentanas().then((m) => ({ default: m.ModalCompartirMas })));
+const ModalFAQ = lazy(() => cargarVentanas().then((m) => ({ default: m.ModalFAQ })));
 const ModalDudas = lazy(() => cargarVentanas().then((m) => ({ default: m.ModalDudas })));
 const ModalEscudoSeguridad = lazy(() => cargarVentanas().then((m) => ({ default: m.ModalEscudoSeguridad })));
 const ModalFormularioWhatsApp = lazy(() => cargarVentanas().then((m) => ({ default: m.ModalFormularioWhatsApp })));
@@ -859,42 +860,9 @@ export default function App() {
         </div>
       )}
 
-      {/* MODAL DE PREGUNTAS FRECUENTES */}
+      {/* MODAL DE PREGUNTAS FRECUENTES (e50: vive en ventanasPesadas para no hacer pesado el toque del botón) */}
       {showFAQ && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm" onClick={() => setShowFAQ(false)}>
-          <div
-            className="bg-white text-slate-900 rounded-2xl max-w-xl w-full p-6 shadow-2xl flex flex-col max-h-[85vh]"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h3 className="text-xl font-bold uppercase tracking-tight border-b pb-3 mb-4 text-emerald-800 font-heading">
-              Preguntas Frecuentes ❓💬
-            </h3>
-            <div className="overflow-y-auto space-y-3 pr-2">
-              {FAQ_TEMAS.map((t) => (
-                <div key={t.id}>
-                  <h4 className="mb-2 mt-1 text-sm font-black uppercase tracking-wide text-emerald-900">{t.titulo}</h4>
-                  <div className="space-y-2">
-                    {FAQ_ITEMS.filter((f) => f.tema === t.id).map((f, i) => (
-                      <details key={i} className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 group">
-                        <summary className="cursor-pointer list-none font-bold text-sm sm:text-base text-[#0f2d1e] flex items-center justify-between gap-3">
-                          {f.pregunta}
-                          <span className="text-emerald-700 group-open:rotate-45 transition-transform text-xl leading-none shrink-0">+</span>
-                        </summary>
-                        <p className="mt-2 text-sm text-slate-600 leading-relaxed font-medium">{f.respuesta}</p>
-                      </details>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <button
-              onClick={() => setShowFAQ(false)}
-              className="mt-6 w-full rounded-xl bg-emerald-700 text-white font-black py-3.5 text-center transition-colors hover:bg-emerald-800 uppercase text-xs tracking-wider font-heading"
-            >
-              Cerrar
-            </button>
-          </div>
-        </div>
+        <Suspense fallback={null}><ModalFAQ onCerrar={() => setShowFAQ(false)} /></Suspense>
       )}
 
       {/* VENTANA DE LOS BOTONES BENEFICIOS / REGISTROS */}

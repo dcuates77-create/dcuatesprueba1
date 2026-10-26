@@ -261,8 +261,8 @@ const CSS = `
 .ap-anu small{display:block;font-size:12.5px;font-weight:800;color:#475569}.ap-anu b{display:block;margin-top:2px;font-size:15.5px;font-weight:900}.ap-anu p{margin:4px 0 0;font-size:14.5px;font-weight:600;line-height:1.35;color:#1f2a37}
 .ap-vacio{margin:6px 0;font-size:14px;font-weight:700;color:#334155}
 .ap-form{display:flex;flex-direction:column;gap:8px;padding:10px;border-radius:14px;background:#f1f5f4;color:#0f172a}
-.ap-form label{display:flex;flex-direction:column;gap:3px;font-size:14px;font-weight:800}
-.ap-form input,.ap-form select,.ap-form textarea{width:100%;border:2px solid #cbd5e1;border-radius:10px;padding:8px;font:inherit;font-size:15px;font-weight:600;background:#fff;color:#0f172a}
+.ap-form > label{display:flex;flex-direction:column;gap:3px;font-size:14px;font-weight:800}
+.ap-form input:not([type=checkbox]),.ap-form select,.ap-form textarea{width:100%;border:2px solid #cbd5e1;border-radius:10px;padding:8px;font:inherit;font-size:15px;font-weight:600;background:#fff;color:#0f172a}
 .ap-enviar{display:block;margin-top:6px;padding:13px 10px;border-radius:14px;background:#25D366;color:#073b1c;font-size:15px;font-weight:900;text-align:center;text-decoration:none}
 .ap-enviar.off{background:#e2e8f0;color:#475569}
 .ap-reglas{margin:6px 0 0;padding-left:20px;list-style:disc;font-size:13px;font-weight:600;line-height:1.4;color:#334155}
