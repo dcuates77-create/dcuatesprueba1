@@ -149,7 +149,6 @@ export default function InicioNuevo({ onIr, logros = [], cargando = false, entra
           <h2 className="vi-h2">🌱 Conoce cómo participar</h2>
           <button type="button" className="vi-como" onClick={() => { registrar("como_funciona"); setComo(true); }}>❓ Cómo funciona</button>
         </div>
-        <p className="vi-h2p">Elige por dónde empezar: cada puerta te lleva paso a paso.</p>
         <EntradaDcuates {...entrada} />
       </section>
 
@@ -269,6 +268,8 @@ const CSS = `
 .vi-part .pu-dif[style*="15, 76, 92"],.vi-part .pu-dif[style*="0f4c5c"]{background:#F8B4D0 !important}
 .vi-part .pu-dif[style*="15, 76, 92"] b,.vi-part .pu-dif[style*="15, 76, 92"] small,.vi-part .pu-dif[style*="0f4c5c"] b,.vi-part .pu-dif[style*="0f4c5c"] small{color:#4a0f2a !important}
 .vi-part .ap-btn{background:#B7791F !important}
+.vi-part .en-tit{display:none}
+.vi-part .pu-q2{margin:4px 46px 12px;min-height:34px;display:flex;align-items:center;justify-content:center;font-size:15px;line-height:1.25}
 .vi-h2fila{display:flex;flex-direction:column;align-items:center;gap:8px;margin:0 0 6px}
 .vi-h2{margin:0;font-family:"Fraunces",Georgia,serif;font-weight:700;font-size:28px;line-height:1.1;color:#fff;text-align:center}
 .vi-como{display:inline-flex;align-items:center;gap:6px;border:2px solid #fff;border-radius:999px;background:#ffd84d;color:#0f2d1e;font-weight:900;font-size:15px;padding:0 16px;min-height:44px;cursor:pointer;font-family:inherit;box-shadow:0 3px 0 rgba(0,0,0,.25)}

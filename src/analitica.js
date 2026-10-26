@@ -102,3 +102,15 @@ export function registrarBusquedaVacia(texto, desde) {
     /* la analítica nunca debe romper la página */
   }
 }
+
+// GUARDAR EN LA HOJA (e50): manda un registro a tu hoja de Google (el Apps Script lo reparte por «Tipo»).
+// Nunca bloquea ni rompe la página; si falla, el mensaje igual sigue por WhatsApp.
+export function guardarEnHoja(campos) {
+  try {
+    if (typeof window === "undefined") return;
+    const d = new URLSearchParams({ ...campos, Estado: "Recibido", Fecha: new Date().toLocaleString("es-MX") });
+    fetch(GOOGLE_SHEETS_URL, { method: "POST", mode: "no-cors", keepalive: true, body: d }).catch(() => {});
+  } catch {
+    /* ignorar */
+  }
+}

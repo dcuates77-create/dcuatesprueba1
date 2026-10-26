@@ -16,7 +16,7 @@ import { normalizarRegalos } from "./BloqueRegalos.jsx";
 import { LOGROS_ITEMS, LOGROS_FIJOS, RECOMENDACIONES_ESTRELLA } from "./datos/cintas.js";
 import { MAPA_NEGOCIOS_EMBED_URL, REDES_SOCIALES, VERSION_BUILD, WHATSAPP_NUMERO, YOUTUBE_VIDEO_ID } from "./datos/config.js";
 import { LINEAS_AYUDA_VIDEO, PALABRAS_VIDEO_AYUDA } from "./datos/apoyo.js";
-import { AVISO_PRIVACIDAD_INTEGRAL, FAQ_ITEMS, TERMINOS_CONDICIONES } from "./datos/legal.js";
+import { AVISO_PRIVACIDAD_INTEGRAL, FAQ_ITEMS, FAQ_TEMAS, TERMINOS_CONDICIONES } from "./datos/legal.js";
 import { TODOS_LOS_PROYECTOS } from "./datos/listas.js";
 import { BOTONES_PORTADA, CATEGORIAS_PROYECTOS, DEGRADADO_SUGERENCIAS, LOGOS_EXTRA_MODAL, RESUMEN_PROYECTO } from "./datos/proyectos.js";
 import { detectarVideo, esPDF, galeriaDesdeColumna, irASeccion, paresBaserow, primerosValores, resolverSrcImagen, tituloProyecto, urlDesdeCeldaBaserow, useCarruselAutomatico, useFilasEnlaces, useFilasZona } from "./utilidades/baserow.js";
@@ -24,6 +24,7 @@ import BloqueCentral, { CarruselFinal, TABS as TABS_BC, ID_A_TAB } from "./Bloqu
 import InicioNuevo from "./InicioNuevo.jsx";
 import MuroGratitud from "./MuroGratitud.jsx";
 import OpinionRapida from "./OpinionRapida.jsx";
+import Reservado, { BotonReservado } from "./Reservado.jsx";
 import InvitaVecino from "./InvitaVecino.jsx";
 import FlechaBajar from "./FlechaBajar.jsx";
 import AvisoSinConexion from "./AvisoSinConexion.jsx";
@@ -605,6 +606,7 @@ export default function App() {
       <PistaDeslizar vista={vista} />
       <AvisoSinConexion />
       <FlechaBajar />
+      <Reservado />
       <AyudaFlotante
         onDudas={() => { registrar("dudas_abrir"); setShowDudas(true); }}
         onContacto={() => irVista("contacto")}
@@ -748,6 +750,7 @@ export default function App() {
         </section>
       <InvitaVecino />
       <OpinionRapida />
+      <BotonReservado />
       <BarraAccionesFinal onAbrirComparte={() => setModalFormulario("comparte")} onInicio={() => irVista("inicio")} />
 
       {/* Portada de la pestaña abierta, al final y en sentido contrario a los videos */}
@@ -867,14 +870,21 @@ export default function App() {
               Preguntas Frecuentes ❓💬
             </h3>
             <div className="overflow-y-auto space-y-3 pr-2">
-              {FAQ_ITEMS.map((f, i) => (
-                <details key={i} className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 group">
-                  <summary className="cursor-pointer list-none font-bold text-sm sm:text-base text-[#0f2d1e] flex items-center justify-between gap-3">
-                    {f.pregunta}
-                    <span className="text-emerald-700 group-open:rotate-45 transition-transform text-xl leading-none shrink-0">+</span>
-                  </summary>
-                  <p className="mt-2 text-sm text-slate-600 leading-relaxed font-medium">{f.respuesta}</p>
-                </details>
+              {FAQ_TEMAS.map((t) => (
+                <div key={t.id}>
+                  <h4 className="mb-2 mt-1 text-sm font-black uppercase tracking-wide text-emerald-900">{t.titulo}</h4>
+                  <div className="space-y-2">
+                    {FAQ_ITEMS.filter((f) => f.tema === t.id).map((f, i) => (
+                      <details key={i} className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 group">
+                        <summary className="cursor-pointer list-none font-bold text-sm sm:text-base text-[#0f2d1e] flex items-center justify-between gap-3">
+                          {f.pregunta}
+                          <span className="text-emerald-700 group-open:rotate-45 transition-transform text-xl leading-none shrink-0">+</span>
+                        </summary>
+                        <p className="mt-2 text-sm text-slate-600 leading-relaxed font-medium">{f.respuesta}</p>
+                      </details>
+                    ))}
+                  </div>
+                </div>
               ))}
             </div>
             <button
