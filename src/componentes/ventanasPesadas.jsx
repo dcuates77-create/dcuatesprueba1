@@ -335,10 +335,41 @@ export function ModalCompartirMas({ onCerrar }) {
 // Ventana de dudas (botón flotante de WhatsApp): primero preguntas
 // frecuentes y buscador; si no alcanzan, una caja para escribir la duda que
 // se envía por WhatsApp y una pantalla de agradecimiento con el logo.
+// Preguntas frecuentes (e50): ventana con acordeón por temas.
+export function ModalFAQ({ onCerrar }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm" onClick={onCerrar}>
+      <div className="bg-white text-slate-900 rounded-2xl max-w-xl w-full p-6 shadow-2xl flex flex-col max-h-[85vh]" onClick={(e) => e.stopPropagation()}>
+        <h3 className="text-xl font-bold uppercase tracking-tight border-b pb-3 mb-4 text-emerald-800 font-heading">Preguntas Frecuentes ❓💬</h3>
+        <div className="overflow-y-auto space-y-3 pr-2">
+          {FAQ_TEMAS.map((t) => (
+            <div key={t.id}>
+              <h4 className="mb-2 mt-1 text-sm font-black uppercase tracking-wide text-emerald-900">{t.titulo}</h4>
+              <div className="space-y-2">
+                {FAQ_ITEMS.filter((f) => f.tema === t.id).map((f, i) => (
+                  <details key={i} className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 group">
+                    <summary className="cursor-pointer list-none font-bold text-sm sm:text-base text-[#0f2d1e] flex items-center justify-between gap-3">
+                      {f.pregunta}
+                      <span className="text-emerald-700 group-open:rotate-45 transition-transform text-xl leading-none shrink-0">+</span>
+                    </summary>
+                    <p className="mt-2 text-sm text-slate-600 leading-relaxed font-medium">{f.respuesta}</p>
+                  </details>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+        <button onClick={onCerrar} className="mt-6 w-full rounded-xl bg-emerald-700 text-white font-black py-3.5 text-center transition-colors hover:bg-emerald-800 uppercase text-xs tracking-wider font-heading">Cerrar</button>
+      </div>
+    </div>
+  );
+}
+
 export function ModalDudas({ onCerrar, onBuscarEnPagina }) {
   const ac = useAceptacion();
   const [consulta, setConsulta] = useState("");
   const [abierta, setAbierta] = useState(null);
+  const [faqAbierto, setFaqAbierto] = useState(false);
   const [mensaje, setMensaje] = useState("");
   const [error, setError] = useState("");
   const [enviado, setEnviado] = useState(false);
@@ -386,7 +417,7 @@ export function ModalDudas({ onCerrar, onBuscarEnPagina }) {
       suave="#e7f9ee"
       emoji="💬"
       titulo="¿En qué podemos ayudarte?"
-      invitacion="Quizá tu duda ya tiene respuesta. Busca una palabra o toca una pregunta frecuente."
+      invitacion="Quizá tu duda ya tiene respuesta. Busca una palabra o abre «Preguntas frecuentes»."
       compartir={{ hash: "dudas", titulo: "¿En qué podemos ayudarte? — DCUATES", texto: "Dudas y atención de la comunidad DCUATES" }}
       onCerrar={onCerrar}
     >
@@ -425,6 +456,17 @@ export function ModalDudas({ onCerrar, onBuscarEnPagina }) {
         <button type="button" aria-label="Buscar en toda la página" title="Buscar en toda la página" onClick={() => { onCerrar(); onBuscarEnPagina && onBuscarEnPagina(); }} className="absolute right-1.5 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-[#128c7e] text-white text-base">🔍</button>
       </label>
 
+      <button
+        type="button"
+        onClick={() => setFaqAbierto((v) => !v)}
+        aria-expanded={faqAbierto || !!q}
+        className="mt-3 w-full flex items-center gap-2 rounded-2xl border-2 border-[#128c7e] bg-emerald-50 px-3 py-3 text-left text-sm font-black text-[#0b6e5f]"
+      >
+        <span aria-hidden="true">❓</span>
+        <span className="flex-1 uppercase tracking-wide">Preguntas frecuentes ({FAQ_ITEMS.length})</span>
+        <span aria-hidden="true" className="text-lg leading-none">{faqAbierto || q ? "−" : "+"}</span>
+      </button>
+      {(faqAbierto || q) && (
       <div className="mt-3 space-y-2">
         {lista.length === 0 && (
           <p className="rounded-xl bg-slate-50 px-3 py-3 text-sm font-semibold text-slate-600 text-center">
@@ -454,6 +496,7 @@ export function ModalDudas({ onCerrar, onBuscarEnPagina }) {
           );
         })}
       </div>
+      )}
 
       <button
         type="button"
