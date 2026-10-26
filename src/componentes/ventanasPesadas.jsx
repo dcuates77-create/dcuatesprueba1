@@ -6,12 +6,12 @@ import { Carrusel, FlechaBlanca, PasarelaVentasConCausa, TarjetaCarrusel } from 
 import { ACCESOS_BENEFICIOS, ACCESOS_REGISTROS } from "../datos/accesos.js";
 import { PATROCINADORES_ALIANZAS_ITEMS } from "../datos/cintas.js";
 import { MAPA_SITIO_EXTRA } from "../datos/config.js";
-import { FAQ_ITEMS } from "../datos/legal.js";
+import { FAQ_ITEMS, FAQ_TEMAS } from "../datos/legal.js";
 import { TODOS_LOS_PROYECTOS } from "../datos/listas.js";
 import { BASEROW_GALLERY_URL, BIENESTAR_GALERIA_ITEMS, BOTONES_PORTADA, CUPONES_PROMOS_ITEMS, DEGRADADO_COMPARTIR, DEGRADADO_DUDAS, DEGRADADO_SUGERENCIAS, GALERIAS_PROYECTOS, HISTORIAS_DCUATES_ITEMS, NOTICIAS_GALERIA_ITEMS, OPCIONES_APORTACION, WA_OFICIAL_TXT, WA_OFICIAL_URL, normalizarBusqueda } from "../datos/proyectos.js";
 import { DEGRADADO_ESCUDO, DEGRADADO_SEGURIDAD } from "../datos/seguridad.js";
 import { enlaceWhatsApp, galeriaDesdeColumna, irASeccion, useFilasEnlaces } from "../utilidades/baserow.js";
-import { registrar } from "../analitica";
+import { registrar, guardarEnHoja } from "../analitica";
 
 export function EnlaceWAOficial() {
   return (
@@ -206,6 +206,7 @@ export function ModalFormularioWhatsApp({ titulo, emoji = "💬", degradado = DE
       return;
     }
     registrar("formulario_enviado", { form: String(titulo).slice(0, 40) });
+    guardarEnHoja({ Tipo: opcion, Perfil: String(titulo), Nombre: "", Contacto: "", Mensaje: mensaje.trim() });
     window.open(enlaceWhatsApp(`¡Hola DCUATES! ${opcion}: ${mensaje.trim()}`), "_blank", "noopener,noreferrer");
     onCerrar();
   };
@@ -265,6 +266,7 @@ export function ModalCompartirMas({ onCerrar }) {
     if (quiereVer) partes.push(`Quiero que compartan más o también sobre: ${textoVer.trim()}`);
     if (quiereCompartir) partes.push(`Quiero compartir algo: ${textoComp.trim()}`);
     registrar("formulario_enviado", { form: "compartir", opciones: quiereVer && quiereCompartir ? "ambas" : quiereVer ? "ver" : "compartir" });
+    guardarEnHoja({ Tipo: "Compartir más", Perfil: quiereVer && quiereCompartir ? "Ver y compartir" : quiereVer ? "Quiere ver" : "Quiere compartir", Nombre: "", Contacto: "", Mensaje: partes.join(" | ") });
     window.open(enlaceWhatsApp(`¡Hola DCUATES!\n\n${partes.join("\n\n")}`), "_blank", "noopener,noreferrer");
     onCerrar();
   };
@@ -355,6 +357,7 @@ export function ModalDudas({ onCerrar, onBuscarEnPagina }) {
       return;
     }
     registrar("dudas_enviada");
+    guardarEnHoja({ Tipo: "Duda", Perfil: "¿En qué podemos ayudarte?", Nombre: "", Contacto: "", Mensaje: mensaje.trim() });
     window.open(enlaceWhatsApp(textoWa()), "_blank", "noopener,noreferrer");
     setEnviado(true);
   };
@@ -365,7 +368,7 @@ export function ModalDudas({ onCerrar, onBuscarEnPagina }) {
         <div className="text-center py-2">
           <div className="flex justify-center"><LogoMarca tam={96} /></div>
           <p className="mt-4 text-base sm:text-lg font-black text-[#0f2d1e] leading-snug">
-            En la primera oportunidad atenderemos tu solicitud…
+            Te respondemos por WhatsApp en máximo 24 h.
           </p>
           <p className="mt-3 text-xl font-black text-[#128c7e] uppercase tracking-wide">¡Gracias y saludos!</p>
           <p className="mt-4 text-[11px] text-slate-500 font-medium">
@@ -428,10 +431,13 @@ export function ModalDudas({ onCerrar, onBuscarEnPagina }) {
             No encontramos esa palabra en las preguntas. Cuéntanos tu duda abajo 👇
           </p>
         )}
-        {lista.map((f) => {
+        {lista.map((f, k) => {
           const activa = abierta === f.i;
+          const titTema = !q && (k === 0 || lista[k - 1].tema !== f.tema) ? (FAQ_TEMAS.find((t) => t.id === f.tema) || {}).titulo : null;
           return (
-            <div key={f.i} className={`rounded-2xl border-2 transition-colors ${activa ? "border-[#128c7e] bg-emerald-50" : "border-slate-200 bg-white"}`}>
+            <React.Fragment key={f.i}>
+            {titTema && <h4 className="pt-2 text-xs font-black uppercase tracking-wide text-[#0b6e5f]">{titTema}</h4>}
+            <div className={`rounded-2xl border-2 transition-colors ${activa ? "border-[#128c7e] bg-emerald-50" : "border-slate-200 bg-white"}`}>
               <button
                 type="button"
                 onClick={() => setAbierta(activa ? null : f.i)}
@@ -444,6 +450,7 @@ export function ModalDudas({ onCerrar, onBuscarEnPagina }) {
               </button>
               {activa && <p className="px-3 pb-3 text-sm text-slate-700 font-medium leading-relaxed">{f.respuesta}</p>}
             </div>
+            </React.Fragment>
           );
         })}
       </div>
