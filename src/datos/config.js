@@ -22,7 +22,7 @@ export const YOUTUBE_VIDEO_ID = "SUnE27QnnyI";
 // iframe); no hace falta tocar nada más en el código.
 // Sello de versión: se ve en pequeño al final de los accesos rápidos y en la
 // consola del navegador. Sirve para comprobar que el celular ya cargó lo último.
-export const VERSION_BUILD = "CLON12 · e49";
+export const VERSION_BUILD = "CLON12 · e50";
 
 // Modo administrador (e48): el sello de versión y el estado de Baserow solo se ven aquí.
 // Para activarlo en un teléfono: abre dcuates.com/?admin=1 (queda guardado en ese teléfono).
