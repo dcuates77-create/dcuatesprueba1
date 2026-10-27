@@ -24,7 +24,7 @@ import BloqueCentral, { CarruselFinal, TABS as TABS_BC, ID_A_TAB } from "./Bloqu
 import InicioNuevo from "./InicioNuevo.jsx";
 import MuroGratitud from "./MuroGratitud.jsx";
 import OpinionRapida from "./OpinionRapida.jsx";
-import Reservado, { BotonReservado } from "./Reservado.jsx";
+import Reservado from "./Reservado.jsx";
 import InvitaVecino from "./InvitaVecino.jsx";
 import FlechaBajar from "./FlechaBajar.jsx";
 import AvisoSinConexion from "./AvisoSinConexion.jsx";
@@ -751,7 +751,6 @@ export default function App() {
         </section>
       <InvitaVecino />
       <OpinionRapida />
-      <BotonReservado />
       <BarraAccionesFinal onAbrirComparte={() => setModalFormulario("comparte")} onInicio={() => irVista("inicio")} />
 
       {/* Portada de la pestaña abierta, al final y en sentido contrario a los videos */}

@@ -11,7 +11,8 @@ import { VISTA } from "./datos/vistaSeccion.js";
 import { Hero, HeroBanner, Emo, Tarjeta, BandaFinal, BloqueSumar, MicroAcciones, RetoMes, CSS_SN } from "./SeccionNueva.jsx";
 import { irASeccion } from "./utilidades/baserow.js";
 import Manifiesto from "./Manifiesto.jsx";
-import { MENSAJE_INVITACION, URL_SITIO } from "./datos/config.js";
+import { IndiceReservado } from "./Reservado.jsx";
+import { MENSAJE_INVITACION, URL_SITIO, esAdmin } from "./datos/config.js";
 
 // =========================================================================
 // BLOQUE CENTRAL INTERACTIVO — DCUATES (CLON8) · FASE 5
@@ -70,6 +71,11 @@ export const TABS = [
   }
 ];
 
+// Octava pestaña (e52): solo la ve la administración (?admin=1). El público no la ve en la barra ni al deslizar.
+const TAB_RESERVADO = { id: "reservado", label: "Reservado", emoji: "🔐", color: "#3b2a6b", pastel: "#EFEAFB", boton: "#3b2a6b", cover: {} };
+
+const TABS_TODAS = esAdmin() ? [...TABS, TAB_RESERVADO] : TABS;
+
 // ids de secciones que ahora viven dentro de una pestaña: los enlaces
 // (#donaciones, irASeccion("chuy-video")…) abren la pestaña correcta.
 export const ID_A_TAB = {
@@ -90,7 +96,8 @@ export const ID_A_TAB = {
   publicidad: "negocios",
   "retos-regalos": "gratitud",
   manifiesto: "nosotros",
-  "muro-gratitud": "gratitud"
+  "muro-gratitud": "gratitud",
+  reservado: "reservado"
 };
 
 
@@ -426,9 +433,9 @@ export default function BloqueCentral({
   const encabezadoOculto = useRef(false);
   const [pegado, setPegado] = useState(false);
   const [compensa, setCompensa] = useState(0);
-  const tab = TABS[idx];
+  const tab = TABS_TODAS[idx];
   const cat = categorias.find((c) => c.id === tab.cat) || {};
-  const pct = Math.round(((idx + 1) / TABS.length) * 100);
+  const pct = Math.round(((idx + 1) / TABS_TODAS.length) * 100);
   const wa = (m) => `https://wa.me/${whatsappNumero}?text=${encodeURIComponent(m)}`;
   const slots = { nosotros, beneficios, causas, valores, negocios: negociosSeccion, regalos, gratitud };
   const imgs = { ...PORTADAS_BASE, ...portadas };
@@ -454,8 +461,8 @@ export default function BloqueCentral({
   // Abrir la pestaña que contiene un id (enlaces, menú, buscador, irASeccion).
   useEffect(() => {
     const abrirId = (id) => {
-      const destino = TABS.findIndex((t) => t.id === id);
-      const porId = TABS.findIndex((t) => t.id === ID_A_TAB[id]);
+      const destino = TABS_TODAS.findIndex((t) => t.id === id);
+      const porId = TABS_TODAS.findIndex((t) => t.id === ID_A_TAB[id]);
       const i = destino >= 0 ? destino : porId;
       if (i < 0) return false;
       window.__dcDestino = id; setTimeout(() => { window.__dcDestino = null; }, 1500);
@@ -589,7 +596,7 @@ export default function BloqueCentral({
 
   const cambiar = (i) => {
     setIdx(i);
-    registrar("pestana", { id: TABS[i].id });
+    registrar("pestana", { id: TABS_TODAS[i].id });
     // Si el usuario ya bajó por el contenido, regresa al inicio del bloque.
     const h = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--alto-header-real")) || 0;
     const top = rootRef.current?.getBoundingClientRect().top ?? 0;
@@ -630,10 +637,10 @@ export default function BloqueCentral({
       if (Date.now() - t0 > 700 || Math.abs(dx) < 80 || Math.abs(dx) < Math.abs(dy) * 2) return;
       const ev = (n, d) => window.dispatchEvent(new CustomEvent(n, { detail: d }));
       // Inicio → (izquierda) primera sección · primera sección → (derecha) Inicio
-      if (enVista === "inicio") { if (dx < 0) ev("dcuates:abrir-seccion", TABS[0].id); return; }
+      if (enVista === "inicio") { if (dx < 0) ev("dcuates:abrir-seccion", TABS_TODAS[0].id); return; }
       const i = idxRef.current + (dx < 0 ? 1 : -1);
       if (i < 0) { ev("dcuates:vista", "inicio"); return; }
-      if (i >= TABS.length) return;
+      if (i >= TABS_TODAS.length) return;
       cambiarRef.current(i);
     };
     document.addEventListener("touchstart", ini, { passive: true });
@@ -660,7 +667,7 @@ export default function BloqueCentral({
     else if (a.zona) ev("dcuates:abrir-zona", a.zona);
     else if (a.ir) irASeccion(a.ir);
     else if (a.wa) window.open(wa(a.wa), "_blank", "noopener");
-    else if (a.tab) { const i = TABS.findIndex((t) => t.id === a.tab); if (i >= 0) cambiar(i); }
+    else if (a.tab) { const i = TABS_TODAS.findIndex((t) => t.id === a.tab); if (i >= 0) cambiar(i); }
     else if (a.evento) ev(a.evento);
     else if (a.invitar) {
       registrar("invitar_vecino", { desde: "sumate" });
@@ -759,6 +766,7 @@ export default function BloqueCentral({
     valores: tab.id === "causas" ? slots.valores : null,
     fichas: fichasJsx,
     manifiesto: <Manifiesto />,
+    reservado: tab.id === "reservado" ? <IndiceReservado /> : null,
     portada: tab.id === "causas" && hayPortada ? <CarruselPortada items={portadasItems[tab.id] || []} tab={tab} fallback={imgs[tab.id]} cargando={cargando} /> : null
   };
 
@@ -776,7 +784,7 @@ export default function BloqueCentral({
               <span className="bc-ico" style={{ background: "#17472d" }} aria-hidden="true"><Emo e="🏠" /></span>
               <span className="bc-tab-t">Inicio</span>
             </button>
-            {TABS.map((t, i) => (
+            {TABS_TODAS.map((t, i) => (
               <button
                 key={t.id} type="button" role="tab" id={`bc-tab-${t.id}`}
                 aria-selected={i === idx} aria-controls="bc-panel" aria-label={t.label}
@@ -789,9 +797,9 @@ export default function BloqueCentral({
             ))}
           </div>
 
-          <div className="bc-prog" role="progressbar" aria-valuemin={1} aria-valuemax={TABS.length} aria-valuenow={idx + 1} aria-label="Sección actual">
+          <div className="bc-prog" role="progressbar" aria-valuemin={1} aria-valuemax={TABS_TODAS.length} aria-valuenow={idx + 1} aria-label="Sección actual">
             <div className="bc-track"><div className="bc-fill" style={{ width: `${pct}%`, background: tab.color }} /></div>
-            <div className="bc-prog-txt"><span>{pct}%</span><b>{idx + 1} / {TABS.length}</b></div>
+            <div className="bc-prog-txt"><span>{pct}%</span><b>{idx + 1} / {TABS_TODAS.length}</b></div>
           </div>
         </div>
 
@@ -873,17 +881,17 @@ export default function BloqueCentral({
 
           {cfg.sumar && <BloqueSumar tab={tab} cfg={cfg.sumar} onAccion={ejecutar} />}
 
-          <div className="bc-compartir-seccion">
+          {tab.id !== "reservado" && <div className="bc-compartir-seccion">
             <BotonCompartir variante="bloque" etiqueta="Compartir esta sección" hash={tab.id} titulo={tab.label} texto={tab.invitacion?.texto || tab.texto || "Conoce lo que hacemos por la comunidad"} />
-          </div>
+          </div>}
 
           {(() => {
-            const sg = TABS[(idx + 1) % TABS.length];
+            const sg = TABS_TODAS[(idx + 1) % TABS_TODAS.length];
             const fr = FRASE[tab.id] ? rota(FRASE[tab.id]) : null;
             return (
               <div className="bc-mira" style={{ "--c": sg.boton || sg.color }}>
                 {fr && <p className="bc-mira-f">💬 Frase de la semana: «{fr}»</p>}
-                <button type="button" onClick={() => cambiar((idx + 1) % TABS.length)}>
+                <button type="button" onClick={() => cambiar((idx + 1) % TABS_TODAS.length)}>
                   <span className="bc-mira-e" aria-hidden="true"><Emo e={sg.emoji} /></span>
                   <span className="bc-mira-t"><small>MIRA TAMBIÉN</small><b>{sg.label}</b></span>
                   <span className="bc-mira-go" aria-hidden="true">›</span>
@@ -894,15 +902,15 @@ export default function BloqueCentral({
 
           <div className="bc-puntos" role="group" aria-label="Ir a otra sección">
             <button type="button" className="bc-punto" aria-label="Inicio" title="Inicio" onClick={() => window.dispatchEvent(new CustomEvent("dcuates:vista", { detail: "inicio" }))}>⌂</button>
-            {TABS.map((t, i) => (
+            {TABS_TODAS.map((t, i) => (
               <button key={t.id} type="button" className={"bc-punto" + (i === idx ? " bc-punto-on" : "")} aria-label={t.label} aria-current={i === idx ? "true" : undefined} title={t.label} onClick={() => cambiar(i)} style={i === idx ? { background: t.color } : undefined} />
             ))}
-            <span className="bc-cuenta" aria-hidden="true">{idx + 2} / {TABS.length + 1}</span>
+            <span className="bc-cuenta" aria-hidden="true">{idx + 2} / {TABS_TODAS.length + 1}</span>
           </div>
 
           <div className="bc-nav">
-            <button type="button" onClick={() => (idx === 0 ? window.dispatchEvent(new CustomEvent("dcuates:vista", { detail: "inicio" })) : cambiar(idx - 1))}>‹ {idx > 0 ? TABS[idx - 1].label : "Inicio"}</button>
-            <button type="button" onClick={() => cambiar(idx < TABS.length - 1 ? idx + 1 : 0)}>{idx < TABS.length - 1 ? TABS[idx + 1].label : "Volver a " + TABS[0].label + " (inicio)"} {idx < TABS.length - 1 ? "›" : "↺"}</button>
+            <button type="button" onClick={() => (idx === 0 ? window.dispatchEvent(new CustomEvent("dcuates:vista", { detail: "inicio" })) : cambiar(idx - 1))}>‹ {idx > 0 ? TABS_TODAS[idx - 1].label : "Inicio"}</button>
+            <button type="button" onClick={() => cambiar(idx < TABS_TODAS.length - 1 ? idx + 1 : 0)}>{idx < TABS_TODAS.length - 1 ? TABS_TODAS[idx + 1].label : "Volver a " + TABS_TODAS[0].label + " (inicio)"} {idx < TABS_TODAS.length - 1 ? "›" : "↺"}</button>
           </div>
         </div>
       </div>
