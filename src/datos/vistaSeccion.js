@@ -107,6 +107,14 @@ export const VISTA = {
       botones: [{ t: "Propón un reto o regalo", a: { wa: "¡Hola DCUATES! Tengo una propuesta de reto o regalo." } }, { t: "Quiero ser patrocinador", a: { proy: "patrocinadores-alianzas" } }]
     }
   },
+  // OCTAVA PESTAÑA «Reservado» (e52): solo administración (?admin=1). Su contenido vive en tu hoja de Google.
+  reservado: {
+    titulo: "Reservado",
+    texto: "Convenios, contratos e información por perfil. Cada elemento tiene su enlace propio para compartir.",
+    pregunta: "Área reservada",
+    intro: "Solo la administración ve esta pestaña. Toca el índice y escribe tu clave de administrador.",
+    extras: [{ ico: "🔐", t: "Índice reservado", d: "Convenios y documentos por perfil, con enlace para compartir.", anidada: "reservado" }]
+  },
   // SECCIÓN DE CIERRE — sintetiza y conecta todas las demás. Nombre provisional: "Súmate" (cámbialo en BloqueCentral.jsx → TABS, id "cierre").
   cierre: {
     titulo: "Súmate",
