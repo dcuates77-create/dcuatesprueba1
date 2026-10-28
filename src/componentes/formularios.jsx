@@ -5,6 +5,7 @@ import { GOOGLE_SHEETS_URL } from "../datos/config.js";
 import { TIPOS_DE_APOYO } from "../datos/proyectos.js";
 import { enlaceWhatsApp, irASeccion } from "../utilidades/baserow.js";
 import { registrar } from "../analitica";
+import { TIPOS_BENEFICIO, FORMAS_DE_CANJE } from "../datos/beneficios.js";
 
 export function FormularioPublicidad() {
   const ac = useAceptacion();
@@ -16,10 +17,21 @@ export function FormularioPublicidad() {
   const [canal1, setCanal1] = useState("");
   const [canal2, setCanal2] = useState("");
   const [canal3, setCanal3] = useState("");
+  // e54 — «Arma tu beneficio» (todo opcional) y ventajas de comprar o conectar
+  const [tipoBen, setTipoBen] = useState("");
+  const [promo, setPromo] = useState("");
+  const [vigencia, setVigencia] = useState("");
+  const [canje, setCanje] = useState("");
+  const [ventajas, setVentajas] = useState("");
+  const [responsable, setResponsable] = useState(false);
+  const [errResp, setErrResp] = useState(false);
+  const ejemplo = (TIPOS_BENEFICIO.find((x) => x.t === tipoBen) || {}).ej || "Ej. 10 % de descuento a quien diga que viene de DCUATES";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!ac.validar()) return;
+    // Si pone promociones o beneficios, debe aceptar que es responsable de sus términos.
+    if ((promo.trim() || tipoBen) && !responsable) { setErrResp(true); return; }
     registrar("formulario_enviado", { form: "publicidad" });
     const fecha = new Date().toLocaleString();
 
@@ -30,7 +42,11 @@ export function FormularioPublicidad() {
       Negocio: nombre,
       Giro: categoria,
       Telefono: telefono,
-      Fecha: fecha
+      Fecha: fecha,
+      Canal1: canal1, Canal2: canal2, Canal3: canal3,
+      TipoBeneficio: tipoBen, Promocion: promo.trim().slice(0, 300), Vigencia: vigencia.trim().slice(0, 80),
+      Canje: canje, Ventajas: ventajas.trim().slice(0, 300),
+      ResponsableTerminos: (promo.trim() || tipoBen) ? "Sí" : ""
     });
 
     try {
@@ -43,7 +59,7 @@ export function FormularioPublicidad() {
       console.error("Error guardando respaldo en Sheets:", err);
     }
 
-    const mensaje = `¡Hola DCUATES!\n\nSolicito el registro de publicidad para mi negocio:\n• Contacto: ${contacto}\n• Negocio: ${nombre}\n• Categoría: ${categoria}\n• Teléfono: ${telefono}\n• Enlace 1: ${canal1 || "No especificado"}\n• Enlace 2: ${canal2 || "No especificado"}\n• Canal 3: ${canal3 || "No especificado"}\n\nA continuación adjunto mis imágenes promocionales.`;
+    const mensaje = `¡Hola DCUATES!\n\nSolicito el registro de publicidad para mi negocio:\n• Contacto: ${contacto}\n• Negocio: ${nombre}\n• Categoría: ${categoria}\n• Teléfono: ${telefono}\n• Enlace 1: ${canal1 || "No especificado"}\n• Enlace 2: ${canal2 || "No especificado"}\n• Canal 3: ${canal3 || "No especificado"}\n• Tipo de beneficio: ${tipoBen || "No especificado"}\n• Promociones y beneficios: ${promo.trim() || "No especificado"}\n• Vigencia: ${vigencia.trim() || "No especificado"}\n• Cómo se canjea: ${canje || "No especificado"}\n• Ventajas de comprar o conectar: ${ventajas.trim() || "No especificado"}\n\nA continuación adjunto mis imágenes promocionales.`;
     window.open(enlaceWhatsApp(mensaje), '_blank', 'noopener,noreferrer');
 
     // Limpiar el formulario para dejarlo listo para un nuevo registro
@@ -54,6 +70,7 @@ export function FormularioPublicidad() {
     setCanal1("");
     setCanal2("");
     setCanal3("");
+    setTipoBen(""); setPromo(""); setVigencia(""); setCanje(""); setVentajas(""); setResponsable(false); setErrResp(false);
     ac.reiniciar();
   };
 
@@ -85,7 +102,7 @@ export function FormularioPublicidad() {
 
       <div
         className="overflow-hidden transition-[max-height] duration-300 space-y-4"
-        style={{ maxHeight: expandido ? 2000 : 0 }}
+        style={{ maxHeight: expandido ? 3200 : 0 }}
       >
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
@@ -110,6 +127,46 @@ export function FormularioPublicidad() {
           <input type="text" inputMode="email" autoCapitalize="none" autoCorrect="off" value={canal1} onChange={e => setCanal1(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="1. Página principal o Correo Electrónico" />
           <input type="text" inputMode="url" autoCapitalize="none" autoCorrect="off" value={canal2} onChange={e => setCanal2(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="2. Perfil o Página de Facebook (Opcional)" />
           <input type="text" inputMode="url" autoCapitalize="none" autoCorrect="off" value={canal3} onChange={e => setCanal3(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="3. Cualquier otra Red Social (Opcional)" />
+        </div>
+        <div className="space-y-3 pt-2 border-t-2 border-dashed border-slate-200">
+          <label className="block text-xs sm:text-sm font-black uppercase tracking-wider text-emerald-800">🎁 ARMA TU BENEFICIO PARA LA COMUNIDAD (opcional)</label>
+          <p className="text-[11px] text-slate-500 font-medium italic">💡 Un beneficio hace que más vecinos te busquen. Elige un tipo y cuéntanos los detalles.</p>
+          <div>
+            <label htmlFor="pub-tipoben" className="block text-xs sm:text-sm font-black uppercase tracking-wider text-slate-700 mb-1">Tipo de beneficio</label>
+            <select id="pub-tipoben" value={tipoBen} onChange={e => setTipoBen(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium">
+              <option value="">Elige uno (opcional)</option>
+              {TIPOS_BENEFICIO.map(x => <option key={x.t} value={x.t}>{x.t}</option>)}
+            </select>
+          </div>
+          <div>
+            <label htmlFor="pub-promo" className="block text-xs sm:text-sm font-black uppercase tracking-wider text-slate-700 mb-1">Promociones y beneficios</label>
+            <textarea id="pub-promo" rows={3} maxLength={300} value={promo} onChange={e => setPromo(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder={ejemplo} />
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <label htmlFor="pub-vig" className="block text-xs sm:text-sm font-black uppercase tracking-wider text-slate-700 mb-1">Vigencia</label>
+              <input id="pub-vig" type="text" maxLength={80} value={vigencia} onChange={e => setVigencia(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="Ej. Hasta el 31 de diciembre" />
+            </div>
+            <div>
+              <label htmlFor="pub-canje" className="block text-xs sm:text-sm font-black uppercase tracking-wider text-slate-700 mb-1">Cómo se canjea</label>
+              <select id="pub-canje" value={canje} onChange={e => setCanje(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium">
+                <option value="">Elige uno (opcional)</option>
+                {FORMAS_DE_CANJE.map(x => <option key={x} value={x}>{x}</option>)}
+              </select>
+            </div>
+          </div>
+          <div>
+            <label htmlFor="pub-vent" className="block text-xs sm:text-sm font-black uppercase tracking-wider text-slate-700 mb-1">Ventajas de comprar o conectar con este negocio</label>
+            <textarea id="pub-vent" rows={3} maxLength={300} value={ventajas} onChange={e => setVentajas(e.target.value)} className="w-full bg-slate-50 border-2 border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 transition-colors font-medium" placeholder="Ej. Productos frescos, atención personalizada, entrega a domicilio" />
+          </div>
+          <p className="text-[11px] text-slate-600 font-semibold leading-snug">⚠️ Quien propone una promoción o beneficio es responsable de sus términos y de cumplirlos. DCUATES solo los difunde y puede retirar los que no se cumplan.</p>
+          {(promo.trim() || tipoBen) && (
+            <label className="flex items-start gap-2 text-xs font-bold text-slate-800 min-h-[44px]">
+              <input type="checkbox" checked={responsable} onChange={e => { setResponsable(e.target.checked); setErrResp(false); }} className="mt-0.5 h-5 w-5 shrink-0" />
+              <span>Entiendo que soy responsable de los términos de mi promoción o beneficio.</span>
+            </label>
+          )}
+          {errResp && <p role="alert" className="text-xs font-black text-red-700">Marca la casilla para enviar tu promoción.</p>}
         </div>
         <CasillaAcepto ac={ac} id="acepta_terminos_privacidad_publicidad" />
         <button type="submit" className="w-full rounded-xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black py-3.5 uppercase tracking-wider text-xs transition-all mt-2 shadow-md font-heading">
