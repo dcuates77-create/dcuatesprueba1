@@ -45,6 +45,7 @@ import { aplicarLetra, leerLetra } from "./tamanoLetra.js";
 import TableroConoce from "./TableroConoce.jsx";
 import MicroAcciones from "./MicroAcciones.jsx";
 import { cargarSinonimosHoja } from "./utilidades/sinonimosHoja.js";
+import { cargarPerfilesHoja } from "./utilidades/perfilesHoja.js";
 import HoyDcuates, { QueSigue, guardarUltimo, BotonRegistrate } from "./HoyDcuates.jsx";
 import InstalarApp from "./InstalarApp.jsx";
 import PlusHost, { BotonPlus } from "./AgendaPlus.jsx";
@@ -121,7 +122,7 @@ export default function App() {
   const [modalProyecto, setModalProyecto] = useState(null);
   useEffect(() => { if (modalProyecto) { const d = identidad(modalProyecto); guardarUltimo("proyecto", modalProyecto, `${d.emoji} ${d.nombre}`); } }, [modalProyecto]);
   // Analítica: cuenta visitas y registra qué proyectos se abren.
-  useEffect(() => { iniciarAnalitica(); cargarSinonimosHoja(); iniciarPWA(); aplicarLetra(leerLetra()); aplicarAccesibilidad(); }, []);
+  useEffect(() => { iniciarAnalitica(); cargarSinonimosHoja(); cargarPerfilesHoja(); iniciarPWA(); aplicarLetra(leerLetra()); aplicarAccesibilidad(); }, []);
   useEffect(() => { if (modalProyecto) registrar("proyecto_abrir", { id: String(modalProyecto) }); }, [modalProyecto]);
   // ¿Ya respondió Baserow (bien o mal)? Mientras no, se muestran esqueletos.
   const [baserowListo, setBaserowListo] = useState(() => typeof window !== "undefined" && !!window.__dcuatesBaserow);

@@ -13,6 +13,7 @@ import { BotonMicro } from "./MicroAcciones.jsx";
 import { OpcionesLeer } from "./accesibilidad.jsx";
 import { ciclarLetra, leerLetra, NOMBRES_LETRA } from "./tamanoLetra.js";
 import { ejecutar } from "./datos/secciones.js";
+import SubtiposPuerta from "./SubtiposPuerta.jsx";
 import { PUERTAS, PUERTAS_BASE, PUERTAS_MAS, puertaPorId } from "./datos/puertas.js";
 
 const lee = (k, d = null) => { try { return localStorage.getItem(k) ?? d; } catch (e) { return d; } };
@@ -55,6 +56,7 @@ function Guia({ p, onCerrar, onAbrirProyecto, modo, setModo }) {
               <span className="pu-n" style={{ color: p.c }}>PASO {i + 1}</span><span className="pu-pe">{e}</span><b>{t}</b><small>{d}</small></button></li>
           ))}
         </ol>
+        <SubtiposPuerta key={p.id} p={p} />
         {grupos.map(([titulo, items]) => (
           <div key={titulo}>
             <p className="zj-et">{titulo}</p>
