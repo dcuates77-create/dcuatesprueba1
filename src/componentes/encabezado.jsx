@@ -504,6 +504,15 @@ export function BotonNecesidades({ onAbrirProyecto, onAccionEspecial, onAbrirFAQ
                 </button>
                 <button
                   type="button"
+                  onClick={() => { cerrarTodo(); setTimeout(() => window.dispatchEvent(new CustomEvent("dcuates:abrir-micro")), 120); }}
+                  className="w-full flex items-center justify-center gap-3 rounded-2xl font-black uppercase text-[13px] sm:text-sm leading-tight px-4 py-4 shadow-md transition-colors text-center"
+                  style={{ background: "#E65100", color: "#fff" }}
+                >
+                  <span className="text-2xl" aria-hidden="true">⚡</span>
+                  Micro-acciones: suma en pocos minutos
+                </button>
+                <button
+                  type="button"
                   onClick={() => { cerrarTodo(); setTimeout(() => window.dispatchEvent(new CustomEvent("dcuates:abrir-plus")), 120); }}
                   className="w-full flex items-center justify-center gap-3 rounded-2xl font-black uppercase text-[13px] sm:text-sm leading-tight px-4 py-4 shadow-md transition-colors text-center"
                   style={{ background: "#14532d", color: "#fff" }}
