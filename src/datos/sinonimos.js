@@ -29,6 +29,15 @@ export const SINONIMOS = {
   vecino: ["nosotros", "comunidad", "participa"], comunidad: ["nosotros", "comunidad"], quienes: ["quienes somos", "nosotros"], mision: ["mision", "nosotros"]
 };
 
+// SINÓNIMOS DESDE TU HOJA (e53): las palabras de la pestaña «Sinónimos» de tu hoja de Google se SUMAN a las de arriba
+// (nunca las reemplazan). Las carga utilidades/sinonimosHoja.js al abrir la página.
+export function agregarSinonimos(extra) {
+  Object.keys(extra || {}).forEach((k) => {
+    const nuevos = Array.isArray(extra[k]) ? extra[k] : [];
+    SINONIMOS[k] = [...new Set([...(SINONIMOS[k] || []), ...nuevos])];
+  });
+}
+
 // Devuelve, por cada palabra escrita, una lista de alternativas (ella misma, su singular y sus sinónimos).
 export function expandirBusqueda(palabras) {
   return palabras.map((w) => {

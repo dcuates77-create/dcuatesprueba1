@@ -134,8 +134,12 @@ export const VISTA = {
         { min: 1, ico: "📸", t: "Envíanos tus capturas", d: "Mándanos por WhatsApp la captura de lo que compartiste.", a: { wa: "¡Hola DCUATES! Comparto la captura de mi difusión de DCUATES." } },
         { min: 2, ico: "🙏", t: "Deja un agradecimiento en el Muro", d: "Un gracias que otros vecinos podrán leer.", a: { ir: "muro-gratitud" } },
         { min: 2, ico: "🏪", t: "Registra tu negocio gratis", d: "Aparece en el mapa y en la lista.", a: { ir: "publicidad" } },
+        { min: 3, ico: "🌟", t: "Recomienda a quien hace labor social", d: "Un negocio, una organización o una persona que hace labor social en beneficio de nuestra comunidad.", a: { micro: "recomienda" } },
+        { min: 5, ico: "🤝", t: "Suma tu negocio a los apoyos mutuos", d: "Si tienes o conoces un negocio que le interese SUMAR y GENERAR BENEFICIOS Y APOYOS MUTUOS Y COMUNITARIOS, contáctanos para platicar y armar los proyectos que nos ayuden a lograr NUESTROS OBJETIVOS PARTICULARES Y CONJUNTOS.", a: { micro: "negocio" } },
         { min: 3, ico: "📚", t: "Dona o presta un libro", d: "Dinos qué libro y lo coordinamos por WhatsApp.", a: { wa: "¡Hola DCUATES! Quiero donar un libro." } },
-        { min: 5, ico: "⭐", t: "Cuéntanos tu opinión", d: "Dinos cómo te fue y qué mejorarías.", a: { ir: "opinion-rapida" } }
+        { min: 5, ico: "⭐", t: "Cuéntanos tu opinión", d: "Dinos cómo te fue y qué mejorarías.", a: { ir: "opinion-rapida" } },
+        // MICRO-META (e53): una micro-acción para proponer más micro-acciones.
+        { min: 3, ico: "💡", meta: true, t: "Micro-meta: sugiere una micro-acción", d: "Si tienes y deseas sugerir o compartir una o más micro-acciones que sean significativas y de APOYO para ti y NUESTRA COMUNIDAD, haznos llegar tu propuesta.", a: { micro: "meta" } }
       ]
     },
     // RETO DEL MES (e49): cámbialo cada mes. El aviso llega por WhatsApp y tú pones el nombre en el Muro (con permiso).
