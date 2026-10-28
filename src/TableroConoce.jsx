@@ -9,7 +9,8 @@ const SECCIONES = [
   { id: "causas", emoji: "❤️", t: "Causas y valores", d: "Apoyo voluntario, Noticias de barrio, Círculo de Confianza…", color: "#D1343B" },
   { id: "negocios", emoji: "🗺️", t: "Negocios", d: "Emprendimientos que multiplican valor: publicidad, alianzas, ventas con causa…", color: "#1F7A46" },
   { id: "gratitud", emoji: "🙏", t: "Gratitud", d: "Regalos, retos, juegos y reconocimientos", color: "#92610F" },
-  { id: "cierre", emoji: "/images/eclipse.svg", t: "Súmate", d: "Tu parte hace la diferencia", color: "#E65100" }
+  { id: "cierre", emoji: "/images/eclipse.svg", t: "Súmate", d: "Tu parte hace la diferencia", color: "#E65100" },
+  { id: "micro", emoji: "⚡", t: "Micro-acciones", d: "Pequeñas acciones de pocos minutos que suman", color: "#BF360C" }
 ];
 
 export default function TableroConoce() {
@@ -29,7 +30,8 @@ export default function TableroConoce() {
       setTimeout(() => document.getElementById("mapa-negocios")?.scrollIntoView({ behavior: "smooth", block: "start" }), 250);
     }, 150);
   };
-  const tarjetas = SECCIONES.map((s) => ({ ...s, onClick: () => ir(s.id) }));
+  const abrirMicro = () => { cerrar(); setTimeout(() => window.dispatchEvent(new CustomEvent("dcuates:abrir-micro")), 150); };
+  const tarjetas = SECCIONES.map((s) => ({ ...s, onClick: () => (s.id === "micro" ? abrirMicro() : ir(s.id)) }));
   return (
     <Tablero
       paso="PASO 1 · CONOCE" emoji="🧭" titulo="CONOCE DCUATES" color="#1B6F8A" hash="zona-conoce"

@@ -111,7 +111,7 @@ export function MicroAcciones({ cfg, onAccion }) {
       {cfg.intro && <p className="sn-i">{cfg.intro}</p>}
       <div className="sn-micro-l">
         {cfg.items.map((x) => (
-          <button key={x.t} type="button" className="sn-micro-i" onClick={() => onAccion(x.a)}>
+          <button key={x.t} type="button" className={"sn-micro-i" + (x.meta ? " sn-micro-meta" : "")} onClick={() => onAccion(x.a)}>
             <span className="sn-micro-e" aria-hidden="true">{x.ico}</span>
             <span className="sn-tx">
               <span className="sn-micro-min" aria-label={x.min + (x.min === 1 ? " minuto" : " minutos")}>⏱ {x.min} min</span>
@@ -141,7 +141,7 @@ export function RetoMes({ cfg, onAccion }) {
 
 export const CSS_SN = `.sn-micro{margin:6px 0 10px}.sn-micro-l{display:flex;flex-direction:column;gap:8px}
 .sn-micro-i{display:flex;align-items:flex-start;gap:10px;width:100%;text-align:left;background:#fff;border:2px solid #f1d9b8;border-radius:16px;padding:10px;min-height:64px;cursor:pointer;font-family:inherit;box-shadow:0 2px 6px rgba(15,45,30,.1)}
-.sn-micro-i:active{transform:translateY(1px)}.sn-micro-e{flex:none;font-size:30px;line-height:1;width:40px;text-align:center;padding-top:20px}
+.sn-micro-meta{border-color:#E65100;background:linear-gradient(135deg,#fff4d6,#ffe9c8)}.sn-micro-i:active{transform:translateY(1px)}.sn-micro-e{flex:none;font-size:30px;line-height:1;width:40px;text-align:center;padding-top:20px}
 .sn-micro-i .sn-tx{flex:1;min-width:0;display:flex;flex-direction:column}.sn-micro-i b{font-size:14.5px;font-weight:900;color:#0f2d1e;line-height:1.2}.sn-micro-i small{font-size:12.5px;font-weight:700;color:#4a5f53;line-height:1.3;margin-top:2px}
 .sn-micro-min{align-self:flex-start;margin-bottom:4px;background:var(--tc,#BF360C);color:#fff;border-radius:999px;padding:4px 9px;font-size:12px;font-weight:900;white-space:nowrap}
 .sn-reto{margin:10px 0;background:linear-gradient(135deg,#fff4d6,#ffe3b8);border:3px solid #E65100;border-radius:20px;padding:14px;text-align:center;font-family:inherit}

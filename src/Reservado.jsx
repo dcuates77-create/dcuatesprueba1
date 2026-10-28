@@ -66,6 +66,7 @@ export default function Reservado() {
             {estado === "ok" && (
               <>
                 {dato.d && <p style={{ margin: "0 0 6px", fontSize: 14.5, fontWeight: 700, color: "#4a5f53" }}>{dato.d}</p>}
+                {dato.version && <p className="rv-ver">Versión {dato.version}</p>}
                 {dato.texto && <p className="rv-txt">{dato.texto}</p>}
                 <div className="rv-b">
                   {dato.enlace && <a className="p" href={dato.enlace} target="_blank" rel="noopener noreferrer">Abrir documento ›</a>}
@@ -99,8 +100,12 @@ export function IndiceReservado() {
   useEffect(() => { const k = leerClaveAdmin(); if (k) entrar(k); }, []);
   if (!esAdmin()) return <p className="rv-nota">Esta sección es solo para administración.</p>;
   const grupos = lista ? [...new Set(lista.map((x) => x.perfil || "Sin perfil"))] : [];
-  const porWA = (x) => window.open("https://wa.me/?text=" + encodeURIComponent(`DCUATES · ${x.tipo}: ${x.t}\n${enlaceElemento(x.id)}`), "_blank", "noopener");
+  // Mensaje listo (e53): saludo + título + enlace; si tiene clave, avisa que se manda aparte (con «Copiar clave»).
+  const mensajeListo = (x) => `Hola 👋 De parte de DCUATES te comparto: ${x.t}\n${enlaceElemento(x.id)}${x.conClave ? "\n(Te mando la clave en otro mensaje.)" : ""}`;
+  const porWA = (x) => window.open("https://wa.me/?text=" + encodeURIComponent(mensajeListo(x)), "_blank", "noopener");
   const copiarEn = async (x) => { setMsg((await copiar(enlaceElemento(x.id))) ? "✅ Enlace copiado" : "No se pudo copiar"); setTimeout(() => setMsg(""), 2500); };
+  const copiarMensaje = async (x) => { setMsg((await copiar(mensajeListo(x))) ? "✅ Mensaje copiado: pégalo en WhatsApp" : "No se pudo copiar"); setTimeout(() => setMsg(""), 2800); };
+  const copiarClave = async (x) => { setMsg((await copiar(x.clave)) ? "✅ Clave copiada: mándala en un mensaje aparte" : "No se pudo copiar"); setTimeout(() => setMsg(""), 2800); };
   return (
     <div className="rv-ind">
       <style>{CSS_RV}</style>
@@ -113,19 +118,21 @@ export function IndiceReservado() {
       )}
       {lista && (
         <>
-          <p className="rv-nota">Solo tú ves este índice. Los textos se editan en tu hoja de Google (pestaña «Reservado»). Cada elemento tiene su enlace propio: quien lo reciba verá únicamente ese elemento.</p>
+          <p className="rv-nota">Solo tú ves este índice. Los textos se editan en tu hoja de Google (pestaña «Reservado»). Cada elemento tiene su enlace propio: quien lo reciba verá únicamente ese elemento. «Inactivo (borrador)» = Activo en «No»: nadie lo ve con el enlace.</p>
           {lista.length === 0 && <p className="rv-nota">Aún no hay elementos. Agrega filas en la pestaña «Reservado».</p>}
           {grupos.map((g) => (
             <div key={g}>
               <h3 className="rv-per">{g} ({lista.filter((x) => (x.perfil || "Sin perfil") === g).length})</h3>
               {lista.filter((x) => (x.perfil || "Sin perfil") === g).map((x) => (
                 <div className="rv-fila" key={x.id}>
-                  <span className="rv-tipo">{x.tipo}{x.conClave ? " · con clave" : ""}{x.activo === false ? " · inactivo" : ""}</span>
+                  <span className="rv-tipo">{x.tipo}{x.conClave ? " · con clave" : ""}{x.activo === false ? " · inactivo (borrador)" : ""}{x.vencido ? " · VENCIDO" : x.vence ? " · vence " + x.vence : ""}{x.version ? " · v" + x.version : ""}</span>
                   <b>{x.t}</b>{x.d && <small>{x.d}</small>}
                   <div className="rv-b">
                     <button type="button" onClick={() => window.open(enlaceElemento(x.id), "_blank", "noopener")}>Ver</button>
                     <button type="button" className="p" onClick={() => copiarEn(x)}>Copiar enlace</button>
+                    <button type="button" onClick={() => copiarMensaje(x)}>Copiar mensaje</button>
                     <button type="button" onClick={() => porWA(x)}>WhatsApp</button>
+                    {x.clave && <button type="button" onClick={() => copiarClave(x)}>Copiar clave</button>}
                   </div>
                 </div>
               ))}
@@ -157,5 +164,6 @@ const CSS_RV = `
 .rv-b .p{background:#3b2a6b;color:#fff}.rv-b button:disabled{opacity:.5}
 .rv-txt{font-size:16px;line-height:1.5;font-weight:600;white-space:pre-line;margin:8px 0 12px}
 .rv-in{width:100%;box-sizing:border-box;min-height:48px;border:2px solid #cbd5e1;border-radius:12px;padding:0 10px;font:inherit;font-size:16px;font-weight:700;margin:6px 0}
+.rv-ver{margin:0 0 6px;font-size:12.5px;font-weight:900;color:#5b6b62}
 .rv-av{font-size:13.5px;font-weight:900;color:#0e7c4f;margin:6px 0 0}
 `;

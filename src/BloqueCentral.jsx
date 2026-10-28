@@ -668,6 +668,7 @@ export default function BloqueCentral({
     else if (a.ir) irASeccion(a.ir);
     else if (a.wa) window.open(wa(a.wa), "_blank", "noopener");
     else if (a.tab) { const i = TABS_TODAS.findIndex((t) => t.id === a.tab); if (i >= 0) cambiar(i); }
+    else if (a.micro) ev("dcuates:abrir-micro", a.micro);
     else if (a.evento) ev(a.evento);
     else if (a.invitar) {
       registrar("invitar_vecino", { desde: "sumate" });
