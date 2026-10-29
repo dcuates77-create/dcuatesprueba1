@@ -7,7 +7,7 @@ import BotonCompartir from "./BotonCompartir.jsx";
 import { CALENDARIO_AGREGAR, CALENDARIO_ID_PUBLICO, CLIMA_LUGAR, WHATSAPP_NUMERO } from "./datos/config.js";
 import {
   alternarRecordatorio, atencion24h, bajarIcs, cargarClima, claveEvento, consejoClima, cuenta, enlaceGoogle, estadoCal,
-  fechaLinda, leerRecordatorios, marcarAvisado, pendientesDeAviso, proximos, quitarRecordatorio, recargarCalendario, textoAtencion, tieneRecordatorio
+  fechaLinda, useFechasEspeciales, leerRecordatorios, marcarAvisado, pendientesDeAviso, proximos, quitarRecordatorio, recargarCalendario, textoAtencion, tieneRecordatorio
 } from "./utilidades/calendario.js";
 
 export const abrirAgenda = () => window.dispatchEvent(new CustomEvent("dcuates:abrir-agenda"));
@@ -104,6 +104,74 @@ function Atencion({ negocios, eventos }) {
   );
 }
 
+
+// ---------- Fechas especiales (e55): festivos, fases de la luna y otros calendarios tipo «fechas», aparte de los eventos ----------
+const MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+const fDia = new Intl.DateTimeFormat("es-MX", { weekday: "short", day: "numeric", timeZone: "America/Mexico_City" });
+function FechasEspeciales() {
+  const todas = useFechasEspeciales();
+  const [abierto, setAbierto] = useState(false);
+  const [mes, setMes] = useState(0);
+  const [quitadas, setQuitadas] = useState([]);
+  const base = new Date();
+  const meses = Array.from({ length: 6 }, (_, i) => { const d = new Date(base.getFullYear(), base.getMonth() + i, 1); return { y: d.getFullYear(), m: d.getMonth() }; });
+  const fuentes = [...new Set(todas.map((e) => e.fuente || "Otras"))];
+  if (!todas.length) return null;
+  const sel = meses[Math.min(mes, meses.length - 1)];
+  const lista = todas.filter((e) => e.inicio.getFullYear() === sel.y && e.inicio.getMonth() === sel.m && !quitadas.includes(e.fuente || "Otras"))
+    .sort((a, b) => a.inicio - b.inicio);
+  const alternar = (f) => setQuitadas((q) => (q.includes(f) ? q.filter((x) => x !== f) : [...q, f]));
+  return (
+    <div className="ag3-fe">
+      <button type="button" className="ag3-fe-b" aria-expanded={abierto} onClick={() => setAbierto(!abierto)}>
+        <span>✨ Fechas especiales <small>festivos, fases de la luna y más</small></span><i>{abierto ? "−" : "+"}</i>
+      </button>
+      {abierto && (
+        <div className="ag3-fe-c">
+          <div className="ag3-chips" role="group" aria-label="Mes">
+            {meses.map((x, i) => <button type="button" key={x.y + "-" + x.m} aria-pressed={mes === i} className={mes === i ? "on" : ""} onClick={() => setMes(i)}>{MESES[x.m].slice(0, 3)}{x.y !== base.getFullYear() ? " " + String(x.y).slice(2) : ""}</button>)}
+          </div>
+          {fuentes.length > 1 && (
+            <div className="ag3-chips" role="group" aria-label="Calendarios">
+              {fuentes.map((f) => <button type="button" key={f} aria-pressed={!quitadas.includes(f)} className={!quitadas.includes(f) ? "on" : ""} onClick={() => alternar(f)}>{f}</button>)}
+            </div>
+          )}
+          <p className="ag3-fe-t">{MESES[sel.m]} {sel.y}</p>
+          {lista.length === 0
+            ? <p className="ag3-vacio">No hay fechas especiales este mes con los calendarios elegidos.</p>
+            : lista.map((e, i) => <div className="ag3-fe-f" key={(e.id || "") + i}><b>{fDia.format(e.inicio).replace(".", "")}</b><span>{e.titulo}</span><small>{e.fuente || ""}</small></div>)}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ---------- Calendario completo (e55): se eligen los calendarios y la vista (Mes, Semana o Agenda) ----------
+const COLORES_CAL = ["#1B6F8A", "#7a5ad8", "#C2410C", "#2E9E5B", "#C2255C", "#B7791F", "#0F766E", "#6D28D9"];
+function CalendarioCompleto() {
+  const cals = (estadoCal.calendarios && estadoCal.calendarios.length ? estadoCal.calendarios.filter((c) => c.ok !== false) : [{ id: CALENDARIO_ID_PUBLICO, nombre: "DCUATES", principal: true }]);
+  const [quitados, setQuitados] = useState(() => cals.filter((c) => !c.principal).map((c) => c.id));
+  const [vista, setVista] = useState("MONTH");
+  const activos = cals.filter((c) => !quitados.includes(c.id));
+  const hay = activos.length ? activos : cals.slice(0, 1);
+  const src = hay.map((c) => "&src=" + encodeURIComponent(c.id) + "&color=" + encodeURIComponent(COLORES_CAL[cals.findIndex((x) => x.id === c.id) % COLORES_CAL.length])).join("");
+  const emb = `https://calendar.google.com/calendar/embed?ctz=America%2FMexico_City&hl=es&mode=${vista}&showTitle=0&showPrint=0&showTz=0${src}`;
+  const alternar = (id) => setQuitados((q) => (q.includes(id) ? q.filter((x) => x !== id) : [...q, id]));
+  return (
+    <div>
+      <div className="ag3-chips" role="group" aria-label="Vista del calendario">
+        {[["MONTH", "Mes"], ["WEEK", "Semana"], ["AGENDA", "Agenda"]].map(([v, t]) => <button type="button" key={v} aria-pressed={vista === v} className={vista === v ? "on" : ""} onClick={() => setVista(v)}>{t}</button>)}
+      </div>
+      {cals.length > 1 && (
+        <div className="ag3-chips" role="group" aria-label="Calendarios que se muestran">
+          {cals.map((c, i) => <button type="button" key={c.id} aria-pressed={!quitados.includes(c.id)} className={!quitados.includes(c.id) ? "on" : ""} style={{ borderColor: COLORES_CAL[i % COLORES_CAL.length] }} onClick={() => alternar(c.id)}>{c.nombre}</button>)}
+        </div>
+      )}
+      <iframe className="ag3-if" title="Calendario DCUATES" src={emb} loading="lazy" />
+    </div>
+  );
+}
+
 function Ventana({ onCerrar, agenda, negocios }) {
   useAtras(true, onCerrar);
   const [ver, setVer] = useState(false);
@@ -111,7 +179,6 @@ function Ventana({ onCerrar, agenda, negocios }) {
   const [, tic] = useState(0);
   useEffect(() => { recargarCalendario().then(() => tic((x) => x + 1)); }, []);
   const lista = useMemo(() => proximos(agenda), [agenda]);
-  const emb = `https://calendar.google.com/calendar/embed?src=${encodeURIComponent(CALENDARIO_ID_PUBLICO)}&ctz=America%2FMexico_City&hl=es&mode=AGENDA&showTitle=0&showPrint=0&showTz=0`;
   return createPortal(
     <div className="zj-fondo" role="dialog" aria-modal="true" aria-label="Agenda y utilerías" onClick={(e) => { if (e.target === e.currentTarget) onCerrar(); }}>
       <div className="zj-caja">
@@ -123,17 +190,18 @@ function Ventana({ onCerrar, agenda, negocios }) {
         <p className="zj-et">📅 Próximos eventos</p>
         {lista.length === 0 ? <p className="ag3-vacio">Aún no hay eventos próximos. Vuelve pronto.</p> : lista.slice(0, 15).map((e, i) => <Evento key={claveEvento(e) + i} e={e} i={i} />)}
         <p className="ag3-estado">{estadoCal.ok ? "✅ Calendario DCUATES conectado" : "ℹ️ Mostrando los eventos de la página" + (estadoCal.motivo ? " (" + estadoCal.motivo + ")" : "")}</p>
+        <FechasEspeciales />
         <div className="zj-col">
           <button type="button" style={{ background: "#334155" }} onClick={() => setVer(!ver)}>{ver ? "Ocultar el calendario completo" : "🗓️ Ver el calendario completo"}</button>
           <a className="ag3-btn" style={{ background: "#1B6F8A" }} href={CALENDARIO_AGREGAR} target="_blank" rel="noopener noreferrer">➕ Agregar el calendario DCUATES a mi Google Calendar</a>
         </div>
-        {ver && <iframe className="ag3-if" title="Calendario DCUATES" src={emb} loading="lazy" />}
+        {ver && <CalendarioCompleto />}
         <p className="zj-et">⛅ Clima · {CLIMA_LUGAR.nombre}</p><div className="ag3-bloque"><Clima /></div>
         <p className="zj-et">🕘 Horarios de atención · próximas 24 h</p><div className="ag3-bloque"><Atencion negocios={negocios} eventos={lista} /></div>
         <p className="zj-et">🔔 Mis recordatorios</p>
         <div className="ag3-bloque">{rec.length === 0 ? <p className="ag3-vacio">Toca un evento y elige «Avisarme en esta página». Te avisamos cuando abras DCUATES y falten menos de 24 horas.</p> : rec.map((r) => <div className="ag3-fila" key={r.k}><b>{r.titulo}</b><small>{fechaLinda({ inicio: new Date(r.inicio), todoElDia: r.todoElDia })}</small><button type="button" onClick={() => quitarRecordatorio(r.k)}>Quitar</button></div>)}</div>
       </div>
-      <style>{`.ag3-bloque{padding:10px;border-radius:14px;background:#f1f5f4;margin-bottom:8px;color:#0f172a}.ag3-vacio{margin:4px 0;font-size:14px;font-weight:700;color:#334155}.ag3-sel{width:100%;min-height:44px;border:2px solid #cbd5e1;border-radius:12px;padding:6px 8px;font:inherit;font-weight:800;margin-bottom:8px;background:#fff;color:#0f172a}.ag3-reloj{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center}.ag3-reloj div{background:#14532d;color:#fff;border-radius:12px;padding:8px 2px}.ag3-reloj b{display:block;font-size:26px;font-weight:900;line-height:1}.ag3-reloj small{font-size:11px;font-weight:800}.ag3-ya{margin:6px 0;text-align:center;font-size:20px;font-weight:900;color:#14532d}.ag3-ev{margin:8px 0 0;text-align:center;font-weight:900}.ag3-card{border:2px solid #fff;border-radius:14px;margin-bottom:6px;color:#fff;box-shadow:0 2px 6px rgba(0,0,0,.18)}.ag3-cab{width:100%;display:flex;align-items:center;gap:8px;padding:10px 12px;background:transparent;border:0;color:#fff;font:inherit;text-align:left;cursor:pointer}.ag3-cab span{flex:1;display:flex;flex-direction:column}.ag3-cab small{font-size:12px;font-weight:800;opacity:.95}.ag3-cab b{font-size:15px;font-weight:900;line-height:1.2}.ag3-cab i{font-style:normal;font-size:24px;font-weight:900}.ag3-cuerpo{padding:0 12px 12px;font-size:13.5px;font-weight:700}.ag3-cuerpo p{margin:4px 0;color:#fff}.ag3-bots{display:grid;gap:6px;margin-top:8px}.ag3-bots button,.ag3-bots a,.ag3-btn{display:block;min-height:42px;padding:9px 10px;border:2px solid #fff;border-radius:12px;background:rgba(0,0,0,.28);color:#fff;font:inherit;font-weight:900;font-size:13.5px;text-align:center;text-decoration:none;cursor:pointer}.ag3-btn{width:100%;box-sizing:border-box}.ag3-estado{margin:4px 2px 8px;font-size:12px;font-weight:700;color:#475569}.ag3-if{width:100%;height:420px;border:2px solid #cbd5e1;border-radius:12px;margin-top:8px;background:#fff}.ag3-hoy{display:flex;align-items:center;gap:12px}.ag3-gr{font-size:46px;line-height:1}.ag3-hoy b{display:block;font-size:30px;font-weight:900}.ag3-hoy small{font-size:14px;font-weight:800}.ag3-dias{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:8px 0;text-align:center}.ag3-dias div{background:#fff;border-radius:12px;padding:6px 2px;display:flex;flex-direction:column;gap:2px}.ag3-dias span{font-size:26px}.ag3-dias b{font-size:13px;font-weight:900}.ag3-dias small{font-size:11.5px;font-weight:800;color:#475569}.ag3-cons{margin:4px 0;padding:8px 10px;border-radius:12px;background:#fff4d6;font-size:13.5px;font-weight:800;color:#3a2a00}.ag3-sub{margin:8px 0 4px;font-size:12px;font-weight:900;letter-spacing:.05em;text-transform:uppercase;color:#14532d}.ag3-fila{display:flex;flex-direction:column;gap:2px;padding:8px 10px;margin-bottom:6px;border-radius:12px;background:#fff;color:#0f172a}.ag3-fila b{font-size:14px;font-weight:900}.ag3-fila small{font-size:13px;font-weight:700;color:#334155}.ag3-fila a,.ag3-fila button{align-self:flex-start;margin-top:4px;padding:4px 10px;border:2px solid #2E9E5B;border-radius:10px;background:#fff;color:#14532d;font:inherit;font-weight:900;font-size:13px;text-decoration:none;cursor:pointer}.ag3-link{display:block;margin-top:6px;font-weight:900;font-size:14px;color:#1B6F8A}body.dc-contraste .zj-caja .ag3-card,body.dc-contraste .zj-caja .ag3-card *,body.dc-contraste .zj-caja .ag3-reloj *,body.dc-contraste .zj-caja .ag3-btn{color:#fff!important}`}</style>
+      <style>{`.ag3-fe{margin:8px 0;border:2px solid #7a5ad8;border-radius:14px;background:#fff;overflow:hidden}.ag3-fe-b{width:100%;min-height:52px;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 12px;border:0;background:#f3efff;color:#3b2a8c;font:inherit;font-size:15px;font-weight:900;text-align:left;cursor:pointer}.ag3-fe-b small{display:block;font-size:12.5px;font-weight:700;color:#5b4fa8}.ag3-fe-b i{font-style:normal;font-size:22px}.ag3-fe-c{padding:8px 10px 10px;color:#0f172a}.ag3-chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}.ag3-chips button{min-height:44px;padding:0 14px;border-radius:999px;border:2px solid #7a5ad8;background:#fff;color:#3b2a8c;font:inherit;font-weight:900;font-size:14px;cursor:pointer}.ag3-chips button.on{background:#7a5ad8;color:#fff}.ag3-fe-t{margin:8px 0 4px;font-size:15px;font-weight:900;text-transform:capitalize;color:#3b2a8c}.ag3-fe-f{display:grid;grid-template-columns:64px 1fr;gap:2px 8px;padding:6px 0;border-top:1px solid #e5e7eb}.ag3-fe-f b{font-size:13.5px;font-weight:900;color:#3b2a8c;text-transform:capitalize}.ag3-fe-f span{font-size:14.5px;font-weight:800}.ag3-fe-f small{grid-column:2;font-size:12.5px;font-weight:700;color:#64748b}.ag3-bloque{padding:10px;border-radius:14px;background:#f1f5f4;margin-bottom:8px;color:#0f172a}.ag3-vacio{margin:4px 0;font-size:14px;font-weight:700;color:#334155}.ag3-sel{width:100%;min-height:44px;border:2px solid #cbd5e1;border-radius:12px;padding:6px 8px;font:inherit;font-weight:800;margin-bottom:8px;background:#fff;color:#0f172a}.ag3-reloj{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center}.ag3-reloj div{background:#14532d;color:#fff;border-radius:12px;padding:8px 2px}.ag3-reloj b{display:block;font-size:26px;font-weight:900;line-height:1}.ag3-reloj small{font-size:11px;font-weight:800}.ag3-ya{margin:6px 0;text-align:center;font-size:20px;font-weight:900;color:#14532d}.ag3-ev{margin:8px 0 0;text-align:center;font-weight:900}.ag3-card{border:2px solid #fff;border-radius:14px;margin-bottom:6px;color:#fff;box-shadow:0 2px 6px rgba(0,0,0,.18)}.ag3-cab{width:100%;display:flex;align-items:center;gap:8px;padding:10px 12px;background:transparent;border:0;color:#fff;font:inherit;text-align:left;cursor:pointer}.ag3-cab span{flex:1;display:flex;flex-direction:column}.ag3-cab small{font-size:12px;font-weight:800;opacity:.95}.ag3-cab b{font-size:15px;font-weight:900;line-height:1.2}.ag3-cab i{font-style:normal;font-size:24px;font-weight:900}.ag3-cuerpo{padding:0 12px 12px;font-size:13.5px;font-weight:700}.ag3-cuerpo p{margin:4px 0;color:#fff}.ag3-bots{display:grid;gap:6px;margin-top:8px}.ag3-bots button,.ag3-bots a,.ag3-btn{display:block;min-height:42px;padding:9px 10px;border:2px solid #fff;border-radius:12px;background:rgba(0,0,0,.28);color:#fff;font:inherit;font-weight:900;font-size:13.5px;text-align:center;text-decoration:none;cursor:pointer}.ag3-btn{width:100%;box-sizing:border-box}.ag3-estado{margin:4px 2px 8px;font-size:12px;font-weight:700;color:#475569}.ag3-if{width:100%;height:420px;border:2px solid #cbd5e1;border-radius:12px;margin-top:8px;background:#fff}.ag3-hoy{display:flex;align-items:center;gap:12px}.ag3-gr{font-size:46px;line-height:1}.ag3-hoy b{display:block;font-size:30px;font-weight:900}.ag3-hoy small{font-size:14px;font-weight:800}.ag3-dias{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:8px 0;text-align:center}.ag3-dias div{background:#fff;border-radius:12px;padding:6px 2px;display:flex;flex-direction:column;gap:2px}.ag3-dias span{font-size:26px}.ag3-dias b{font-size:13px;font-weight:900}.ag3-dias small{font-size:11.5px;font-weight:800;color:#475569}.ag3-cons{margin:4px 0;padding:8px 10px;border-radius:12px;background:#fff4d6;font-size:13.5px;font-weight:800;color:#3a2a00}.ag3-sub{margin:8px 0 4px;font-size:12px;font-weight:900;letter-spacing:.05em;text-transform:uppercase;color:#14532d}.ag3-fila{display:flex;flex-direction:column;gap:2px;padding:8px 10px;margin-bottom:6px;border-radius:12px;background:#fff;color:#0f172a}.ag3-fila b{font-size:14px;font-weight:900}.ag3-fila small{font-size:13px;font-weight:700;color:#334155}.ag3-fila a,.ag3-fila button{align-self:flex-start;margin-top:4px;padding:4px 10px;border:2px solid #2E9E5B;border-radius:10px;background:#fff;color:#14532d;font:inherit;font-weight:900;font-size:13px;text-decoration:none;cursor:pointer}.ag3-link{display:block;margin-top:6px;font-weight:900;font-size:14px;color:#1B6F8A}body.dc-contraste .zj-caja .ag3-card,body.dc-contraste .zj-caja .ag3-card *,body.dc-contraste .zj-caja .ag3-reloj *,body.dc-contraste .zj-caja .ag3-btn{color:#fff!important}`}</style>
     </div>, document.body);
 }
 

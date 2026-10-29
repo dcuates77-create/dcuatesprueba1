@@ -11,6 +11,7 @@ import { VISTA } from "./datos/vistaSeccion.js";
 import { MENSAJE_INVITACION, URL_SITIO, WHATSAPP_NUMERO } from "./datos/config.js";
 import { irASeccion } from "./utilidades/baserow.js";
 import FormMini from "./FormMini.jsx";
+import { cargarEspacios } from "./utilidades/hojaPublica.js";
 import BotonCompartir from "./BotonCompartir.jsx";
 
 export const abrirMicro = (cual) => window.dispatchEvent(new CustomEvent("dcuates:abrir-micro", { detail: cual || "" }));
@@ -55,6 +56,75 @@ export const FORMULARIOS_MICRO = {
   }
 };
 
+// e55 — reto «recomienda de confianza y pide dos», eventos y espacios.
+const RESP = { k: "resp", etiqueta: "Confirmación de responsabilidad", tipo: "opciones", opciones: ["Sí, soy responsable de los términos"], req: true };
+FORMULARIOS_MICRO.dos = {
+  tipo: "Recomendación de confianza", perfil: "Reto: recomienda y pide dos", boton: "Enviar y pedir mis dos",
+  gracias: "¡Gracias por recomendar! 💚 Te escribiremos por WhatsApp con dos recomendaciones de lo que necesitas.",
+  wa: "¡Hola DCUATES! Quiero hacer una recomendación de confianza y pedir dos recomendaciones de lo que necesito.",
+  campos: [
+    { k: "nombre", etiqueta: "Tu nombre", campo: "Nombre", max: 60, req: true },
+    { k: "contacto", etiqueta: "Tu WhatsApp", campo: "Contacto", max: 30, req: true },
+    { k: "cat", etiqueta: "¿Qué recomiendas?", tipo: "opciones", opciones: ["Negocio", "Organización", "Persona"], req: true },
+    { k: "quien", etiqueta: "¿A quién recomiendas?", ph: "Nombre del negocio, organización o persona", max: 90, req: true },
+    { k: "porque", etiqueta: "¿Por qué la recomiendas?", tipo: "area", ph: "Cuéntanos tu buena experiencia", max: 400, req: true },
+    { k: "suc", etiqueta: "Contacto de la persona recomendada", ph: "Teléfono, red social o colonia", max: 120 },
+    { k: "perm", etiqueta: "¿Te dio permiso para publicar su recomendación?", tipo: "opciones", opciones: ["Sí", "Aún no"] },
+    { k: "necesito", etiqueta: "Qué necesitas o te interesa (te damos dos recomendaciones)", tipo: "area", ph: "Ej. Busco quien arregle una lavadora y un curso de inglés para mi hijo", max: 400, req: true }
+  ]
+};
+FORMULARIOS_MICRO.evento = {
+  tipo: "Evento", perfil: "Propuesta de evento", boton: "Enviar mi evento",
+  gracias: "¡Gracias! 📅 Lo revisamos y, si lo aprobamos, lo verás en la Agenda.",
+  wa: "¡Hola DCUATES! Quiero proponer un evento o actividad para la Agenda de la comunidad.",
+  campos: [
+    { k: "titulo", etiqueta: "Título del evento", max: 100, req: true },
+    { k: "fecha", etiqueta: "Fecha", tipo: "fecha", req: true },
+    { k: "hora", etiqueta: "Hora de inicio", tipo: "hora" },
+    { k: "lugar", etiqueta: "Lugar", max: 140, req: true },
+    { k: "org", etiqueta: "Quién organiza", max: 100 },
+    { k: "desc", etiqueta: "Descripción", tipo: "area", ph: "De qué trata, a quién va dirigido, si tiene costo", max: 350 },
+    { k: "enlace", etiqueta: "Enlace", ph: "Página o red social (si hay)", max: 160 },
+    { k: "nombre", etiqueta: "Tu nombre", campo: "Nombre", max: 60, req: true },
+    { k: "contacto", etiqueta: "Tu WhatsApp", campo: "Contacto", max: 30, req: true },
+    RESP
+  ]
+};
+FORMULARIOS_MICRO.espacio = {
+  tipo: "Espacio", perfil: "Ofrece un espacio", boton: "Ofrecer mi espacio",
+  gracias: "¡Gracias por ofrecer tu espacio! 🏛️ Te escribiremos para acordar los detalles.",
+  wa: "¡Hola DCUATES! Quiero ofrecer un espacio para actividades de la red.",
+  campos: [
+    { k: "esp", etiqueta: "Nombre del espacio", max: 100, req: true },
+    { k: "tipoe", etiqueta: "Tipo de espacio", tipo: "opciones", opciones: ["Café o local", "Salón o centro", "Casa o patio", "Galería o foro", "Otro"] },
+    { k: "zona", etiqueta: "Colonia o zona", max: 100, req: true },
+    { k: "cap", etiqueta: "Capacidad (personas)", max: 20 },
+    { k: "horarios", etiqueta: "Días y horarios disponibles", tipo: "area", max: 250 },
+    { k: "permite", etiqueta: "Qué actividades permite", tipo: "area", ph: "Cafés literarios, pláticas, presentaciones de producto, exposiciones, talleres…", max: 300 },
+    { k: "cond", etiqueta: "Condiciones o cuota", tipo: "area", ph: "Gratis, aportación, reglas, limpieza, aforo…", max: 300 },
+    { k: "publ", etiqueta: "¿Podemos publicarlo en la página?", tipo: "opciones", opciones: ["Sí", "No"], req: true },
+    { k: "nombre", etiqueta: "Tu nombre", campo: "Nombre", max: 60, req: true },
+    { k: "contacto", etiqueta: "Tu WhatsApp", campo: "Contacto", max: 30, req: true },
+    RESP
+  ]
+};
+FORMULARIOS_MICRO.usar = {
+  tipo: "Solicitud de espacio", perfil: "Busca un espacio", boton: "Enviar mi solicitud",
+  gracias: "¡Gracias! 🎤 Buscaremos un espacio y te escribimos por WhatsApp.",
+  wa: "¡Hola DCUATES! Busco un espacio para una actividad de la red.",
+  campos: [
+    { k: "act", etiqueta: "¿Qué actividad quieres hacer?", ph: "Ej. Café literario, conferencia, presentación de mi producto", max: 140, req: true },
+    { k: "tipoa", etiqueta: "Tipo de actividad", tipo: "opciones", opciones: ["Café literario", "Plática o conferencia", "Presentación de producto", "Exposición o galería", "Taller", "Reunión de negocios", "Otra"] },
+    { k: "fecha", etiqueta: "Fecha tentativa", tipo: "fecha" },
+    { k: "dur", etiqueta: "Duración", ph: "Ej. 2 horas", max: 40 },
+    { k: "asis", etiqueta: "Asistentes aproximados", max: 20 },
+    { k: "necesita", etiqueta: "Qué necesitas del espacio", tipo: "area", ph: "Sillas, proyector, mesas, acceso para personas mayores…", max: 300 },
+    { k: "nombre", etiqueta: "Tu nombre", campo: "Nombre", max: 60, req: true },
+    { k: "contacto", etiqueta: "Tu WhatsApp", campo: "Contacto", max: 30, req: true },
+    RESP
+  ]
+};
+
 export function BotonMicro() {
   return (
     <>
@@ -70,6 +140,8 @@ export function BotonMicro() {
 export default function MicroAcciones() {
   const [abierta, setAbierta] = useState(false);
   const [forma, setForma] = useState(null);
+  const [espacios, setEspacios] = useState([]);
+  useEffect(() => { if (abierta) cargarEspacios().then((x) => setEspacios(Array.isArray(x) ? x : [])); }, [abierta]);
   const cerrar = () => {
     setAbierta(false); setForma(null);
     setTimeout(() => { try { if (/^#micro-acciones$/.test(window.location.hash)) history.replaceState(history.state, "", window.location.pathname + window.location.search); } catch (e) { /* ignorar */ } }, 250);
@@ -132,6 +204,21 @@ export default function MicroAcciones() {
             );
           })}
         </div>
+        {espacios.length > 0 && (
+          <div className="ma-esp">
+            <p className="ma-et">🏛️ Espacios de la red que se prestan</p>
+            {espacios.slice(0, 20).map((x) => (
+              <div className="ma-ec" key={x.id || x.nombre}>
+                <b>{x.nombre}</b>
+                <small>{[x.tipo, x.zona, x.cap ? "Capacidad: " + x.cap : ""].filter(Boolean).join(" · ")}</small>
+                {x.permite && <small>Permite: {x.permite}</small>}
+                {x.cond && <small>Condiciones: {x.cond}</small>}
+                <button type="button" onClick={() => window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(`¡Hola DCUATES! Me interesa usar el espacio «${x.nombre}» para una actividad. Mi nombre es: ___`)}`, "_blank", "noopener")}>Quiero usarlo</button>
+              </div>
+            ))}
+            <small className="ma-resp">Quien ofrece y quien usa un espacio es responsable de los términos que acuerden. DCUATES solo conecta.</small>
+          </div>
+        )}
       </div>
     </div>,
     document.body
@@ -139,6 +226,9 @@ export default function MicroAcciones() {
 }
 
 const CSS = `
+.ma-esp{margin-top:12px;display:flex;flex-direction:column;gap:8px}.ma-et{margin:0;font-size:13px;font-weight:900;text-transform:uppercase;letter-spacing:.04em;color:#6b7785}
+.ma-ec{display:flex;flex-direction:column;gap:3px;padding:10px;border:2px solid #cbd5e1;border-radius:14px;background:#fff}.ma-ec b{font-size:14.5px;font-weight:900;color:#0f2d1e}.ma-ec small{font-size:13px;font-weight:700;color:#4a5564;line-height:1.3}
+.ma-ec button{align-self:flex-start;min-height:44px;padding:0 16px;margin-top:4px;border:0;border-radius:999px;background:#25a244;color:#fff;font:inherit;font-weight:900;font-size:14px;cursor:pointer}.ma-resp{font-size:12.5px;font-weight:700;color:#5b6b62}
 .ma-fondo{position:fixed;inset:0;z-index:76;background:rgba(15,25,20,.65);display:flex;align-items:flex-end;justify-content:center;font-family:Nunito,system-ui,sans-serif}
 .ma-caja{background:#fbf7ec;width:100%;max-width:560px;max-height:92dvh;overflow-y:auto;overscroll-behavior:contain;border-radius:24px 24px 0 0;padding:0 12px 22px;color:#0f2d1e}
 @media(min-width:640px){.ma-fondo{align-items:center}.ma-caja{border-radius:22px;max-height:86dvh}}

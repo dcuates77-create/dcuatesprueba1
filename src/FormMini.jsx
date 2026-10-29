@@ -1,7 +1,7 @@
 // FORMULARIO MINI (e53) — un formulario corto y reutilizable. Guarda en tu hoja de Google (pestaña «Mensajes») y ofrece
 // además enviar lo mismo por WhatsApp. Se usa en la ventana de Micro-acciones y en las menciones del Muro de gratitud.
 //
-// cfg = { tipo, perfil, boton, gracias, campos: [{ k, etiqueta, ph, max, req, tipo: "texto"|"area"|"opciones", opciones: [], campo: "Nombre"|"Contacto" }], wa }
+// cfg = { tipo, perfil, boton, gracias, campos: [{ k, etiqueta, ph, max, req, tipo: "texto"|"area"|"opciones"|"fecha"|"hora", opciones: [], campo: "Nombre"|"Contacto" }], wa }
 //  - Los campos con «campo» van a la columna Nombre o Contacto; los demás se juntan en la columna Mensaje («Etiqueta: valor»).
 //  - Nunca bloquea: si no hay internet, el mensaje se puede mandar por WhatsApp.
 import React, { useState } from "react";
@@ -60,6 +60,8 @@ export default function FormMini({ cfg, onListo, clave = "form" }) {
             <label htmlFor={id}>{c.etiqueta}{c.req ? "" : " (opcional)"}</label>
             {c.tipo === "area" ? (
               <textarea id={id} rows={3} maxLength={c.max || 500} value={v[c.k]} onChange={(e) => cambia(c.k, e.target.value)} placeholder={c.ph || ""} />
+            ) : c.tipo === "fecha" || c.tipo === "hora" ? (
+              <input id={id} type={c.tipo === "fecha" ? "date" : "time"} value={v[c.k]} onChange={(e) => cambia(c.k, e.target.value)} />
             ) : c.tipo === "opciones" ? (
               <div className="fm-op" role="group" aria-label={c.etiqueta}>
                 {c.opciones.map((o) => (
