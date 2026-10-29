@@ -1,20 +1,32 @@
 // CALENDARIO Y UTILERÍAS: eventos de Google Calendar (vía /api/calendario), recordatorios, clima y horarios.
 import { useEffect, useState } from "react";
 import { CLIMA_LUGAR } from "../datos/config.js";
+import { cargarAgendaHoja } from "./hojaPublica.js";
 
 const TZ = "America/Mexico_City";
 const pad = (n) => String(n).padStart(2, "0");
 
 // ---------- eventos ----------
 let cache = null, promesa = null, cargadoEn = 0;
-export const estadoCal = { ok: null, motivo: "" };
+export const estadoCal = { ok: null, motivo: "", calendarios: [] };
 const subs = new Set();
 
 const aFecha = (t, todo) => { if (!t) return null; if (todo || /^\d{4}-\d{2}-\d{2}$/.test(t)) { const [y, m, d] = t.slice(0, 10).split("-").map(Number); return new Date(y, m - 1, d); } return new Date(t); };
 const normalizar = (e) => {
   const inicio = aFecha(e.inicio, e.todoElDia), fin = aFecha(e.fin, e.todoElDia) || inicio;
   if (!inicio || isNaN(inicio)) return null;
-  return { id: e.id, fecha: String(e.inicio).slice(0, 10), titulo: e.titulo, info: e.info || "", lugar: e.lugar || "", enlace: e.enlace || "", inicio, fin, todoElDia: !!e.todoElDia, origen: "calendario" };
+  return { id: e.id, fecha: String(e.inicio).slice(0, 10), titulo: e.titulo, info: e.info || "", lugar: e.lugar || "", enlace: e.enlace || "", inicio, fin, todoElDia: !!e.todoElDia, origen: "calendario", tipo: e.tipo === "fechas" ? "fechas" : "eventos", fuente: e.fuente || "" };
+};
+// Eventos aprobados en la pestaña «Agenda» de la hoja (e55): {id, fecha:"AAAA-MM-DD", hi:"18:00", hf, titulo, lugar, info, enlace, org}
+const deHoja = (x) => {
+  if (!x || !x.fecha || !x.titulo) return null;
+  const hi = /^\d{1,2}:\d{2}$/.test(String(x.hi || "")) ? String(x.hi).padStart(5, "0") : "";
+  const hf = /^\d{1,2}:\d{2}$/.test(String(x.hf || "")) ? String(x.hf).padStart(5, "0") : "";
+  const ini = hi ? `${x.fecha}T${hi}:00` : x.fecha;
+  const fin = hi && hf ? `${x.fecha}T${hf}:00` : ini;
+  const info = [x.org ? "Organiza: " + x.org : "", x.info || ""].filter(Boolean).join(" · ");
+  const e = normalizar({ id: "hoja:" + (x.id || x.fecha + x.titulo), titulo: x.titulo, info, lugar: x.lugar, enlace: x.enlace, inicio: ini, fin, todoElDia: !hi });
+  return e ? { ...e, origen: "hoja" } : null;
 };
 export function recargarCalendario(forzar) {
   if (promesa && !forzar && Date.now() - cargadoEn < 120000) return promesa;
@@ -24,15 +36,26 @@ export function recargarCalendario(forzar) {
       const r = await fetch("/api/calendario");
       const j = await r.json();
       estadoCal.ok = !!j.ok; estadoCal.motivo = j.motivo || "";
+      estadoCal.calendarios = Array.isArray(j.calendarios) ? j.calendarios : [];
       cache = (j.eventos || []).map(normalizar).filter(Boolean);
     } catch (e) { estadoCal.ok = false; estadoCal.motivo = "sin-conexion"; cache = cache || []; }
+    try { const h = (await cargarAgendaHoja()).map(deHoja).filter(Boolean); if (h.length) cache = [...(cache || []).filter((x) => x.origen !== "hoja"), ...h]; } catch (e) { /* sin eventos de la hoja */ }
     subs.forEach((f) => f());
   })();
   return promesa;
 }
+const soloEventos = () => (cache || []).filter((e) => e.tipo !== "fechas");
+const soloFechas = () => (cache || []).filter((e) => e.tipo === "fechas");
+// Eventos normales (NO incluye las «fechas especiales»: festivos, fases de la luna…).
 export function useCalendario() {
-  const [ev, setEv] = useState(cache || []);
-  useEffect(() => { const f = () => setEv(cache || []); subs.add(f); recargarCalendario(); return () => { subs.delete(f); }; }, []);
+  const [ev, setEv] = useState(soloEventos());
+  useEffect(() => { const f = () => setEv(soloEventos()); subs.add(f); recargarCalendario(); return () => { subs.delete(f); }; }, []);
+  return ev;
+}
+// Fechas especiales (calendarios con tipo «fechas» en GOOGLE_CALENDAR_ID).
+export function useFechasEspeciales() {
+  const [ev, setEv] = useState(soloFechas());
+  useEffect(() => { const f = () => setEv(soloFechas()); subs.add(f); recargarCalendario(); return () => { subs.delete(f); }; }, []);
   return ev;
 }
 // Suma los eventos de la página (datos/agenda.js y Baserow) con los del calendario, sin repetir.
