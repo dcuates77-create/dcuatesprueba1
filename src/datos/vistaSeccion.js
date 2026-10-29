@@ -138,6 +138,11 @@ export const VISTA = {
         { min: 5, ico: "🤝", t: "Suma tu negocio a los apoyos mutuos", d: "Si tienes o conoces un negocio que le interese SUMAR y GENERAR BENEFICIOS Y APOYOS MUTUOS Y COMUNITARIOS, contáctanos para platicar y armar los proyectos que nos ayuden a lograr NUESTROS OBJETIVOS PARTICULARES Y CONJUNTOS.", a: { micro: "negocio" } },
         { min: 3, ico: "📚", t: "Dona o presta un libro", d: "Dinos qué libro y lo coordinamos por WhatsApp.", a: { wa: "¡Hola DCUATES! Quiero donar un libro." } },
         { min: 5, ico: "⭐", t: "Cuéntanos tu opinión", d: "Dinos cómo te fue y qué mejorarías.", a: { ir: "opinion-rapida" } },
+        // e55: reto de recomendación de confianza, eventos y espacios
+        { min: 3, ico: "🔁", t: "Recomienda de confianza y pide dos que necesites", d: "Por cada recomendación de confianza que nos hagas, te damos dos recomendaciones de lo que necesites o te interese.", a: { micro: "dos" } },
+        { min: 4, ico: "📅", t: "Propón un evento o actividad", d: "Cuéntanos qué harás y, si lo aprobamos, lo sumamos a la Agenda de la comunidad.", a: { micro: "evento" } },
+        { min: 4, ico: "🏛️", t: "Ofrece un espacio para actividades de la red", d: "Café, salón, patio o galería: préstalo para cafés literarios, pláticas, presentaciones o talleres.", a: { micro: "espacio" } },
+        { min: 4, ico: "🎤", t: "Busca un espacio para tu actividad", d: "Conferencias, cafés literarios, presentaciones de producto, galería: te conectamos con quien presta.", a: { micro: "usar" } },
         // MICRO-META (e53): una micro-acción para proponer más micro-acciones.
         { min: 3, ico: "💡", meta: true, t: "Micro-meta: sugiere una micro-acción", d: "Si tienes y deseas sugerir o compartir una o más micro-acciones que sean significativas y de APOYO para ti y NUESTRA COMUNIDAD, haznos llegar tu propuesta.", a: { micro: "meta" } }
       ]
@@ -146,11 +151,11 @@ export const VISTA = {
     reto: {
       ico: "🏆",
       titulo: "Reto del mes",
-      t: "Invita a 3 vecinos y sale tu nombre en el Muro",
-      d: "Cuando lo logres, avísanos por WhatsApp y, con tu permiso, ponemos tu nombre en el Muro de gratitud.",
+      t: "Por cada RECOMENDACIÓN DE CONFIANZA, solicita dos que necesites",
+      d: "Recomienda a una persona, negocio u organización de confianza y, a cambio, te damos dos recomendaciones de lo que necesites o te interese. Es una forma de apoyarnos entre vecinos.",
       botones: [
-        { t: "Invitar ahora", a: { invitar: 1 } },
-        { t: "Ya invité a 3", a: { wa: "¡Hola DCUATES! Ya invité a 3 vecinos para el reto del mes. Pueden poner mi nombre en el Muro." } }
+        { t: "Recomendar y pedir dos", a: { micro: "dos" } },
+        { t: "Prefiero hacerlo por WhatsApp", a: { wa: "¡Hola DCUATES! Quiero hacer una recomendación de confianza y pedir dos recomendaciones de lo que necesito." } }
       ]
     },
     extrasFinalTitulo: "Explora las secciones",
