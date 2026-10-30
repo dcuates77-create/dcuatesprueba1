@@ -4,6 +4,8 @@ import BotonCompartir from "../BotonCompartir.jsx";
 import { BotonCerrar, CasillaAcepto, ErrorAcepto, VentanaMarca, abrirLegal, useAceptacion } from "./legal.jsx";
 import { Carrusel, FlechaBlanca, PasarelaVentasConCausa, TarjetaCarrusel } from "./media.jsx";
 import { ACCESOS_BENEFICIOS, ACCESOS_REGISTROS } from "../datos/accesos.js";
+import { abrirRegistroPrevio } from "../RegistroPrevio.jsx";
+import { opcionAportacion } from "../datos/registros.js";
 import { PATROCINADORES_ALIANZAS_ITEMS } from "../datos/cintas.js";
 import { MAPA_SITIO_EXTRA } from "../datos/config.js";
 import { FAQ_ITEMS, FAQ_TEMAS } from "../datos/legal.js";
@@ -827,7 +829,7 @@ export function ContenidoModalProyecto({ id, onCerrar }) {
           Tu aportación impulsa a la comunidad
         </h3>
         <p className="text-sm text-slate-600 font-medium leading-relaxed">
-          Elige la forma de aportación que prefieras — todas te conectan directo por WhatsApp.
+          Elige la forma de aportación que prefieras — te registramos y te contactamos por WhatsApp.
         </p>
         <ul className="space-y-2">
           {["Económica, en especie o trueque", "Labor voluntaria", "Total transparencia"].map((punto, i) => (
@@ -841,9 +843,8 @@ export function ContenidoModalProyecto({ id, onCerrar }) {
           {OPCIONES_APORTACION.map((opc) => (
             <a
               key={opc.t}
-              href={enlaceWhatsApp(opc.m)}
-              target="_blank"
-              rel="noopener noreferrer"
+              href="#registros"
+              onClick={(e) => { e.preventDefault(); abrirRegistroPrevio("aportacion", { valores: { tipo: opcionAportacion(opc.t) } }); }}
               className="w-full text-left rounded-xl border-2 border-[#0f2d1e] bg-[#e65100] hover:bg-[#bf360c] p-3 shadow-sm transition-colors block"
             >
               <div className="flex justify-between items-center gap-3">
@@ -946,13 +947,16 @@ export function ContenidoModalProyecto({ id, onCerrar }) {
             <FlechaBlanca />
           </a>
           <a
-            href={proyecto.enlaceDirectoWA}
+            href={proyecto.registro ? undefined : proyecto.enlaceDirectoWA}
+            onClick={proyecto.registro ? () => abrirRegistroPrevio(proyecto.registro) : undefined}
+            role={proyecto.registro ? "button" : undefined}
+            tabIndex={proyecto.registro ? 0 : undefined}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full text-left rounded-xl border-2 border-[#0f2d1e] bg-[#e65100] hover:bg-[#bf360c] p-3 shadow-sm transition-colors flex items-center justify-between gap-3"
+            className="w-full text-left rounded-xl border-2 border-[#0f2d1e] bg-[#e65100] hover:bg-[#bf360c] p-3 shadow-sm transition-colors flex items-center justify-between gap-3 cursor-pointer"
           >
             <p className="text-sm sm:text-base font-black text-white uppercase tracking-tight leading-tight">
-              Envíanos tus Recomendaciones
+              {proyecto.registro ? "Regístrate y suma actividades" : "Envíanos tus Recomendaciones"}
             </p>
             <FlechaBlanca />
           </a>
@@ -961,8 +965,15 @@ export function ContenidoModalProyecto({ id, onCerrar }) {
 
       {!galeria && (
         <div className="pt-1 space-y-2">
+          {proyecto.registro && (
+            <BotonModal onClick={() => abrirRegistroPrevio(proyecto.registro)}>{proyecto.textoRegistro || proyecto.textoBoton}</BotonModal>
+          )}
+          {proyecto.micro && (
+            <BotonModal onClick={() => { onCerrar(); setTimeout(() => window.dispatchEvent(new CustomEvent("dcuates:abrir-micro", { detail: proyecto.micro })), 250); }}>{proyecto.textoBoton}</BotonModal>
+          )}
           {proyecto.scrollDestino ? (
             <BotonModal
+              variante={proyecto.registro ? "secundario" : "principal"}
               onClick={() => {
                 onCerrar();
                 irASeccion(proyecto.scrollDestino);
@@ -970,9 +981,9 @@ export function ContenidoModalProyecto({ id, onCerrar }) {
             >
               {proyecto.textoBoton}
             </BotonModal>
-          ) : (
+          ) : (!proyecto.registro && !proyecto.micro) ? (
             <BotonModal href={proyecto.enlaceDirectoWA}>{proyecto.textoBoton}</BotonModal>
-          )}
+          ) : null}
           {proyecto.segundoBoton && (
             proyecto.segundoBoton.claveAcceso ? (
               <BotonModalProtegido href={proyecto.segundoBoton.enlace} clave={proyecto.segundoBoton.claveAcceso}>
@@ -1001,7 +1012,9 @@ export function ModalAccesoRapido({ tipo, onCerrar, onAbrirProyecto, onAccion })
     registrar("acceso_rapido", { tipo, elemento: String(it.t).slice(0, 40) });
     onCerrar();
     if (it.abre) window.dispatchEvent(new CustomEvent("dcuates:abrir-registro", { detail: it.abre }));
-    if (it.modal) onAbrirProyecto && onAbrirProyecto(it.modal);
+    if (it.reg) setTimeout(() => abrirRegistroPrevio(it.reg), 120);
+    else if (it.micro) setTimeout(() => window.dispatchEvent(new CustomEvent("dcuates:abrir-micro", { detail: it.micro })), 120);
+    else if (it.modal) onAbrirProyecto && onAbrirProyecto(it.modal);
     else if (it.seccion) setTimeout(() => irASeccion(it.seccion), it.abre ? 400 : 150);
     else if (it.accion) onAccion && onAccion(it.accion);
   };
@@ -1023,6 +1036,7 @@ export function ModalAccesoRapido({ tipo, onCerrar, onAbrirProyecto, onAccion })
         </div>
         <div className="px-5 pb-3 grid grid-cols-2 gap-3">
           {lista.map((it, i) => {
+            if (it.grupo) return <p key={i} className="col-span-2 mt-2 text-[13px] font-black uppercase tracking-wide text-[#0f2d1e]">{it.grupo}</p>;
             const logo = it.modal ? (BOTONES_PORTADA.find((b) => b.modal === it.modal) || {}).img : null;
             return (
               <button
