@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import BotonCompartir from "./BotonCompartir.jsx";
+import { abrirRegistroPrevio } from "./RegistroPrevio.jsx";
 import CaminoDcuates from "./CaminoDcuates.jsx";
 import { useAtras } from "./atras.js";
 import { abrirDespues } from "./Extras.jsx";
@@ -66,7 +67,7 @@ function Guia({ p, onCerrar, onAbrirProyecto, modo, setModo }) {
         {des && des.length > 0 && <>
           <p className="zj-et">🚧 Ideas y proyectos en desarrollo</p>
           <div className="pu-des">{des.map(([e, t, d]) => <div className="ag-ev" key={t}><b>{e} {t}</b><p>{d}</p></div>)}</div>
-          <div className="zj-col"><button type="button" onClick={() => ir({ chat: `¡Hola DCUATES! Me gustaría participar o proponer algo en «${p.titulo}»: ___` })} style={{ background: "#334155" }}>🙌 Quiero participar o proponer algo</button></div>
+          <div className="zj-col"><button type="button" onClick={() => ir({ reg: { id: "puerta-participar", perfil: p.titulo } })} style={{ background: "#334155" }}>🙌 Quiero participar o proponer algo</button></div>
         </>}
         {aviso && <p className="pu-aviso">{aviso}</p>}
         {m.vender && <p className="pu-aviso">{m.nota}</p>}
@@ -118,7 +119,12 @@ function Selector({ onCerrar, onAbrirProyecto }) {
           <button type="button" onClick={() => abrirPuerta("invitado")}>💌 Me invitaron</button>
         </div>
         <div className="zj-col">
-          {lista.map((x) => <button type="button" key={x.id} style={{ background: x.c }} onClick={() => abrirPuerta(x.id)}>{x.e} {x.t}{actual === x.id ? "  ✅ tu puerta" : ""}</button>)}
+          {lista.map((x) => (
+            <React.Fragment key={x.id}>
+              {x.id === "talento" && <button type="button" className="pu-otro" style={{ background: "#475569" }} onClick={() => abrirRegistroPrevio("otro-perfil")}>🧩 Otro perfil <small>(describe aquí tu perfil y tu solicitud)</small></button>}
+              <button type="button" style={{ background: x.c }} onClick={() => abrirPuerta(x.id)}>{x.e} {x.t}{actual === x.id ? "  ✅ tu puerta" : ""}</button>
+            </React.Fragment>
+          ))}
           <button type="button" style={{ background: "#1B6F8A" }} onClick={() => lanza({ tablero: "conoce" }, onCerrar, onAbrirProyecto)}>📚 Proyectos DCUATES</button>
           <button type="button" style={{ background: "#334155" }} onClick={onCerrar}>🌐 Ir a la página (sin elegir puerta)</button>
         </div>

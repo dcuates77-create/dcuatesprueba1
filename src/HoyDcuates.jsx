@@ -121,7 +121,7 @@ export function BotonRegistrate() {
     <div className="rp-wrap">
       <button type="button" className="rp-btn" onClick={() => abrirAcceso("registros")}>
         <span className="rp-e" aria-hidden="true">📝</span>
-        <span className="rp-t"><b>REGÍSTRATE Y PARTICIPA</b><small>Pide o suma: ayuda, negocio, voluntariado</small></span>
+        <span className="rp-t"><b>REGÍSTRATE Y PARTICIPA</b><small>Pide o suma: libros, mascotas, negocio, voluntariado y más</small></span>
       </button>
       <span className="rp-comp"><BotonCompartir hash="registrate" titulo="Regístrate y participa en DCUATES" texto="Cuéntanos qué necesitas o qué puedes ofrecer a la comunidad" variante="claro" /></span>
       <style>{`

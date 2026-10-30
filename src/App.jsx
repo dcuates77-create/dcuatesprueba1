@@ -44,6 +44,7 @@ import { useCalendario, mezclarAgenda } from "./utilidades/calendario.js";
 import { aplicarLetra, leerLetra } from "./tamanoLetra.js";
 import TableroConoce from "./TableroConoce.jsx";
 import MicroAcciones from "./MicroAcciones.jsx";
+import RegistroPrevio from "./RegistroPrevio.jsx";
 import { cargarSinonimosHoja } from "./utilidades/sinonimosHoja.js";
 import { cargarPerfilesHoja } from "./utilidades/perfilesHoja.js";
 import HoyDcuates, { QueSigue, guardarUltimo, BotonRegistrate } from "./HoyDcuates.jsx";
@@ -710,6 +711,7 @@ export default function App() {
       {/* Accesos rápidos: Avisos y Beneficios · Compartir Más · Inicio */}
       <TableroConoce />
       <MicroAcciones />
+      <RegistroPrevio />
       <Extras logros={logrosBanda} />
       <PuertasHost onAbrirProyecto={(id) => setModalProyecto(id)} />
       <Temporada />

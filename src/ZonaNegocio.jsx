@@ -2,6 +2,7 @@
 import React from "react";
 import { WHATSAPP_NUMERO } from "./datos/config.js";
 import BotonCompartir from "./BotonCompartir.jsx";
+import { abrirRegistroPrevio } from "./RegistroPrevio.jsx";
 import { identidad } from "./datos/identidad.js";
 import { abrirAcceso } from "./Tablero.jsx";
 import { abrirServicios, abrirLogros } from "./Extras.jsx";
@@ -51,7 +52,7 @@ export default function Negocio({ onCerrar, onAbrirProyecto }) {
           </div>
         ))}
         <p className="zj-et">¿Prefieres platicarlo?</p>
-        <div className="zj-col"><a className="in-btn" href={wa} target="_blank" rel="noopener noreferrer" style={{ background: "#25a244" }}>💬 Cuéntanos de tu negocio por WhatsApp</a></div>
+        <div className="zj-col"><button type="button" className="in-btn" onClick={() => abrirRegistroPrevio("alianza")} style={{ background: "#25a244" }}>📝 Registra tu negocio y recibe tu folio</button></div>
       </div>
     </div>
   );

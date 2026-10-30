@@ -187,6 +187,7 @@ export default function InicioNuevo({ onIr, logros = [], cargando = false, entra
             if (!a) return;
             const ev = (n, d) => window.dispatchEvent(new CustomEvent(n, { detail: d }));
             if (a.acceso) { setPrev(null); setTimeout(() => ev("dcuates:abrir-acceso", a.acceso), 150); }
+            else if (a.reg) { ev("dcuates:registro-previo", typeof a.reg === "string" ? { id: a.reg } : a.reg); }
             else if (a.proy) { entrada.onAbrirProyecto && entrada.onAbrirProyecto(a.proy); }
             else if (a.zona) { setPrev(null); setTimeout(() => ev("dcuates:abrir-zona", a.zona), 150); }
             else if (a.wa) window.open("https://wa.me/" + WHATSAPP_NUMERO + "?text=" + encodeURIComponent(a.wa), "_blank", "noopener");

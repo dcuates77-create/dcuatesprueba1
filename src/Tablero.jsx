@@ -37,7 +37,7 @@ export default function Tablero({ paso, emoji, titulo, intro, color = "#1B6F8A",
           <button type="button" className="tb-card tb-reg" style={{ "--c": "#2E9E5B" }} onClick={onRegistros}>
             <span className="tb-e" aria-hidden="true">📝</span>
             <span className="tb-t"><b>REGÍSTRATE Y PARTICIPA</b>
-            <small>Solicitudes, negocio, ventas con causa, reportes, voluntariado y sugerencias</small></span>
+            <small>Libros, asesorías, mascotas, negocio, alianzas, voluntariado, ideas y más. Recibes tu folio.</small></span>
           </button>
         </div>
       </div>

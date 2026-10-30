@@ -661,7 +661,8 @@ export default function BloqueCentral({
   const ejecutar = (a) => {
     if (!a) return;
     const ev = (n, d) => window.dispatchEvent(new CustomEvent(n, { detail: d }));
-    if (a.entrada) ev("dcuates:abrir-entrada");
+    if (a.reg) ev("dcuates:registro-previo", typeof a.reg === "string" ? { id: a.reg } : a.reg);
+    else if (a.entrada) ev("dcuates:elegir-puerta");
     else if (a.acceso) onAcceso(a.acceso);
     else if (a.proy) onAbrirProyecto(a.proy);
     else if (a.zona) ev("dcuates:abrir-zona", a.zona);

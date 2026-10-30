@@ -6,6 +6,7 @@ import TiraAuto from "./TiraAuto.jsx";
 import { useAtras } from "./atras.js";
 import Tablero, { abrirAcceso } from "./Tablero.jsx";
 import BotonCompartir from "./BotonCompartir.jsx";
+import { abrirRegistroPrevio } from "./RegistroPrevio.jsx";
 import { GOOGLE_SHEETS_URL, WHATSAPP_NUMERO } from "./datos/config.js";
 import { LOGROS_ITEMS } from "./datos/cintas.js";
 import { ACTIVIDADES_VOLUNTARIOS, BENEFICIOS, MENSAJES_DIFUSION, PERFILES, TARJETAS_ALIADOS } from "./datos/aliados.js";
@@ -38,7 +39,7 @@ function Acceso({ onCerrar, onEntrar }) {
           {error && <p className="pr-err" role="alert">{error}</p>}
           <button type="submit" className="pr-enviar">🔓 Entrar</button>
         </form>
-        <a className="in-btn in-sec2" href={wa("Hola, quiero unirme a la Zona de Aliados, Patrocinadores, Voluntarios y Amigos de DCUATES y solicitar mi clave. Mi nombre es: ___ · Me gustaría participar como (aliado / patrocinador / voluntario / amigo): ___ · Mi negocio u organización (si aplica): ___")} target="_blank" rel="noopener noreferrer">🤝 SOLICITAR UNIRME Y MI CLAVE</a>
+        <button type="button" className="in-btn in-sec2" onClick={() => abrirRegistroPrevio("clave")}>🤝 SOLICITAR UNIRME Y MI CLAVE</button>
         <p className="pr-nota">Nunca compartas tu clave con desconocidos. DCUATES jamás te la pedirá por mensaje.</p>
       </div>
     </div>
