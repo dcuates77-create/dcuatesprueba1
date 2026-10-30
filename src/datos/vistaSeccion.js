@@ -37,7 +37,7 @@ export const VISTA = {
     extras: [
       { ico: "📝", t: "Registra tu solicitud", d: "Cuéntanos qué necesitas y te contactamos por WhatsApp.", anidada: "slot" }
     ],
-    cta: { t: "Tu iniciativa también puede ser un beneficio", d: "Únete a DCUATES y sé parte del cambio.", a: { entrada: 1 } },
+    cta: { t: "Tu iniciativa también puede ser un beneficio", d: "Únete a DCUATES y sé parte del cambio.", a: { reg: "iniciativa" } },
     sumar: {
       img: "/images/sumar-beneficios.jpg",
       titulo: "Tus beneficios también suman",

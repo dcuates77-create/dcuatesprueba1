@@ -5,6 +5,7 @@ import { enlaceWhatsApp } from "../utilidades/baserow.js";
 export const INICIATIVAS_PRINCIPALES = [
   {
     id: "libros",
+    registro: "libros",
     categoria: "EDUCACIÓN Y DESARROLLO",
     titulo: "LA BIBLIOBICI Y AMIGOS",
     descripcion: "Préstamo gratuito de libros y materiales educativos para el desarrollo personal y social. La lectura que llega hasta tu colonia para fortalecer a la COMUNIDAD.",
@@ -18,6 +19,7 @@ export const INICIATIVAS_PRINCIPALES = [
   },
   {
     id: "ecatepets",
+    registro: "ecatepets", textoRegistro: "Quiero sumarme a Ecatepets",
     categoria: "BIENESTAR ANIMAL",
     titulo: "ECATEPETS",
     descripcion: "Apoyo en la búsqueda de mascotas extraviadas, y fomento de la adopción y el cuidado animal responsable en conjunto con los vecinos de DCUATES.",
@@ -34,6 +36,7 @@ export const INICIATIVAS_PRINCIPALES = [
   },
   {
     id: "alianzas-tarjeta",
+    registro: "alianza",
     categoria: "CRECIMIENTO CONJUNTO",
     titulo: "ALIANZAS GANAR-GANAR",
     descripcion: "Emprendedores, organizaciones y particulares que desean hacer sinergia para crecer juntos y robustecer el tejido social de la COMUNIDAD.",
@@ -47,6 +50,7 @@ export const INICIATIVAS_PRINCIPALES = [
   },
   {
     id: "circulo-confianza",
+    registro: "circulo",
     categoria: "APOYOS Y BENEFICIOS MUTUOS",
     titulo: "CÍRCULO DE CONFIANZA",
     descripcion: "Si eres una persona o negocio TOTALMENTE CONFIABLE que desea SUMAR con perfiles que están en la misma sintonía, o conoces personas o negocios que les gustaría formar parte de nuestro círculo, ¡serán muy BIENVENIDOS!",
@@ -63,6 +67,7 @@ export const INICIATIVAS_PRINCIPALES = [
   },
   {
     id: "recomienda-evalua-gana",
+    micro: "recomienda",
     categoria: "CONOCIMIENTOS Y EXPERIENCIAS QUE VALEN",
     titulo: "RECOMIENDA, EVALÚA Y GANA",
     descripcion: "Tus recomendaciones y comentarios sobre las buenas o malas prácticas, acciones y calidad que tienen los negocios con sus productos y servicios, y las personas que están a cargo de estos, APORTAN VALOR Y MERECEN ser RECOMPENSADOS de alguna forma.",
@@ -88,6 +93,7 @@ export const INICIATIVAS_PRINCIPALES = [
 export const NUEVOS_PROYECTOS_DATA = [
   {
     id: "asesorias",
+    registro: "asesorias",
     categoria: "DESARROLLO PROFESIONAL",
     titulo: "Asesorías Personales y de Negocios",
     descripcion: "Orientación profesional sin barreras para impulsar tus metas o regularizar tu modelo de negocio de manera efectiva.",
@@ -97,6 +103,7 @@ export const NUEVOS_PROYECTOS_DATA = [
   },
   {
     id: "bazares",
+    registro: "bazar",
     categoria: "VENTAS CON CAUSA",
     titulo: "Comercios Físicos y Digitales",
     descripcion: "Ventas caseras y de calle basadas en la confianza mutua para el apoyo de la economía familiar y solidaria.",
@@ -106,6 +113,7 @@ export const NUEVOS_PROYECTOS_DATA = [
   },
   {
     id: "noticias",
+    registro: "noticias",
     categoria: "COMUNICACIÓN COLECTIVA",
     titulo: "Noticias y Agenda Cultural",
     descripcion: "Mantente al día con los eventos culturales, convocatorias comunitarias y acontecimientos sociales de la zona.",
@@ -115,6 +123,7 @@ export const NUEVOS_PROYECTOS_DATA = [
   },
   {
     id: "bienestar",
+    registro: "bienestar",
     categoria: "SALUD Y ESPARCIMIENTO",
     titulo: "Bienestar, Salud y Recreación",
     descripcion: "Actividades recreativas y talleres enfocados en el desarrollo integral, la salud mental y el esparcimiento familiar.",

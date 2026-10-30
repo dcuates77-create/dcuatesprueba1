@@ -3,7 +3,7 @@
 // Todo lo "de la semana" rota solo cada lunes. NOSOTROS usa el CAMINO/HOY generales.
 // Acciones: {p:"id-proyecto"} abre un proyecto · {z:"empieza|juegos|aprende|gana|propon|causa|info|negocio"} abre una zona
 //           {serv:1} servicios · {logros:1} logros · {acc:"beneficios|registros|mapa"} · {wa:"texto"} compartir por WhatsApp
-//           {scroll:"id"} baja a un punto de la página
+//           {scroll:"id"} baja a un punto de la página · {reg:"ecatepets"} abre un registro previo (src/datos/registros.js) · {micro:"dos"} abre una micro-acción
 // =========================================================================
 import { abrirServicios, abrirLogros } from "../Extras.jsx";
 import { WHATSAPP_NUMERO } from "./config.js";
@@ -22,6 +22,8 @@ export function ejecutar(a, abrirProyecto = () => {}) {
   else if (a.serv) abrirServicios();
   else if (a.logros) abrirLogros();
   else if (a.acc) ev("dcuates:abrir-acceso", a.acc);
+  else if (a.reg) ev("dcuates:registro-previo", typeof a.reg === "string" ? { id: a.reg } : a.reg);
+  else if (a.micro) ev("dcuates:abrir-micro", a.micro);
   else if (a.elegir) ev("dcuates:elegir-puerta");
   else if (a.bienvenida) ev("dcuates:bienvenida");
   else if (a.tablero) ev("dcuates:abrir-tablero", a.tablero);
