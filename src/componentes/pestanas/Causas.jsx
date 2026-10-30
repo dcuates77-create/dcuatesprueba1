@@ -2,6 +2,8 @@ import React from "react";
 import { BotonNaranjaDesplegable, FlechaBlanca, PasarelaExtraviados } from "../media.jsx";
 import { YOUTUBE_VIDEO_ID } from "../../datos/config.js";
 import { enlaceWhatsApp } from "../../utilidades/baserow.js";
+import { abrirRegistroPrevio } from "../../RegistroPrevio.jsx";
+import { opcionAportacion } from "../../datos/registros.js";
 import BotonCompartir from "../../BotonCompartir";
 
 export function PestanaCausas({ apoyoCausaAnimalLinks, apoyoCosasCasosLinks, apoyoPersonasExtraviadasLinks, extraviadosResumenAbierto, setExtraviadosResumenAbierto }) {
@@ -101,9 +103,8 @@ export function PestanaCausas({ apoyoCausaAnimalLinks, apoyoCosasCasosLinks, apo
             ].map((opc) => (
               <a
                 key={opc.t}
-                href={enlaceWhatsApp(opc.m)}
-                target="_blank"
-                rel="noopener noreferrer"
+                href="#registros"
+                onClick={(e) => { e.preventDefault(); abrirRegistroPrevio("aportacion", { valores: { tipo: opcionAportacion(opc.t) } }); }}
                 className="w-full text-left rounded-2xl border-4 border-[#0f2d1e] bg-[#e65100] hover:bg-[#bf360c] p-4 sm:p-5 shadow-md transition-all hover:scale-[1.01] group duration-200 block"
               >
                 <div className="flex justify-between items-center gap-3">
@@ -164,13 +165,12 @@ export function PestanaCausas({ apoyoCausaAnimalLinks, apoyoCosasCasosLinks, apo
                     <FlechaBlanca />
                   </a>
                   <a
-                    href={enlaceWhatsApp("¡Hola DCUATES! Quiero reportar un caso de mascota, persona o cosa extraviada.")}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    href="#registros"
+                    onClick={(e) => { e.preventDefault(); abrirRegistroPrevio("extraviado"); }}
                     className="w-full text-left rounded-xl border-2 border-[#0f2d1e] bg-[#e65100] hover:bg-[#bf360c] p-3 shadow-sm transition-colors flex items-center justify-between gap-3"
                   >
                     <p className="text-sm sm:text-base font-black text-white uppercase tracking-tight leading-tight">
-                      Reportar un Caso por WhatsApp
+                      Reportar un caso (registro con folio)
                     </p>
                     <FlechaBlanca />
                   </a>
