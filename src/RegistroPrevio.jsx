@@ -8,6 +8,7 @@ import FormMini from "./FormMini.jsx";
 import BotonCompartir from "./BotonCompartir.jsx";
 import { REGISTROS } from "./datos/registros.js";
 import { registrar } from "./analitica.js";
+import { abrirTablon } from "./Tablon.jsx";
 import { WHATSAPP_NUMERO as WHATS_NUM } from "./datos/config.js";
 
 export const abrirRegistroPrevio = (id, opciones = {}) =>
@@ -21,6 +22,7 @@ export default function RegistroPrevio() {
     const abre = (e) => {
       const d = e && e.detail;
       const o = typeof d === "string" ? { id: d } : d || {};
+      if (o.id === "tablon") { abrirTablon(o.filtro || ""); return; }
       if (!REGISTROS[o.id]) return;
       registrar("registro_previo_abierto", { id: o.id });
       setAct(o);
@@ -42,6 +44,7 @@ export default function RegistroPrevio() {
         </div>
         <p className="rp-i">{base.intro}</p>
         <FormMini key={act.id + (act.perfil || "")} cfg={cfg} clave={"rp-" + act.id} valores={act.valores || null} />
+        {base.seccion && <p className="rp-s"><button type="button" onClick={() => { cerrar(); setTimeout(() => abrirTablon(base.seccion), 60); }}>🧺 Ver lo que ya hay disponible en «{base.seccion}»</button></p>}
         <p className="rp-s">¿Prefieres escribirnos directo? <button type="button" onClick={() => { const t = `${base.wa || "¡Hola DCUATES!"}`; window.open(`https://wa.me/${WHATS_NUM}?text=${encodeURIComponent(t)}`, "_blank", "noopener"); }}>Abrir WhatsApp</button></p>
       </div>
     </div>,

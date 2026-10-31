@@ -28,21 +28,22 @@ export default function FormMini({ cfg, onListo, clave = "form", valores = null 
   const cambia = (k, val) => { setV((x) => ({ ...x, [k]: val })); setErr(""); };
   const armar = () => {
     let nombre = "", contacto = "";
-    const partes = [];
+    const partes = [], extras = {};
     cfg.campos.forEach((c) => {
       const val = String(v[c.k] || "").trim();
       if (!val) return;
+      if (c.pub) extras[c.pub] = val; // e57: datos para el tablón público (Titulo, Texto, Categoria, Permiso)
       if (c.campo === "Nombre") nombre = val;
       else if (c.campo === "Contacto") contacto = val;
       else partes.push(`${c.etiqueta.replace(/[¿?:]/g, "").trim()}: ${val}`);
     });
-    return { nombre, contacto, mensaje: partes.join(" | ") };
+    return { nombre, contacto, extras, mensaje: partes.join(" | ") };
   };
   const enviar = (e) => {
     e.preventDefault();
     const falta = cfg.campos.find((c) => c.req && !String(v[c.k] || "").trim());
     if (falta) { setErr(`Falta: ${falta.etiqueta.replace(/[¿?]/g, "").trim()}`); return; }
-    const { nombre, contacto, mensaje } = armar();
+    const { nombre, contacto, mensaje, extras } = armar();
     if (cfg.folio && digitos(contacto).length < 10) { setErr("Escribe tu WhatsApp con 10 dígitos para poder contactarte."); return; }
     // Anti-spam: campo oculto (los robots lo llenan) y un mismo registro no se envía dos veces en 20 segundos.
     if (trampa) { setFolio(cfg.folio ? nuevoFolio(cfg.folio) : ""); setEnviado(true); return; }
@@ -50,7 +51,7 @@ export default function FormMini({ cfg, onListo, clave = "form", valores = null 
     try { const ult = parseInt(localStorage.getItem(llaveT) || "0", 10); if (Date.now() - ult < 20000) { setErr("Ya recibimos tu registro hace un momento. Espera unos segundos."); return; } localStorage.setItem(llaveT, String(Date.now())); } catch (e2) { /* sin almacenamiento */ }
     const f = cfg.folio ? nuevoFolio(cfg.folio) : "";
     setFolio(f);
-    guardarEnHoja({ Tipo: cfg.tipo, Perfil: cfg.perfil || "", Nombre: nombre, Contacto: contacto, Mensaje: mensaje.slice(0, 1200), ...(f ? { Folio: f, Proyecto: cfg.proyecto || cfg.tipo, Urgente: cfg.urgente ? "Sí" : "" } : {}) });
+    guardarEnHoja({ Tipo: cfg.tipo, Perfil: cfg.perfil || "", Nombre: nombre, Contacto: contacto, Mensaje: mensaje.slice(0, 1200), ...(f ? { Folio: f, Proyecto: cfg.proyecto || cfg.tipo, Urgente: cfg.urgente ? "Sí" : "", ...(cfg.seccion ? { Seccion: cfg.seccion } : {}), ...extras } : {}) });
     registrar("form_mini_enviado", { tipo: cfg.tipo });
     setEnviado(true);
     onListo && onListo();
