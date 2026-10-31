@@ -22,7 +22,14 @@ export const YOUTUBE_VIDEO_ID = "SUnE27QnnyI";
 // iframe); no hace falta tocar nada más en el código.
 // Sello de versión: se ve en pequeño al final de los accesos rápidos y en la
 // consola del navegador. Sirve para comprobar que el celular ya cargó lo último.
-export const VERSION_BUILD = "CLON12 · e56";
+export const VERSION_BUILD = "CLON12 · e57";
+
+// Interruptor de contenido DE EJEMPLO (testimonios, cupones, casos extraviados,
+// anuncios del ticker, eventos de muestra). En true (como está ahora) se dejan visibles.
+// Al lanzar, ponlo en false y la página solo muestra
+// contenido real (hoja / Baserow / Calendar) y, si no hay, un mensaje amable.
+// Ponlo en true solo para ver cómo se vería con datos de muestra.
+export const MOSTRAR_EJEMPLOS = true;
 
 // Modo administrador (e48): el sello de versión y el estado de Baserow solo se ven aquí.
 // Para activarlo en un teléfono: abre dcuates.com/?admin=1 (queda guardado en ese teléfono).

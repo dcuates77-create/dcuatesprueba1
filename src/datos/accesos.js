@@ -25,7 +25,8 @@ export const ACCESOS_BENEFICIOS = [
 //   reg: "id"   abre un registro previo con folio (src/datos/registros.js)
 //   micro: "id" abre una micro-acción (recomienda, dos, evento, espacio, usar)
 export const ACCESOS_REGISTROS = [
-  { grupo: "🙏 Pide apoyo o servicios" },
+  { grupo: "🙏 NECESITO · Pide apoyo o servicios" },
+  { emoji: "🙏", t: "NECESITO algo", d: "Una cosa, servicio, recomendación o ayuda", reg: "necesito" },
   { emoji: "📝", t: "Registra tu solicitud", d: "Cuéntanos qué apoyo necesitas", seccion: "solicitudes" },
   { emoji: "📚", t: "Préstamo de libros", d: "Pide o dona libros y materiales", reg: "libros" },
   { emoji: "🎓", t: "Asesoría gratuita", d: "Legal, de negocio o personal", reg: "asesorias" },
@@ -33,7 +34,8 @@ export const ACCESOS_REGISTROS = [
   { emoji: "🌿", t: "Bienestar y recreación", d: "Talleres y actividades", reg: "bienestar" },
   { emoji: "🐾👣", blanco: true, t: "Reporta un caso", d: "Mascotas, personas o cosas extraviadas", reg: "extraviado" },
   { emoji: "🎤", t: "Espacio para tu actividad", d: "Pide prestado un espacio", micro: "usar" },
-  { grupo: "🤝 Suma tu parte" },
+  { grupo: "🤝 OFREZCO · Suma tu parte" },
+  { emoji: "🎁", t: "OFREZCO algo", d: "Una cosa, servicio o ayuda para alguien", reg: "ofrezco" },
   { emoji: "🏪", t: "Registra tu negocio gratis", d: "Publicidad y mapa de negocios", seccion: "publicidad" },
   { emoji: "🤝", t: "Alianza ganar-ganar", d: "Negocios y organizaciones", reg: "alianza" },
   { emoji: "🛍️", t: "Ventas con causa", d: "Ofrece tu producto o servicio", seccion: "registro-ventas", abre: "ventas" },
@@ -43,6 +45,8 @@ export const ACCESOS_REGISTROS = [
   { emoji: "🎓", t: "Ser asesor voluntario", d: "Comparte tus conocimientos", reg: "asesor" },
   { emoji: "💛", t: "Aportación para causas", d: "Económica, en especie o trueque", reg: "aportacion" },
   { emoji: "🏡", t: "Presta un espacio", d: "Para actividades de la red", micro: "espacio" },
+  { grupo: "🧺 RECIBO · Lo que hay hoy" },
+  { emoji: "🧺", t: "Ver lo que hay hoy", d: "Ofertas, necesidades, adopciones y libros", reg: "tablon" },
   { grupo: "💡 Propón y recomienda" },
   { emoji: "⭐", t: "Recomienda a alguien", d: "Quien hace labor social", micro: "recomienda" },
   { emoji: "✌️", t: "Reto: pide dos recomendaciones", d: "Por cada una que das, pide dos", micro: "dos" },

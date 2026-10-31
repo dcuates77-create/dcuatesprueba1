@@ -14,6 +14,8 @@ const NOMBRE = { k: "nombre", etiqueta: "Tu nombre", campo: "Nombre", req: true,
 const WHATS = { k: "wa", etiqueta: "Tu WhatsApp", campo: "Contacto", req: true, max: 20, ph: "10 dígitos. Ej. 5512345678" };
 const ZONA = { k: "zona", etiqueta: "Tu colonia o zona", max: 80, ph: "Ej. Jardines de Morelos" };
 
+const PERM = { k: "perm", pub: "Permiso", etiqueta: "¿Autorizas que publiquemos esto en «Lo que hay hoy», sin tu nombre ni tu teléfono?", tipo: "opciones", opciones: ["Sí, publíquenlo", "No, solo contáctenme"], req: true };
+
 const R = (id, e, titulo, folio, tipo, proyecto, intro, campos, extra = {}) => ({
   id, e, titulo, folio, tipo, proyecto, intro, campos: [NOMBRE, WHATS, ...campos], ...extra,
 });
@@ -23,17 +25,19 @@ export const REGISTROS = {
     "Cuéntanos qué libro o material necesitas, o cuál quieres donar o compartir. Te contactamos por WhatsApp.",
     [
       { k: "q", etiqueta: "¿Qué quieres hacer?", tipo: "opciones", opciones: ["Pedir un libro o material", "Donar libros", "Ser voluntario(a)"], req: true },
-      { k: "t", etiqueta: "Título, tema o cantidad", ph: "Ej. Libros de primaria / 10 novelas", max: 140, req: true },
+      { k: "t", pub: "Titulo", etiqueta: "Título, tema o cantidad", ph: "Ej. Libros de primaria / 10 novelas", max: 140, req: true },
       { k: "cuando", etiqueta: "¿Cuándo te queda bien? (día y horario)", max: 100 },
       ZONA,
-    ], { wa: "¡Hola DCUATES! Acabo de registrar mi solicitud en La Bibliobici (préstamo de libros)." }),
+      { k: "perm", pub: "Permiso", etiqueta: "¿Autorizas que publiquemos esto en «Lo que hay hoy», sin tu nombre ni tu teléfono?", tipo: "opciones", opciones: ["Sí, publíquenlo", "No, solo contáctenme"], req: true },
+    ], { seccion: "Libros", wa: "¡Hola DCUATES! Acabo de registrar mi solicitud en La Bibliobici (préstamo de libros)." }),
   ecatepets: R("ecatepets", "🐾", "Ecatepets · bienestar animal", "ECA", "Solicitud Ecatepets", "Ecatepets",
     "Cuéntanos cómo quieres sumarte o qué necesitas para un peludito. Te contactamos por WhatsApp.",
     [
-      { k: "q", etiqueta: "¿Qué quieres hacer?", tipo: "opciones", opciones: ["Adoptar", "Dar en adopción", "Hogar temporal", "Donar alimento o insumos", "Ser voluntario(a)", "Otra forma de ayudar"], req: true },
-      { k: "d", etiqueta: "Cuéntanos más", tipo: "area", max: 400, ph: "Ej. Busco un perro mediano, vivo en casa con patio", req: true },
+      { k: "q", pub: "Titulo", etiqueta: "¿Qué quieres hacer?", tipo: "opciones", opciones: ["Adoptar", "Dar en adopción", "Hogar temporal", "Donar alimento o insumos", "Ser voluntario(a)", "Otra forma de ayudar"], req: true },
+      { k: "d", pub: "Texto", etiqueta: "Cuéntanos más", tipo: "area", max: 400, ph: "Ej. Busco un perro mediano, vivo en casa con patio", req: true },
       ZONA,
-    ], { wa: "¡Hola DCUATES! Acabo de registrarme en Ecatepets para el bienestar animal." }),
+      { k: "perm", pub: "Permiso", etiqueta: "¿Autorizas que publiquemos esto en «Lo que hay hoy», sin tu nombre ni tu teléfono?", tipo: "opciones", opciones: ["Sí, publíquenlo", "No, solo contáctenme"], req: true },
+    ], { seccion: "Adopciones", wa: "¡Hola DCUATES! Acabo de registrarme en Ecatepets para el bienestar animal." }),
   asesorias: R("asesorias", "🎓", "Asesoría gratuita", "ASE", "Solicitud asesoría", "Asesorías",
     "Dinos qué tipo de orientación necesitas. Es gratuita y te contactamos por WhatsApp.",
     [
@@ -134,6 +138,31 @@ export const REGISTROS = {
       { k: "quien", etiqueta: "¿A quién beneficiaría?", max: 160 },
       { k: "nec", etiqueta: "¿Qué necesitas para lograrla?", tipo: "area", max: 300 },
     ], { wa: "¡Hola DCUATES! Acabo de enviar una iniciativa que puede ser un beneficio." }),
+  // e57 — TABLÓN «Lo que hay hoy»: OFREZCO / NECESITO (se publican desde la hoja, con permiso) y «Me interesa» (contacto a través de DCUATES)
+  ofrezco: R("ofrezco", "🎁", "Ofrezco", "OFR", "Ofrezco", "Tablón · Ofrezco",
+    "Algo que puedes dar, prestar, vender con causa o hacer por alguien. Lo revisamos y, si lo autorizas, lo publicamos sin tu nombre ni tu teléfono.",
+    [
+      { k: "cat", pub: "Categoria", etiqueta: "¿Qué ofreces?", tipo: "opciones", opciones: ["Producto", "Servicio", "Ayuda o voluntariado", "Libros", "Mascota", "Otro"], req: true },
+      { k: "tit", pub: "Titulo", etiqueta: "Título corto", max: 80, req: true, ph: "Ej. Regalo cuna en buen estado" },
+      { k: "d", pub: "Texto", etiqueta: "Cuéntanos más", tipo: "area", max: 300, req: true, ph: "Estado, cantidad, horarios, condiciones…" },
+      ZONA,
+      PERM,
+    ], { seccion: "Ofrezco", wa: "¡Hola DCUATES! Acabo de registrar algo que ofrezco." }),
+  necesito: R("necesito", "🙏", "Necesito", "NEC", "Necesito", "Tablón · Necesito",
+    "Algo que te hace falta: una cosa, un servicio, una recomendación o una mano. Lo revisamos y, si lo autorizas, lo publicamos sin tu nombre ni tu teléfono.",
+    [
+      { k: "cat", pub: "Categoria", etiqueta: "¿Qué necesitas?", tipo: "opciones", opciones: ["Producto", "Servicio", "Recomendación", "Ayuda o voluntariado", "Libros", "Mascota", "Otro"], req: true },
+      { k: "tit", pub: "Titulo", etiqueta: "Título corto", max: 80, req: true, ph: "Ej. Busco silla de ruedas prestada" },
+      { k: "d", pub: "Texto", etiqueta: "Cuéntanos más", tipo: "area", max: 300, req: true, ph: "Qué necesitas, para cuándo, en qué zona…" },
+      ZONA,
+      PERM,
+    ], { seccion: "Necesito", wa: "¡Hola DCUATES! Acabo de registrar algo que necesito." }),
+  interesa: R("interesa", "🙋", "Me interesa", "MEI", "Me interesa", "Tablón · Me interesa",
+    "DCUATES te pone en contacto: avisamos a quien publicó y, si está de acuerdo, le compartimos tu WhatsApp. Tu teléfono no se publica.",
+    [
+      { k: "ref", etiqueta: "Publicación", max: 160, req: true },
+      { k: "msg", etiqueta: "Mensaje (opcional)", tipo: "area", max: 300, ph: "Ej. Me interesa, puedo pasar el sábado" },
+    ], { wa: "¡Hola DCUATES! Me interesa una publicación de «Lo que hay hoy»." }),
   "puerta-participar": R("puerta-participar", "🙌", "Quiero participar o proponer algo", "PUE", "Propuesta de puerta", "Puertas",
     "Cuéntanos qué te gustaría hacer o proponer.",
     [{ k: "d", etiqueta: "¿Qué te gustaría hacer o proponer?", tipo: "area", max: 400, req: true }], { wa: "¡Hola DCUATES! Acabo de enviar una propuesta desde una puerta." }),

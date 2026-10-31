@@ -2,7 +2,7 @@
 // src/datos/proyectos.js — Proyectos, categorías y listas de la página
 // Solo datos: aquí se cambian textos sin tocar la lógica de la página.
 // =========================================================================
-import { WHATSAPP_NUMERO } from "./config.js";
+import { WHATSAPP_NUMERO, MOSTRAR_EJEMPLOS } from "./config.js";
 
 // Clave de acceso del candado que protege el botón "Únete a Nuestra Red de
 // Confianza" dentro de Círculo de Confianza — cámbiala aquí cuando quieras.
@@ -21,19 +21,21 @@ export const MUSICA_DCUATES_URL = "/audio/musica-dcuates.mp3";
 // enlace — "ver catálogo completo" — apuntando a tu galería pública real.
 export const BASEROW_GALLERY_URL = "https://baserow.io/public/gallery/xCYm1NOc3A5wuJC1NeYlVYyVeY_w7O2tQdNRKcDsiyE";
 
-export const VENTAS_CON_CAUSA_ITEMS = [
+const VENTAS_CON_CAUSA_ITEMS_EJEMPLO = [
   { id: "vc1", tipo: "Artesanías", nombre: "Bordados hechos a mano", descripcion: "Piezas únicas bordadas por manos locales. Pregunta por diseños personalizados.", img: "/images/ventas-causa-1.png" },
   { id: "vc2", tipo: "Alimentos", nombre: "Pan casero y repostería", descripcion: "Pedidos con un día de anticipación. Ideal para eventos y reuniones.", img: "/images/ventas-causa-2.png" },
   { id: "vc3", tipo: "Servicios", nombre: "Jardinería a domicilio", descripcion: "Poda, mantenimiento y diseño de jardines. Cotización sin costo.", img: "/images/ventas-causa-3.png" },
   { id: "vc4", tipo: "Segunda mano", nombre: "Ropa y accesorios", descripcion: "Prendas en buen estado a precios accesibles. Nuevo inventario cada semana.", img: "/images/ventas-causa-4.png" }
 ];
+export const VENTAS_CON_CAUSA_ITEMS = MOSTRAR_EJEMPLOS ? VENTAS_CON_CAUSA_ITEMS_EJEMPLO : [];
 
-export const EXTRAVIADOS_ITEMS = [
+const EXTRAVIADOS_ITEMS_EJEMPLO = [
   { id: "ex1", tipo: "Mascota", nombre: "Firulais", descripcion: "Perrito café, orejas caídas, visto por última vez cerca de la colonia centro.", img: "/images/extraviado-1.png" },
   { id: "ex2", tipo: "Persona", nombre: "Sr. Ramírez", descripcion: "Adulto mayor, salió de casa el martes por la tarde y no ha regresado.", img: "/images/extraviado-2.png" },
   { id: "ex3", tipo: "Cosa", nombre: "Mochila escolar azul", descripcion: "Olvidada en la parada del camión sobre la avenida principal.", img: "/images/extraviado-3.png" },
   { id: "ex4", tipo: "Mascota", nombre: "Michi", descripcion: "Gata blanca con manchas grises, muy asustadiza, extraviada desde el fin de semana.", img: "/images/extraviado-4.png" }
 ];
+export const EXTRAVIADOS_ITEMS = MOSTRAR_EJEMPLOS ? EXTRAVIADOS_ITEMS_EJEMPLO : [];
 
 // =========================================================================
 // CONEXIÓN REAL A BASEROW (segura: el token vive en el servidor, ver
@@ -79,34 +81,38 @@ export const BASEROW_TABLE_ID_ENLACES = "1178299";
 // solo Noticias y Bienestar la tienen, a modo de prueba — si el resultado
 // gusta, se puede replicar para cualquier otro proyecto agregando su propio
 // arreglo aquí y una entrada en GALERIAS_PROYECTOS.
-export const NOTICIAS_GALERIA_ITEMS = [
+const NOTICIAS_GALERIA_ITEMS_EJEMPLO = [
   { id: "not1", tipo: "Evento", nombre: "Feria cultural de agosto", descripcion: "Música en vivo, gastronomía local y actividades para toda la familia en la plaza principal.", img: "/images/noticias-1.png" },
   { id: "not2", tipo: "Convocatoria", nombre: "Taller de muralismo vecinal", descripcion: "Convocatoria abierta para pintar un mural comunitario. Se proporcionan materiales.", img: "/images/noticias-2.png" },
   { id: "not3", tipo: "Aviso", nombre: "Jornada de limpieza del parque", descripcion: "Súmate el próximo sábado a la jornada de limpieza y reforestación del parque de la colonia.", img: "/images/noticias-3.png" }
 ];
+export const NOTICIAS_GALERIA_ITEMS = MOSTRAR_EJEMPLOS ? NOTICIAS_GALERIA_ITEMS_EJEMPLO : [];
 
-export const BIENESTAR_GALERIA_ITEMS = [
+const BIENESTAR_GALERIA_ITEMS_EJEMPLO = [
   { id: "bien1", tipo: "Taller", nombre: "Yoga al aire libre", descripcion: "Sesiones gratuitas los domingos por la mañana, para todos los niveles.", img: "/images/bienestar-1.png" },
   { id: "bien2", tipo: "Actividad", nombre: "Grupo de caminata vecinal", descripcion: "Caminatas ligeras entre semana para fomentar la actividad física y la convivencia.", img: "/images/bienestar-2.png" },
   { id: "bien3", tipo: "Charla", nombre: "Salud mental y comunidad", descripcion: "Plática abierta sobre bienestar emocional, con espacio para preguntas.", img: "/images/bienestar-3.png" }
 ];
+export const BIENESTAR_GALERIA_ITEMS = MOSTRAR_EJEMPLOS ? BIENESTAR_GALERIA_ITEMS_EJEMPLO : [];
 
 // 3 secciones naranjas nuevas, debajo de los botones verdes (Historias,
 // Cupones/Promos y Patrocinadores/Alianzas). Cada arreglo alimenta su
 // propio carrusel — reemplaza estas fotos/textos de EJEMPLO por las reales
 // cuando las tengas. Misma estructura que las galerías de arriba, así que
 // también se pueden conectar a Baserow más adelante si se desea.
-export const HISTORIAS_DCUATES_ITEMS = [
+const HISTORIAS_DCUATES_ITEMS_EJEMPLO = [
   { id: "hist1", tipo: "Historia", nombre: "El renacer de la Panadería Café Sol", descripcion: "Cómo una alianza vecinal ayudó a reabrir sus puertas después de un momento difícil.", img: "/images/historias-1.png" },
   { id: "hist2", tipo: "Historia", nombre: "De la calle a un hogar: la adopción de Firulais", descripcion: "Una historia de Ecatepets con final feliz gracias a la red de vecinos.", img: "/images/historias-2.png" },
   { id: "hist3", tipo: "Historia", nombre: "Voluntarios que cambian vidas", descripcion: "El testimonio de una familia apoyada por la comunidad DCUATES.", img: "/images/historias-3.png" }
 ];
+export const HISTORIAS_DCUATES_ITEMS = MOSTRAR_EJEMPLOS ? HISTORIAS_DCUATES_ITEMS_EJEMPLO : [];
 
-export const CUPONES_PROMOS_ITEMS = [
+const CUPONES_PROMOS_ITEMS_EJEMPLO = [
   { id: "cup1", tipo: "Cupón", nombre: "20% en tu primera visita — Taquería El Sol", descripcion: "Válido presentando este cupón digital directo desde tu celular.", img: "/images/cupones-1.png" },
   { id: "cup2", tipo: "Promo", nombre: "2x1 en tu primera consulta de asesoría", descripcion: "Cupo limitado — agenda tu lugar directo por WhatsApp.", img: "/images/cupones-2.png" },
   { id: "cup3", tipo: "Promo", nombre: "Descuento en Ventas con Causa", descripcion: "Pregunta por la promoción vigente del mes en el catálogo.", img: "/images/cupones-3.png" }
 ];
+export const CUPONES_PROMOS_ITEMS = MOSTRAR_EJEMPLOS ? CUPONES_PROMOS_ITEMS_EJEMPLO : [];
 
 // Mapa que conecta cada id de proyecto con su galería y título de modal —
 // así el botón "Ver galería" sabe qué mostrar sin más configuración.
