@@ -58,6 +58,17 @@ function Guia({ p, onCerrar, onAbrirProyecto, modo, setModo }) {
           ))}
         </ol>
         <SubtiposPuerta key={p.id} p={p} />
+        {!p.sensible && (
+          <>
+            <p className="zj-et">🔁 ¿Qué quieres hacer hoy?</p>
+            <div className="pu-onr">
+              <button type="button" style={{ background: "#1F7A46" }} onClick={() => ir({ reg: { id: "ofrezco", perfil: p.titulo } })}><b>🎁 OFREZCO</b><small>algo para la comunidad</small></button>
+              <button type="button" style={{ background: "#B7791F" }} onClick={() => ir({ reg: { id: "necesito", perfil: p.titulo } })}><b>🙏 NECESITO</b><small>una mano o algo</small></button>
+              <button type="button" style={{ background: "#1B6F8A" }} onClick={() => ir({ reg: { id: "tablon" } })}><b>🧺 RECIBO</b><small>lo que ya hay</small></button>
+            </div>
+            <style>{`.pu-onr{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:0 0 8px}.pu-onr button{min-height:64px;border:0;border-radius:14px;color:#fff;font:inherit;padding:6px 4px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}.pu-onr b{font-size:14px;font-weight:900}.pu-onr small{font-size:11.5px;font-weight:700;line-height:1.15;color:#fff}`}</style>
+          </>
+        )}
         {grupos.map(([titulo, items]) => (
           <div key={titulo}>
             <p className="zj-et">{titulo}</p>

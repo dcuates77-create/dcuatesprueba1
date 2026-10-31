@@ -34,7 +34,7 @@ export default function Tablon() {
   const [filtro, setFiltro] = useState("");
   const [items, setItems] = useState(null);
   const cerrar = () => setAbierto(false);
-  const oculta = useAtras(abierto, cerrar);
+  const oculta = useAtras(abierto, cerrar, { hub: true }); // hub: se oculta mientras hay otra ventana encima y reaparece al cerrarla
   useEffect(() => {
     const abre = (e) => { setFiltro(typeof e.detail === "string" ? e.detail : ""); setAbierto(true); registrar("tablon_abierto", {}); };
     window.addEventListener("dcuates:abrir-tablon", abre);
@@ -43,9 +43,9 @@ export default function Tablon() {
   useEffect(() => { if (abierto && items === null) cargarPublicados().then(setItems); }, [abierto, items]);
   if (!abierto) return null;
   const lista = (items || []).filter((x) => !filtro || x.sec === filtro);
-  const ofrecer = () => { cerrar(); setTimeout(() => abrirRegistroPrevio("ofrezco"), 60); };
-  const necesitar = () => { cerrar(); setTimeout(() => abrirRegistroPrevio("necesito"), 60); };
-  const meInteresa = (x) => { cerrar(); setTimeout(() => abrirRegistroPrevio("interesa", { valores: { ref: `${x.id} · ${x.t}`.slice(0, 160) } }), 60); };
+  const ofrecer = () => abrirRegistroPrevio("ofrezco");
+  const necesitar = () => abrirRegistroPrevio("necesito");
+  const meInteresa = (x) => abrirRegistroPrevio("interesa", { valores: { ref: `${x.id} · ${x.t}`.slice(0, 160) } });
   return createPortal(
     <div className="tb-fondo" style={oculta ? { display: "none" } : undefined} role="dialog" aria-modal="true" aria-label="Lo que hay hoy" onClick={(e) => { if (e.target === e.currentTarget) cerrar(); }}>
       <style>{CSS}</style>

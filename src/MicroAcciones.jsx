@@ -6,6 +6,7 @@
 import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useAtras } from "./atras.js";
+import { abrirRegistroPrevio } from "./RegistroPrevio.jsx";
 import { registrar } from "./analitica.js";
 import { VISTA } from "./datos/vistaSeccion.js";
 import { MENSAJE_INVITACION, URL_SITIO, WHATSAPP_NUMERO } from "./datos/config.js";
@@ -164,7 +165,7 @@ export default function MicroAcciones() {
   const ejecutar = (a) => {
     if (!a) return;
     if (a.micro) { setForma((f) => (f === a.micro ? null : a.micro)); return; }
-    if (a.invitar) { registrar("invitar_vecino", { desde: "micro" }); window.open("https://wa.me/?text=" + encodeURIComponent(`${MENSAJE_INVITACION} ${URL_SITIO}/?origen=invitacion`), "_blank", "noopener"); return; }
+    if (a.invitar) { registrar("invitar_vecino", { desde: "micro" }); abrirRegistroPrevio("invitar"); return; }
     if (a.compartir) {
       registrar("compartir", { desde: "micro" });
       const url = `${URL_SITIO}/?origen=compartir`;
