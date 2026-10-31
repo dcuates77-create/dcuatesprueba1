@@ -5,6 +5,7 @@ import { BotonCerrar, CasillaAcepto, ErrorAcepto, VentanaMarca, abrirLegal, useA
 import { Carrusel, FlechaBlanca, PasarelaVentasConCausa, TarjetaCarrusel } from "./media.jsx";
 import { ACCESOS_BENEFICIOS, ACCESOS_REGISTROS } from "../datos/accesos.js";
 import { abrirRegistroPrevio } from "../RegistroPrevio.jsx";
+import { useAtras } from "../atras.js";
 import { opcionAportacion } from "../datos/registros.js";
 import { PATROCINADORES_ALIANZAS_ITEMS } from "../datos/cintas.js";
 import { MAPA_SITIO_EXTRA } from "../datos/config.js";
@@ -1008,18 +1009,20 @@ export function ModalAccesoRapido({ tipo, onCerrar, onAbrirProyecto, onAccion })
   const invitacion = esBen
     ? "Toca el que te interese y conoce cómo usarlo, sin costo."
     : "Elige qué quieres registrar o a qué quieres sumarte.";
+  // e58: esta lista se queda abierta (oculta) mientras se ve un registro o micro-acción, y reaparece al cerrarlo: así no se sale hasta la página.
+  const oculta = useAtras(true, onCerrar, { hub: true });
   const elegir = (it) => {
     registrar("acceso_rapido", { tipo, elemento: String(it.t).slice(0, 40) });
-    onCerrar();
+    if (!(it.reg || it.micro)) onCerrar();
     if (it.abre) window.dispatchEvent(new CustomEvent("dcuates:abrir-registro", { detail: it.abre }));
-    if (it.reg) setTimeout(() => abrirRegistroPrevio(it.reg), 120);
-    else if (it.micro) setTimeout(() => window.dispatchEvent(new CustomEvent("dcuates:abrir-micro", { detail: it.micro })), 120);
+    if (it.reg) abrirRegistroPrevio(it.reg);
+    else if (it.micro) window.dispatchEvent(new CustomEvent("dcuates:abrir-micro", { detail: it.micro }));
     else if (it.modal) onAbrirProyecto && onAbrirProyecto(it.modal);
     else if (it.seccion) setTimeout(() => irASeccion(it.seccion), it.abre ? 400 : 150);
     else if (it.accion) onAccion && onAccion(it.accion);
   };
   return (
-    <div className="fixed inset-0 z-[55] flex items-end sm:items-center justify-center bg-black/55 p-3" onClick={onCerrar}>
+    <div className="fixed inset-0 z-[55] flex items-end sm:items-center justify-center bg-black/55 p-3" style={oculta ? { display: "none" } : undefined} onClick={onCerrar}>
       <div
         className="bg-white text-slate-900 rounded-3xl shadow-2xl w-full max-w-md max-h-[calc(100dvh-1.5rem)] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
