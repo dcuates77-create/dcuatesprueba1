@@ -16,3 +16,10 @@ export const cargarEspacios = () => {
   return espaciosP;
 };
 export const cargarAgendaHoja = () => pedir("agenda");
+
+// e57 — publicaciones del tablón «Lo que hay hoy» (Ofrezco / Necesito / Adopciones / Libros): solo las que tú marcas «Sí» en la hoja.
+let pubP = null, pubT = 0;
+export const cargarPublicados = () => {
+  if (!pubP || Date.now() - pubT > 600000) { pubT = Date.now(); pubP = pedir("publicados"); }
+  return pubP;
+};
