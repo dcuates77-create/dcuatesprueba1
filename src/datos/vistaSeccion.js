@@ -42,7 +42,7 @@ export const VISTA = {
       img: "/images/sumar-beneficios.jpg",
       titulo: "Tus beneficios también suman",
       texto: "Cada persona que usa y comparte un beneficio hace crecer la red. Pide el tuyo o recomiéndalo a alguien que lo necesite.",
-      botones: [{ t: "Registra tu solicitud", a: { ir: "solicitudes" } }, { t: "Regístrate o participa", a: { acceso: "registros" } }]
+      botones: [{ t: "Registra tu solicitud", a: { reg: "solicitud" } }, { t: "Regístrate o participa", a: { acceso: "registros" } }]
     }
   },
   causas: {
