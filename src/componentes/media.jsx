@@ -133,12 +133,12 @@ export function BotonNaranjaDesplegable({ titulo, children }) {
   );
 }
 
-export function Carrusel({ items, renderItem, intervaloMs = 4000 }) {
+export function Carrusel({ items, renderItem, intervaloMs = 4000, vacio }) {
   const [index, setIndex] = useState(0);
   const [pausado, setPausado] = useState(false);
 
   useEffect(() => {
-    if (pausado) return;
+    if (pausado || items.length < 2) return;
     const id = setInterval(() => {
       setIndex((i) => (i + 1) % items.length);
     }, intervaloMs);
@@ -161,7 +161,15 @@ export function Carrusel({ items, renderItem, intervaloMs = 4000 }) {
   const anterior = () => { setIndex((i) => (i - 1 + items.length) % items.length); setPausado(true); };
   const siguiente = () => { setIndex((i) => (i + 1) % items.length); setPausado(true); };
 
-  const item = items[index];
+  if (!items.length) {
+    return (
+      <div className="rounded-2xl border-4 border-dashed border-emerald-700/40 bg-emerald-50/60 p-5 text-center text-sm font-bold text-emerald-900">
+        {vacio || "Aún no hay nada publicado aquí. ¡Sé la primera persona en sumarte!"}
+      </div>
+    );
+  }
+
+  const item = items[index % items.length];
 
   return (
     <div className="rounded-2xl border-4 border-[#0f2d1e] bg-white overflow-hidden shadow-md">
@@ -346,6 +354,7 @@ export function PasarelaExtraviados() {
   return (
     <Carrusel
       items={items}
+      vacio="Por ahora no hay reportes activos. Si extravías o encuentras algo, repórtalo aquí abajo y lo difundimos."
       renderItem={(item) => (
         <TarjetaCarrusel item={item} etiqueta={item.tipo ? `${item.tipo} extraviad${item.tipo === "Persona" ? "a" : "o"}` : ""} />
       )}
@@ -358,6 +367,7 @@ export function PasarelaVentasConCausa() {
   return (
     <Carrusel
       items={items}
+      vacio="Pronto verás aquí ventas y servicios con causa. ¿Tienes algo que ofrecer? Regístralo con el botón de abajo."
       renderItem={(item) => (
         <TarjetaCarrusel item={item} etiqueta={item.tipo} mostrarDetallesVenta />
       )}

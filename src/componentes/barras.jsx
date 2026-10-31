@@ -2,10 +2,11 @@ import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { BotonCerrar } from "./legal.jsx";
 import BotonCompartir from "../BotonCompartir.jsx";
 import { IframeVideo } from "./media.jsx";
+import { MOSTRAR_EJEMPLOS } from "../datos/config.js";
 import { LOGROS_ITEMS, LOGROS_FIJOS, TICKER_ETIQUETAS, TICKER_FRASES } from "../datos/cintas.js";
 import { detectarVideo, enlaceWhatsApp, esPDF, paresBaserow, urlDesdeCeldaBaserow, useCarruselAutomatico, useFilasEnlaces } from "../utilidades/baserow.js";
 
-export const TICKER_ITEMS = [
+const TICKER_EJEMPLO = [
   { tipo: "negocio", nombre: "Taquería El Sol — 20% en tu primera visita", img: "/images/ticker-negocio-1.png", enlace: enlaceWhatsApp("¡Hola! Vi la promoción de Taquería El Sol en DCUATES.") },
   { tipo: "mascota", nombre: "Firulais — en búsqueda por la colonia centro", img: "/images/ticker-mascota-1.png", enlace: "#ecatepets" },
   { tipo: "aviso", texto: "🎉 Bazar comunitario este sábado en la plaza principal, 10am–4pm" },
@@ -15,6 +16,7 @@ export const TICKER_ITEMS = [
   { tipo: "aviso", texto: "📚 Nueva alianza con la papelería del barrio: 10% para vecinos DCUATES" },
   { tipo: "momento", nombre: "Taller de bienestar comunitario, julio 2026", img: "/images/ticker-momento-2.png", enlace: "#bienestar" }
 ];
+export const TICKER_ITEMS = MOSTRAR_EJEMPLOS ? TICKER_EJEMPLO : [];
 
 // =========================================================================
 // 5. SUBCOMPONENTE: BARRA TICKER INFERIOR (negocios / mascotas / avisos / momentos)
@@ -372,7 +374,7 @@ export function BarraTicker() {
   useEffect(() => {
     if (!visible) return;
     const id = setInterval(() => {
-      setIndex((i) => (i + 1) % itemsTicker.length);
+      setIndex((i) => (i + 1) % Math.max(1, itemsTicker.length));
     }, 4500);
     return () => clearInterval(id);
   }, [visible, itemsTicker.length]);
@@ -391,7 +393,7 @@ export function BarraTicker() {
     return () => { ro?.disconnect(); window.removeEventListener("resize", medir); };
   }, [visible, itemsTicker.length]);
 
-  if (!visible) return null;
+  if (!visible || itemsTicker.length === 0) return null;
 
   return (
     <div ref={barraRef} style={{ bottom: "var(--alto-nav, 0px)" }} className="fixed inset-x-0 z-40 bg-[#17472d] border-t-2 border-emerald-700/50 shadow-[0_-4px_12px_rgba(0,0,0,0.25)]">
