@@ -62,7 +62,7 @@ export const VISTA = {
       img: "/images/sumar-causas.webp",
       titulo: "Tu ayuda cambia vidas",
       texto: "Un poco de tu tiempo, talento o recursos puede cambiar la historia de alguien. Elige cómo ayudar y hazlo visible: tu ejemplo invita a otros.",
-      botones: [{ t: "Quiero ser voluntario", a: { ir: "donaciones" } }, { t: "Reporta un caso", a: { ir: "extraviados-registro" } }]
+      botones: [{ t: "Quiero ser voluntario", a: { reg: "voluntario" } }, { t: "Reporta un caso", a: { reg: "extraviado" } }]
     }
   },
   negocios: {
@@ -80,7 +80,7 @@ export const VISTA = {
     sumar: {
       img: "/images/sumar-negocios.jpg",
       titulo: "Tu negocio también suma",
-      texto: "Cuando compramos y recomendamos local, el valor se multiplica en el barrio. Registra tu negocio gratis y forma parte de la red.",
+      texto: "Cuando compramos y recomendamos local, el valor se multiplica en la comunidad. Registra tu negocio gratis y forma parte de la red.",
       botones: [{ t: "Registra tu negocio", a: { zona: "negocio" } }, { t: "Regístrate o participa", a: { acceso: "registros" } }]
     }
   },
@@ -129,7 +129,7 @@ export const VISTA = {
       titulo: "Micro-acciones: suma en pocos minutos",
       intro: "Toca la que puedas hacer ahora. Cada una suma.",
       items: [
-        { min: 1, ico: "💚", t: "Invita a un vecino", d: "Le mandas un WhatsApp con la invitación lista.", a: { invitar: 1 } },
+        { min: 1, ico: "💚", t: "Invita a un vecino, amigo o familiar", d: "Les mandas un WhatsApp con la invitación lista.", a: { invitar: 1 } },
         { min: 1, ico: "📣", t: "Comparte DCUATES en tu estado y/o redes sociales", d: "Comparte tus capturas y GANA MAYORES BENEFICIOS MIENTRAS MÁS DIFUSIÓN DCUATES REALICES.", a: { compartir: 1 } },
         { min: 1, ico: "📸", t: "Envíanos tus capturas", d: "Mándanos por WhatsApp la captura de lo que compartiste.", a: { wa: "¡Hola DCUATES! Comparto la captura de mi difusión de DCUATES." } },
         { min: 2, ico: "🙏", t: "Deja un agradecimiento en el Muro", d: "Un gracias que otros vecinos podrán leer.", a: { ir: "muro-gratitud" } },

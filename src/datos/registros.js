@@ -14,7 +14,7 @@ const NOMBRE = { k: "nombre", etiqueta: "Tu nombre", campo: "Nombre", req: true,
 const WHATS = { k: "wa", etiqueta: "Tu WhatsApp", campo: "Contacto", req: true, max: 20, ph: "10 dígitos. Ej. 5512345678" };
 const ZONA = { k: "zona", etiqueta: "Tu colonia o zona", max: 80, ph: "Ej. Jardines de Morelos" };
 
-const PERM = { k: "perm", pub: "Permiso", etiqueta: "¿Autorizas que publiquemos esto en «Lo que hay hoy», sin tu nombre ni tu teléfono?", tipo: "opciones", opciones: ["Sí, publíquenlo", "No, solo contáctenme"], req: true };
+const PERM = { k: "perm", pub: "Permiso", etiqueta: "¿Autorizas que publiquemos esto en «Lo que compartimos», sin tu nombre ni tu teléfono?", tipo: "opciones", opciones: ["Sí, publíquenlo", "No, solo contáctenme"], req: true };
 
 const R = (id, e, titulo, folio, tipo, proyecto, intro, campos, extra = {}) => ({
   id, e, titulo, folio, tipo, proyecto, intro, campos: [NOMBRE, WHATS, ...campos], ...extra,
@@ -28,7 +28,7 @@ export const REGISTROS = {
       { k: "t", pub: "Titulo", etiqueta: "Título, tema o cantidad", ph: "Ej. Libros de primaria / 10 novelas", max: 140, req: true },
       { k: "cuando", etiqueta: "¿Cuándo te queda bien? (día y horario)", max: 100 },
       ZONA,
-      { k: "perm", pub: "Permiso", etiqueta: "¿Autorizas que publiquemos esto en «Lo que hay hoy», sin tu nombre ni tu teléfono?", tipo: "opciones", opciones: ["Sí, publíquenlo", "No, solo contáctenme"], req: true },
+      { k: "perm", pub: "Permiso", etiqueta: "¿Autorizas que publiquemos esto en «Lo que compartimos», sin tu nombre ni tu teléfono?", tipo: "opciones", opciones: ["Sí, publíquenlo", "No, solo contáctenme"], req: true },
     ], { seccion: "Libros", wa: "¡Hola DCUATES! Acabo de registrar mi solicitud en La Bibliobici (préstamo de libros)." }),
   ecatepets: R("ecatepets", "🐾", "Ecatepets · bienestar animal", "ECA", "Solicitud Ecatepets", "Ecatepets",
     "Cuéntanos cómo quieres sumarte o qué necesitas para un peludito. Te contactamos por WhatsApp.",
@@ -36,8 +36,8 @@ export const REGISTROS = {
       { k: "q", pub: "Titulo", etiqueta: "¿Qué quieres hacer?", tipo: "opciones", opciones: ["Adoptar", "Dar en adopción", "Hogar temporal", "Donar alimento o insumos", "Ser voluntario(a)", "Otra forma de ayudar"], req: true },
       { k: "d", pub: "Texto", etiqueta: "Cuéntanos más", tipo: "area", max: 400, ph: "Ej. Busco un perro mediano, vivo en casa con patio", req: true },
       ZONA,
-      { k: "perm", pub: "Permiso", etiqueta: "¿Autorizas que publiquemos esto en «Lo que hay hoy», sin tu nombre ni tu teléfono?", tipo: "opciones", opciones: ["Sí, publíquenlo", "No, solo contáctenme"], req: true },
-    ], { seccion: "Adopciones", wa: "¡Hola DCUATES! Acabo de registrarme en Ecatepets para el bienestar animal." }),
+      { k: "perm", pub: "Permiso", etiqueta: "¿Autorizas que publiquemos esto en «Lo que compartimos», sin tu nombre ni tu teléfono?", tipo: "opciones", opciones: ["Sí, publíquenlo", "No, solo contáctenme"], req: true },
+    ], { seccion: "Adopciones", atajo: { reg: "extraviado", e: "🔎", t: "REPORTAR UN CASO: mascota extraviada o encontrada" }, wa: "¡Hola DCUATES! Acabo de registrarme en Ecatepets para el bienestar animal." }),
   asesorias: R("asesorias", "🎓", "Asesoría gratuita", "ASE", "Solicitud asesoría", "Asesorías",
     "Dinos qué tipo de orientación necesitas. Es gratuita y te contactamos por WhatsApp.",
     [
@@ -78,12 +78,12 @@ export const REGISTROS = {
       { k: "quien", etiqueta: "¿Para quién?", tipo: "opciones", opciones: ["Niñez", "Juventud", "Personas adultas", "Personas mayores", "Familia"] },
       { k: "hor", etiqueta: "¿Qué horario te queda mejor?", max: 100 },
     ], { wa: "¡Hola DCUATES! Acabo de registrar mi interés en bienestar y recreación." }),
-  noticias: R("noticias", "📰", "Agenda y noticias del barrio", "NOT", "Interés agenda", "Agenda y noticias",
+  noticias: R("noticias", "📰", "Agenda y noticias de la comunidad", "NOT", "Interés agenda", "Agenda y noticias",
     "Dinos qué actividades quieres sumar o qué temas te interesa recibir.",
     [
       { k: "q", etiqueta: "¿Qué quieres hacer?", tipo: "opciones", opciones: ["Sumar una actividad", "Recibir información"], req: true },
       { k: "d", etiqueta: "Cuéntanos más", tipo: "area", max: 400 },
-    ], { wa: "¡Hola DCUATES! Acabo de registrar mi interés en la agenda y noticias del barrio." }),
+    ], { wa: "¡Hola DCUATES! Acabo de registrar mi interés en la agenda y noticias de la comunidad." }),
   reto: R("reto", "⭐", "Propón un reto", "RET", "Propuesta", "Retos",
     "Un reto que nos haga mejores. Cuéntanos tu idea.",
     [{ k: "d", etiqueta: "Tu propuesta de reto", tipo: "area", max: 400, req: true }], { perfil: "Reto", wa: "¡Hola DCUATES! Acabo de enviar una propuesta de reto." }),
@@ -138,7 +138,7 @@ export const REGISTROS = {
       { k: "quien", etiqueta: "¿A quién beneficiaría?", max: 160 },
       { k: "nec", etiqueta: "¿Qué necesitas para lograrla?", tipo: "area", max: 300 },
     ], { wa: "¡Hola DCUATES! Acabo de enviar una iniciativa que puede ser un beneficio." }),
-  // e57 — TABLÓN «Lo que hay hoy»: OFREZCO / NECESITO (se publican desde la hoja, con permiso) y «Me interesa» (contacto a través de DCUATES)
+  // e57 — TABLÓN «Lo que compartimos»: OFREZCO / NECESITO (se publican desde la hoja, con permiso) y «Me interesa» (contacto a través de DCUATES)
   ofrezco: R("ofrezco", "🎁", "Ofrezco", "OFR", "Ofrezco", "Tablón · Ofrezco",
     "Algo que puedes dar, prestar, vender con causa o hacer por alguien. Lo revisamos y, si lo autorizas, lo publicamos sin tu nombre ni tu teléfono.",
     [
@@ -162,7 +162,7 @@ export const REGISTROS = {
     [
       { k: "ref", etiqueta: "Publicación", max: 160, req: true },
       { k: "msg", etiqueta: "Mensaje (opcional)", tipo: "area", max: 300, ph: "Ej. Me interesa, puedo pasar el sábado" },
-    ], { wa: "¡Hola DCUATES! Me interesa una publicación de «Lo que hay hoy»." }),
+    ], { wa: "¡Hola DCUATES! Me interesa una publicación de «Lo que compartimos»." }),
   // e58 — registros que antes eran formularios sueltos o mensajes directos, ahora con folio y en la bandeja «Registros»
   solicitud: R("solicitud", "📝", "Registra tu solicitud", "SOL", "Solicitud de apoyo", "Solicitudes de apoyo",
     "Cuéntanos qué apoyo necesitas. Te respondemos por WhatsApp. Si es una urgencia, usa el botón rosa «¿Necesitas apoyo o tienes una urgencia?».",
@@ -186,19 +186,28 @@ export const REGISTROS = {
       { k: "d", etiqueta: "¿Qué ofreces o buscas?", tipo: "area", max: 300, req: true },
       ZONA,
     ], { wa: "¡Hola DCUATES! Acabo de registrar algo para Ventas con causa." }),
-  invitar: R("invitar", "💚", "Invita a un vecino", "INV", "Invitación", "Invitaciones",
-    "Regístrate como quien invita y te damos un enlace con tu código. Cuando tu vecino se sume, sabremos que vino de ti y podrás recibir un reconocimiento.",
+  invitar: R("invitar", "💚", "Invita a tu comunidad", "INV", "Invitación", "Invitaciones",
+    "Invita a un vecino, amigo o familiar. Te damos un enlace con tu código para que lo compartas por WhatsApp: cuando alguien se registre con él, sabremos que vino de ti y podrás recibir un reconocimiento. No pedimos los datos de quien invitas: cada persona se registra por sí misma.",
     [
-      { k: "vecino", etiqueta: "Nombre del vecino o vecina que invitas", max: 80, req: true },
-      { k: "vwa", etiqueta: "Su WhatsApp (opcional)", max: 20, ph: "10 dígitos" },
+      { k: "quien", etiqueta: "¿A quién piensas invitar?", tipo: "opciones", opciones: ["Vecino o vecina", "Amigo o amiga", "Familiar", "Compañero o compañera", "Varias personas"], req: true },
       ZONA,
-    ], { acuse: "invitar", wa: "¡Hola DCUATES! Acabo de registrar una invitación a un vecino." }),
+    ], { acuse: "invitar", wa: "¡Hola DCUATES! Acabo de registrar que invité a alguien de mi comunidad." }),
   difusion: R("difusion", "📣", "Ya difundí DCUATES", "DIF", "Difusión", "Difusión",
-    "Cuéntanos dónde compartes DCUATES. Te damos un enlace con tu código para que sepamos cuántas personas llegan por ti.",
+    "Cuéntanos dónde compartes DCUATES (WhatsApp, redes u otro lugar). Te damos un enlace con tu código para que sepamos cuántas personas llegan por ti. También puedes mandarnos una captura por WhatsApp.",
     [
       { k: "donde", etiqueta: "¿Dónde compartes?", tipo: "opciones", opciones: ["WhatsApp", "Facebook", "Instagram", "TikTok", "Otro"], req: true },
-      { k: "lnk", etiqueta: "Enlace de tu publicación (si ya la hiciste)", max: 300, ph: "https://…" },
-    ], { acuse: "difundir", wa: "¡Hola DCUATES! Acabo de registrar que difundí DCUATES." }),
+      { k: "lnk", pub: "Evidencia", etiqueta: "Enlace de tu publicación (si ya la hiciste)", max: 300, ph: "https://… (o manda una captura por WhatsApp al terminar)" },
+    ], { acuse: "difundir", evidencia: true, wa: "¡Hola DCUATES! Acabo de registrar que difundí DCUATES." }),
+  // e59 — Recomendaciones: PÚBLICAS (se publican en «Lo que compartimos», sin nombre ni teléfono de quien recomienda) o PRIVADAS (solo para el círculo de confianza: no se publican)
+  recomendar: R("recomendar", "⭐", "Recomienda a alguien", "RCM", "Recomendación", "Recomendaciones",
+    "Cuéntanos a quién recomiendas y por qué. Tú decides: pública (la ve todo mundo, sin tu nombre ni tu teléfono) o privada (no se publica; solo la compartimos con tu círculo de confianza si nos lo pides). No escribas teléfonos ni datos personales de otras personas.",
+    [
+      { k: "vis", pub: "Permiso", etiqueta: "¿Cómo quieres compartirla?", tipo: "opciones", opciones: ["Sí, pública: para todo mundo", "No, privada: solo mi círculo de confianza"], req: true },
+      { k: "cat", pub: "Categoria", etiqueta: "¿Qué es?", tipo: "opciones", opciones: ["Negocio", "Organización", "Persona", "Servicio"], req: true },
+      { k: "quien", pub: "Titulo", etiqueta: "¿A quién recomiendas?", ph: "Nombre del negocio, organización o persona", max: 90, req: true },
+      { k: "porque", pub: "Texto", etiqueta: "¿Por qué la recomiendas?", tipo: "area", ph: "Cuéntanos tu buena experiencia", max: 300, req: true },
+      { k: "donde", etiqueta: "¿Dónde la encontramos? (colonia o redes)", max: 140 },
+    ], { seccion: "Recomendaciones", wa: "¡Hola DCUATES! Acabo de registrar una recomendación." }),
   "puerta-participar": R("puerta-participar", "🙌", "Quiero participar o proponer algo", "PUE", "Propuesta de puerta", "Puertas",
     "Cuéntanos qué te gustaría hacer o proponer.",
     [{ k: "d", etiqueta: "¿Qué te gustaría hacer o proponer?", tipo: "area", max: 400, req: true }], { wa: "¡Hola DCUATES! Acabo de enviar una propuesta desde una puerta." }),
@@ -225,7 +234,7 @@ const CON_EVIDENCIA = ["extraviado", "aportacion", "reconocimiento", "reto", "re
 // Lado de la dinámica OFREZCO / NECESITO (columna «Lado» de «Registros»). Vacío = mixto.
 const LADOS = {
   ofrezco: "Ofrezco", necesito: "Necesito", solicitud: "Necesito", asesorias: "Necesito", bienestar: "Necesito", interes: "Necesito", extraviado: "Necesito", interesa: "Necesito",
-  asesor: "Ofrezco", alianza: "Ofrezco", bazar: "Ofrezco", regalo: "Ofrezco", aportacion: "Ofrezco", horario: "Ofrezco", iniciativa: "Ofrezco", voluntario: "Ofrezco", ventas: "", invitar: "Ofrezco", difusion: "Ofrezco"
+  asesor: "Ofrezco", alianza: "Ofrezco", bazar: "Ofrezco", regalo: "Ofrezco", aportacion: "Ofrezco", horario: "Ofrezco", iniciativa: "Ofrezco", voluntario: "Ofrezco", ventas: "", invitar: "Ofrezco", difusion: "Ofrezco", recomendar: "Ofrezco"
 };
 // Registros relacionados: aparecen como botones «¿Quieres también…?» dentro de la ventana y en el acuse.
 const RELACIONADOS = {
@@ -251,8 +260,9 @@ const RELACIONADOS = {
   regalo: ["reto", "reconocimiento", "aportacion"],
   reconocimiento: ["reto", "regalo", "invitar"],
   horario: ["alianza", "ventas", "noticias"],
-  invitar: ["difusion", "voluntario"],
-  difusion: ["invitar", "reto"]
+  invitar: ["difusion", { reg: "voluntario", e: "🤝", t: "QUIERO APOYAR" }, { reg: "necesito", e: "🙏", t: "NECESITO ALGO" }, { acc: "beneficios", e: "🎁", t: "VER BENEFICIOS" }, "recomendar"],
+  difusion: ["invitar", { reg: "voluntario", e: "🤝", t: "QUIERO APOYAR" }, { acc: "beneficios", e: "🎁", t: "VER BENEFICIOS" }, "reto"],
+  recomendar: ["ofrezco", "necesito", "invitar"]
 };
 Object.keys(REGISTROS).forEach((id) => {
   const r = REGISTROS[id];
@@ -262,5 +272,5 @@ Object.keys(REGISTROS).forEach((id) => {
     r.evidencia = true;
   }
   r.lado = LADOS[id] || "";
-  r.relacionados = (RELACIONADOS[id] || []).filter((x) => REGISTROS[x]);
+  r.relacionados = (RELACIONADOS[id] || []).filter((x) => typeof x !== "string" || REGISTROS[x]);
 });
