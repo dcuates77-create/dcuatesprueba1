@@ -11,26 +11,12 @@ import { registrar } from "./analitica.js";
 import { abrirTablon } from "./Tablon.jsx";
 import { WHATSAPP_NUMERO as WHATS_NUM } from "./datos/config.js";
 
-// e58 — si la persona llega con un enlace ?inv=CODIGO (invitación o difusión), se recuerda 60 días para ligar su registro con quien la invitó.
-try {
-  const c = new URLSearchParams(window.location.search).get("inv");
-  if (c && /^[A-Z]{3}-\d{4}-[A-Z0-9]{3}$/.test(c.toUpperCase())) localStorage.setItem("dc_inv", JSON.stringify({ c: c.toUpperCase(), t: Date.now() }));
-} catch (e) { /* sin almacenamiento */ }
-
 export const abrirRegistroPrevio = (id, opciones = {}) =>
   window.dispatchEvent(new CustomEvent("dcuates:registro-previo", { detail: { id, ...opciones } }));
 
 export default function RegistroPrevio() {
   const [act, setAct] = useState(null);
-  const [pila, setPila] = useState([]); // e58: registros por los que se pasó, para regresar con «‹» o con el botón atrás
-  const cerrar = () => { if (pila.length) { setAct(pila[pila.length - 1]); setPila(pila.slice(0, -1)); } else setAct(null); };
-  // e59: un relacionado puede ser un id de registro, { reg, e, t } (registro con otro nombre) o { acc, e, t } (abre una lista de la página)
-  const abrirRel = (x) => {
-    const id = typeof x === "string" ? x : x.reg;
-    registrar("registro_relacionado", { de: act && act.id, a: id || x.acc });
-    if (typeof x !== "string" && x.acc) { setAct(null); setPila([]); setTimeout(() => window.dispatchEvent(new CustomEvent("dcuates:abrir-acceso", { detail: x.acc })), 80); return; }
-    setPila([...pila, act]); setAct({ id });
-  };
+  const cerrar = () => setAct(null);
   const oculta = useAtras(!!act, cerrar);
   useEffect(() => {
     const abre = (e) => {
@@ -39,7 +25,6 @@ export default function RegistroPrevio() {
       if (o.id === "tablon") { abrirTablon(o.filtro || ""); return; }
       if (!REGISTROS[o.id]) return;
       registrar("registro_previo_abierto", { id: o.id });
-      setPila([]);
       setAct(o);
     };
     window.addEventListener("dcuates:registro-previo", abre);
@@ -53,21 +38,13 @@ export default function RegistroPrevio() {
       <style>{CSS}</style>
       <div className="rp-caja">
         <div className="rp-cab">
-          {pila.length > 0 && <button type="button" className="rp-x rp-v" onClick={cerrar} aria-label="Volver">‹</button>}
           <b>{base.e} {base.titulo}</b>
           <BotonCompartir hash="registros" titulo={base.titulo + " — DCUATES"} texto="Regístrate y participa en DCUATES" variante="circulo" />
           <button type="button" className="rp-x" onClick={cerrar} aria-label="Cerrar">✕</button>
         </div>
         <p className="rp-i">{base.intro}</p>
-        {base.atajo && <button type="button" className="rp-at" onClick={() => abrirRel(base.atajo)}>{base.atajo.e} {base.atajo.t}</button>}
         <FormMini key={act.id + (act.perfil || "")} cfg={cfg} clave={"rp-" + act.id} valores={act.valores || null} />
-        {base.relacionados && base.relacionados.length > 0 && (
-          <div className="rp-rel">
-            <p>¿Quieres también…?</p>
-            <div>{base.relacionados.map((x) => typeof x === "string" ? <button key={x} type="button" onClick={() => abrirRel(x)}>{REGISTROS[x].e} {REGISTROS[x].titulo}</button> : <button key={x.t} type="button" onClick={() => abrirRel(x)}>{x.e} {x.t}</button>)}</div>
-          </div>
-        )}
-        {base.seccion && <p className="rp-s"><button type="button" onClick={() => { setAct(null); setPila([]); setTimeout(() => abrirTablon(base.seccion), 60); }}>🧺 Ver lo que ya hay disponible en «{base.seccion}»</button></p>}
+        {base.seccion && <p className="rp-s"><button type="button" onClick={() => { cerrar(); setTimeout(() => abrirTablon(base.seccion), 60); }}>🧺 Ver lo que ya hay disponible en «{base.seccion}»</button></p>}
         <p className="rp-s">¿Prefieres escribirnos directo? <button type="button" onClick={() => { const t = `${base.wa || "¡Hola DCUATES!"}`; window.open(`https://wa.me/${WHATS_NUM}?text=${encodeURIComponent(t)}`, "_blank", "noopener"); }}>Abrir WhatsApp</button></p>
       </div>
     </div>,
@@ -81,10 +58,6 @@ const CSS = `
 .rp-cab{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:8px;background:#1F7A46;color:#fff;margin:0 -12px 10px;padding:12px;border-radius:24px 24px 0 0}
 .rp-cab b{flex:1;font-size:17px;font-weight:900;line-height:1.15}
 .rp-x{width:44px;height:44px;border-radius:50%;border:0;background:#fff;color:#1F7A46;font-size:20px;font-weight:900;cursor:pointer}
-.rp-v{font-size:26px;line-height:1}
-.rp-rel{margin:14px 0 0;padding:10px;background:#fff;border:2px solid #d8d2bd;border-radius:14px}.rp-rel p{margin:0 0 6px;font-size:14px;font-weight:900}.rp-rel div{display:flex;flex-wrap:wrap;gap:6px}
-.rp-rel button{min-height:44px;padding:0 12px;border:2px solid #1F7A46;border-radius:22px;background:#fff;color:#1F7A46;font:inherit;font-weight:800;font-size:13px;cursor:pointer;text-align:left}
-.rp-at{display:block;width:100%;min-height:52px;margin:6px 0 4px;padding:8px 12px;border:0;border-radius:14px;background:#E65100;color:#fff;font:inherit;font-weight:900;font-size:14.5px;text-align:left;cursor:pointer;box-shadow:0 3px 0 #a33a00}
 .rp-i{margin:0 0 4px;font-size:14.5px;font-weight:700;line-height:1.35}
 .rp-s{margin:12px 0 0;font-size:13px;font-weight:700;color:#4a5b52}
 .rp-s button{border:0;background:none;color:#128c7e;font:inherit;font-weight:900;text-decoration:underline;cursor:pointer;min-height:36px}

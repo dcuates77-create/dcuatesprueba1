@@ -9,8 +9,7 @@
 //  - Nunca bloquea: si no hay internet, el mensaje se puede mandar por WhatsApp.
 import React, { useState } from "react";
 import { guardarEnHoja, registrar } from "./analitica.js";
-import { WHATSAPP_NUMERO, MENSAJE_INVITACION, URL_SITIO, VERSION_AVISO } from "./datos/config.js";
-import { abrirLegal } from "./componentes/legal.jsx";
+import { WHATSAPP_NUMERO } from "./datos/config.js";
 
 const LETRAS = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
 export const nuevoFolio = (pref) => {
@@ -18,8 +17,6 @@ export const nuevoFolio = (pref) => {
   let r = ""; for (let i = 0; i < 3; i++) r += LETRAS[Math.floor(Math.random() * LETRAS.length)];
   return `${pref}-${mm}${dd}-${r}`;
 };
-// e58 — código de quien invitó (llega en el enlace ?inv=CODIGO y RegistroPrevio lo guarda 60 días). Se envía con cada registro nuevo.
-const codigoInvitacion = () => { try { const c = JSON.parse(localStorage.getItem("dc_inv") || "null"); return c && c.c && Date.now() - c.t < 60 * 86400000 ? c.c : ""; } catch (e) { return ""; } };
 const digitos = (t) => String(t || "").replace(/\D/g, "");
 
 export default function FormMini({ cfg, onListo, clave = "form", valores = null }) {
@@ -28,7 +25,6 @@ export default function FormMini({ cfg, onListo, clave = "form", valores = null 
   const [enviado, setEnviado] = useState(false);
   const [folio, setFolio] = useState("");
   const [trampa, setTrampa] = useState("");
-  const [acepto, setAcepto] = useState(false); // e59: casilla del Aviso de Privacidad (solo registros con folio)
   const cambia = (k, val) => { setV((x) => ({ ...x, [k]: val })); setErr(""); };
   const armar = () => {
     let nombre = "", contacto = "";
@@ -49,40 +45,21 @@ export default function FormMini({ cfg, onListo, clave = "form", valores = null 
     if (falta) { setErr(`Falta: ${falta.etiqueta.replace(/[¿?]/g, "").trim()}`); return; }
     const { nombre, contacto, mensaje, extras } = armar();
     if (cfg.folio && digitos(contacto).length < 10) { setErr("Escribe tu WhatsApp con 10 dígitos para poder contactarte."); return; }
-    if (cfg.folio && !acepto) { setErr("Marca la casilla del Aviso de Privacidad para registrarte. Si prefieres, mándalo directo por WhatsApp."); return; }
     // Anti-spam: campo oculto (los robots lo llenan) y un mismo registro no se envía dos veces en 20 segundos.
     if (trampa) { setFolio(cfg.folio ? nuevoFolio(cfg.folio) : ""); setEnviado(true); return; }
     const llaveT = "dc_ult_" + (cfg.tipo || "x");
     try { const ult = parseInt(localStorage.getItem(llaveT) || "0", 10); if (Date.now() - ult < 20000) { setErr("Ya recibimos tu registro hace un momento. Espera unos segundos."); return; } localStorage.setItem(llaveT, String(Date.now())); } catch (e2) { /* sin almacenamiento */ }
     const f = cfg.folio ? nuevoFolio(cfg.folio) : "";
     setFolio(f);
-    guardarEnHoja({ Tipo: cfg.tipo, Perfil: cfg.perfil || "", Nombre: nombre, Contacto: contacto, Mensaje: mensaje.slice(0, 1200), ...(f ? { Aviso: "Sí · " + VERSION_AVISO, Folio: f, Proyecto: cfg.proyecto || cfg.tipo, Urgente: cfg.urgente ? "Sí" : "", ...(cfg.seccion ? { Seccion: cfg.seccion } : {}), ...(cfg.lado ? { Lado: cfg.lado } : {}), ...(codigoInvitacion() && !cfg.acuse ? { InvitadoPor: codigoInvitacion() } : {}), ...extras } : {}) });
+    guardarEnHoja({ Tipo: cfg.tipo, Perfil: cfg.perfil || "", Nombre: nombre, Contacto: contacto, Mensaje: mensaje.slice(0, 1200), ...(f ? { Folio: f, Proyecto: cfg.proyecto || cfg.tipo, Urgente: cfg.urgente ? "Sí" : "", ...(cfg.seccion ? { Seccion: cfg.seccion } : {}), ...extras } : {}) });
     registrar("form_mini_enviado", { tipo: cfg.tipo });
     setEnviado(true);
     onListo && onListo();
   };
-  const porWhatsApp = (foto) => {
+  const porWhatsApp = () => {
     const { nombre, contacto, mensaje } = armar();
-    const t = `${cfg.wa || "¡Hola DCUATES!"}${folio ? "\nMi folio: " + folio : ""}${foto ? "\nTe mando mis fotos o evidencia." : ""}\n\n${mensaje.replace(/ \| /g, "\n")}${nombre ? "\nMi nombre: " + nombre : ""}${contacto ? "\nContacto: " + contacto : ""}`;
-    // e58 — se anota en la hoja que la persona avisó por WhatsApp (columna «Avisó por WhatsApp»), para atender primero a quien avisó.
-    if (folio) { try { guardarEnHoja({ Tipo: "Aviso WhatsApp", Folio: folio, Foto: foto ? "Sí" : "" }); } catch (e2) { /* solo es una marca */ } }
+    const t = `${cfg.wa || "¡Hola DCUATES!"}${folio ? "\nMi folio: " + folio : ""}\n\n${mensaje.replace(/ \| /g, "\n")}${nombre ? "\nMi nombre: " + nombre : ""}${contacto ? "\nContacto: " + contacto : ""}`;
     window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(t)}`, "_blank", "noopener");
-  };
-  // e59 — enviar directo por WhatsApp, sin guardar nada en la hoja: la persona manda lo que escribió desde su propio WhatsApp.
-  const directoWA = () => {
-    const falta = cfg.campos.find((c) => c.req && c.campo !== "Contacto" && c.campo !== "Nombre" && !String(v[c.k] || "").trim());
-    if (falta) { setErr(`Falta: ${falta.etiqueta.replace(/[¿?]/g, "").trim()}`); return; }
-    const { nombre, mensaje } = armar();
-    registrar("registro_wa_directo", { tipo: cfg.tipo });
-    const t = `${cfg.wa || "¡Hola DCUATES!"}\n\n${mensaje.replace(/ \| /g, "\n")}${nombre ? "\nMi nombre: " + nombre : ""}`;
-    window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(t)}`, "_blank", "noopener");
-  };
-  // e58 — enlace personal con el código del folio: quien llega por él queda ligado a quien invitó o difundió.
-  const enviarCodigo = (otras) => {
-    const url = `${URL_SITIO}/?inv=${encodeURIComponent(folio)}`;
-    registrar("compartir_con_codigo", { tipo: cfg.tipo });
-    if (cfg.acuse === "difundir" && otras && navigator.share) { navigator.share({ title: "DCUATES", text: MENSAJE_INVITACION, url }).catch(() => {}); return; }
-    window.open("https://wa.me/?text=" + encodeURIComponent(`${MENSAJE_INVITACION} ${url}`), "_blank", "noopener");
   };
   if (enviado) {
     return (
@@ -90,16 +67,9 @@ export default function FormMini({ cfg, onListo, clave = "form", valores = null 
         <style>{CSS}</style>
         <b>{cfg.gracias || "¡Gracias! Lo recibimos. 💚"}</b>
         {folio && <span className="fm-fol" aria-label={"Tu folio es " + folio}>Tu folio: <strong>{folio}</strong></span>}
-        {folio ? (
-          <>
-            <small>Guarda tu folio: con él damos seguimiento a tu registro.</small>
-            <small className="fm-24"><b>En las próximas 24 horas revisamos tu solicitud y en la primera oportunidad la atenderemos.</b> ¡MUCHAS GRACIAS POR TU CONFIANZA Y POR SUMAR CON DCUATES!</small>
-          </>
-        ) : <small>Lo revisamos antes de publicar cualquier cosa. Si quieres que lo veamos más rápido, también puedes mandarlo por WhatsApp.</small>}
+        <small>{folio ? "Guarda tu folio: con él damos seguimiento a tu registro. Te contactaremos por WhatsApp." : "Lo revisamos antes de publicar cualquier cosa. Si quieres que lo veamos más rápido, también puedes mandarlo por WhatsApp."}</small>
         {cfg.urgente && <small><b>Si es una urgencia o una persona en peligro, llama al 911.</b></small>}
-        {folio && cfg.acuse && <div className="fm-b"><button type="button" className="fm-s" onClick={() => enviarCodigo(false)}>{cfg.acuse === "invitar" ? "💚 Enviar mi invitación por WhatsApp con mi código" : "📲 Compartir por WhatsApp con mi código"}</button>{cfg.acuse === "difundir" && typeof navigator !== "undefined" && navigator.share && <button type="button" className="fm-w fm-f" onClick={() => enviarCodigo(true)}>📣 Compartir en redes u otras apps</button>}</div>}
-        <div className="fm-b"><button type="button" className="fm-w" onClick={() => porWhatsApp(false)}>{folio ? "Avisar también por WhatsApp" : "Mandar también por WhatsApp"}</button></div>
-        {folio && cfg.evidencia && <div className="fm-b"><button type="button" className="fm-w fm-f" onClick={() => porWhatsApp(true)}>📷 Enviar fotos o evidencia por WhatsApp</button></div>}
+        <div className="fm-b"><button type="button" className="fm-w" onClick={porWhatsApp}>{folio ? "Avisar también por WhatsApp" : "Mandar también por WhatsApp"}</button></div>
       </div>
     );
   }
@@ -128,21 +98,9 @@ export default function FormMini({ cfg, onListo, clave = "form", valores = null 
         );
       })}
       <input type="text" name="sitio" tabIndex={-1} autoComplete="off" aria-hidden="true" value={trampa} onChange={(e) => setTrampa(e.target.value)} style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0 }} />
-      {cfg.folio && (
-        <label className="fm-ac">
-          <input type="checkbox" checked={acepto} onChange={(e) => { setAcepto(e.target.checked); setErr(""); }} />
-          <span>He leído el <button type="button" onClick={() => abrirLegal("privacidad")}>Aviso de Privacidad</button> y acepto que DCUATES guarde lo que escribí para atenderme. Si puse datos de otra persona, ella lo sabe y está de acuerdo.</span>
-        </label>
-      )}
       {err && <p className="fm-e" role="alert">{err}</p>}
       <div className="fm-b"><button type="submit" className="fm-s">{cfg.boton || "Enviar"}</button></div>
-      {cfg.folio && (
-        <div className="fm-d">
-          <button type="button" className="fm-w fm-f" onClick={directoWA}>📲 Prefiero enviarlo directo por WhatsApp</button>
-          <small>Así no se guarda en nuestra hoja: tú lo mandas desde tu WhatsApp (los datos viajan por esa app).</small>
-        </div>
-      )}
-      <small className="fm-n">Usamos tus datos solo para responderte. Revisamos todo antes de publicar. No escribas datos sensibles de otras personas.</small>
+      <small className="fm-n">Usamos tus datos solo para responderte. Revisamos todo antes de publicar. Aviso de Privacidad en el pie de la página.</small>
     </form>
   );
 }
@@ -163,8 +121,5 @@ const CSS = `
 .fm-n{display:block;font-size:12.5px;font-weight:700;color:#5b6b62;line-height:1.35}
 .fm-ok{display:flex;flex-direction:column;gap:6px;background:#e3f3e9;border-radius:14px;padding:12px;margin:8px 0 2px;font-family:Nunito,system-ui,sans-serif;color:#0f2d1e}
 .fm-fol{display:inline-block;align-self:flex-start;background:#fff;border:2px dashed #0e7c4f;border-radius:10px;padding:6px 10px;font-size:15px;font-weight:800}.fm-fol strong{font-size:18px;letter-spacing:.04em}
-.fm-w.fm-f{background:#fff;color:#128c7e;border:2px solid #128c7e}.fm-24{background:#fff;border-radius:10px;padding:8px 10px}
-.fm-ac{display:flex;gap:8px;align-items:flex-start;font-size:13px;font-weight:700;line-height:1.35;background:#fff;border:2px solid #d8d2bd;border-radius:12px;padding:8px 10px}.fm-ac input{flex:none;width:24px;height:24px;margin-top:1px;accent-color:#0e7c4f}.fm-ac button{border:0;background:none;padding:0;font:inherit;font-weight:900;color:#128c7e;text-decoration:underline;cursor:pointer}
-.fm-d{display:flex;flex-direction:column;gap:4px;align-items:flex-start}.fm-d small{font-size:12px;font-weight:700;color:#5b6b62}
 .fm-ok b{font-size:16px}.fm-ok small{font-size:13.5px;font-weight:700;line-height:1.35}
 `;

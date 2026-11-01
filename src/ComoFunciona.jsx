@@ -2,6 +2,8 @@
 // y dónde encaja todo lo demás. Los textos están aquí abajo: edítalos sin tocar el código.
 import React, { useState } from "react";
 import { registrar } from "./analitica.js";
+import { abrirRegistroPrevio } from "./RegistroPrevio.jsx";
+import { abrirTablon } from "./Tablon.jsx";
 
 const PASOS = [
   ["1", "PUERTAS", "#C2410C", "Dinos quién eres (vecino, voluntario, negocio…) y te llevamos paso a paso."],
@@ -22,10 +24,10 @@ const RESTO = [
 const CICLO = ["Registras", "Recibes tu folio", "Lo revisamos", "Te conectamos", "Recibes y agradeces"];
 const EJEMPLOS = {
   ofrezco: {
-    color: "#1F7A46",
+    color: "#1F7A46", reg: "ofrezco", boton: "🎁 Probar OFREZCO",
     casos: [
       { id: "producto", t: "Un producto o servicio", hist: "Rosa tiene una cuna que ya no usa y Memo sabe arreglar bicicletas.",
-        pasos: ["Rosa toca OFREZCO, elige «Producto», escribe «Cuna en buen estado» y su WhatsApp.", "Le sale un folio (OFR-…) y nos llega el aviso por correo.", "Revisamos y, con su permiso, la cuna aparece en «Lo que compartimos» sin su nombre ni teléfono.", "Una vecina toca «Me interesa»; DCUATES le avisa a Rosa y las pone en contacto.", "La cuna cambia de casa. La vecina agradece en el Muro de gratitud y suma Semillas."] },
+        pasos: ["Rosa toca OFREZCO, elige «Producto», escribe «Cuna en buen estado» y su WhatsApp.", "Le sale un folio (OFR-…) y nos llega el aviso por correo.", "Revisamos y, con su permiso, la cuna aparece en «Lo que hay hoy» sin su nombre ni teléfono.", "Una vecina toca «Me interesa»; DCUATES le avisa a Rosa y las pone en contacto.", "La cuna cambia de casa. La vecina agradece en el Muro de gratitud y suma Semillas."] },
       { id: "mascota", t: "Una mascota", hist: "Lupe rescató una gatita y busca hogar para ella.",
         pasos: ["Lupe entra a Ecatepets → «Dar en adopción» y cuenta cómo es la gatita.", "Recibe su folio (ECA-…).", "Verificamos y publicamos la adopción en «Adopciones».", "Una familia toca «Me interesa» y coordinamos la visita.", "La gatita encuentra hogar y se cuenta en Historias DCUATES."] },
       { id: "ayuda", t: "Mi tiempo o conocimiento", hist: "Don Raúl es contador y quiere orientar gratis a quien lo necesite.",
@@ -33,14 +35,14 @@ const EJEMPLOS = {
     ]
   },
   necesito: {
-    color: "#B7791F",
+    color: "#B7791F", reg: "necesito", boton: "🙏 Probar NECESITO",
     casos: [
       { id: "recomendacion", t: "Una recomendación", hist: "Ana necesita un plomero de confianza en su colonia.",
         pasos: ["Ana toca NECESITO, elige «Recomendación» y escribe «Busco plomero, zona norte».", "Le sale su folio (NEC-…).", "Lo publicamos (si lo autoriza) y también buscamos en el directorio de negocios aliados.", "Alguien recomienda a un plomero y DCUATES les pasa el contacto.", "Ana resuelve su problema y agradece. Reto: «por cada recomendación recibida, da dos»."] },
       { id: "mascota", t: "Una mascota extraviada o apoyo animal", hist: "A Pedro se le perdió su perrito.",
         pasos: ["Pedro toca «Reportar un caso» (si es urgente, también llama al 911 en caso de personas).", "Folio EXT-… y aviso inmediato por correo.", "Difundimos el caso en Extraviados.", "Una vecina lo vio y avisa; DCUATES conecta a ambos.", "El perrito vuelve a casa. Pedro agradece en el Muro."] },
       { id: "producto", t: "Un producto o servicio", hist: "Marta busca una silla de ruedas prestada para su mamá.",
-        pasos: ["Marta toca NECESITO → «Producto» → «Silla de ruedas prestada».", "Folio NEC-… en su pantalla.", "Se publica en «Lo que compartimos» con su permiso (sin nombre ni teléfono).", "Alguien toca «Me interesa» en una oferta parecida y las conectamos.", "Marta la recibe, la devuelve cuando termina y agradece."] }
+        pasos: ["Marta toca NECESITO → «Producto» → «Silla de ruedas prestada».", "Folio NEC-… en su pantalla.", "Se publica en «Lo que hay hoy» con su permiso (sin nombre ni teléfono).", "Alguien toca «Me interesa» en una oferta parecida y las conectamos.", "Marta la recibe, la devuelve cuando termina y agradece."] }
     ]
   }
 };
@@ -68,9 +70,9 @@ function Ejemplos({ onCerrar }) {
           <li key={i}><span style={{ background: E.color }}>{i + 1}</span><div><b>{CICLO[i]}</b><small>{p}</small></div></li>
         ))}
       </ol>
-      <p className="cf-hist" style={{ borderLeftColor: "#0f2d1e" }}>Cuando elijas tu <b>puerta</b>, ahí mismo encontrarás los botones OFREZCO, NECESITO y RECIBO adaptados a tu perfil.</p>
       <div className="cf-b">
-        <button type="button" className="a" style={{ background: E.color }} onClick={() => { onCerrar(); setTimeout(() => window.dispatchEvent(new CustomEvent("dcuates:elegir-puerta")), 150); }}>🚪 Elegir mi puerta</button>
+        <button type="button" className="a" style={{ background: E.color }} onClick={() => { onCerrar(); setTimeout(() => abrirRegistroPrevio(E.reg), 150); }}>{E.boton}</button>
+        <button type="button" className="b" onClick={() => { onCerrar(); setTimeout(() => abrirTablon(), 150); }}>🧺 RECIBO: ver lo que hay hoy</button>
       </div>
     </section>
   );
