@@ -117,7 +117,7 @@ export const CUPONES_PROMOS_ITEMS = MOSTRAR_EJEMPLOS ? CUPONES_PROMOS_ITEMS_EJEM
 // Mapa que conecta cada id de proyecto con su galería y título de modal —
 // así el botón "Ver galería" sabe qué mostrar sin más configuración.
 export const GALERIAS_PROYECTOS = {
-  noticias: { titulo: "Agenda Cultural — Noticias de la Comunidad", items: NOTICIAS_GALERIA_ITEMS },
+  noticias: { titulo: "Agenda Cultural — Noticias de Barrio", items: NOTICIAS_GALERIA_ITEMS },
   bienestar: { titulo: "Actividades de Bienestar, Salud y Recreación", items: BIENESTAR_GALERIA_ITEMS }
 };
 
@@ -145,7 +145,7 @@ export const BOTONES_PORTADA = [
   { t: "ASESORÍAS GRATUITAS", h: "#asesorias", modal: "asesorias", img: "/images/Asesorías.png" },
   { t: "BAZAR Y COMERCIO", h: "#bazares", modal: "bazares", img: "/images/Bazar.webp" },
   { t: "VENTAS CON CAUSA", h: "#ventas-con-causa", modal: "ventas-con-causa", img: "/images/VentasConCausa.webp" },
-  { t: "NOTICIAS DE LA COMUNIDAD", h: "#noticias", modal: "noticias", img: "/images/Noticias.webp" },
+  { t: "NOTICIAS DE BARRIO", h: "#noticias", modal: "noticias", img: "/images/Noticias.webp" },
   { t: "BIENESTAR Y RECREACIÓN", h: "#bienestar", modal: "bienestar", img: "/images/Bienestar.webp" },
   { t: "PRÉSTAMO GRATUITO DE LIBROS", h: "#libros", modal: "libros", img: "/images/bb.webp" }
 ];
@@ -164,7 +164,7 @@ export const RESUMEN_PROYECTO = {
   bazares: "Comercio y bazar local",
   "ventas-con-causa": "Compra y apoya una causa",
   donaciones: "Tu tiempo, talento o recursos",
-  noticias: "Lo que pasa en tu comunidad"
+  noticias: "Lo que pasa en tu barrio"
 };
 
 // Logos para las ventanas que no salen de BOTONES_PORTADA (los 3 botones
@@ -221,7 +221,7 @@ export const CATEGORIAS_PROYECTOS = [
     slogan: "Valores que se multiplican",
     emoji: "✨",
     img: null,
-    descripcion: "Proyectos que fortalecen el tejido comunitario desde distintos frentes: asesoría, alianzas, noticias de la comunidad, bienestar, mascotas y una red basada en la confianza.",
+    descripcion: "Proyectos que fortalecen el tejido comunitario desde distintos frentes: asesoría, alianzas, noticias de barrio, bienestar, mascotas y una red basada en la confianza.",
     proyectos: ["asesorias", "alianzas-tarjeta", "noticias", "bienestar", "ecatepets", "circulo-confianza"]
   }
 ];
@@ -266,7 +266,7 @@ export const COMO_SUMAR = {
 export const INTERESES_BENEFICIOS = [
   "Promociones y negocios locales",
   "Mascotas (adopciones y extravíos)",
-  "Noticias y eventos de la comunidad",
+  "Noticias y eventos del barrio",
   "Bienestar y actividades comunitarias",
   "Otros Beneficios y Apoyos/Voluntariado"
 ];
