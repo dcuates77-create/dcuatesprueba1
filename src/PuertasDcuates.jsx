@@ -11,7 +11,6 @@ import HoyDcuates from "./HoyDcuates.jsx";
 import InstalarApp from "./InstalarApp.jsx";
 import { BotonPlus } from "./AgendaPlus.jsx";
 import { BotonMicro } from "./MicroAcciones.jsx";
-import { BotonTablon } from "./Tablon.jsx";
 import { OpcionesLeer } from "./accesibilidad.jsx";
 import { ciclarLetra, leerLetra, NOMBRES_LETRA } from "./tamanoLetra.js";
 import { ejecutar } from "./datos/secciones.js";
@@ -250,7 +249,6 @@ export default function EntradaDcuates({ onAbrirProyecto = () => {}, agenda = []
       {actual && <CaminoDcuates key={actual.id + modoAct} compacto seccion={"p_" + actual.id + "_" + modoAct} pasos={actual.modos[modoAct].pasos} titulo={"TU CAMINO · " + actual.t.toUpperCase()} sinSoy menu={{}} onAbrirProyecto={onAbrirProyecto} />}
       <BotonPlus />
       <BotonMicro />
-      <BotonTablon />
       <InstalarApp />
       {ven === "hoy" && createPortal(
         <VentanaEntrada titulo="☀️ Hoy en DCUATES" hash="hoy" texto="Lo que pasa hoy y esta semana en DCUATES" onCerrar={() => setVen(null)}>

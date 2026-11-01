@@ -9,7 +9,7 @@
 //  - Nunca bloquea: si no hay internet, el mensaje se puede mandar por WhatsApp.
 import React, { useState } from "react";
 import { guardarEnHoja, registrar } from "./analitica.js";
-import { WHATSAPP_NUMERO } from "./datos/config.js";
+import { WHATSAPP_NUMERO, MENSAJE_INVITACION, URL_SITIO } from "./datos/config.js";
 
 const LETRAS = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
 export const nuevoFolio = (pref) => {
@@ -17,6 +17,8 @@ export const nuevoFolio = (pref) => {
   let r = ""; for (let i = 0; i < 3; i++) r += LETRAS[Math.floor(Math.random() * LETRAS.length)];
   return `${pref}-${mm}${dd}-${r}`;
 };
+// e58 — código de quien invitó (llega en el enlace ?inv=CODIGO y RegistroPrevio lo guarda 60 días). Se envía con cada registro nuevo.
+const codigoInvitacion = () => { try { const c = JSON.parse(localStorage.getItem("dc_inv") || "null"); return c && c.c && Date.now() - c.t < 60 * 86400000 ? c.c : ""; } catch (e) { return ""; } };
 const digitos = (t) => String(t || "").replace(/\D/g, "");
 
 export default function FormMini({ cfg, onListo, clave = "form", valores = null }) {
@@ -51,15 +53,24 @@ export default function FormMini({ cfg, onListo, clave = "form", valores = null 
     try { const ult = parseInt(localStorage.getItem(llaveT) || "0", 10); if (Date.now() - ult < 20000) { setErr("Ya recibimos tu registro hace un momento. Espera unos segundos."); return; } localStorage.setItem(llaveT, String(Date.now())); } catch (e2) { /* sin almacenamiento */ }
     const f = cfg.folio ? nuevoFolio(cfg.folio) : "";
     setFolio(f);
-    guardarEnHoja({ Tipo: cfg.tipo, Perfil: cfg.perfil || "", Nombre: nombre, Contacto: contacto, Mensaje: mensaje.slice(0, 1200), ...(f ? { Folio: f, Proyecto: cfg.proyecto || cfg.tipo, Urgente: cfg.urgente ? "Sí" : "", ...(cfg.seccion ? { Seccion: cfg.seccion } : {}), ...extras } : {}) });
+    guardarEnHoja({ Tipo: cfg.tipo, Perfil: cfg.perfil || "", Nombre: nombre, Contacto: contacto, Mensaje: mensaje.slice(0, 1200), ...(f ? { Folio: f, Proyecto: cfg.proyecto || cfg.tipo, Urgente: cfg.urgente ? "Sí" : "", ...(cfg.seccion ? { Seccion: cfg.seccion } : {}), ...(cfg.lado ? { Lado: cfg.lado } : {}), ...(codigoInvitacion() && !cfg.acuse ? { InvitadoPor: codigoInvitacion() } : {}), ...extras } : {}) });
     registrar("form_mini_enviado", { tipo: cfg.tipo });
     setEnviado(true);
     onListo && onListo();
   };
-  const porWhatsApp = () => {
+  const porWhatsApp = (foto) => {
     const { nombre, contacto, mensaje } = armar();
-    const t = `${cfg.wa || "¡Hola DCUATES!"}${folio ? "\nMi folio: " + folio : ""}\n\n${mensaje.replace(/ \| /g, "\n")}${nombre ? "\nMi nombre: " + nombre : ""}${contacto ? "\nContacto: " + contacto : ""}`;
+    const t = `${cfg.wa || "¡Hola DCUATES!"}${folio ? "\nMi folio: " + folio : ""}${foto ? "\nTe mando mis fotos o evidencia." : ""}\n\n${mensaje.replace(/ \| /g, "\n")}${nombre ? "\nMi nombre: " + nombre : ""}${contacto ? "\nContacto: " + contacto : ""}`;
+    // e58 — se anota en la hoja que la persona avisó por WhatsApp (columna «Avisó por WhatsApp»), para atender primero a quien avisó.
+    if (folio) { try { guardarEnHoja({ Tipo: "Aviso WhatsApp", Folio: folio, Foto: foto ? "Sí" : "" }); } catch (e2) { /* solo es una marca */ } }
     window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(t)}`, "_blank", "noopener");
+  };
+  // e58 — enlace personal con el código del folio: quien llega por él queda ligado a quien invitó o difundió.
+  const enviarCodigo = () => {
+    const url = `${URL_SITIO}/?inv=${encodeURIComponent(folio)}`;
+    registrar("compartir_con_codigo", { tipo: cfg.tipo });
+    if (cfg.acuse === "difundir" && navigator.share) { navigator.share({ title: "DCUATES", text: MENSAJE_INVITACION, url }).catch(() => {}); return; }
+    window.open("https://wa.me/?text=" + encodeURIComponent(`${MENSAJE_INVITACION} ${url}`), "_blank", "noopener");
   };
   if (enviado) {
     return (
@@ -67,9 +78,16 @@ export default function FormMini({ cfg, onListo, clave = "form", valores = null 
         <style>{CSS}</style>
         <b>{cfg.gracias || "¡Gracias! Lo recibimos. 💚"}</b>
         {folio && <span className="fm-fol" aria-label={"Tu folio es " + folio}>Tu folio: <strong>{folio}</strong></span>}
-        <small>{folio ? "Guarda tu folio: con él damos seguimiento a tu registro. Te contactaremos por WhatsApp." : "Lo revisamos antes de publicar cualquier cosa. Si quieres que lo veamos más rápido, también puedes mandarlo por WhatsApp."}</small>
+        {folio ? (
+          <>
+            <small>Guarda tu folio: con él damos seguimiento a tu registro.</small>
+            <small className="fm-24"><b>En las próximas 24 horas revisamos tu solicitud y en la primera oportunidad la atenderemos.</b> ¡MUCHAS GRACIAS POR TU CONFIANZA Y POR SUMAR CON DCUATES!</small>
+          </>
+        ) : <small>Lo revisamos antes de publicar cualquier cosa. Si quieres que lo veamos más rápido, también puedes mandarlo por WhatsApp.</small>}
         {cfg.urgente && <small><b>Si es una urgencia o una persona en peligro, llama al 911.</b></small>}
-        <div className="fm-b"><button type="button" className="fm-w" onClick={porWhatsApp}>{folio ? "Avisar también por WhatsApp" : "Mandar también por WhatsApp"}</button></div>
+        {folio && cfg.acuse && <div className="fm-b"><button type="button" className="fm-s" onClick={enviarCodigo}>{cfg.acuse === "invitar" ? "💚 Enviar mi invitación con mi código" : "📣 Compartir DCUATES con mi código"}</button></div>}
+        <div className="fm-b"><button type="button" className="fm-w" onClick={() => porWhatsApp(false)}>{folio ? "Avisar también por WhatsApp" : "Mandar también por WhatsApp"}</button></div>
+        {folio && cfg.evidencia && <div className="fm-b"><button type="button" className="fm-w fm-f" onClick={() => porWhatsApp(true)}>📷 Enviar fotos o evidencia por WhatsApp</button></div>}
       </div>
     );
   }
@@ -121,5 +139,6 @@ const CSS = `
 .fm-n{display:block;font-size:12.5px;font-weight:700;color:#5b6b62;line-height:1.35}
 .fm-ok{display:flex;flex-direction:column;gap:6px;background:#e3f3e9;border-radius:14px;padding:12px;margin:8px 0 2px;font-family:Nunito,system-ui,sans-serif;color:#0f2d1e}
 .fm-fol{display:inline-block;align-self:flex-start;background:#fff;border:2px dashed #0e7c4f;border-radius:10px;padding:6px 10px;font-size:15px;font-weight:800}.fm-fol strong{font-size:18px;letter-spacing:.04em}
+.fm-w.fm-f{background:#fff;color:#128c7e;border:2px solid #128c7e}.fm-24{background:#fff;border-radius:10px;padding:8px 10px}
 .fm-ok b{font-size:16px}.fm-ok small{font-size:13.5px;font-weight:700;line-height:1.35}
 `;
