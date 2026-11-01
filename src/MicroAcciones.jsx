@@ -149,7 +149,7 @@ export default function MicroAcciones() {
   };
   const oculta = useAtras(abierta, cerrar);
   useEffect(() => {
-    const abre = (e) => { const f = e && e.detail; setForma(f && FORMULARIOS_MICRO[f] ? f : null); setAbierta(true); };
+    const abre = (e) => { const f = e && e.detail; if (f === "recomienda") { abrirRegistroPrevio("recomendar"); return; } setForma(f && FORMULARIOS_MICRO[f] ? f : null); setAbierta(true); };
     const hash = () => { if (/^#micro-acciones$/.test(window.location.hash)) abre(null); };
     hash();
     window.addEventListener("dcuates:abrir-micro", abre);
@@ -164,6 +164,7 @@ export default function MicroAcciones() {
   const cfg = (VISTA.cierre && VISTA.cierre.micro) || { titulo: "Micro-acciones", intro: "", items: [] };
   const ejecutar = (a) => {
     if (!a) return;
+    if (a.micro === "recomienda") { registrar("recomienda_registro", { desde: "micro" }); abrirRegistroPrevio("recomendar"); return; }
     if (a.micro) { setForma((f) => (f === a.micro ? null : a.micro)); return; }
     if (a.invitar) { registrar("invitar_vecino", { desde: "micro" }); abrirRegistroPrevio("invitar"); return; }
     if (a.compartir) {
@@ -188,7 +189,7 @@ export default function MicroAcciones() {
         <p className="ma-i">{cfg.intro || "Toca la que puedas hacer ahora. Cada una suma."}</p>
         <div className="ma-lista">
           {cfg.items.map((x) => {
-            const form = x.a && x.a.micro ? FORMULARIOS_MICRO[x.a.micro] : null;
+            const form = x.a && x.a.micro && x.a.micro !== "recomienda" ? FORMULARIOS_MICRO[x.a.micro] : null;
             const ab = form && forma === x.a.micro;
             return (
               <div key={x.t} id={form ? "ma-f-" + x.a.micro : undefined} className={"ma-it" + (x.meta ? " ma-meta" : "") + (ab ? " ma-ab" : "")}>

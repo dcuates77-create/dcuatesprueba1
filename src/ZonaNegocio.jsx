@@ -21,7 +21,7 @@ export default function Negocio({ onCerrar, onAbrirProyecto }) {
       proy("cupones-promos", "🏷️ Ofrecer cupones y promociones"),
       proy("ventas-con-causa", "🛍️ Vender mi producto o servicio con causa"),
       proy("bazares", "🧺 Participar en un bazar comunitario"),
-      proy("noticias", "📰 Anunciar una novedad o evento en Noticias de barrio")
+      proy("noticias", "📰 Anunciar una novedad o evento en Noticias de la comunidad")
     ]],
     ["🤝 Crecer con aliados", [
       proy("alianzas-tarjeta", "🏪 Alianzas solidarias ganar-ganar"),

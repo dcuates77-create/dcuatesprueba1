@@ -144,7 +144,7 @@ const OPC_NUEVO = [
   ["asesorias", "Asesoría educativa o laboral gratuita"],
   ["bienestar", "Talleres, cursos y bienestar"],
   ["circulo-confianza", "Recomendaciones de servicios de confianza"],
-  ["noticias", "Noticias y avisos de mi barrio"],
+  ["noticias", "Noticias y avisos de mi comunidad"],
   ["bazares", "Bazares y trueques"],
   ["ventas-con-causa", "Comprar algo que apoya una causa"],
   ["donaciones", "Ser voluntario(a) o donar"]

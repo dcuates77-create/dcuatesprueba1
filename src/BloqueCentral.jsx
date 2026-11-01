@@ -39,7 +39,7 @@ export const TABS = [
     id: "beneficios", label: "Beneficios", emoji: "🎁", color: "#F07A1A", pastel: "#FFF1E1",
     boton: "#D1530A",
     cat: "beneficios-comunitarios", cover: {}, ver: true, slot: "beneficios",
-    banda: { titulo: "Beneficios que ya se sienten en el barrio" },
+    banda: { titulo: "Beneficios que ya se sienten en la comunidad" },
     invitacion: { titulo: "Beneficios que sí llegan a tu puerta", texto: "Libros, asesorías, bienestar y apoyo para tus mascotas, todo gratis. Toca uno y descubre cómo usarlo." },
     wa: "¡Hola DCUATES! Quiero conocer los beneficios comunitarios disponibles."
   },
@@ -55,8 +55,8 @@ export const TABS = [
     boton: "#23804A",
     cat: "alianzas-y-negocios", cover: { slogan: "APOYOS Y BENEFICIOS MUTUOS Y COMUNITARIOS" }, ocultarSinItems: true, mapa: true, fichas: true, ver: true, slot: "negocios",
     texto: "Encuentra comercios aliados en Jardines de Morelos o registra el tuyo gratis.",
-    banda: { titulo: "Comunidad que mueve el barrio" },
-    invitacion: { titulo: "Compra local, crece en comunidad", texto: "Alianzas que mueven la economía del barrio. Descubre cómo participar." },
+    banda: { titulo: "Comunidad que se mueve unida" },
+    invitacion: { titulo: "Compra local, crece en comunidad", texto: "Alianzas que mueven la economía de la comunidad. Descubre cómo participar." },
     wa: "¡Hola DCUATES! Quiero registrar mi negocio."
   },
   {

@@ -40,7 +40,7 @@ export default function ApoyoHost({ onAbrirProyecto = () => {} }) {
         ))}
         <p className="zj-et">En DCUATES</p>
         <div className="zj-col">
-          <button type="button" style={{ background: "#2E9E5B" }} onClick={() => ir({ p: "extraviados-registro" })}>🔎 Reportar mascota extraviada o encontrada</button>
+          <button type="button" style={{ background: "#2E9E5B" }} onClick={() => ir({ reg: "extraviado" })}>🔎 Reportar mascota extraviada o encontrada</button>
           <button type="button" style={{ background: "#C2410C" }} onClick={() => ir({ p: "ecatepets" })}>🐾 Ecatepets: adopción y cuidado</button>
           <button type="button" style={{ background: "#7a5ad8" }} onClick={() => ir({ chat: "¡Hola DCUATES! Necesito orientación por un caso de animales (extravío / adopción / rescate / maltrato). Mi caso es: ___" })}>💬 Pedir orientación por WhatsApp</button>
         </div>
