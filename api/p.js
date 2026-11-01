@@ -29,13 +29,13 @@ const ENLACES = {
   ventas: { hash: "proyecto-ventas-con-causa", titulo: "Ventas con causa", texto: "Compra productos y servicios locales que además apoyan una causa.", img: "/images/VentasConCausa.png" },
   apoyo: { hash: "proyecto-donaciones", titulo: "Apoyo voluntario", texto: "Tu tiempo, tu talento o tus recursos pueden cambiar vidas. Conoce cómo sumarte.", img: "/images/ApoyoVoluntario.png" },
   donar: { alias: "apoyo" },
-  noticias: { hash: "proyecto-noticias", titulo: "Noticias de barrio", texto: "Lo que pasa en tu colonia: eventos, convocatorias y buenas noticias.", img: "/images/Noticias.png" },
+  noticias: { hash: "proyecto-noticias", titulo: "Noticias de la comunidad", texto: "Lo que pasa en tu colonia: eventos, convocatorias y buenas noticias.", img: "/images/Noticias.png" },
   // Pestañas
   nosotros: { hash: "nosotros", titulo: "Nosotros · DCUATES", texto: "Juntos hacemos una mejor comunidad. Conoce quiénes somos y cómo puedes sumar." },
   beneficios: { hash: "beneficios", titulo: "Beneficios para tu comunidad", texto: "Libros, asesorías, bienestar y apoyo para tus mascotas, todo gratis." },
   causas: { hash: "causas", titulo: "Causas que cambian vidas", texto: "Cada proyecto es una forma concreta de apoyar a alguien de tu comunidad." },
   negocios: { hash: "negocios", titulo: "Negocios locales aliados", texto: "Compra local, crece en comunidad. Encuentra negocios aliados o registra el tuyo gratis." },
-  valores: { hash: "valores", titulo: "Los valores que nos unen", texto: "Confianza, alianzas y buenas noticias del barrio." },
+  valores: { hash: "valores", titulo: "Los valores que nos unen", texto: "Confianza, alianzas y buenas noticias de la comunidad." },
   regalos: { hash: "regalos", titulo: "Retos y regalos DCUATES", texto: "Retos que nos hacen mejores y regalos para quienes participan." },
   gratitud: { hash: "gratitud", titulo: "Gratitud", texto: "Reconocemos a quienes hacen el bien en nuestra comunidad." },
   // Otras secciones
