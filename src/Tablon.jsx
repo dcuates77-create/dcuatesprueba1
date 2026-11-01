@@ -1,4 +1,4 @@
-// TABLÓN «LO QUE COMPARTIMOS» (e57) — el RECIBO: lo que la comunidad OFREZCO / NECESITO, adopciones y libros, publicado desde tu hoja.
+// TABLÓN «LO QUE COMPARTIMOS» (e57) — el COMPARTIMOS: lo que la comunidad OFREZCO / NECESITO, adopciones y libros, publicado desde tu hoja.
 // Cómo llega algo aquí:
 //   1) Alguien lo registra (Ofrezco, Necesito, Ecatepets, Libros) y autoriza publicarlo → cae en la pestaña «Registros» de tu hoja.
 //   2) Tú lo revisas y escribes «Sí» en la columna «¿Publicar?» (puedes pulir «Título público» y «Texto público»).

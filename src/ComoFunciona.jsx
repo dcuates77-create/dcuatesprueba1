@@ -54,7 +54,7 @@ function Ejemplos({ onCerrar }) {
   return (
     <section className="cf-ejs" aria-label="Dos ejemplos">
       <h3 className="cf-h">📖 Dos ejemplos: ofrecer y pedir</h3>
-      <p className="cf-i" style={{ fontSize: 14.5 }}>En DCUATES todo gira en tres verbos: <b>OFREZCO</b>, <b>NECESITO</b> y <b>RECIBO</b> (lo que ya hay disponible para ti).</p>
+      <p className="cf-i" style={{ fontSize: 14.5 }}>En DCUATES todo gira en tres verbos: <b>COMPARTIMOS</b> (lo que ya hay y se recomienda), <b>OFREZCO</b> y <b>NECESITO</b>. Son nuestro <b>CON</b>: con DCUATES todos ganamos.</p>
       <div className="cf-tabs" role="tablist">
         <button type="button" role="tab" aria-selected={lado === "ofrezco"} className={lado === "ofrezco" ? "on o" : ""} onClick={() => cambiaLado("ofrezco")}>🎁 OFREZCO</button>
         <button type="button" role="tab" aria-selected={lado === "necesito"} className={lado === "necesito" ? "on n" : ""} onClick={() => cambiaLado("necesito")}>🙏 NECESITO</button>
@@ -68,7 +68,7 @@ function Ejemplos({ onCerrar }) {
           <li key={i}><span style={{ background: E.color }}>{i + 1}</span><div><b>{CICLO[i]}</b><small>{p}</small></div></li>
         ))}
       </ol>
-      <p className="cf-hist" style={{ borderLeftColor: "#0f2d1e" }}>Cuando elijas tu <b>puerta</b>, ahí mismo encontrarás los botones OFREZCO, NECESITO y RECIBO adaptados a tu perfil.</p>
+      <p className="cf-hist" style={{ borderLeftColor: "#0f2d1e" }}>Cuando elijas tu <b>puerta</b>, ahí mismo encontrarás los botones COMPARTIMOS, OFREZCO y NECESITO adaptados a tu perfil.</p>
       <div className="cf-b">
         <button type="button" className="a" style={{ background: E.color }} onClick={() => { onCerrar(); setTimeout(() => window.dispatchEvent(new CustomEvent("dcuates:elegir-puerta")), 150); }}>🚪 Elegir mi puerta</button>
       </div>
