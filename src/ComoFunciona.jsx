@@ -25,7 +25,7 @@ const EJEMPLOS = {
     color: "#1F7A46",
     casos: [
       { id: "producto", t: "Un producto o servicio", hist: "Rosa tiene una cuna que ya no usa y Memo sabe arreglar bicicletas.",
-        pasos: ["Rosa toca OFREZCO, elige «Producto», escribe «Cuna en buen estado» y su WhatsApp.", "Le sale un folio (OFR-…) y nos llega el aviso por correo.", "Revisamos y, con su permiso, la cuna aparece en «Lo que hay hoy» sin su nombre ni teléfono.", "Una vecina toca «Me interesa»; DCUATES le avisa a Rosa y las pone en contacto.", "La cuna cambia de casa. La vecina agradece en el Muro de gratitud y suma Semillas."] },
+        pasos: ["Rosa toca OFREZCO, elige «Producto», escribe «Cuna en buen estado» y su WhatsApp.", "Le sale un folio (OFR-…) y nos llega el aviso por correo.", "Revisamos y, con su permiso, la cuna aparece en «Lo que compartimos» sin su nombre ni teléfono.", "Una vecina toca «Me interesa»; DCUATES le avisa a Rosa y las pone en contacto.", "La cuna cambia de casa. La vecina agradece en el Muro de gratitud y suma Semillas."] },
       { id: "mascota", t: "Una mascota", hist: "Lupe rescató una gatita y busca hogar para ella.",
         pasos: ["Lupe entra a Ecatepets → «Dar en adopción» y cuenta cómo es la gatita.", "Recibe su folio (ECA-…).", "Verificamos y publicamos la adopción en «Adopciones».", "Una familia toca «Me interesa» y coordinamos la visita.", "La gatita encuentra hogar y se cuenta en Historias DCUATES."] },
       { id: "ayuda", t: "Mi tiempo o conocimiento", hist: "Don Raúl es contador y quiere orientar gratis a quien lo necesite.",
@@ -40,7 +40,7 @@ const EJEMPLOS = {
       { id: "mascota", t: "Una mascota extraviada o apoyo animal", hist: "A Pedro se le perdió su perrito.",
         pasos: ["Pedro toca «Reportar un caso» (si es urgente, también llama al 911 en caso de personas).", "Folio EXT-… y aviso inmediato por correo.", "Difundimos el caso en Extraviados.", "Una vecina lo vio y avisa; DCUATES conecta a ambos.", "El perrito vuelve a casa. Pedro agradece en el Muro."] },
       { id: "producto", t: "Un producto o servicio", hist: "Marta busca una silla de ruedas prestada para su mamá.",
-        pasos: ["Marta toca NECESITO → «Producto» → «Silla de ruedas prestada».", "Folio NEC-… en su pantalla.", "Se publica en «Lo que hay hoy» con su permiso (sin nombre ni teléfono).", "Alguien toca «Me interesa» en una oferta parecida y las conectamos.", "Marta la recibe, la devuelve cuando termina y agradece."] }
+        pasos: ["Marta toca NECESITO → «Producto» → «Silla de ruedas prestada».", "Folio NEC-… en su pantalla.", "Se publica en «Lo que compartimos» con su permiso (sin nombre ni teléfono).", "Alguien toca «Me interesa» en una oferta parecida y las conectamos.", "Marta la recibe, la devuelve cuando termina y agradece."] }
     ]
   }
 };

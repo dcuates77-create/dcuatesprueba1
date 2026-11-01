@@ -11,7 +11,6 @@ import { WHATSAPP_NUMERO } from "./datos/config.js";
 import { registrar } from "./analitica.js";
 import CosasSemana from "./CosasSemana.jsx";
 import ComoFunciona from "./ComoFunciona.jsx";
-import { BotonTablon } from "./Tablon.jsx";
 
 // Foto de portada: sube /public/images/portada-inicio.webp para cambiarla; mientras no exista se usa la de respaldo.
 const FOTOS = ["/images/portada-inicio.webp", "/images/bibliobici-movil.webp"];
@@ -164,7 +163,6 @@ export default function InicioNuevo({ onIr, logros = [], cargando = false, entra
       </nav>
 
       <CosasSemana agenda={entrada.agenda} filasZona={entrada.filasZona} />
-      <div style={{ padding: "0 14px 6px" }}><BotonTablon /></div>
 
       <div className="vi-logros bc-root" style={{ "--tc": "#17472d" }}>
         <BandaImpacto logros={logros} cargando={cargando} tab={{ ...tabNosotros, banda: { titulo: "NUESTROS LOGROS" } }} />
