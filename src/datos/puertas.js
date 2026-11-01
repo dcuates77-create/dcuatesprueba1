@@ -41,7 +41,7 @@ export const PUERTAS = [
         ["💼", "DESCUBRE MÁS", "Servicios y promos especiales", { serv: 1 }]],
         grupos: [["Beneficios y oportunidades", [["🏷️ Cupones y promociones", { p: "cupones-promos" }], ["🛍️ Ventas con causa", { p: "ventas-con-causa" }], ["🗺️ Mapa de negocios", { sec: "negocios" }], ["🧺 Bazares", { p: "bazares" }], ["💼 Servicios y promociones especiales", { serv: 1 }]]]] },
       { n: "👍 Recomiendo y opino", pasos: [
-        ["🛒", "VISITA", "Compra en el barrio", { sec: "negocios" }],
+        ["🛒", "VISITA", "Compra en la comunidad", { sec: "negocios" }],
         ["👍", "RECOMIENDA", "Cuenta tu buena experiencia", { p: "recomienda-evalua-gana" }],
         ["💬", "RETROALIMENTA", "Sugiere cómo mejorar", { chat: "¡Hola DCUATES! Quiero dar una retroalimentación amable sobre un negocio: ___" }],
         ["🏆", "GANA", "Semillas y premios", { z: "gana" }]],
@@ -135,10 +135,10 @@ export const PUERTAS = [
     intro: "Peluditos y quienes los quieren: adopciones, extravíos y ayuda para animalitos de la comunidad. 🐶🐱",
     modos: [{ n: null, pasos: [
       ["🐾", "CONOCE", "Ecatepets", { p: "ecatepets" }],
-      ["🔎", "REPORTA", "Extraviados y encontrados", { p: "extraviados-registro" }],
+      ["🔎", "REPORTA", "Extraviados y encontrados", { reg: "extraviado" }],
       ["🏠", "ADOPTA O AYUDA", "Hogar temporal y apoyo", { chat: "¡Hola DCUATES! Quiero ayudar a los animales. Puedo: adoptar / dar hogar temporal / donar / ser voluntario(a)." }],
       ["📲", "COMPARTE", "Difunde casos", { wa: "Te comparto casos de mascotas y peluditos que necesitan ayuda en DCUATES: dcuates.com 🐾" }]],
-      grupos: [["Para los peluditos", [["🐾 Ecatepets", { p: "ecatepets" }], ["🆘 Ayuda causa animal: teléfonos y qué hacer", { apoyo: "animal" }], ["🔎 Mascotas extraviadas o encontradas", { p: "extraviados-registro" }], ["🎁 Donar alimento o ayuda", { z: "causa" }], ["🙋 Ser voluntario(a)", { p: "donaciones" }]]]],
+      grupos: [["Para los peluditos", [["🐾 Ecatepets", { p: "ecatepets" }], ["🆘 Ayuda causa animal: teléfonos y qué hacer", { apoyo: "animal" }], ["🔎 Mascotas extraviadas o encontradas", { reg: "extraviado" }], ["🎁 Donar alimento o ayuda", { z: "causa" }], ["🙋 Ser voluntario(a)", { p: "donaciones" }]]]],
       desarrollo: [DES("Jornadas de esterilización y vacunación", "Aliados veterinarios y fechas cercanas."), DES("Red de hogares temporales", "Vecinos que dan refugio mientras llega una familia."), DES("Directorio de veterinarias aliadas", "Descuentos y apoyo para casos urgentes."), DES("Paseos y cuidados solidarios", "Voluntarios para acompañar a peluditos de adultos mayores.")] }]
   },
   {
@@ -215,7 +215,7 @@ export const PUERTAS = [
       ["📣", "MUESTRA", "Dalo a conocer", { p: "noticias" }],
       ["🌱", "CONSTRUYE", "Con aliados y apoyo", { p: "asesorias" }]],
       grupos: [["Para compartir y construir", [["💡 Proponer una idea o proyecto", { z: "propon" }], ["🎓 Enseñar lo que sé", { p: "asesorias" }], ["📣 Dar a conocer lo que hago", { p: "publicidad-tarjeta" }], ["🛍️ Vender con causa", { p: "ventas-con-causa" }]]]],
-      desarrollo: [DES("Escaparate de talentos del barrio", "Una vitrina con músicos, artistas, artesanos y más."), DES("Proyectos buscan equipo", "Ideas de la comunidad que necesitan manos y mentes.")] }]
+      desarrollo: [DES("Escaparate de talentos de la comunidad", "Una vitrina con músicos, artistas, artesanos y más."), DES("Proyectos buscan equipo", "Ideas de la comunidad que necesitan manos y mentes.")] }]
   }
 ];
 

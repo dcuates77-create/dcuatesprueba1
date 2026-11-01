@@ -17,7 +17,7 @@ export const CONTEXTOS = [
     meta: "¡Tu ayuda llegó a quien la necesitaba!" },
   { id: "negocios", nombre: "Negocios", emoji: "🗺️", color: "#2E9E5B",
     pares: ["🌮", "🥖", "☕", "💈", "🧵", "🍎"], buenos: ["🌮", "🏷️", "🥖"], malo: "⚠️", heroe: "🛒",
-    meta: "¡Compraste local y ayudaste al barrio!" },
+    meta: "¡Compraste local y ayudaste a la comunidad!" },
   { id: "muertos", nombre: "Día de Muertos", emoji: "🌼", color: "#E8710A",
     pares: ["🌼", "🕯️", "💀", "🍞", "🧡", "🦋"], buenos: ["🌼", "🕯️", "🍞"], malo: "⚠️", heroe: "🦋",
     meta: "¡Recordaste con cariño a quienes quieres!" }

@@ -22,7 +22,9 @@ export const YOUTUBE_VIDEO_ID = "SUnE27QnnyI";
 // iframe); no hace falta tocar nada más en el código.
 // Sello de versión: se ve en pequeño al final de los accesos rápidos y en la
 // consola del navegador. Sirve para comprobar que el celular ya cargó lo último.
-export const VERSION_BUILD = "CLON12 · e58";
+export const VERSION_BUILD = "CLON12 · e59";
+// e59 — versión del Aviso de Privacidad que acepta la persona al registrarse (se anota en la hoja, columna «Aceptó aviso»). Súbela cuando cambies el aviso.
+export const VERSION_AVISO = "oct-2026 (borrador)";
 
 // Interruptor de contenido DE EJEMPLO (testimonios, cupones, casos extraviados,
 // anuncios del ticker, eventos de muestra). En true (como está ahora) se dejan visibles.
@@ -91,7 +93,7 @@ export const NAV_LINKS_MAS = [
   { label: "Recomienda, Evalúa y Gana", emoji: "⭐", modal: "recomienda-evalua-gana" },
   { label: "Asesorías Gratuitas", emoji: "🎓", modal: "asesorias" },
   { label: "Bazar y Comercio", emoji: "🏪", modal: "bazares" },
-  { label: "Noticias de Barrio", emoji: "📰", modal: "noticias" },
+  { label: "Noticias de la Comunidad", emoji: "📰", modal: "noticias" },
   { label: "Bienestar y Recreación", emoji: "🧘", modal: "bienestar" },
   { label: "Sugerencias y Quejas", emoji: "💬", action: "sugerencias" },
   { label: "Preguntas Frecuentes", emoji: "❓", action: "faq" }

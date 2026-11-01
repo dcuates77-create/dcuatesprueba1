@@ -13,7 +13,7 @@ export const IDENTIDAD = {
   "cupones-promos": { emoji: "🏷️", color: "#F07A1A", nombre: "Cupones y promos" },
   "publicidad-tarjeta": { emoji: "📣", color: "#C2410C", nombre: "Publicidad gratuita" },
   bazares: { emoji: "🧺", color: "#B7791F", nombre: "Bazar y comercio" },
-  noticias: { emoji: "📰", color: "#475569", nombre: "Noticias de barrio" },
+  noticias: { emoji: "📰", color: "#475569", nombre: "Noticias de la comunidad" },
   bienestar: { emoji: "🧘", color: "#0F766E", nombre: "Bienestar y recreación" },
   "recomienda-evalua-gana": { emoji: "👍", color: "#4F46E5", nombre: "Recomienda, evalúa y gana" },
   "alianzas-tarjeta": { emoji: "🏪", color: "#9A3412", nombre: "Alianzas solidarias" }

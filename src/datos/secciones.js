@@ -46,7 +46,7 @@ export const CAMINO = {
     ["🔎", "DESCUBRE", "Mira qué beneficios hay", { acc: "beneficios" }],
     ["🙏", "PIDE", "Un libro o una asesoría", { p: "libros" }],
     ["🎁", "APROVECHA", "Cupones y promos", { p: "cupones-promos" }],
-    ["📲", "COMPARTE", "Invita a un vecino", { wa: INV }]
+    ["📲", "COMPARTE", "Invita a tu comunidad", { wa: INV }]
   ],
   causas: [
     ["📰", "ENTÉRATE", "Qué se necesita hoy", { p: "noticias" }],
@@ -117,7 +117,7 @@ export function tarjetasHoy(sec, d = {}) {
     ];
     case "negocios": return [
       { e: nego ? nego.emoji || "🏪" : "🏪", et: "NEGOCIO DE LA SEMANA", t: nego ? nego.nombre : "Registra el tuyo gratis", s: nego ? `${nego.giro || ""} · ${nego.zona || ""}` : "Aparece en el mapa y en la lista.", c: "#23804A", a: nego ? { scroll: "mapa-negocios" } : { z: "negocio" } },
-      { e: "🏷️", et: "PROMO DE LA SEMANA", t: "Cupones y promos de tu zona", s: "Descuentos que mueven al barrio.", c: "#F07A1A", a: { p: "cupones-promos" } },
+      { e: "🏷️", et: "PROMO DE LA SEMANA", t: "Cupones y promos de tu zona", s: "Descuentos que mueven a la comunidad.", c: "#F07A1A", a: { p: "cupones-promos" } },
       { e: "💡", et: "TIP PARA EMPRENDEDORES DE LA SEMANA", t: rota(TIPS_EMPRENDER), c: "#1B6F8A", a: { z: "negocio" } }
     ];
     case "valores": return [

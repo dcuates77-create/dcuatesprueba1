@@ -38,7 +38,8 @@ export const AVISO_PRIVACIDAD_INTEGRAL = {
         "Número de teléfono celular (WhatsApp).",
         "Colonia de residencia.",
         "Tipo de apoyo solicitado o requerido.",
-        "Descripción detallada de la necesidad o aportación."
+        "Descripción detallada de la necesidad o aportación.",
+        "Folio de su registro y, si llegó por el enlace de otra persona, el código de quien la invitó."
       ],
       despues: [
         "DCUATES no recaba, almacena ni trata bajo ninguna circunstancia datos personales sensibles (como ideología, religión, política, estado de salud o datos financieros).",
@@ -80,7 +81,18 @@ export const AVISO_PRIVACIDAD_INTEGRAL = {
       ]
     },
     {
-      titulo: "7. Modificaciones por formalización legal",
+      titulo: "7. Datos de otras personas, publicaciones, invitaciones y WhatsApp",
+      parrafos: [
+        "Datos de otras personas: escriba en los formularios únicamente datos que sean suyos. Si necesita mencionar a alguien (por ejemplo, a quien recomienda), no escriba su teléfono ni datos delicados. Al registrarse usted declara que los datos que escribe son suyos o que cuenta con el permiso de la persona a quien se refieren. DCUATES podrá borrar, sin previo aviso, cualquier dato o publicación que no cumpla esto, y podrá negar reconocimientos o recompensas relacionados con ellos.",
+        "Invitaciones y difusión: para invitar a alguien o difundir DCUATES no se piden los datos de la persona invitada. Usted comparte un enlace con su código; si esa persona se registra por sí misma, su registro queda ligado al código de quien la invitó, únicamente para poder entregar reconocimientos. Quien se registra puede pedir que se borre ese vínculo.",
+        "Publicaciones en «Lo que compartimos»: solo se publican ofertas, necesidades o recomendaciones públicas cuando usted lo autoriza de forma expresa, sin su nombre ni su teléfono. Las recomendaciones privadas no se publican.",
+        "Registro de su consentimiento: al marcar la casilla de aceptación en un registro, se anota en nuestra base de datos la fecha de su registro y la versión de este aviso que aceptó.",
+        "WhatsApp y correo: si usted decide escribirnos por WhatsApp, su mensaje y su número viajan y se guardan también en esa aplicación y en el teléfono de DCUATES, conforme a las políticas de WhatsApp. Además, cada registro con folio genera un correo de aviso al responsable con los datos que usted escribió. Esos mensajes y correos se conservan solo el tiempo necesario para atenderle y se eliminan cuando usted lo solicite.",
+        "Conservación y acceso: DCUATES conserva los registros mientras sean necesarios para atenderle y por el tiempo que la ley exija, y los revisa periódicamente para borrar los que ya no hagan falta. El responsable procura limitar el acceso a la base de datos a personas autorizadas y protegerla con medidas de seguridad razonables."
+      ]
+    },
+    {
+      titulo: "8. Modificaciones por formalización legal",
       parrafos: [
         "Este aviso de privacidad es de carácter temporal y sufrirá modificaciones y actualizaciones una vez que el proyecto DCUATES culmine su proceso de transición hacia una figura jurídica colectiva (Sociedad Cooperativa). Las actualizaciones estarán siempre disponibles para su consulta en esta misma sección del sitio web."
       ]
@@ -190,11 +202,11 @@ export const FAQ_ITEMS = [
   { tema: "Voluntariado", pregunta: "¿Cómo dono o presto un libro?", respuesta: "En «Súmate», dentro de «Micro-acciones», toca «Dona o presta un libro»: se abre WhatsApp con el mensaje «Quiero donar un libro». Ahí coordinamos contigo cómo entregarlo." },
   { tema: "Voluntariado", pregunta: "¿Cómo reporto una mascota, persona o cosa extraviada?", respuesta: "Entra a «Causas y valores», abre «Apoyo voluntario, donativos y casos» y toca «Reporta un caso» (también está en «Regístrate»). Te contactamos directo por WhatsApp. Si es una mascota, también puedes escribir «mascotas» en el buscador de Inicio para ver Ecatepets." },
   { tema: "Voluntariado", pregunta: "¿Qué es el Muro de gratitud?", respuesta: "Es un espacio donde cualquiera puede dejar un mensaje de agradecimiento para alguien de la comunidad. Lo encuentras en la sección «Gratitud», o desde «Súmate» → «Deja un agradecimiento en el Muro»." },
-  { tema: "Voluntariado", pregunta: "¿Cómo invito a un vecino?", respuesta: "En «Súmate» → «Micro-acciones» toca «Invita a un vecino», o usa «Invita a un vecino» al final de Inicio. Se abre WhatsApp con la invitación lista para mandar a quien tú elijas." },
+  { tema: "Voluntariado", pregunta: "¿Cómo invito a un vecino, amigo o familiar?", respuesta: "En «Regístrate o participa» toca «Invita a un vecino, amigo o familiar», o usa «Invita a tu comunidad» al final de Inicio. Recibes un enlace con tu código para mandarlo por WhatsApp. No pedimos los datos de quien invitas: cada persona se registra por sí misma." },
   { tema: "Voluntariado", pregunta: "¿Para qué sirve «Tu opinión cuenta»?", respuesta: "Para decirnos cómo te fue en la página y qué mejorarías. Es anónima; la encuentras en «Contacto» y en «Súmate» → «Cuéntanos tu opinión»." },
   { tema: "Privacidad", pregunta: "¿DCUATES tiene algún costo para participar?", respuesta: "No. Todos los proyectos (libros, publicidad, Ecatepets, asesorías, etc.) son gratuitos. Las aportaciones voluntarias solo ayudan a que la plataforma llegue a más familias." },
   { tema: "Privacidad", pregunta: "¿Qué pasa con mis datos si lleno un formulario?", respuesta: "Solo se usan para la difusión comunitaria del proyecto que elegiste y para contactarte. Puedes ver el detalle completo en nuestro Aviso de Privacidad, en el pie de página." },
-  { tema: "Privacidad", pregunta: "¿Cómo piden o borran mis datos?", respuesta: "Escríbenos a dcuates77@gmail.com o por WhatsApp pidiendo la rectificación o eliminación de tus datos. Está explicado en el Aviso de Privacidad." },
+  { tema: "Privacidad", pregunta: "¿Cómo piden o borran mis datos?", respuesta: "Escríbenos a dcuates77@gmail.com o por WhatsApp pidiendo la rectificación o eliminación de tus datos. Está explicado en el Aviso de Privacidad. Si prefieres no dejar datos en nuestra hoja, puedes mandar tu registro directo por WhatsApp." },
   { tema: "Privacidad", pregunta: "¿Usan cookies o me rastrean?", respuesta: "Para saber qué secciones se usan más contamos visitas y toques de forma anónima, con herramientas que no usan cookies de seguimiento ni guardan tu nombre, teléfono o identidad." },
   { tema: "Privacidad", pregunta: "¿Cómo evito fraudes o estafas?", respuesta: "Revisa el «Escudo de seguridad» y el «Aviso de seguridad» (en el menú y el pie de página). Regla básica: DCUATES no te pide dinero por adelantado ni claves; si alguien lo hace a nombre de DCUATES, repórtalo." },
   { tema: "Técnicos", pregunta: "Algo no funciona, ¿qué hago?", respuesta: "Toca el botón ¿Necesitas algo? (abajo a la derecha) y elige «Algo no funciona»: se abre WhatsApp con los datos básicos de tu teléfono para que podamos revisar el problema." },

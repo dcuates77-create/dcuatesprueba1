@@ -112,7 +112,7 @@ export const SUBTIPOS = [
   "a": [
    "Pídenos ayuda por WhatsApp o llamada (también puede hacerlo un familiar).",
    "Conoce actividades y apoyos cercanos.",
-   "Comparte tu experiencia: un cuento, un oficio, un recuerdo del barrio."
+   "Comparte tu experiencia: un cuento, un oficio, un recuerdo de la comunidad."
   ],
   "o": "Atención sencilla por WhatsApp o llamada; actividades en espacios aliados.",
   "e": "Solo si quieres: compartir tu historia.",

@@ -24,10 +24,10 @@ export const INICIATIVAS_PRINCIPALES = [
     titulo: "ECATEPETS",
     descripcion: "Apoyo en la búsqueda de mascotas extraviadas, y fomento de la adopción y el cuidado animal responsable en conjunto con los vecinos de DCUATES.",
     puntos: ["Difusión de extravíos", "Adopción responsable", "Cuidado y concientización"],
-    textoBoton: "Publicar Extravíos y Adopciones",
+    textoBoton: "Reportar un caso (mascota extraviada o encontrada)",
     // En vez de abrir WhatsApp, este botón lleva directo al registro de
     // extraviados/adopciones dentro de la sección "Ventas con Causa".
-    scrollDestino: "extraviados-registro",
+    registro2: "extraviado",
     enlaceDirectoWA: enlaceWhatsApp("¡Hola DCUATES! Quiero sumarme a la causa de Ecatepets para el bienestar animal."),
     segundoBoton: {
       titulo: "Ver Adopciones, Extraviados y Temas sobre Cuidado Animal",
@@ -107,7 +107,7 @@ export const NUEVOS_PROYECTOS_DATA = [
     categoria: "VENTAS CON CAUSA",
     titulo: "Comercios Físicos y Digitales",
     descripcion: "Ventas caseras y de calle basadas en la confianza mutua para el apoyo de la economía familiar y solidaria.",
-    puntos: ["Comercio local seguro", "Barrio de confianza", "Apoyo a causas"],
+    puntos: ["Comercio local seguro", "Comunidad de confianza", "Apoyo a causas"],
     textoBoton: "Incluir mi negocio",
     enlaceDirectoWA: enlaceWhatsApp("¡Hola DCUATES! Quiero obtener información para participar en los bazares y mercados.")
   },
@@ -119,7 +119,7 @@ export const NUEVOS_PROYECTOS_DATA = [
     descripcion: "Mantente al día con los eventos culturales, convocatorias comunitarias y acontecimientos sociales de la zona.",
     puntos: ["Eventos culturales", "Convocatorias vecinales", "Acontecimientos sociales"],
     textoBoton: "Sumar Actividades",
-    enlaceDirectoWA: enlaceWhatsApp("¡Hola DCUATES! Me interesa conocer la agenda cultural y las noticias del barrio.")
+    enlaceDirectoWA: enlaceWhatsApp("¡Hola DCUATES! Me interesa conocer la agenda cultural y las noticias de la comunidad.")
   },
   {
     id: "bienestar",
