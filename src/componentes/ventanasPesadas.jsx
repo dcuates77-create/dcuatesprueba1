@@ -1023,6 +1023,7 @@ export function ModalAccesoRapido({ tipo, onCerrar, onAbrirProyecto, onAccion })
     else if (it.modal) onAbrirProyecto && onAbrirProyecto(it.modal);
     else if (it.seccion) setTimeout(() => irASeccion(it.seccion), it.abre ? 400 : 150);
     else if (it.accion) onAccion && onAccion(it.accion);
+    else if (it.ev) window.dispatchEvent(new CustomEvent(it.ev));
   };
   return (
     <div className="fixed inset-0 z-[55] flex items-end sm:items-center justify-center bg-black/55 p-3" style={oculta ? { display: "none" } : undefined} onClick={onCerrar}>
