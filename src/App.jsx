@@ -252,7 +252,7 @@ export default function App() {
   const [videoEnGrande, setVideoEnGrande] = useState(null);
   // Botón "Atrás" del celular: cierra la ventana de arriba en vez de salir de la página.
   useAtras(!!modalProyecto, () => setModalProyecto(null));
-  useAtras(!!accesoAbierto, () => setAccesoAbierto(null));
+  // e59: la ventana de accesos (REGÍSTRATE / Para ti) maneja su propio «atrás» dentro de ModalAccesoRapido (hub). Tenerlo también aquí la ocultaba al abrirla por segunda vez.
   useAtras(showMapaSitio, () => setShowMapaSitio(false));
   useAtras(!!categoriaAbierta, () => setCategoriaAbierta(null));
   useAtras(showFAQ, () => setShowFAQ(false));
