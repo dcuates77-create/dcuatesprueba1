@@ -163,6 +163,42 @@ export const REGISTROS = {
       { k: "ref", etiqueta: "Publicación", max: 160, req: true },
       { k: "msg", etiqueta: "Mensaje (opcional)", tipo: "area", max: 300, ph: "Ej. Me interesa, puedo pasar el sábado" },
     ], { wa: "¡Hola DCUATES! Me interesa una publicación de «Lo que hay hoy»." }),
+  // e58 — registros que antes eran formularios sueltos o mensajes directos, ahora con folio y en la bandeja «Registros»
+  solicitud: R("solicitud", "📝", "Registra tu solicitud", "SOL", "Solicitud de apoyo", "Solicitudes de apoyo",
+    "Cuéntanos qué apoyo necesitas. Te respondemos por WhatsApp. Si es una urgencia, usa el botón rosa «¿Necesitas apoyo o tienes una urgencia?».",
+    [
+      { k: "tipo", etiqueta: "¿Qué tipo de apoyo necesitas?", tipo: "opciones", opciones: ["Alimentos o despensa", "Ropa o útiles", "Salud o bienestar", "Asesoría", "Libros", "Mascotas", "Otro"], req: true },
+      { k: "d", etiqueta: "Cuéntanos con calma qué necesitas", tipo: "area", max: 500, req: true },
+      ZONA,
+    ], { wa: "¡Hola DCUATES! Acabo de registrar una solicitud de apoyo." }),
+  voluntario: R("voluntario", "🙋", "Quiero ser voluntario(a)", "VOL", "Voluntario", "Voluntariado",
+    "Gracias por querer sumar tu tiempo. Cuéntanos en qué te gustaría ayudar.",
+    [
+      { k: "en", etiqueta: "¿En qué te gustaría ayudar?", tipo: "opciones", opciones: ["Acompañar personas", "Leer o enseñar", "Mascotas", "Eventos y logística", "Difusión", "Donar o juntar apoyos", "Otro"], req: true },
+      { k: "hab", etiqueta: "¿Qué sabes hacer o qué te gustaría aportar?", tipo: "area", max: 300 },
+      { k: "disp", etiqueta: "¿Cuándo tienes tiempo?", max: 100, ph: "Ej. Sábados por la tarde" },
+      ZONA,
+    ], { wa: "¡Hola DCUATES! Acabo de registrarme como voluntario(a)." }),
+  ventas: R("ventas", "🛍️", "Ventas con causa", "VEN", "Ventas con causa", "Ventas con causa",
+    "Cuéntanos qué quieres ofrecer o qué estás buscando. Parte de lo que se vende apoya una causa.",
+    [
+      { k: "q", etiqueta: "¿Qué quieres hacer?", tipo: "opciones", opciones: ["Ofrecer un producto o servicio", "Buscar algo para comprar"], req: true },
+      { k: "d", etiqueta: "¿Qué ofreces o buscas?", tipo: "area", max: 300, req: true },
+      ZONA,
+    ], { wa: "¡Hola DCUATES! Acabo de registrar algo para Ventas con causa." }),
+  invitar: R("invitar", "💚", "Invita a un vecino", "INV", "Invitación", "Invitaciones",
+    "Regístrate como quien invita y te damos un enlace con tu código. Cuando tu vecino se sume, sabremos que vino de ti y podrás recibir un reconocimiento.",
+    [
+      { k: "vecino", etiqueta: "Nombre del vecino o vecina que invitas", max: 80, req: true },
+      { k: "vwa", etiqueta: "Su WhatsApp (opcional)", max: 20, ph: "10 dígitos" },
+      ZONA,
+    ], { acuse: "invitar", wa: "¡Hola DCUATES! Acabo de registrar una invitación a un vecino." }),
+  difusion: R("difusion", "📣", "Ya difundí DCUATES", "DIF", "Difusión", "Difusión",
+    "Cuéntanos dónde compartes DCUATES. Te damos un enlace con tu código para que sepamos cuántas personas llegan por ti.",
+    [
+      { k: "donde", etiqueta: "¿Dónde compartes?", tipo: "opciones", opciones: ["WhatsApp", "Facebook", "Instagram", "TikTok", "Otro"], req: true },
+      { k: "lnk", etiqueta: "Enlace de tu publicación (si ya la hiciste)", max: 300, ph: "https://…" },
+    ], { acuse: "difundir", wa: "¡Hola DCUATES! Acabo de registrar que difundí DCUATES." }),
   "puerta-participar": R("puerta-participar", "🙌", "Quiero participar o proponer algo", "PUE", "Propuesta de puerta", "Puertas",
     "Cuéntanos qué te gustaría hacer o proponer.",
     [{ k: "d", etiqueta: "¿Qué te gustaría hacer o proponer?", tipo: "area", max: 400, req: true }], { wa: "¡Hola DCUATES! Acabo de enviar una propuesta desde una puerta." }),
@@ -179,3 +215,52 @@ export const opcionAportacion = (t) => {
   if (x.includes("labor") || x.includes("volunt")) return "Labor voluntaria";
   return "";
 };
+
+// =========================================================================
+// e58 — ajustes comunes a TODOS los registros (se aplican aquí para no repetir en cada bloque)
+// =========================================================================
+// Campo opcional de evidencia: se guarda en la columna «Evidencia (enlace)» de «Registros». Las fotos también pueden mandarse por WhatsApp con el folio.
+const EVID = { k: "evid", pub: "Evidencia", etiqueta: "Enlace de fotos o evidencia", max: 300, ph: "Pega un enlace (Drive, Facebook…) o mándalas por WhatsApp al terminar" };
+const CON_EVIDENCIA = ["extraviado", "aportacion", "reconocimiento", "reto", "regalo", "ecatepets", "ofrezco", "necesito", "ventas", "bazar", "iniciativa", "libros"];
+// Lado de la dinámica OFREZCO / NECESITO (columna «Lado» de «Registros»). Vacío = mixto.
+const LADOS = {
+  ofrezco: "Ofrezco", necesito: "Necesito", solicitud: "Necesito", asesorias: "Necesito", bienestar: "Necesito", interes: "Necesito", extraviado: "Necesito", interesa: "Necesito",
+  asesor: "Ofrezco", alianza: "Ofrezco", bazar: "Ofrezco", regalo: "Ofrezco", aportacion: "Ofrezco", horario: "Ofrezco", iniciativa: "Ofrezco", voluntario: "Ofrezco", ventas: "", invitar: "Ofrezco", difusion: "Ofrezco"
+};
+// Registros relacionados: aparecen como botones «¿Quieres también…?» dentro de la ventana y en el acuse.
+const RELACIONADOS = {
+  ecatepets: ["extraviado", "aportacion", "voluntario", "ofrezco"],
+  extraviado: ["ecatepets", "difusion", "voluntario"],
+  libros: ["aportacion", "voluntario", "asesor", "ofrezco"],
+  asesorias: ["solicitud", "libros", "asesor"],
+  asesor: ["voluntario", "libros", "asesorias"],
+  alianza: ["ventas", "horario", "circulo", "invitar"],
+  circulo: ["alianza", "invitar", "ofrezco", "necesito"],
+  bazar: ["ventas", "alianza", "ofrezco"],
+  ventas: ["bazar", "alianza", "ofrezco", "necesito"],
+  bienestar: ["noticias", "voluntario", "asesorias"],
+  noticias: ["bienestar", "horario", "voluntario"],
+  aportacion: ["voluntario", "libros", "ecatepets", "ofrezco"],
+  voluntario: ["aportacion", "ecatepets", "libros", "asesor"],
+  solicitud: ["necesito", "libros", "asesorias", "ecatepets"],
+  ofrezco: ["necesito", "voluntario", "invitar"],
+  necesito: ["ofrezco", "solicitud", "asesorias"],
+  interesa: ["ofrezco", "necesito"],
+  iniciativa: ["alianza", "voluntario", "invitar"],
+  reto: ["regalo", "reconocimiento", "invitar"],
+  regalo: ["reto", "reconocimiento", "aportacion"],
+  reconocimiento: ["reto", "regalo", "invitar"],
+  horario: ["alianza", "ventas", "noticias"],
+  invitar: ["difusion", "voluntario"],
+  difusion: ["invitar", "reto"]
+};
+Object.keys(REGISTROS).forEach((id) => {
+  const r = REGISTROS[id];
+  if (CON_EVIDENCIA.includes(id) && !r.campos.some((c) => c.k === "evid")) {
+    const i = r.campos.findIndex((c) => c.k === "perm");
+    if (i >= 0) r.campos.splice(i, 0, EVID); else r.campos.push(EVID);
+    r.evidencia = true;
+  }
+  r.lado = LADOS[id] || "";
+  r.relacionados = (RELACIONADOS[id] || []).filter((x) => REGISTROS[x]);
+});
