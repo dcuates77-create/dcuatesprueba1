@@ -478,7 +478,7 @@ export function BotonNecesidades({ onAbrirProyecto, onAccionEspecial, onAbrirFAQ
 
                 <button
                   type="button"
-                  onClick={() => irA("extraviados-registro")}
+                  onClick={() => { cerrarTodo(); setTimeout(() => window.dispatchEvent(new CustomEvent("dcuates:registro-previo", { detail: { id: "extraviado" } })), 150); }}
                   className="w-full flex items-center justify-center gap-3 rounded-2xl bg-[#e65100] hover:bg-[#bf360c] text-white font-black uppercase text-[13px] sm:text-sm leading-tight px-4 py-4 shadow-md text-center transition-colors"
                 >
                   <span className="text-2xl" aria-hidden="true">🐾</span>

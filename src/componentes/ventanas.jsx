@@ -50,7 +50,7 @@ export function BotonRecibeBeneficios({ grande = false }) {
           suave="#fff3e0"
           emoji="💌"
           titulo="Avisos y Beneficios"
-          invitacion="Sé de los primeros en enterarte. Elige lo que te interesa y te escribimos por WhatsApp con promociones de negocios locales, mascotas que buscan hogar, eventos del barrio y oportunidades de apoyo."
+          invitacion="Sé de los primeros en enterarte. Elige lo que te interesa y te escribimos por WhatsApp con promociones de negocios locales, mascotas que buscan hogar, eventos de la comunidad y oportunidades de apoyo."
           cierre="Una comunidad bien informada es una comunidad más fuerte. ¡Qué gusto tenerte aquí! 💚"
           compartir={{ hash: "avisos", titulo: "Avisos y Beneficios", texto: "Entérate de promociones, mascotas, eventos y apoyos de tu colonia" }}
           onCerrar={() => setAbierto(false)}
