@@ -23,3 +23,13 @@ export const cargarPublicados = () => {
   if (!pubP || Date.now() - pubT > 600000) { pubT = Date.now(); pubP = pedir("publicados"); }
   return pubP;
 };
+
+// e60 — consulta de folio (doGet ?a=folio&f=XXX-0000-AAA): { encontrado, proyecto, estado, fecha, respondido, respuesta } o { error: true }
+export const consultarFolio = async (f) => {
+  try {
+    if (!GOOGLE_SHEETS_URL) return { error: true };
+    const r = await fetch(GOOGLE_SHEETS_URL + (GOOGLE_SHEETS_URL.includes("?") ? "&" : "?") + "a=folio&f=" + encodeURIComponent(f));
+    const j = await r.json();
+    return j && j.ok ? j : { error: true };
+  } catch (e) { return { error: true }; }
+};
