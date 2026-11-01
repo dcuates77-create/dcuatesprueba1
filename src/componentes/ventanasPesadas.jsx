@@ -168,7 +168,7 @@ export function ModalLegal({ documento, emoji, degradado, onCerrar }) {
       invitacion={documento.intro}
       onCerrar={onCerrar}
       ancho="max-w-2xl"
-      capa="z-[97]"
+      capa="z-[80]"
     >
       <div className="space-y-5 text-sm text-slate-700 leading-relaxed text-left font-medium">
         {documento.secciones.map((sec, i) => (
@@ -968,9 +968,6 @@ export function ContenidoModalProyecto({ id, onCerrar }) {
         <div className="pt-1 space-y-2">
           {proyecto.registro && (
             <BotonModal onClick={() => abrirRegistroPrevio(proyecto.registro)}>{proyecto.textoRegistro || proyecto.textoBoton}</BotonModal>
-          )}
-          {proyecto.registro2 && (
-            <BotonModal variante="secundario" onClick={() => abrirRegistroPrevio(proyecto.registro2)}>{proyecto.textoBoton}</BotonModal>
           )}
           {proyecto.micro && (
             <BotonModal onClick={() => { onCerrar(); setTimeout(() => window.dispatchEvent(new CustomEvent("dcuates:abrir-micro", { detail: proyecto.micro })), 250); }}>{proyecto.textoBoton}</BotonModal>
