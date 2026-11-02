@@ -1,5 +1,4 @@
 import React from "react";
-import { CLAVE_CIRCULO_CONFIANZA } from "./proyectos.js";
 import { enlaceWhatsApp } from "../utilidades/baserow.js";
 
 export const INICIATIVAS_PRINCIPALES = [
@@ -45,7 +44,8 @@ export const INICIATIVAS_PRINCIPALES = [
     enlaceDirectoWA: enlaceWhatsApp("¡Hola DCUATES! Me interesa generar una alianza ganar-ganar con ustedes."),
     segundoBoton: {
       titulo: "Apoyos y Beneficios para Nuestros Aliados (Con Clave de Acceso)",
-      enlace: "https://chat.whatsapp.com/F2Rdvu5ueSlJ0YuDYGi8VL"
+      // e63: el enlace del grupo ya no está en el código; se pide a la hoja (pestaña «Zonas», perfil aliado, bloque grupo) con la clave
+      claveZona: "aliado"
     }
   },
   {
@@ -59,10 +59,8 @@ export const INICIATIVAS_PRINCIPALES = [
     enlaceDirectoWA: enlaceWhatsApp("¡Hola DCUATES! Me interesa sumarme al Círculo de Confianza y sus Apoyos y Beneficios Mutuos."),
     segundoBoton: {
       titulo: "Únete a Nuestra Red de Confianza (Con Clave de Acceso)",
-      enlace: "https://chat.whatsapp.com/F2Rdvu5ueSlJ0YuDYGi8VL",
-      // Al tener "claveAcceso", este botón sale bloqueado con un candado en
-      // vez de abrir el enlace directo (ver BotonModalProtegido más abajo).
-      claveAcceso: CLAVE_CIRCULO_CONFIANZA
+      // e63: el enlace del grupo ya no está en el código; se pide a la hoja (pestaña «Zonas», perfil circulo, bloque grupo) con la clave del Círculo
+      claveZona: "circulo"
     }
   },
   {

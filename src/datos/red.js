@@ -1,17 +1,8 @@
 // =========================================================================
 // src/datos/red.js — TERCER NIVEL: RED DE CONFIANZA (actividades INDIVIDUALES)
-// ⚠️ Candado sencillo de prueba (la clave vive en el código). Acceso por invitación:
-// cámbiala y dásela solo a quien invites. Lo que cada persona escribe (diario, notas,
-// retos, sellos) se guarda SOLO en su celular; no se envía a ningún lado.
+// (e63) La clave de la Red y el libro del mes ya no están aquí: viven en tu hoja (pestañas «Claves» y «Zonas»).
+// Lo que cada persona escribe (diario, notas, retos, sellos) se guarda SOLO en su celular; no se envía a ningún lado.
 // =========================================================================
-export const CLAVE_RED = "red2026";
-
-export const LIBRO_MES = {
-  titulo: "Fábulas de Samaniego",
-  info: "Fábulas breves con moraleja sobre honestidad, trabajo y amistad. Una al día basta.",
-  enlace: "https://www.gutenberg.org/ebooks/55206",
-  pregunta: "¿Qué moraleja te sirvió esta semana en tu vida diaria?"
-};
 
 export const METAS_SEMANA = [
   { id: "leer", emoji: "📖", texto: "Leer 15 minutos", dias: 4 },

@@ -1,25 +1,16 @@
 // =========================================================================
 // src/datos/aliados.js — ZONA DE ALIADOS, PATROCINADORES, VOLUNTARIOS Y AMIGOS
-// ⚠️ CANDADO SENCILLO (etapa de prueba): estas claves viven en el código, así que
-// cualquiera con conocimientos técnicos podría verlas. Sirve para ocultar
-// contenido NO sensible mientras pruebas. NO pongas aquí datos personales ni
-// información confidencial. Más adelante se cambia a clave verificada en servidor.
-// Cambia las claves por las tuyas antes de compartirlas.
+// (e63) Las CLAVES y el CONTENIDO por perfil (beneficios, actividades de voluntarios, kit de difusión) ya NO están aquí:
+// viven en tu hoja de Google, pestañas «Claves» y «Zonas», y el Apps Script solo los entrega con la clave correcta.
+// Aquí quedan únicamente los nombres, emojis y colores de los perfiles y los títulos de las tarjetas (nada secreto).
 // =========================================================================
 export const PERFILES = {
-  aliado: { nombre: "Aliado", emoji: "🏪", color: "#C2410C", clave: "aliado2026" },
-  patrocinador: { nombre: "Patrocinador", emoji: "🌟", color: "#B7791F", clave: "patro2026" },
-  voluntario: { nombre: "Voluntario", emoji: "🙋", color: "#2E9E5B", clave: "volun2026" },
-  amigo: { nombre: "Amigo", emoji: "💛", color: "#1B6F8A", clave: "amigo2026" }
+  aliado: { nombre: "Aliado", emoji: "🏪", color: "#C2410C" },
+  patrocinador: { nombre: "Patrocinador", emoji: "🌟", color: "#B7791F" },
+  voluntario: { nombre: "Voluntario", emoji: "🙋", color: "#2E9E5B" },
+  amigo: { nombre: "Amigo", emoji: "💛", color: "#1B6F8A" }
 };
 
-// Beneficios particulares por perfil (edítalos con tus acuerdos reales).
-export const BENEFICIOS = {
-  aliado: ["Aparecer en Cupones y Promos y en la ruleta de Juega y gana.", "Kit de difusión listo para compartir en tus redes.", "Prioridad en la agenda de reuniones de negocios."],
-  patrocinador: ["Mención como patrocinador en la página y la barra de agradecimientos.", "Reporte de impacto de lo que su apoyo hizo posible.", "Reconocimiento digital para compartir."],
-  voluntario: ["Constancia de participación por tus horas.", "Acceso a capacitaciones y actividades abiertas.", "Reconocimiento en el cuadro de honor (con tu permiso)."],
-  amigo: ["Invitaciones a tertulias, jornadas y eventos de la comunidad.", "Material para invitar a otros y sumar Semillas.", "Canal directo con la administración."]
-};
 
 // Cada tarjeta indica qué perfiles pueden abrirla ("todos" = cualquiera con clave).
 export const TARJETAS_ALIADOS = [
@@ -32,13 +23,3 @@ export const TARJETAS_ALIADOS = [
   { id: "difusion", emoji: "📣", titulo: "KIT DE DIFUSIÓN", texto: "Mensajes listos para compartir y sumar a más gente.", color: "#0E7490", perfiles: "todos" }
 ];
 
-export const ACTIVIDADES_VOLUNTARIOS = [
-  { titulo: "Tertulia literaria", info: "Apoyo con lectura y organización del espacio." },
-  { titulo: "Jornada de adopción de peluditos", info: "Orientación a visitantes y acompañamiento." },
-  { titulo: "Entrega de libros y materiales", info: "Registro y préstamo de libros." }
-];
-export const MENSAJES_DIFUSION = [
-  "Conoce DCUATES: una comunidad que genera proyectos sociales, cultiva amistades y apoya a personas, grupos y causas. dcuates.com",
-  "Juega, participa y suma Semillas en la ZONA DE CUATES 🎮🌱 dcuates.com",
-  "Pide un libro prestado, ayuda a un peludito o descubre descuentos de negocios locales en dcuates.com 💛"
-];

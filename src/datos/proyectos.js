@@ -4,11 +4,7 @@
 // =========================================================================
 import { WHATSAPP_NUMERO, MOSTRAR_EJEMPLOS } from "./config.js";
 
-// Clave de acceso del candado que protege el botón "Únete a Nuestra Red de
-// Confianza" dentro de Círculo de Confianza — cámbiala aquí cuando quieras.
-// AVISO: esto NO es seguridad real (cualquiera puede verla si revisa el
-// código fuente de la página), solo filtra visitas casuales.
-export const CLAVE_CIRCULO_CONFIANZA = "confianza2026";
+// (e63) Las claves del Círculo, la Red y los aliados ya no están en el código: viven en tu hoja (pestaña «Claves»).
 
 // Botón "🎵 Escucha Música DCUATES" — pega aquí la ruta de tu archivo de
 // audio (colócalo en /public/audio/, ej. /public/audio/musica-dcuates.mp3).
