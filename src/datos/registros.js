@@ -10,6 +10,8 @@
 //   campos   → { k, etiqueta, tipo: texto|area|opciones|fecha|hora, opciones, req, ph, max }
 //   Nombre y WhatsApp se agregan solos (WhatsApp de 10 dígitos obligatorio).
 // =========================================================================
+import { MODALIDADES } from "./club.js";
+
 const NOMBRE = { k: "nombre", etiqueta: "Tu nombre", campo: "Nombre", req: true, max: 80, ph: "Ej. Ana López" };
 const WHATS = { k: "wa", etiqueta: "Tu WhatsApp", campo: "Contacto", req: true, max: 20, ph: "10 dígitos. Ej. 5512345678" };
 const ZONA = { k: "zona", etiqueta: "Tu colonia o zona", max: 80, ph: "Ej. Jardines de Morelos" };
@@ -208,6 +210,17 @@ export const REGISTROS = {
       { k: "porque", pub: "Texto", etiqueta: "¿Por qué la recomiendas?", tipo: "area", ph: "Cuéntanos tu buena experiencia", max: 300, req: true },
       { k: "donde", etiqueta: "¿Dónde la encontramos? (colonia o redes)", max: 140 },
     ], { seccion: "Recomendaciones", wa: "¡Hola DCUATES! Acabo de registrar una recomendación." }),
+  // e61 — CLUB DCUATES «Sé NUESTRO CUATE». Queda «En revisión» en «Registros» hasta que escribas «Cuate» en Estado. Sin cobro: solo compromiso.
+  club: R("club", "🧡", "Únete al Club DCUATES", "CLB", "Club DCUATES", "Club DCUATES",
+    "Sé NUESTRO CUATE. Elige tu modalidad y cuéntanos con qué te comprometes. No hay cuotas y esta página nunca cobra. Tu registro queda «En revisión»; cuando DCUATES lo apruebe, lo verás en «Consulta tu folio».",
+    [
+      { k: "mod", perfilDe: true, etiqueta: "¿Cómo quieres ser Cuate?", tipo: "opciones", opciones: MODALIDADES.map((m) => m.nombre), req: true },
+      { k: "org", etiqueta: "Nombre de tu negocio, organización o grupo (si aplica)", max: 100 },
+      { k: "como", etiqueta: "¿Con qué te comprometes?", tipo: "opciones", opciones: ["Mi tiempo", "Mis conocimientos o servicios", "Productos o apoyo en especie", "Difundir DCUATES", "Un espacio o recursos", "Otra forma"], req: true },
+      { k: "d", etiqueta: "Cuéntanos más", tipo: "area", max: 400, ph: "Ej. Puedo dar clases de dibujo los sábados / Tengo una panadería y quiero dar un cupón" },
+      ZONA,
+      { k: "ent", etiqueta: "¿Entiendes que es un compromiso comunitario, sin cuotas y sin ser socio(a) ni empleado(a)?", tipo: "opciones", opciones: ["Sí, lo entiendo"], req: true },
+    ], { wa: "¡Hola DCUATES! Acabo de registrarme para unirme al Club DCUATES (Sé NUESTRO CUATE)." }),
   "puerta-participar": R("puerta-participar", "🙌", "Quiero participar o proponer algo", "PUE", "Propuesta de puerta", "Puertas",
     "Cuéntanos qué te gustaría hacer o proponer.",
     [{ k: "d", etiqueta: "¿Qué te gustaría hacer o proponer?", tipo: "area", max: 400, req: true }], { wa: "¡Hola DCUATES! Acabo de enviar una propuesta desde una puerta." }),
@@ -234,7 +247,7 @@ const CON_EVIDENCIA = ["extraviado", "aportacion", "reconocimiento", "reto", "re
 // Lado de la dinámica OFREZCO / NECESITO (columna «Lado» de «Registros»). Vacío = mixto.
 const LADOS = {
   ofrezco: "Ofrezco", necesito: "Necesito", solicitud: "Necesito", asesorias: "Necesito", bienestar: "Necesito", interes: "Necesito", extraviado: "Necesito", interesa: "Necesito",
-  asesor: "Ofrezco", alianza: "Ofrezco", bazar: "Ofrezco", regalo: "Ofrezco", aportacion: "Ofrezco", horario: "Ofrezco", iniciativa: "Ofrezco", voluntario: "Ofrezco", ventas: "", invitar: "Ofrezco", difusion: "Ofrezco", recomendar: "Ofrezco"
+  asesor: "Ofrezco", alianza: "Ofrezco", bazar: "Ofrezco", regalo: "Ofrezco", aportacion: "Ofrezco", horario: "Ofrezco", iniciativa: "Ofrezco", voluntario: "Ofrezco", ventas: "", invitar: "Ofrezco", difusion: "Ofrezco", recomendar: "Ofrezco", club: ""
 };
 // Registros relacionados: aparecen como botones «¿Quieres también…?» dentro de la ventana y en el acuse.
 const RELACIONADOS = {
@@ -262,7 +275,8 @@ const RELACIONADOS = {
   horario: ["alianza", "ventas", "noticias"],
   invitar: ["difusion", { reg: "voluntario", e: "🤝", t: "QUIERO APOYAR" }, { reg: "necesito", e: "🙏", t: "NECESITO ALGO" }, { acc: "beneficios", e: "🎁", t: "VER BENEFICIOS" }, "recomendar"],
   difusion: ["invitar", { reg: "voluntario", e: "🤝", t: "QUIERO APOYAR" }, { acc: "beneficios", e: "🎁", t: "VER BENEFICIOS" }, "reto"],
-  recomendar: ["ofrezco", "necesito", "invitar"]
+  recomendar: ["ofrezco", "necesito", "invitar"],
+  club: [{ ev: "dcuates:club-info", e: "🧡", t: "Ver qué incluye el Club" }, "ofrezco", "necesito", "invitar"]
 };
 Object.keys(REGISTROS).forEach((id) => {
   const r = REGISTROS[id];

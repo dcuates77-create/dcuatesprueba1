@@ -22,7 +22,7 @@ export const YOUTUBE_VIDEO_ID = "SUnE27QnnyI";
 // iframe); no hace falta tocar nada más en el código.
 // Sello de versión: se ve en pequeño al final de los accesos rápidos y en la
 // consola del navegador. Sirve para comprobar que el celular ya cargó lo último.
-export const VERSION_BUILD = "CLON12 · e60";
+export const VERSION_BUILD = "CLON12 · e61";
 // e59 — versión del Aviso de Privacidad que acepta la persona al registrarse (se anota en la hoja, columna «Aceptó aviso»). Súbela cuando cambies el aviso.
 export const VERSION_AVISO = "oct-2026 (borrador)";
 
@@ -80,6 +80,7 @@ export const REDES_SOCIALES = {
 // - { label, modal }  -> abre la ventana emergente de ese proyecto (mismo
 //   id que en TODOS_LOS_PROYECTOS)
 export const NAV_LINKS_MAS = [
+  { label: "Únete al Club DCUATES", emoji: "🧡", action: "club" },
   { label: "Publicidad Gratuita", emoji: "📣", href: "#publicidad" },
   { label: "Ventas con Causa", emoji: "🛍️", href: "#ventas-con-causa" },
   { label: "Alianzas Solidarias", emoji: "🤝", modal: "alianzas-tarjeta" },
