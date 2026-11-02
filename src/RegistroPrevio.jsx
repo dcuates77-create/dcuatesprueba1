@@ -28,6 +28,7 @@ export default function RegistroPrevio() {
   const abrirRel = (x) => {
     const id = typeof x === "string" ? x : x.reg;
     registrar("registro_relacionado", { de: act && act.id, a: id || x.acc });
+    if (typeof x !== "string" && x.ev) { setAct(null); setPila([]); setTimeout(() => window.dispatchEvent(new CustomEvent(x.ev)), 80); return; }
     if (typeof x !== "string" && x.acc) { setAct(null); setPila([]); setTimeout(() => window.dispatchEvent(new CustomEvent("dcuates:abrir-acceso", { detail: x.acc })), 80); return; }
     setPila([...pila, act]); setAct({ id });
   };

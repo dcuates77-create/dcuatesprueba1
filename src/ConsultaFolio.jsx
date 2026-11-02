@@ -7,6 +7,7 @@ import { useAtras } from "./atras.js";
 import { consultarFolio } from "./utilidades/hojaPublica.js";
 import { registrar } from "./analitica.js";
 import { WHATSAPP_NUMERO } from "./datos/config.js";
+import { modalidadPorNombre, NARANJA_CLUB } from "./datos/club.js";
 
 export const abrirConsultaFolio = () => window.dispatchEvent(new CustomEvent("dcuates:consulta-folio"));
 
@@ -20,6 +21,7 @@ export function BotonFolio() {
 }
 
 // Texto amable según el Estado de la hoja (si escribes otro estado, se muestra tal cual).
+const esClub = (res, f) => /^CLB-/.test(String(f).trim().toUpperCase());
 const AMABLE = (e) => {
   const x = String(e || "").toLowerCase();
   if (/^(recibid|nuev)/.test(x)) return "Lo recibimos. En las próximas 24 horas lo revisamos y en la primera oportunidad lo atendemos.";
@@ -28,6 +30,25 @@ const AMABLE = (e) => {
   return "";
 };
 
+// e61 — Club DCUATES: textos según el Estado (En revisión → Cuate). Si escribes otro estado se muestra tal cual.
+const AMABLE_CLUB = (e) => {
+  const x = String(e || "").toLowerCase();
+  if (/^cuate|aprobad|activ/.test(x)) return "cuate";
+  if (/(pausa|baja|no aprob|rechaz)/.test(x)) return "Por ahora tu registro al Club no quedó activo. Escríbenos por WhatsApp y lo platicamos.";
+  return "Recibimos tu registro al Club. Lo estamos revisando; cuando DCUATES lo apruebe aquí verás que ya eres Cuate y tu constancia.";
+};
+function ConstanciaClub({ res, folio }) {
+  const m = modalidadPorNombre(res.perfil);
+  return (
+    <div className="cfo-cons">
+      <b>🧡 ¡Ya eres Cuate DCUATES!</b>
+      <p>{res.perfil || "Cuate"}</p>
+      <p>Folio {folio}{res.respondido ? <> · desde el {res.respondido}</> : res.fecha ? <> · registro del {res.fecha}</> : null}</p>
+      {m && <><p className="cfo-h">Lo que puede incluir:</p><ul>{m.puedeIncluir.map((x) => <li key={x}>{x}</li>)}</ul></>}
+      <small>Constancia comunitaria: no es un documento oficial ni una credencial. Tómale captura si quieres conservarla.</small>
+    </div>
+  );
+}
 export default function ConsultaFolio() {
   const [abierto, setAbierto] = useState(false);
   const [f, setF] = useState("");
@@ -66,7 +87,7 @@ export default function ConsultaFolio() {
           <div className="cfo-ok" role="status">
             <p><b>{res.proyecto || "Tu registro"}</b></p>
             <p>Estado: <strong>{res.estado || "Recibido"}</strong>{res.fecha ? <> · registrado el {res.fecha}</> : null}{res.respondido ? <> · respuesta el {res.respondido}</> : null}</p>
-            {AMABLE(res.estado) && <p>{AMABLE(res.estado)}</p>}
+            {esClub(res, f) ? (AMABLE_CLUB(res.estado) === "cuate" ? <ConstanciaClub res={res} folio={f.trim().toUpperCase()} /> : <p>{AMABLE_CLUB(res.estado)}</p>) : (AMABLE(res.estado) && <p>{AMABLE(res.estado)}</p>)}
             {res.respuesta ? <p className="cfo-r">💬 {res.respuesta}</p> : null}
           </div>
         )}
@@ -93,6 +114,7 @@ const CSS = `
 .cfo-caja form button{min-height:48px;padding:0 16px;border:0;border-radius:12px;background:#0e7c4f;color:#fff;font:inherit;font-weight:900;font-size:15px;cursor:pointer}
 .cfo-m{margin:6px 0;font-size:14px;font-weight:800}.cfo-e{color:#b42318}
 .cfo-ok{margin:8px 0;padding:10px 12px;background:#e3f3e9;border-radius:14px}.cfo-ok p{margin:0 0 4px;font-size:14.5px;font-weight:700;line-height:1.35}.cfo-r{background:#fff;border-radius:10px;padding:8px}
+.cfo-cons{margin:6px 0;padding:10px;border:2px solid ${NARANJA_CLUB};border-radius:14px;background:#fff4ea}.cfo-cons b{font-size:16px;color:${NARANJA_CLUB}}.cfo-cons p{margin:4px 0}.cfo-cons ul{margin:0 0 6px;padding-left:18px;font-size:13.5px}.cfo-cons small{font-size:12px;color:#5b6b62}.cfo-h{font-weight:900!important}
 .cfo-wa{display:block;width:100%;min-height:48px;margin:10px 0 6px;border:2px solid #128c7e;border-radius:999px;background:#fff;color:#128c7e;font:inherit;font-weight:900;font-size:14.5px;cursor:pointer}
 .cfo-n{display:block;font-size:12px;font-weight:700;color:#5b6b62;line-height:1.35}
 `;

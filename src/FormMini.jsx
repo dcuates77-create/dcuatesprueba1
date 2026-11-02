@@ -43,6 +43,7 @@ export default function FormMini({ cfg, onListo, clave = "form", valores = null 
     });
     return { nombre, contacto, extras, mensaje: partes.join(" | ") };
   };
+  const perfilElegido = () => { const c = cfg.campos.find((x) => x.perfilDe); return c ? String(v[c.k] || "").trim() : ""; }; // e61: la modalidad del Club va a la columna «Perfil»
   const enviar = (e) => {
     e.preventDefault();
     const falta = cfg.campos.find((c) => c.req && !String(v[c.k] || "").trim());
@@ -56,7 +57,7 @@ export default function FormMini({ cfg, onListo, clave = "form", valores = null 
     try { const ult = parseInt(localStorage.getItem(llaveT) || "0", 10); if (Date.now() - ult < 20000) { setErr("Ya recibimos tu registro hace un momento. Espera unos segundos."); return; } localStorage.setItem(llaveT, String(Date.now())); } catch (e2) { /* sin almacenamiento */ }
     const f = cfg.folio ? nuevoFolio(cfg.folio) : "";
     setFolio(f);
-    guardarEnHoja({ Tipo: cfg.tipo, Perfil: cfg.perfil || "", Nombre: nombre, Contacto: contacto, Mensaje: mensaje.slice(0, 1200), ...(f ? { Aviso: "Sí · " + VERSION_AVISO, Folio: f, Proyecto: cfg.proyecto || cfg.tipo, Urgente: cfg.urgente ? "Sí" : "", ...(cfg.seccion ? { Seccion: cfg.seccion } : {}), ...(cfg.lado ? { Lado: cfg.lado } : {}), ...(codigoInvitacion() && !cfg.acuse ? { InvitadoPor: codigoInvitacion() } : {}), ...extras } : {}) });
+    guardarEnHoja({ Tipo: cfg.tipo, Perfil: perfilElegido() || cfg.perfil || "", Nombre: nombre, Contacto: contacto, Mensaje: mensaje.slice(0, 1200), ...(f ? { Aviso: "Sí · " + VERSION_AVISO, Folio: f, Proyecto: cfg.proyecto || cfg.tipo, Urgente: cfg.urgente ? "Sí" : "", ...(cfg.seccion ? { Seccion: cfg.seccion } : {}), ...(cfg.lado ? { Lado: cfg.lado } : {}), ...(codigoInvitacion() && !cfg.acuse ? { InvitadoPor: codigoInvitacion() } : {}), ...extras } : {}) });
     registrar("form_mini_enviado", { tipo: cfg.tipo });
     setEnviado(true);
     onListo && onListo();

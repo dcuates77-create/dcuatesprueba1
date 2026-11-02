@@ -12,6 +12,7 @@ import { registrar } from "./analitica.js";
 import CosasSemana from "./CosasSemana.jsx";
 import ConDcuates from "./ConDcuates.jsx";
 import { BotonFolio } from "./ConsultaFolio.jsx";
+import ClubTarjeta from "./ClubDcuates.jsx";
 import ComoFunciona from "./ComoFunciona.jsx";
 
 // Foto de portada: sube /public/images/portada-inicio.webp para cambiarla; mientras no exista se usa la de respaldo.
@@ -147,6 +148,7 @@ export default function InicioNuevo({ onIr, logros = [], cargando = false, entra
       <div id="vi-resultados" />
 
       <ConDcuates />
+      <ClubTarjeta />
       <BotonFolio />
 
       <section id="vi-participar" className="vi-part" aria-label="Conoce cómo participar" style={{ "--tc": "#17472d" }}>

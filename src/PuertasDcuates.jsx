@@ -12,6 +12,7 @@ import InstalarApp from "./InstalarApp.jsx";
 import { BotonPlus } from "./AgendaPlus.jsx";
 import { BotonMicro } from "./MicroAcciones.jsx";
 import ConDcuates from "./ConDcuates.jsx";
+import { BotonClubPuerta } from "./ClubDcuates.jsx";
 import { OpcionesLeer } from "./accesibilidad.jsx";
 import { ciclarLetra, leerLetra, NOMBRES_LETRA } from "./tamanoLetra.js";
 import { ejecutar } from "./datos/secciones.js";
@@ -61,6 +62,7 @@ function Guia({ p, onCerrar, onAbrirProyecto, modo, setModo }) {
         <SubtiposPuerta key={p.id} p={p} />
         {!p.sensible && (
           <>
+            <BotonClubPuerta puertaId={p.id} ir={ir} />
             <ConDcuates compacto perfil={p.titulo} onElegir={(k) => ir({ reg: k === "compartimos" ? { id: "tablon" } : { id: k, perfil: p.titulo } })} />
           </>
         )}
