@@ -15,6 +15,7 @@ import { BASEROW_GALLERY_URL, BIENESTAR_GALERIA_ITEMS, BOTONES_PORTADA, CUPONES_
 import { DEGRADADO_ESCUDO, DEGRADADO_SEGURIDAD } from "../datos/seguridad.js";
 import { enlaceWhatsApp, galeriaDesdeColumna, irASeccion, useFilasEnlaces } from "../utilidades/baserow.js";
 import { registrar, guardarEnHoja } from "../analitica";
+import { MENSAJE_ZONA, useZona } from "../utilidades/zonasHoja.js";
 
 export function EnlaceWAOficial() {
   return (
@@ -565,24 +566,28 @@ export function BotonModal({ href, children, variante = "principal", onClick }) 
 // clave correcta, en vez del botón real se ve un candado con un campo de
 // texto. AVISO: esto NO es seguridad real, solo filtra visitas casuales —
 // la clave queda visible en el código fuente de la página.
-export function BotonModalProtegido({ href, children, clave }) {
-  const [desbloqueado, setDesbloqueado] = useState(false);
+export function BotonModalProtegido({ zona, children }) {
+  // e63: la clave se valida en tu hoja (Apps Script); el enlace del grupo viene de la pestaña «Zonas» (bloque grupo) y solo se entrega con la clave correcta.
+  const { zona: dentro, entrar } = useZona([zona], true);
   const [intento, setIntento] = useState("");
-  const [error, setError] = useState(false);
-
-  if (desbloqueado) {
-    return <BotonModal href={href}>{children}</BotonModal>;
+  const [error, setError] = useState("");
+  const [verificando, setVerificando] = useState(false);
+  if (dentro) {
+    const g = dentro.contenido && dentro.contenido.grupo && dentro.contenido.grupo[0];
+    if (g && g.e) return <BotonModal href={g.e}>{g.t || children}</BotonModal>;
+    return (
+      <div className="w-full rounded-xl border-2 border-dashed border-[#0f2d1e]/40 bg-[#0f2d1e]/5 p-3">
+        <p className="text-xs sm:text-sm font-black text-[#0f2d1e] leading-tight">✅ Tu clave es válida. El enlace del grupo aún no está disponible: pídelo por WhatsApp.</p>
+      </div>
+    );
   }
-
-  const verificar = () => {
-    if (intento.trim().toLowerCase() === String(clave).toLowerCase()) {
-      setDesbloqueado(true);
-      setError(false);
-    } else {
-      setError(true);
-    }
+  const verificar = async () => {
+    if (!intento.trim() || verificando) return;
+    setVerificando(true); setError("");
+    const r = await entrar(intento);
+    setVerificando(false);
+    if (!r.ok) setError(MENSAJE_ZONA[r.motivo] || MENSAJE_ZONA.clave);
   };
-
   return (
     <div className="w-full rounded-xl border-2 border-dashed border-[#0f2d1e]/40 bg-[#0f2d1e]/5 p-3 space-y-2">
       <p className="text-xs sm:text-sm font-black uppercase text-[#0f2d1e] flex items-center gap-1.5 leading-tight">
@@ -592,21 +597,23 @@ export function BotonModalProtegido({ href, children, clave }) {
         <input
           type="password"
           value={intento}
-          onChange={(e) => { setIntento(e.target.value); setError(false); }}
+          onChange={(e) => { setIntento(e.target.value); setError(""); }}
           onKeyDown={(e) => e.key === "Enter" && verificar()}
           placeholder="Clave de acceso"
+          autoComplete="off"
           className="flex-1 rounded-lg border-2 border-[#0f2d1e]/30 px-3 py-2 text-sm focus:outline-none focus:border-[#0f2d1e]"
         />
         <button
           type="button"
           onClick={verificar}
+          disabled={verificando}
           className="shrink-0 rounded-lg bg-[#0f2d1e] hover:bg-emerald-800 text-white px-4 text-xs font-black uppercase tracking-wide transition-colors"
         >
-          Entrar
+          {verificando ? "…" : "Entrar"}
         </button>
       </div>
       {error && (
-        <p className="text-xs font-bold text-red-600">Clave incorrecta, intenta de nuevo.</p>
+        <p className="text-xs font-bold text-red-600" role="alert">{error}</p>
       )}
     </div>
   );
@@ -989,8 +996,8 @@ export function ContenidoModalProyecto({ id, onCerrar }) {
             <BotonModal href={proyecto.enlaceDirectoWA}>{proyecto.textoBoton}</BotonModal>
           ) : null}
           {proyecto.segundoBoton && (
-            proyecto.segundoBoton.claveAcceso ? (
-              <BotonModalProtegido href={proyecto.segundoBoton.enlace} clave={proyecto.segundoBoton.claveAcceso}>
+            proyecto.segundoBoton.claveZona ? (
+              <BotonModalProtegido zona={proyecto.segundoBoton.claveZona}>
                 {proyecto.segundoBoton.titulo}
               </BotonModalProtegido>
             ) : (
