@@ -12,24 +12,25 @@
 // vercel.json (lista "alias"). Después de editar, haz commit.
 
 const SITIO = "dcuates.com";
-const IMAGEN_BASE = "/images/logo-circular.png";
+// Vista previa 1200×630 (JPG ligero: WhatsApp y Facebook descartan imágenes muy pesadas). Se generan en public/images/og/.
+const IMAGEN_BASE = "/images/og/logo.jpg";
 
 const ENLACES = {
   // Proyectos (abren su ventana: #proyecto-<id>)
-  libros: { hash: "proyecto-libros", titulo: "Préstamo gratuito de libros", texto: "Pide prestado un libro sin costo o dona los que ya leíste. Hagamos una comunidad que lee.", img: "/images/bb.png" },
-  bienestar: { hash: "proyecto-bienestar", titulo: "Bienestar y recreación", texto: "Talleres, cursos y actividades para cuidar tu cuerpo y tu mente, en tu colonia.", img: "/images/Bienestar.png" },
-  asesorias: { hash: "proyecto-asesorias", titulo: "Asesorías gratuitas", texto: "Orientación educativa, laboral y de negocio sin costo, con voluntarios de tu comunidad.", img: "/images/Asesorías.png" },
-  ecatepets: { hash: "proyecto-ecatepets", titulo: "Ecatepets: mascotas que buscan hogar", texto: "Adopta, reporta una mascota extraviada o ayuda a un peludito. Cada patita cuenta.", img: "/images/Ecatepets.png" },
+  libros: { hash: "proyecto-libros", titulo: "Préstamo gratuito de libros", texto: "Pide prestado un libro sin costo o dona los que ya leíste. Hagamos una comunidad que lee.", img: "/images/og/libros.jpg" },
+  bienestar: { hash: "proyecto-bienestar", titulo: "Bienestar y recreación", texto: "Talleres, cursos y actividades para cuidar tu cuerpo y tu mente, en tu colonia.", img: "/images/og/bienestar.jpg" },
+  asesorias: { hash: "proyecto-asesorias", titulo: "Asesorías gratuitas", texto: "Orientación educativa, laboral y de negocio sin costo, con voluntarios de tu comunidad.", img: "/images/og/asesorias.jpg" },
+  ecatepets: { hash: "proyecto-ecatepets", titulo: "Ecatepets: mascotas que buscan hogar", texto: "Adopta, reporta una mascota extraviada o ayuda a un peludito. Cada patita cuenta.", img: "/images/og/ecatepets.jpg" },
   mascotas: { alias: "ecatepets" },
-  circulo: { hash: "proyecto-circulo-confianza", titulo: "Círculo de Confianza", texto: "Una red vecinal de apoyos y recomendaciones de personas y servicios en los que sí se puede confiar.", img: "/images/Círculo.png" },
-  publicidad: { hash: "proyecto-publicidad-tarjeta", titulo: "Publicidad gratuita para tu negocio", texto: "Registra tu negocio y que más vecinos te conozcan. Sin costo.", img: "/images/Publicidad2.png" },
-  recomienda: { hash: "proyecto-recomienda-evalua-gana", titulo: "Recomienda, evalúa y gana", texto: "Comparte tu experiencia con negocios y servicios locales, y ayuda a otros a elegir mejor.", img: "/images/Recomienda.png" },
-  alianzas: { hash: "proyecto-alianzas-tarjeta", titulo: "Alianzas solidarias", texto: "Alianzas ganar-ganar entre negocios y comunidad. Descubre cómo sumarte.", img: "/images/Alianzas.png" },
-  bazar: { hash: "proyecto-bazares", titulo: "Bazar y comercio local", texto: "Compra, vende o intercambia de forma segura entre vecinos.", img: "/images/Bazar.png" },
-  ventas: { hash: "proyecto-ventas-con-causa", titulo: "Ventas con causa", texto: "Compra productos y servicios locales que además apoyan una causa.", img: "/images/VentasConCausa.png" },
-  apoyo: { hash: "proyecto-donaciones", titulo: "Apoyo voluntario", texto: "Tu tiempo, tu talento o tus recursos pueden cambiar vidas. Conoce cómo sumarte.", img: "/images/ApoyoVoluntario.png" },
+  circulo: { hash: "proyecto-circulo-confianza", titulo: "Círculo de Confianza", texto: "Una red vecinal de apoyos y recomendaciones de personas y servicios en los que sí se puede confiar.", img: "/images/og/circulo.jpg" },
+  publicidad: { hash: "proyecto-publicidad-tarjeta", titulo: "Publicidad gratuita para tu negocio", texto: "Registra tu negocio y que más vecinos te conozcan. Sin costo.", img: "/images/og/publicidad.jpg" },
+  recomienda: { hash: "proyecto-recomienda-evalua-gana", titulo: "Recomienda, evalúa y gana", texto: "Comparte tu experiencia con negocios y servicios locales, y ayuda a otros a elegir mejor.", img: "/images/og/recomienda.jpg" },
+  alianzas: { hash: "proyecto-alianzas-tarjeta", titulo: "Alianzas solidarias", texto: "Alianzas ganar-ganar entre negocios y comunidad. Descubre cómo sumarte.", img: "/images/og/alianzas.jpg" },
+  bazar: { hash: "proyecto-bazares", titulo: "Bazar y comercio local", texto: "Compra, vende o intercambia de forma segura entre vecinos.", img: "/images/og/bazar.jpg" },
+  ventas: { hash: "proyecto-ventas-con-causa", titulo: "Ventas con causa", texto: "Compra productos y servicios locales que además apoyan una causa.", img: "/images/og/ventas.jpg" },
+  apoyo: { hash: "proyecto-donaciones", titulo: "Apoyo voluntario", texto: "Tu tiempo, tu talento o tus recursos pueden cambiar vidas. Conoce cómo sumarte.", img: "/images/og/apoyo.jpg" },
   donar: { alias: "apoyo" },
-  noticias: { hash: "proyecto-noticias", titulo: "Noticias de la comunidad", texto: "Lo que pasa en tu colonia: eventos, convocatorias y buenas noticias.", img: "/images/Noticias.png" },
+  noticias: { hash: "proyecto-noticias", titulo: "Noticias de la comunidad", texto: "Lo que pasa en tu colonia: eventos, convocatorias y buenas noticias.", img: "/images/og/noticias.jpg" },
   // Pestañas
   nosotros: { hash: "nosotros", titulo: "Nosotros · DCUATES", texto: "Juntos hacemos una mejor comunidad. Conoce quiénes somos y cómo puedes sumar." },
   beneficios: { hash: "beneficios", titulo: "Beneficios para tu comunidad", texto: "Libros, asesorías, bienestar y apoyo para tus mascotas, todo gratis." },
@@ -80,7 +81,9 @@ export default function handler(req, res) {
 <meta property="og:description" content="${esc(e.texto)}">
 <meta property="og:url" content="${esc(canonica)}">
 <meta property="og:image" content="${esc(imagen)}">
-<meta name="twitter:card" content="summary">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${esc(titulo)}">
 <meta name="twitter:description" content="${esc(e.texto)}">
 <meta name="twitter:image" content="${esc(imagen)}">
