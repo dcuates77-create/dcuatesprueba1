@@ -6,13 +6,12 @@ import Tablero, { abrirAcceso } from "./Tablero.jsx";
 import BotonCompartir from "./BotonCompartir.jsx";
 import { GOOGLE_SHEETS_URL, WHATSAPP_NUMERO } from "./datos/config.js";
 import { IDENTIDAD, identidad } from "./datos/identidad.js";
-import { CLAVE_RED, INSIGNIAS, LIBRO_MES, METAS_SEMANA, guardarJSON, hoyISO, leerInsignias, leerJSON, otorgar, semanaClave } from "./datos/red.js";
+import { INSIGNIAS, METAS_SEMANA, guardarJSON, hoyISO, leerInsignias, leerJSON, otorgar, semanaClave } from "./datos/red.js";
 import { leerSemillas, nivelDe, sumarSemillas } from "./datos/juegos.js";
 import { CasillaAcepto, useAceptacion } from "./componentes/legal.jsx";
+import { MENSAJE_ZONA, useZona } from "./utilidades/zonasHoja.js";
 
 const wa = (t) => `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(t)}`;
-const dentro = () => { try { return sessionStorage.getItem("dc_red") === "1"; } catch (e) { return false; } };
-const marcar = (v) => { try { v ? sessionStorage.setItem("dc_red", "1") : sessionStorage.removeItem("dc_red"); } catch (e) {} };
 const sumar = (n) => sumarSemillas(n);
 
 const TARJETAS = [
@@ -27,8 +26,8 @@ const TARJETAS = [
 
 const iso = (d) => new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
 function Acceso({ onCerrar, onEntrar }) {
-  const [clave, setClave] = useState(""); const [error, setError] = useState("");
-  const entrar = (e) => { e.preventDefault(); if (clave.trim().toLowerCase() === CLAVE_RED.toLowerCase()) onEntrar(); else setError("Esa clave no es válida. Pídela por WhatsApp."); };
+  const [clave, setClave] = useState(""); const [error, setError] = useState(""); const [verificando, setVerificando] = useState(false);
+  const entrar = async (e) => { e.preventDefault(); if (!clave.trim() || verificando) return; setVerificando(true); setError(""); const r = await onEntrar(clave); setVerificando(false); if (r && !r.ok) setError(MENSAJE_ZONA[r.motivo] || MENSAJE_ZONA.clave); };
   return (
     <div className="zj-fondo" role="dialog" aria-modal="true" aria-label="Acceso a la Red de confianza" onClick={(e) => { if (e.target === e.currentTarget) onCerrar(); }}>
       <div className="zj-caja">
@@ -37,7 +36,7 @@ function Acceso({ onCerrar, onEntrar }) {
         <form className="pr-form" onSubmit={entrar}>
           <label>Tu clave<input value={clave} onChange={(e) => { setClave(e.target.value); setError(""); }} autoComplete="off" autoCapitalize="none" /></label>
           {error && <p className="pr-err" role="alert">{error}</p>}
-          <button type="submit" className="pr-enviar">🔓 Entrar</button>
+          <button type="submit" className="pr-enviar" disabled={verificando}>{verificando ? "Verificando…" : "🔓 Entrar"}</button>
         </form>
         <a className="in-btn in-sec2" href={wa("Hola, me gustaría recibir una invitación para la Red de confianza de DCUATES.")} target="_blank" rel="noopener noreferrer">💬 Pedir mi invitación por WhatsApp</a>
       </div>
@@ -69,15 +68,16 @@ function Pasaporte({ onAbrirProyecto, cerrar }) {
   );
 }
 
-function Lectura() {
+function Lectura({ libro, pregunta }) {
   const mes = hoyISO().slice(0, 7);
   const [nota, setNota] = useState(() => leerJSON("dc_lectura_" + mes, { nota: "", fin: false }));
   const guardar = (n) => { setNota(n); guardarJSON("dc_lectura_" + mes, n); };
   return (
     <div className="rd-lista">
-      <div className="ag-ev"><b>📖 Libro del mes: {LIBRO_MES.titulo}</b><p>{LIBRO_MES.info}</p><a href={LIBRO_MES.enlace} target="_blank" rel="noopener noreferrer">Leer gratis ›</a></div>
-      <p className="zj-et">Para reflexionar</p>
-      <p className="zj-p">{LIBRO_MES.pregunta}</p>
+      {libro ? <div className="ag-ev"><b>📖 Libro del mes: {libro.t}</b><p>{libro.x}</p>{libro.e && <a href={libro.e} target="_blank" rel="noopener noreferrer">Leer gratis ›</a>}</div>
+        : <div className="ag-ev"><p>📖 Pronto compartiremos el libro del mes.</p></div>}
+      {pregunta && <><p className="zj-et">Para reflexionar</p>
+      <p className="zj-p">{pregunta}</p></>}
       <textarea className="rd-area" rows={4} value={nota.nota} onChange={(e) => guardar({ ...nota, nota: e.target.value })} placeholder="Tu nota personal (se guarda solo en tu celular)" />
       {nota.fin ? <p className="gn-nota">¡Libro terminado este mes! 📚</p>
         : <button type="button" className="in-btn" onClick={() => { guardar({ ...nota, fin: true }); sumar(2); otorgar("lector"); }}>✅ Ya terminé el libro (+2 Semillas)</button>}
@@ -200,13 +200,13 @@ function Insignias() {
   );
 }
 
-function Ventana({ t, onCerrar, onAbrirProyecto }) {
+function Ventana({ t, contenido, onCerrar, onAbrirProyecto }) {
   return (
     <div className="zj-fondo" role="dialog" aria-modal="true" aria-label={t.titulo} onClick={(e) => { if (e.target === e.currentTarget) onCerrar(); }}>
       <div className="zj-caja">
         <div className="zj-cab"><b>{t.emoji} {t.titulo}</b><button type="button" className="zj-x" onClick={onCerrar} aria-label="Cerrar">✕</button></div>
         {t.id === "pasaporte" && <Pasaporte onAbrirProyecto={onAbrirProyecto} cerrar={onCerrar} />}
-        {t.id === "lectura" && <Lectura />}
+        {t.id === "lectura" && <Lectura libro={contenido.libro && contenido.libro[0]} pregunta={contenido["libro-pregunta"] && contenido["libro-pregunta"][0] && contenido["libro-pregunta"][0].x} />}
         {t.id === "diario" && <Diario />}
         {t.id === "reto" && <Reto />}
         {t.id === "mentor" && <Mentor />}
@@ -218,11 +218,12 @@ function Ventana({ t, onCerrar, onAbrirProyecto }) {
 }
 
 export default function ZonaRed({ onAbrirProyecto: abrirProy = () => {} }) {
-  const [ok, setOk] = useState(dentro);
   const [pidiendo, setPidiendo] = useState(null);
   const [abierta, setAbierta] = useState(null);
   const [tablero, setTablero] = useState(false);
   useAtras(tablero, () => setTablero(false));
+  const { zona, entrar: entrarZona, salir: salirZona } = useZona(["red"], tablero);
+  const ok = !!zona;
   useAtras(!!pidiendo, () => setPidiendo(null));
   useAtras(!!abierta, () => setAbierta(null));
   const onAbrirProyecto = (id) => { setTablero(false); setAbierta(null); abrirProy(id); };
@@ -237,8 +238,8 @@ export default function ZonaRed({ onAbrirProyecto: abrirProy = () => {} }) {
     try { const r = new URLSearchParams(window.location.search).get("ref"); if (r && !localStorage.getItem("dc_ref")) localStorage.setItem("dc_ref", r.slice(0, 12)); } catch (e) {}
   }, []);
   const tocar = (t) => { if (ok) setAbierta(t.id); else setPidiendo(t.id); };
-  const entrar = () => { marcar(true); setOk(true); const id = pidiendo; setPidiendo(null); if (id && id !== "_") setAbierta(id); };
-  const salir = () => { marcar(false); setOk(false); setAbierta(null); };
+  const entrar = async (clave) => { const r = await entrarZona(clave); if (r.ok) { const id = pidiendo; setPidiendo(null); if (id && id !== "_") setAbierta(id); } return r; };
+  const salir = () => { salirZona(); setAbierta(null); };
   const t = TARJETAS.find((x) => x.id === abierta);
   return (
     <>
@@ -255,7 +256,7 @@ export default function ZonaRed({ onAbrirProyecto: abrirProy = () => {} }) {
         />
       )}
       {pidiendo && createPortal(<Acceso onCerrar={() => setPidiendo(null)} onEntrar={entrar} />, document.body)}
-      {t && ok && createPortal(<Ventana t={t} onCerrar={() => setAbierta(null)} onAbrirProyecto={onAbrirProyecto} />, document.body)}
+      {t && ok && createPortal(<Ventana t={t} contenido={(zona && zona.contenido) || {}} onCerrar={() => setAbierta(null)} onAbrirProyecto={onAbrirProyecto} />, document.body)}
       <style>{`
 .tb-sub2{margin:0 0 8px;text-align:center;font-size:13px;font-weight:700;color:#3a4654}
 .tb-sub2 button{margin-left:6px;min-height:40px;border:0;border-radius:99px;padding:6px 14px;background:#14532d;color:#fff;font-family:inherit;font-size:13px;font-weight:900;cursor:pointer}

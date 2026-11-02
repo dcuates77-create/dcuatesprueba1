@@ -1,5 +1,5 @@
 // ZONA DE ALIADOS, PATROCINADORES, VOLUNTARIOS Y AMIGOS — barra con candado general y candado por tarjeta/perfil.
-// Candado sencillo de prueba (claves en src/datos/aliados.js): no pongas aquí información confidencial.
+// (e63) Las claves y el contenido por perfil viven en tu hoja (pestañas «Claves» y «Zonas»); se piden al Apps Script con utilidades/zonasHoja.js.
 import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import TiraAuto from "./TiraAuto.jsx";
@@ -9,25 +9,26 @@ import BotonCompartir from "./BotonCompartir.jsx";
 import { abrirRegistroPrevio } from "./RegistroPrevio.jsx";
 import { GOOGLE_SHEETS_URL, WHATSAPP_NUMERO } from "./datos/config.js";
 import { LOGROS_ITEMS } from "./datos/cintas.js";
-import { ACTIVIDADES_VOLUNTARIOS, BENEFICIOS, MENSAJES_DIFUSION, PERFILES, TARJETAS_ALIADOS } from "./datos/aliados.js";
+import { PERFILES, TARJETAS_ALIADOS } from "./datos/aliados.js";
+import { MENSAJE_ZONA, useZona } from "./utilidades/zonasHoja.js";
 import { CasillaAcepto, useAceptacion } from "./componentes/legal.jsx";
 
 const wa = (t) => `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(t)}`;
 const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
 const fmt = (f) => { const [, m, d] = f.split("-").map(Number); return `${d} ${MESES[m - 1]}`; };
-const leerPerfil = () => { try { const p = sessionStorage.getItem("dc_perfil"); return PERFILES[p] ? p : null; } catch (e) { return null; } };
-const guardarPerfil = (p) => { try { p ? sessionStorage.setItem("dc_perfil", p) : sessionStorage.removeItem("dc_perfil"); } catch (e) {} };
 const permitido = (t, perfil) => !!perfil && (t.perfiles === "todos" || t.perfiles.includes(perfil));
 
 function Acceso({ onCerrar, onEntrar }) {
   const [clave, setClave] = useState("");
   const [error, setError] = useState("");
-  const entrar = (e) => {
+  const [verificando, setVerificando] = useState(false);
+  const entrar = async (e) => {
     e.preventDefault();
-    const k = clave.trim().toLowerCase();
-    const p = Object.keys(PERFILES).find((x) => PERFILES[x].clave.toLowerCase() === k);
-    if (!p) { setError("Esa clave no es válida. Revísala o solicítala por WhatsApp."); return; }
-    onEntrar(p);
+    if (!clave.trim() || verificando) return;
+    setVerificando(true); setError("");
+    const r = await onEntrar(clave);
+    setVerificando(false);
+    if (r && !r.ok) setError(MENSAJE_ZONA[r.motivo] || MENSAJE_ZONA.clave);
   };
   return (
     <div className="zj-fondo" role="dialog" aria-modal="true" aria-label="Acceso a la zona" onClick={(e) => { if (e.target === e.currentTarget) onCerrar(); }}>
@@ -35,9 +36,9 @@ function Acceso({ onCerrar, onEntrar }) {
         <div className="zj-cab"><b>🔐 Entrar a la zona</b><button type="button" className="zj-x" onClick={onCerrar} aria-label="Cerrar">✕</button></div>
         <p className="zj-p">Esta zona es para quienes ya forman parte de la red de DCUATES. Escribe la clave que te compartimos.</p>
         <form className="pr-form" onSubmit={entrar}>
-          <label>Tu clave<input value={clave} onChange={(e) => { setClave(e.target.value); setError(""); }} placeholder="Ej. aliado2026" autoComplete="off" autoCapitalize="none" /></label>
+          <label>Tu clave<input value={clave} onChange={(e) => { setClave(e.target.value); setError(""); }} placeholder="Tu clave" autoComplete="off" autoCapitalize="none" /></label>
           {error && <p className="pr-err" role="alert">{error}</p>}
-          <button type="submit" className="pr-enviar">🔓 Entrar</button>
+          <button type="submit" className="pr-enviar" disabled={verificando}>{verificando ? "Verificando…" : "🔓 Entrar"}</button>
         </form>
         <button type="button" className="in-btn in-sec2" onClick={() => abrirRegistroPrevio("clave")}>🤝 SOLICITAR UNIRME Y MI CLAVE</button>
         <p className="pr-nota">Nunca compartas tu clave con desconocidos. DCUATES jamás te la pedirá por mensaje.</p>
@@ -79,7 +80,7 @@ function Formulario({ tipo, perfil, ph, boton, etiqueta, extra, onListo }) {
   );
 }
 
-function Ventana({ tarjeta, perfil, agenda, onCerrar }) {
+function Ventana({ tarjeta, perfil, contenido, agenda, onCerrar }) {
   const P = PERFILES[perfil];
   const hoy = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
   const proximos = agenda.filter((e) => e.fecha >= hoy).sort((a, b) => a.fecha.localeCompare(b.fecha)).slice(0, 8);
@@ -91,7 +92,8 @@ function Ventana({ tarjeta, perfil, agenda, onCerrar }) {
         <div className="zj-cab"><b>{tarjeta.emoji} {tarjeta.titulo}</b><button type="button" className="zj-x" onClick={onCerrar} aria-label="Cerrar">✕</button></div>
         <p className="zl-perfil" style={{ background: P.color }}>{P.emoji} Perfil: {P.nombre}</p>
         {tarjeta.id === "beneficios" && (
-          <div className="zl-lista">{BENEFICIOS[perfil].map((b, i) => <div className="ag-ev" key={i}><p>✔️ {b}</p></div>)}
+          <div className="zl-lista">{(contenido.beneficios || []).map((b, i) => <div className="ag-ev" key={i}><p>✔️ {b.x}</p></div>)}
+            {!(contenido.beneficios || []).length && <p className="ag-vacio">Pronto sumaremos tus beneficios aquí.</p>}
             <a className="in-btn" href={wa(`Hola, soy ${P.nombre} de DCUATES y quiero conocer mis beneficios.`)} target="_blank" rel="noopener noreferrer">💬 Preguntar por mis beneficios</a></div>
         )}
         {tarjeta.id === "ofrece" && <Formulario tipo="Beneficio aliado" perfil={perfil} etiqueta="¿Qué quieres ofrecer a la comunidad?" ph="Ej. 10% en pasteles presentando el cupón DCUATES, vigente hasta diciembre." boton="🏷️ Enviar mi beneficio" extra="Tu cupón, descuento o regalo puede aparecer en Cupones y Promos y en Juega y gana. Antes lo revisamos contigo." />}
@@ -106,7 +108,7 @@ function Ventana({ tarjeta, perfil, agenda, onCerrar }) {
         {tarjeta.id === "voluntarios" && (
           <div className="zl-lista">
             <p className="pr-nota">Actividades abiertas:</p>
-            {ACTIVIDADES_VOLUNTARIOS.map((a, i) => <div className="ag-ev" key={i}><b>{a.titulo}</b><p>{a.info}</p><a href={wa(`Hola, quiero apoyar en: ${a.titulo}.`)} target="_blank" rel="noopener noreferrer">🙋 Me apunto ›</a></div>)}
+            {(contenido.actividades || []).map((a, i) => <div className="ag-ev" key={i}><b>{a.t}</b><p>{a.x}</p><a href={wa(`Hola, quiero apoyar en: ${a.t}.`)} target="_blank" rel="noopener noreferrer">🙋 Me apunto ›</a></div>)}
             <p className="zj-et">Registrar mis horas</p>
             <Formulario tipo="Horas voluntario" perfil={perfil} etiqueta="¿Qué hiciste y cuántas horas?" ph="Ej. 3 horas apoyando en la tertulia del sábado." boton="🕒 Registrar horas" extra="Con tus horas podemos emitir tu constancia de participación." />
           </div>
@@ -121,7 +123,7 @@ function Ventana({ tarjeta, perfil, agenda, onCerrar }) {
         {tarjeta.id === "difusion" && (
           <div className="zl-lista">
             <p className="pr-nota">Copia o comparte estos mensajes. Cada persona que invites suma a la comunidad.</p>
-            {MENSAJES_DIFUSION.map((m, i) => (
+            {(contenido.difusion || []).map((d, i) => d.x).map((m, i) => (
               <div className="ag-ev" key={i}><p>{m}</p>
                 <div className="ca-btns"><button type="button" onClick={() => copiar(m, i)}>{copiado === i ? "✔️ Copiado" : "📋 Copiar"}</button><a href={wa(m)} target="_blank" rel="noopener noreferrer">💬 Compartir</a></div></div>
             ))}
@@ -133,11 +135,12 @@ function Ventana({ tarjeta, perfil, agenda, onCerrar }) {
 }
 
 export default function ZonaAliados({ agenda = [] }) {
-  const [perfil, setPerfil] = useState(leerPerfil);
   const [pidiendo, setPidiendo] = useState(null); // id de tarjeta pendiente o "_"
   const [abierta, setAbierta] = useState(null);
   const [tablero, setTablero] = useState(false);
   useAtras(tablero, () => setTablero(false));
+  const { zona, entrar: entrarZona, salir: salirZona } = useZona(Object.keys(PERFILES), tablero);
+  const perfil = zona ? zona.perfil : null;
   useAtras(!!pidiendo, () => setPidiendo(null));
   useAtras(!!abierta, () => setAbierta(null));
   useEffect(() => {
@@ -153,11 +156,12 @@ export default function ZonaAliados({ agenda = [] }) {
     if (!perfil) { setPidiendo(t.id); return; }
     if (permitido(t, perfil)) setAbierta(t.id); else setPidiendo(t.id);
   };
-  const entrar = (p) => {
-    guardarPerfil(p); setPerfil(p); const t = TARJETAS_ALIADOS.find((x) => x.id === pidiendo);
-    setPidiendo(null); if (t && permitido(t, p)) setAbierta(t.id);
+  const entrar = async (clave) => {
+    const r = await entrarZona(clave);
+    if (r.ok) { const t = TARJETAS_ALIADOS.find((x) => x.id === pidiendo); setPidiendo(null); if (t && permitido(t, r.perfil)) setAbierta(t.id); }
+    return r;
   };
-  const salir = () => { guardarPerfil(null); setPerfil(null); setAbierta(null); };
+  const salir = () => { salirZona(); setAbierta(null); };
   const tarjeta = TARJETAS_ALIADOS.find((t) => t.id === abierta);
   const nombresPerfiles = (t) => t.perfiles === "todos" ? "Todos los perfiles" : t.perfiles.map((p) => PERFILES[p].nombre).join(", ");
 
@@ -176,7 +180,7 @@ export default function ZonaAliados({ agenda = [] }) {
         />
       )}
       {pidiendo && createPortal(<Acceso onCerrar={() => setPidiendo(null)} onEntrar={entrar} />, document.body)}
-      {tarjeta && perfil && createPortal(<Ventana tarjeta={tarjeta} perfil={perfil} agenda={agenda} onCerrar={() => setAbierta(null)} />, document.body)}
+      {tarjeta && perfil && createPortal(<Ventana tarjeta={tarjeta} perfil={perfil} contenido={(zona && zona.contenido) || {}} agenda={agenda} onCerrar={() => setAbierta(null)} />, document.body)}
       <style>{`
 .tb-sub{margin:0 0 8px;text-align:center}
 .tb-sub span{display:inline-block;border-radius:99px;padding:4px 12px;font-size:13px;font-weight:900;color:#fff}
