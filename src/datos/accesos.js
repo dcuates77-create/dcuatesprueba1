@@ -51,6 +51,7 @@ export const ACCESOS_REGISTROS = [
   { grupo: "🧡 ÚNETE AL CLUB · Sé NUESTRO CUATE" },
   { emoji: "🧡", t: "Únete al Club DCUATES", d: "Vecino, voluntario, padrino, aliad@, patrocinador u organización", reg: "club" },
   { emoji: "🎁", t: "Qué incluye ser Cuate", d: "Lo que el Club puede ofrecerte", ev: "dcuates:club-info" },
+  { emoji: "💳", t: "Mi tarjeta Cuate", d: "Ya soy Cuate: mis puntos y mi tarjeta digital", ev: "dcuates:tarjeta" },
   { grupo: "💡 Propón y recomienda" },
   { emoji: "✌️", t: "Reto: pide dos recomendaciones", d: "Por cada una que das, pide dos", micro: "dos" },
   { emoji: "📅", t: "Propón un evento", d: "Súmalo a la Agenda", micro: "evento" },
