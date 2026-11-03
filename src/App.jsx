@@ -53,6 +53,7 @@ import PlusHost, { BotonPlus } from "./AgendaPlus.jsx";
 import Tablon from "./Tablon.jsx";
 import ConsultaFolio from "./ConsultaFolio.jsx";
 import { ClubInfo } from "./ClubDcuates.jsx";
+import TarjetaCuate from "./TarjetaCuate.jsx";
 import { normalizarAnuncios, normalizarDirectorio } from "./datos/plus.js";
 import Extras from "./Extras.jsx";
 import { identidad } from "./datos/identidad.js";
@@ -718,6 +719,7 @@ export default function App() {
       <Tablon />
       <ConsultaFolio />
       <ClubInfo />
+      <TarjetaCuate />
       <Extras logros={logrosBanda} />
       <PuertasHost onAbrirProyecto={(id) => setModalProyecto(id)} />
       <Temporada />

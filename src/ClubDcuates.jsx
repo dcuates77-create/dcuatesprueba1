@@ -10,6 +10,7 @@ import { abrirRegistroPrevio } from "./RegistroPrevio.jsx";
 import { MODALIDADES, CLUB_TITULO, CLUB_LEMA, CLUB_REGLAS, NARANJA_CLUB, MODALIDAD_DE_PUERTA, modalidadPorId } from "./datos/club.js";
 
 export const abrirClubInfo = () => window.dispatchEvent(new CustomEvent("dcuates:club-info"));
+export const abrirTarjeta = () => window.dispatchEvent(new CustomEvent("dcuates:tarjeta"));
 const unirse = (m, desde) => { registrar("club_unirse", { m: m.id, desde }); abrirRegistroPrevio("club", { valores: { mod: m.nombre } }); };
 
 export default function ClubTarjeta() {
@@ -26,6 +27,7 @@ export default function ClubTarjeta() {
         ))}
       </div>
       <button type="button" className="clb-i" onClick={() => { registrar("club_info", { desde: "inicio" }); abrirClubInfo(); }}>🎁 ¿Qué incluye ser Cuate?</button>
+      <button type="button" className="clb-tj" onClick={() => { registrar("tarjeta_desde", { desde: "inicio" }); abrirTarjeta(); }}>💳 Ya soy Cuate: abrir mi tarjeta</button>
     </section>
   );
 }
@@ -60,6 +62,7 @@ export function ClubInfo() {
       <div className="clb-caja">
         <div className="clb-cab"><b>🧡 {CLUB_TITULO}</b><button type="button" onClick={cerrar} aria-label="Cerrar">✕</button></div>
         <p className="clb-s">{CLUB_LEMA}. Elige tu modalidad y mira lo que <i>puede incluir</i>.</p>
+        <button type="button" className="clb-tj clb-tj2" onClick={() => { registrar("tarjeta_desde", { desde: "info" }); cerrar(); setTimeout(abrirTarjeta, 80); }}>💳 Ya soy Cuate: abrir mi tarjeta</button>
         {MODALIDADES.map((m) => (
           <div key={m.id} className="clb-m">
             <button type="button" className="clb-mh" aria-expanded={sel === m.id} onClick={() => setSel(sel === m.id ? "" : m.id)}>
@@ -92,6 +95,8 @@ const CSS = `
 .clb-b span{font-size:22px}.clb-b b{font-weight:900;line-height:1.15}
 .clb-b:active{transform:translateY(2px);box-shadow:none}
 .clb-i{margin:10px 0 0;min-height:44px;padding:0 14px;border:0;background:none;color:${NARANJA_CLUB};font:inherit;font-weight:900;font-size:14.5px;text-decoration:underline;cursor:pointer}
+.clb-tj{display:block;width:100%;min-height:48px;margin:6px 0 0;padding:0 14px;border:2px solid ${NARANJA_CLUB};border-radius:14px;background:#fff;color:${NARANJA_CLUB};font:inherit;font-weight:900;font-size:14.5px;cursor:pointer}
+.clb-tj2{margin:0 0 8px}
 .clb-p{display:block;width:100%;min-height:50px;margin:0 0 8px;padding:8px 12px;border:0;border-radius:14px;background:${NARANJA_CLUB};color:#fff;font:inherit;font-weight:900;font-size:15px;cursor:pointer;box-shadow:0 3px 0 #a33a00}
 .clb-fondo{position:fixed;inset:0;z-index:95;background:rgba(15,25,20,.65);display:flex;align-items:flex-end;justify-content:center;font-family:Nunito,system-ui,sans-serif}
 .clb-caja{background:#fbf7ec;width:100%;max-width:560px;max-height:92dvh;overflow-y:auto;border-radius:24px 24px 0 0;padding:0 12px 22px;color:#0f2d1e}
