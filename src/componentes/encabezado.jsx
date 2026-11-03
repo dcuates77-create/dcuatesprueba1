@@ -280,6 +280,7 @@ export function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirTerminos, onA
                             if (link.action === "faq") onAbrirFAQ && onAbrirFAQ();
                             else if (link.action === "sugerencias") onAbrirSugerencias && onAbrirSugerencias();
                             else if (link.action === "club") window.dispatchEvent(new CustomEvent("dcuates:club-info"));
+                            else if (link.action === "tarjeta") window.dispatchEvent(new CustomEvent("dcuates:tarjeta"));
                             else if (link.action === "mapa-sitio") onAbrirMapaSitio && onAbrirMapaSitio();
                             else if (link.modal) onAbrirProyecto && onAbrirProyecto(link.modal);
                           }}
