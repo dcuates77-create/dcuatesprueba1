@@ -10,7 +10,7 @@ import { NARANJA_CLUB } from "./datos/club.js";
 import { REGISTROS } from "./datos/registros.js";
 import { abrirClubInfo, abrirClubPasos } from "./ClubDcuates.jsx";
 import { abrirRegistroPrevio } from "./RegistroPrevio.jsx";
-import { useTarjeta, MENSAJE_TARJETA, procesarFoto, procesarFondo, pinDeEnlace, pinGuardado } from "./utilidades/tarjetaHoja.js";
+import { useTarjeta, MENSAJE_TARJETA, MENSAJE_CANJE, ESTADO_CANJE, procesarFoto, procesarFondo, pinDeEnlace, pinGuardado } from "./utilidades/tarjetaHoja.js";
 import {
   TARJETA_TITULO, TARJETA_LEMA, TARJETA_LEGAL, TARJETA_PRIVACIDAD_FOTO, AVATARES_LOGO, AVATARES_EMOJI, rutaLogo, temaDe, iconoPremio, desdeTexto,
   TEXTO_CANJEAR, TEXTO_SIGUE_SUMANDO, SECCIONES_CLUB, nombreSeccion, VELOS
@@ -193,15 +193,18 @@ export default function TarjetaCuate({ onAbrirProyecto }) {
   const [vista, setVista] = useState("pase");
   const [entrando, setEntrando] = useState(false);
   const [avisoEnlace, setAvisoEnlace] = useState("");
+  const [conf, setConf] = useState(null);      // premio que se va a pedir (ventana de confirmación)
+  const [canjeando, setCanjeando] = useState(false);
+  const [resCanje, setResCanje] = useState(null); // { ok, premio, folio } o { ok:false, mensaje }
   const carr = useRef(null);
   const premiosRef = useRef(null);
   const pinEntrante = useRef("");
   const cerrar = () => { setAbierto(false); setCfg(false); };
   const oculta = useAtras(abierto, cerrar, { hub: true });
-  const { tarjeta, cargando, sinConexion, aviso, prefs, entrar, salir, guardarPrefs } = useTarjeta(abierto);
+  const { tarjeta, cargando, sinConexion, aviso, prefs, entrar, salir, guardarPrefs, canjear } = useTarjeta(abierto);
 
   useEffect(() => {
-    const abre = () => { setCfg(false); setVerMovs(false); setDot(0); setVista("pase"); setAvisoEnlace(""); setAbierto(true); registrar("tarjeta_abrir", {}); };
+    const abre = () => { setCfg(false); setVerMovs(false); setDot(0); setVista("pase"); setAvisoEnlace(""); setConf(null); setResCanje(null); setAbierto(true); registrar("tarjeta_abrir", {}); };
     // Enlace personal: «…/#pase=PIN». Se guarda el PIN y se quita del enlace.
     const alEnlace = () => {
       const p = pinDeEnlace();
@@ -237,9 +240,23 @@ export default function TarjetaCuate({ onAbrirProyecto }) {
   const vars = { "--c1": tema.c1, "--c2": tema.c2, "--f1": tema.f1, "--f2": tema.f2 };
   const premios = (tarjeta && tarjeta.premios) || [];
   const puntos = tarjeta ? tarjeta.puntos : 0;
-  const siguiente = premios.find((p) => p.p > puntos);
-  const canjeables = premios.filter((p) => p.p <= puntos).length;
-  const pct = !premios.length ? 0 : siguiente ? Math.max(4, Math.min(100, Math.round((puntos / siguiente.p) * 100))) : 100;
+  const apartados = tarjeta ? Number(tarjeta.comprometidos) || 0 : 0;   // puntos de canjes pedidos y aún no entregados
+  const disp = Math.max(0, puntos - apartados);
+  const canjes = (tarjeta && tarjeta.canjes) || [];
+  const enProceso = (n) => canjes.some((c) => c.n === n && (c.e === "pendiente" || c.e === "listo"));
+  const siguiente = premios.find((p) => p.p > disp);
+  const canjeables = premios.filter((p) => p.p <= disp && p.x !== 0 && p.l !== 0 && !enProceso(p.n)).length;
+  const pct = !premios.length ? 0 : siguiente ? Math.max(4, Math.min(100, Math.round((disp / siguiente.p) * 100))) : 100;
+  const pedir = async () => {
+    if (!conf || canjeando) return;
+    setCanjeando(true);
+    const r = await canjear(conf.n);
+    setCanjeando(false);
+    registrar("canje_pedir", { ok: r.ok, m: r.motivo || "" });
+    if (r.ok) setResCanje({ ok: true, premio: conf.n, folio: r.canje.f, p: conf.p });
+    else setResCanje({ ok: false, premio: conf.n, mensaje: MENSAJE_CANJE[r.motivo] || MENSAJE_CANJE.red });
+    setConf(null);
+  };
   const lema = tema.lemas[Math.min(prefs.lema || 0, tema.lemas.length - 1)] || tema.lemas[0];
   const nombre = (prefs.nombre || (tarjeta && tarjeta.nombre) || "Cuate").slice(0, MAXNOM);
   const desde = tarjeta ? desdeTexto(tarjeta.desde) : "";
@@ -301,6 +318,7 @@ export default function TarjetaCuate({ onAbrirProyecto }) {
                     <div className="tj-ph"><span>PANEL DE PUNTOS &amp; PROYECTOS</span><button type="button" onClick={() => setCfg(true)} aria-label="Configurar mi Pase">⚙️</button></div>
                     <div className="tj-pb">
                       <div className="tj-pts"><span className="tj-est" aria-hidden="true">✦</span><b data-testid="tj-puntos">{prefs.oculto ? "•••" : puntos}</b> <span>Puntos DCUATES</span></div>
+                      {!prefs.oculto && apartados > 0 && <p className="tj-apart" data-testid="tj-apartados">🕓 {apartados} pts apartados en canjes por entregar · Disponibles: <b>{disp}</b></p>}
                       <div className="tj-barra" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={prefs.oculto ? 0 : pct} aria-label="Avance al próximo premio"><i style={{ width: (prefs.oculto ? 0 : pct) + "%" }} /></div>
                       {!prefs.oculto && canjeables > 0 && <button type="button" className="tj-ok" onClick={() => premiosRef.current && premiosRef.current.scrollIntoView({ behavior: "smooth", block: "start" })}>🎁 {TEXTO_CANJEAR}</button>}
                       <p className="tj-prox">{!premios.length ? "Pronto habrá premios para canjear" : siguiente ? <>PRÓXIMO PREMIO: <b>{siguiente.p} pts</b></> : TEXTO_SIGUE_SUMANDO}</p>
@@ -312,22 +330,45 @@ export default function TarjetaCuate({ onAbrirProyecto }) {
                       <h3 className="tj-h3">🎁 Canjea tus puntos</h3>
                       <div className="tj-car" ref={carr} onScroll={alScroll}>
                         {premios.map((p) => {
-                          const alcanza = puntos >= p.p;
+                          const alcanza = disp >= p.p, proceso = enProceso(p.n);
+                          const estado = proceso ? "EN PROCESO" : p.x === 0 ? "AGOTADO" : p.l === 0 ? "YA LO CANJEASTE" : "";
                           return (
                             <article key={p.n} className="tj-pr">
                               <div className="tj-pr-i" aria-hidden="true">{iconoPremio(p.n)}</div>
                               <b>{p.n}</b>
                               <small>{p.p} pts</small>
                               {p.d && <em>{p.d}</em>}
-                              {alcanza
-                                ? <button type="button" className="tj-canje" onClick={() => { registrar("tarjeta_canje", { p: p.p }); window.open(wa(`¡Hola DCUATES! Soy el Cuate ${tarjeta.numero} y quiero canjear «${p.n}» (${p.p} pts).`), "_blank", "noopener"); }}>[ CANJEAR ]</button>
-                                : <button type="button" className="tj-canje" disabled>{`[ FALTAN ${p.p - puntos} ]`}</button>}
+                              {p.x !== null && p.x !== undefined && p.x > 0 && p.x <= 10 && <em className="tj-quedan">Quedan {p.x}</em>}
+                              {estado
+                                ? <button type="button" className="tj-canje" disabled>{`[ ${estado} ]`}</button>
+                                : alcanza
+                                  ? <button type="button" className="tj-canje" onClick={() => { setResCanje(null); setConf(p); }}>[ CANJEAR ]</button>
+                                  : <button type="button" className="tj-canje" disabled>{`[ FALTAN ${p.p - disp} ]`}</button>}
                             </article>
                           );
                         })}
                       </div>
                       {premios.length > 1 && <div className="tj-dots" aria-hidden="true">{premios.map((p, i) => <i key={p.n} className={i === dot ? "on" : ""} />)}</div>}
-                      <p className="tj-sm tj-c">Al tocar «Canjear» se abre WhatsApp con tu mensaje listo; DCUATES te confirma y descuenta los puntos al entregarte tu premio.</p>
+                      {resCanje && resCanje.ok && (
+                        <div className="tj-res tj-res-ok" role="status" data-testid="tj-canje-ok">
+                          <b>✅ ¡Listo! Pediste «{resCanje.premio}»</b>
+                          <p>Tu canje es el <b>{resCanje.folio}</b>. Te avisamos cuando esté listo para entregarse; tus {resCanje.p} puntos se descuentan hasta ese momento.</p>
+                          <button type="button" onClick={() => window.open(wa(`¡Hola DCUATES! Soy el Cuate ${tarjeta.numero}. Pedí el canje ${resCanje.folio}: «${resCanje.premio}».`), "_blank", "noopener")}>📲 Avisar también por WhatsApp (opcional)</button>
+                        </div>
+                      )}
+                      {resCanje && !resCanje.ok && <p className="tj-err" role="alert" data-testid="tj-canje-err">{resCanje.mensaje}</p>}
+                      <p className="tj-sm tj-c">Al pedir un premio, tus puntos quedan apartados; DCUATES te avisa y los descuenta cuando te lo entrega. Los puntos no caducan.</p>
+                    </section>
+                  )}
+
+                  {canjes.length > 0 && (
+                    <section className="tj-canjes" aria-label="Mis canjes">
+                      <h3 className="tj-h3">📦 Mis canjes</h3>
+                      <ul>
+                        {canjes.map((c) => { const e = ESTADO_CANJE[c.e] || ESTADO_CANJE.pendiente; return (
+                          <li key={c.f} className={"tj-cj tj-cj-" + c.e}><span aria-hidden="true">{e.ic}</span><span><b>{c.n}</b><small>{c.f} · {c.p} pts · {e.t}{c.e === "entregado" && c.g ? " el " + c.g : ""}</small></span></li>
+                        ); })}
+                      </ul>
                     </section>
                   )}
 
@@ -355,6 +396,18 @@ export default function TarjetaCuate({ onAbrirProyecto }) {
               </div>
               <p className="tj-legal">{TARJETA_LEGAL}</p>
               <div className="tj-silw" data-perfil={perfilId}><Silueta tipo={tema.silueta} /></div>
+              {conf && (
+                <div className="tj-cfg-f" onClick={(e) => { if (e.target === e.currentTarget && !canjeando) setConf(null); }}>
+                  <div className="tj-cfg" role="dialog" aria-modal="true" aria-label="Confirmar canje" data-testid="tj-confirmar">
+                    <div className="tj-cfg-h"><b>🎁 Pedir mi premio</b><button type="button" onClick={() => !canjeando && setConf(null)} aria-label="Cancelar">✕</button></div>
+                    <p className="tj-conf-t">«{conf.n}»</p>
+                    <p className="tj-sm">Costo: <b>{conf.p} puntos</b>. Tienes {disp} disponibles.</p>
+                    <p className="tj-sm">No se descuentan ahora: se descuentan cuando te lo entreguemos. Mientras tanto quedan apartados y no puedes gastarlos en otro premio.</p>
+                    <button type="button" className="tj-listo" onClick={pedir} disabled={canjeando}>{canjeando ? "Enviando…" : "Sí, pedir este premio"}</button>
+                    <button type="button" className="tj-salir" onClick={() => setConf(null)} disabled={canjeando}>Ahora no</button>
+                  </div>
+                </div>
+              )}
               {cfg && <Configuracion tarjeta={tarjeta} tema={tema} lemas={tema.lemas} prefs={prefs} guardarPrefs={guardarPrefs} salir={salir} cerrar={() => setCfg(false)} />}
             </>
           )}
@@ -407,6 +460,16 @@ const CSS = `
 .tj-car::-webkit-scrollbar{display:none}
 .tj-pr{flex:0 0 150px;scroll-snap-align:start;display:flex;flex-direction:column;align-items:center;text-align:center;gap:3px;padding:12px 8px;border-radius:18px;background:#fff;box-shadow:0 3px 10px rgba(0,0,0,.1)}
 .tj-pr-i{font-size:40px;line-height:1}.tj-pr b{font-size:15px;font-weight:900;line-height:1.15}.tj-pr small{font-weight:800;color:var(--c2);font-size:13px}.tj-pr em{font-style:normal;font-size:11.5px;font-weight:600;color:#4a5b52;line-height:1.25}
+.tj-apart{margin:4px 0 2px;font-size:13px;font-weight:800;color:#7a4a00;background:#fff3cd;border-radius:10px;padding:5px 9px}
+.tj-quedan{color:#b42318!important;font-weight:800!important}
+.tj-res{margin:8px 0;padding:10px 12px;border-radius:14px;font-size:13.5px;font-weight:700;line-height:1.35}
+.tj-res-ok{background:#e8f6ee;border:2px solid #0e7c4f;color:#0f2d1e}.tj-res>b{display:block;font-size:15px}.tj-res p{margin:4px 0 6px}.tj-res p b{display:inline;font-size:inherit}
+.tj-res button{min-height:44px;width:100%;border:2px solid #0e7c4f;border-radius:12px;background:#fff;color:#0e7c4f;font:inherit;font-weight:900;font-size:13.5px;cursor:pointer}
+.tj-conf-t{margin:8px 2px 2px;font-size:20px;font-weight:900;color:var(--c1);text-align:center}
+.tj-canjes ul{list-style:none;margin:0 0 6px;padding:0}
+.tj-cj{display:flex;gap:10px;align-items:flex-start;margin:0 0 6px;padding:9px 11px;border-radius:14px;background:rgba(255,255,255,.88);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.tj-cj>span:first-child{font-size:22px;flex:none}.tj-cj b{display:block;font-size:14.5px;font-weight:900;line-height:1.2}.tj-cj small{display:block;font-size:12px;font-weight:700;color:#4a5b52}
+.tj-cj-cancelado{opacity:.65}
 .tj-canje{margin-top:auto;min-height:44px;width:100%;border:2px solid var(--c1);border-radius:12px;background:#fff;color:var(--c1);font:inherit;font-weight:900;font-size:13px;letter-spacing:.03em;cursor:pointer}
 .tj-canje:disabled{border-color:#c4cbc7;color:#7a8680;cursor:default}
 .tj-pr .tj-canje:not(:disabled){background:var(--c1);color:#fff}
