@@ -1,5 +1,5 @@
 import React, { useState, useEffect, lazy, Suspense } from "react";
-import { BarraLogros, BarraPatrocinadores, BarraTicker, TickerFrases } from "./componentes/barras.jsx";
+import { BarraNovedades, BarraPatrocinadores } from "./componentes/barras.jsx";
 import { BarraAccionesFinal, BotonNecesidades, SiteHeader } from "./componentes/encabezado.jsx";
 import { BotonCerrar } from "./componentes/legal.jsx";
 import { IframeVideo, MiniaturaVideo } from "./componentes/media.jsx";
@@ -28,7 +28,8 @@ import Reservado from "./Reservado.jsx";
 import InvitaVecino from "./InvitaVecino.jsx";
 import FlechaBajar from "./FlechaBajar.jsx";
 import AvisoSinConexion from "./AvisoSinConexion.jsx";
-import AyudaFlotante, { PistaDeslizar } from "./AyudaFlotante.jsx";
+import { PistaDeslizar } from "./AyudaFlotante.jsx";
+import { enlaceReporteProblema } from "./utilidades/reporte.js";
 import NavInferior from "./NavInferior.jsx";
 import ZonaJuegos from "./ZonaJuegos.jsx";
 import ZonaAliados from "./ZonaAliados.jsx";
@@ -602,7 +603,6 @@ export default function App() {
       </div>
 
       {/* Barra Ticker Inferior Fija — combina negocios, mascotas, avisos y momentos */}
-      <BarraTicker />
       <NavInferior vista={vista} onVista={irVista} onPlus={() => window.dispatchEvent(new CustomEvent("dcuates:abrir-plus"))} onProyectos={() => window.dispatchEvent(new CustomEvent("dcuates:abrir-tablero", { detail: "conoce" }))} onLogros={() => window.dispatchEvent(new CustomEvent("dcuates:abrir-logros"))} />
 
       {/* Ayuda flotante única: ¿Necesitas algo? → ¿Qué necesitas hoy? · Dudas y atención · Contacto */}
@@ -616,10 +616,6 @@ export default function App() {
       <AvisoSinConexion />
       <FlechaBajar />
       <Reservado />
-      <AyudaFlotante
-        onDudas={() => { registrar("dudas_abrir"); setShowDudas(true); }}
-        onContacto={() => irVista("contacto")}
-      />
 
       {/* Flecha "Subir" — abajo a la derecha, arriba de la barra inferior; aparece después de bajar un poco. */}
       {mostrarSubir && (
@@ -629,7 +625,7 @@ export default function App() {
           aria-label="Subir al inicio de la página"
           title="Subir al menú"
           className="fixed right-3 sm:right-6 z-50 h-12 w-12 flex items-center justify-center rounded-full bg-[#0f2d1e] text-white shadow-lg border-2 border-white/40 hover:bg-emerald-800 transition-colors"
-          style={{ bottom: "calc(var(--alto-ticker, 48px) + var(--alto-nav, 0px) + 66px)" }}
+          style={{ bottom: "calc(var(--alto-nav, 0px) + 12px)" }}
         >
           <span className="text-2xl leading-none font-black" aria-hidden="true">↑</span>
         </button>
@@ -640,6 +636,7 @@ export default function App() {
           (top-full), pegado al borde inferior, y que se mueva junto con todo
           el bloque al hacer scroll (igual que el header, que es sticky). */}
       <div id="encabezado-fijo" className="sticky top-0 z-40 relative">
+        <BarraNovedades />
         <SiteHeader
           onAbrirFAQ={() => setShowFAQ(true)}
           onAbrirPrivacidad={() => setShowPrivacy(true)}
@@ -653,8 +650,7 @@ export default function App() {
           busquedaAbierta={busquedaAbierta}
           setBusquedaAbierta={setBusquedaAbierta}
         />
-        <TickerFrases />
-        <BarraLogros />
+        {/* e66: la barra de frases (TickerFrases) se oculta por ahora; BarraLogros y el cintillo inferior se fusionaron en BarraNovedades (arriba). */}
 
       </div>
 
@@ -745,8 +741,18 @@ export default function App() {
       <div data-vista="contacto" id="contacto" style={vista === "contacto" ? undefined : { display: "none" }}>
         <section aria-label="Contacto y registro" className="px-4 pt-5 pb-5 border-b-4 border-[#0f2d1e]" style={{ background: "#fbf7ec" }}>
           <div className="mx-auto max-w-2xl md:max-w-4xl">
-            <h2 className="text-center font-black uppercase text-xl sm:text-2xl leading-tight" style={{ color: "#0f2d1e" }}>Contacto y registro</h2>
-            <p className="text-center text-sm font-semibold mt-1" style={{ color: "#475569" }}>Regístrate, pide apoyo o escríbenos. Aquí también está todo lo demás: privacidad, seguridad, preguntas y créditos.</p>
+            <h2 className="text-center font-black uppercase text-xl sm:text-2xl leading-tight" style={{ color: "#0f2d1e" }}>¿Qué necesitas?</h2>
+            <p className="text-center text-sm font-semibold mt-1" style={{ color: "#475569" }}>Pide apoyo, escríbenos o regístrate. Aquí también está todo lo demás: privacidad, seguridad, preguntas y créditos.</p>
+            <div className="mt-3 grid grid-cols-1 gap-3">
+              <button type="button" data-testid="nec-hoy" onClick={() => { registrar("ayuda_opcion", { id: "hoy" }); window.dispatchEvent(new CustomEvent("dcuates:abrir-necesitas")); }} style={{ background: "#facc15", color: "#0f2d1e" }} className="min-h-[72px] rounded-2xl shadow-md border-b-4 border-black/25 px-3 py-3 flex items-center gap-3 text-left font-black uppercase text-[15px] leading-tight">
+                <span className="text-3xl leading-none" aria-hidden="true">❓</span>
+                <span>¿Qué necesitas hoy?<small className="block normal-case font-bold text-[12.5px] opacity-80">Apoyos, libros, mascotas, negocios y servicios</small></span>
+              </button>
+              <button type="button" data-testid="nec-problema" onClick={() => { registrar("ayuda_opcion", { id: "problema" }); window.open(enlaceReporteProblema(), "_blank", "noopener"); }} style={{ background: "#e2e8f0", color: "#0f2d1e" }} className="min-h-[64px] rounded-2xl shadow-md border-b-4 border-black/20 px-3 py-3 flex items-center gap-3 text-left font-black uppercase text-[14px] leading-tight">
+                <span className="text-2xl leading-none" aria-hidden="true">🛠️</span>
+                <span>Algo no funciona<small className="block normal-case font-bold text-[12.5px] opacity-80">Avísanos por WhatsApp; se manda solo lo necesario</small></span>
+              </button>
+            </div>
             <div className="mt-4 grid grid-cols-2 gap-3">
               {[
                 ["📝", "Regístrate o participa", "#2E9E5B", () => setAccesoAbierto("registros")],

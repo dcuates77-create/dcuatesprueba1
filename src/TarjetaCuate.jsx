@@ -72,7 +72,7 @@ function Acceso({ entrar, aviso, cerrar }) {
       </form>
       {msg && <p className="tj-err" role="alert">{msg}</p>}
       <button type="button" className="tj-lnk" onClick={() => window.open(wa("¡Hola DCUATES! Ya soy Cuate pero perdí mi PIN. Mi nombre es ___ y mi número de Cuate es ___."), "_blank", "noopener")}>📲 No tengo o perdí mi PIN: pedirlo por WhatsApp</button>
-      <button type="button" className="tj-lnk" onClick={() => { cerrar(); setTimeout(abrirClubPasos, 80); }}>🧡 Aún no soy Cuate: ¿cómo me uno? (3 pasos)</button>
+      <button type="button" className="tj-lnk" onClick={() => abrirClubPasos()}>🧡 Aún no soy Cuate: ¿cómo me uno? (3 pasos)</button>
     </div>
   );
 }
@@ -256,11 +256,11 @@ export default function TarjetaCuate({ onAbrirProyecto }) {
     registrar("zona_cuates_abrir", { s: it.s });
     const a = String(it.a || "");
     const [tipo, ...resto] = a.split(":"); const val = resto.join(":").trim();
-    if (tipo === "proyecto" && val && onAbrirProyecto) { cerrar(); setTimeout(() => onAbrirProyecto(val), 150); return; }
-    if (tipo === "registro" && REGISTROS[val]) { cerrar(); setTimeout(() => abrirRegistroPrevio(val), 150); return; }
-    if (tipo === "micro") { cerrar(); setTimeout(() => window.dispatchEvent(new CustomEvent("dcuates:abrir-micro")), 150); return; }
-    if (tipo === "tablero" && TABLEROS.indexOf(val) >= 0) { cerrar(); setTimeout(() => window.dispatchEvent(new CustomEvent("dcuates:abrir-tablero", { detail: val })), 150); return; }
-    if (tipo === "evento" && EVENTOS_OK.indexOf(val) >= 0) { cerrar(); setTimeout(() => window.dispatchEvent(new CustomEvent("dcuates:" + val)), 150); return; }
+    if (tipo === "proyecto" && val && onAbrirProyecto) { onAbrirProyecto(val); return; }
+    if (tipo === "registro" && REGISTROS[val]) { abrirRegistroPrevio(val); return; }
+    if (tipo === "micro") { window.dispatchEvent(new CustomEvent("dcuates:abrir-micro")); return; }
+    if (tipo === "tablero" && TABLEROS.indexOf(val) >= 0) { window.dispatchEvent(new CustomEvent("dcuates:abrir-tablero", { detail: val })); return; }
+    if (tipo === "evento" && EVENTOS_OK.indexOf(val) >= 0) { window.dispatchEvent(new CustomEvent("dcuates:" + val)); return; }
     if (/^https?:\/\//i.test(it.e || "")) window.open(it.e, "_blank", "noopener");
   };
 

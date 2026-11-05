@@ -100,8 +100,8 @@ export function ClubInfo() {
       <div className="clb-caja">
         <div className="clb-cab"><b>🧡 {CLUB_TITULO}</b><button type="button" onClick={cerrar} aria-label="Cerrar">✕</button></div>
         <p className="clb-s">{CLUB_LEMA}. Elige tu modalidad y mira lo que <i>puede incluir</i>.</p>
-        <button type="button" className="clb-tj clb-tj2" onClick={() => { registrar("tarjeta_desde", { desde: "info" }); cerrar(); setTimeout(abrirTarjeta, 80); }}>💳 Ya soy Cuate: abrir mi Pase</button>
-        <button type="button" className="clb-tj clb-tj2" onClick={() => { registrar("club_pasos", { desde: "info" }); cerrar(); setTimeout(abrirClubPasos, 80); }}>1️⃣2️⃣3️⃣ Cómo ser Cuate en 3 pasos</button>
+        <button type="button" className="clb-tj clb-tj2" onClick={() => { registrar("tarjeta_desde", { desde: "info" }); abrirTarjeta(); }}>💳 Ya soy Cuate: abrir mi Pase</button>
+        <button type="button" className="clb-tj clb-tj2" onClick={() => { registrar("club_pasos", { desde: "info" }); abrirClubPasos(); }}>1️⃣2️⃣3️⃣ Cómo ser Cuate en 3 pasos</button>
         {MODALIDADES.map((m) => (
           <div key={m.id} className="clb-m">
             <button type="button" className="clb-mh" aria-expanded={sel === m.id} onClick={() => setSel(sel === m.id ? "" : m.id)}>
@@ -148,8 +148,8 @@ export function ClubPasos() {
         <ol className="clb-pasos">
           {pasos.map(([n, t, x]) => <li key={n}><span aria-hidden="true">{n}</span><div><b>{t}</b><p>{x}</p></div></li>)}
         </ol>
-        <button type="button" className="clb-u" onClick={() => { registrar("club_pasos_unirse", {}); cerrar(); setTimeout(abrirClubInfo, 80); }}>🧡 Elegir mi modalidad</button>
-        <button type="button" className="clb-tj" onClick={() => { cerrar(); setTimeout(abrirTarjeta, 80); }}>💳 Ya tengo mi PIN: abrir mi Pase</button>
+        <button type="button" className="clb-u" onClick={() => { registrar("club_pasos_unirse", {}); abrirClubInfo(); }}>🧡 Elegir mi modalidad</button>
+        <button type="button" className="clb-tj" onClick={() => abrirTarjeta()}>💳 Ya tengo mi PIN: abrir mi Pase</button>
       </div>
     </div>,
     document.body

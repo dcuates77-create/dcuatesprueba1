@@ -1,4 +1,4 @@
-// BARRA INFERIOR (e34): Inicio · Proyectos · Logros · Agenda Plus · Contacto
+// BARRA INFERIOR (e34): Inicio · Proyectos · Logros · Agenda Plus · ¿Qué necesitas? (antes «Contacto»; e66)
 import React, { useLayoutEffect, useRef } from "react";
 
 const ITEMS = [
@@ -6,7 +6,7 @@ const ITEMS = [
   ["proyectos", "🌱", "Proyectos"],
   ["logros", "🏆", "Logros"],
   ["plus", "📅", "Agenda Plus"],
-  ["contacto", "💬", "Contacto"]
+  ["contacto", "💬", "¿Qué necesitas?"]
 ];
 
 export default function NavInferior({ vista, onVista, onPlus, onProyectos, onLogros }) {
@@ -14,6 +14,7 @@ export default function NavInferior({ vista, onVista, onPlus, onProyectos, onLog
   // Publica su alto (--alto-nav) para que el ticker y los botones flotantes queden encima.
   useLayoutEffect(() => {
     const raiz = document.documentElement;
+    raiz.style.setProperty("--alto-ticker", "0px"); // e66: ya no hay cintillo inferior
     const medir = () => raiz.style.setProperty("--alto-nav", `${Math.round(ref.current?.getBoundingClientRect().height || 0)}px`);
     medir();
     let ro;
@@ -47,7 +48,7 @@ const CSS = `
 .ni-barra{position:fixed;left:0;right:0;bottom:0;z-index:41;display:grid;grid-template-columns:repeat(5,1fr);background:#fff;border-top:2px solid #cfe5d6;box-shadow:0 -4px 14px rgba(0,0,0,.18);padding:4px 4px calc(4px + env(safe-area-inset-bottom,0px))}
 .ni-b{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;border:0;background:transparent;min-height:50px;border-radius:14px;color:#3d5a4a;font-weight:800;cursor:pointer;font-family:"Nunito",ui-rounded,system-ui,sans-serif}
 .ni-e{font-size:21px;line-height:1}
-.ni-t{font-size:11px;line-height:1.1;font-weight:900}
+.ni-t{font-size:10.5px;text-align:center;line-height:1.1;font-weight:900}
 .ni-act{background:#e3f3e9;color:#0e7c4f}
 .ni-b:active{transform:translateY(1px)}
 @media (min-width:768px){.ni-barra{left:50%;right:auto;width:560px;transform:translateX(-50%);border-radius:18px 18px 0 0}}
