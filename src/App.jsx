@@ -52,7 +52,7 @@ import InstalarApp from "./InstalarApp.jsx";
 import PlusHost, { BotonPlus } from "./AgendaPlus.jsx";
 import Tablon from "./Tablon.jsx";
 import ConsultaFolio from "./ConsultaFolio.jsx";
-import { ClubInfo } from "./ClubDcuates.jsx";
+import { ClubInfo, ClubPasos } from "./ClubDcuates.jsx";
 import TarjetaCuate from "./TarjetaCuate.jsx";
 import { normalizarAnuncios, normalizarDirectorio } from "./datos/plus.js";
 import Extras from "./Extras.jsx";
@@ -719,7 +719,8 @@ export default function App() {
       <Tablon />
       <ConsultaFolio />
       <ClubInfo />
-      <TarjetaCuate />
+      <ClubPasos />
+      <TarjetaCuate onAbrirProyecto={setModalProyecto} />
       <Extras logros={logrosBanda} />
       <PuertasHost onAbrirProyecto={(id) => setModalProyecto(id)} />
       <Temporada />

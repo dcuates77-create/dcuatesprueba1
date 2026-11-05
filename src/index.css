@@ -63,3 +63,12 @@ img[src*="hero-comunidad.png"] {
   input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select { min-height: 44px; }
   .zj-x { width: 44px; height: 44px; }
 }
+
+/* e65 · Letra grande (A+): el zoom del navegador en <body> descuadra las ventanas fijas (se salían del recuadro y se cortaban los títulos).
+   Se les da el tamaño real de la pantalla dividido entre el zoom (--dcz, lo pone tamanoLetra.js). */
+body.dc-letra-lg > [class*="-fondo"], body.dc-letra-lg > [role="dialog"], body.dc-letra-lg > .fixed.inset-0,
+body.dc-letra-lg [class*="-fondo"] > .tj-cfg-f, body.dc-letra-lg .tj-cfg-f, body.dc-letra-lg .cb-velo {
+  inset: auto !important; top: 0 !important; left: 0 !important;
+  width: calc(100vw / var(--dcz, 1)) !important; height: calc(100dvh / var(--dcz, 1)) !important;
+}
+body.dc-letra-lg [class*="-fondo"] > [class*="-caja"] { max-height: 92% !important; }

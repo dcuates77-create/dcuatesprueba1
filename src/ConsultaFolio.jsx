@@ -46,7 +46,7 @@ function ConstanciaClub({ res, folio }) {
       <p>{res.perfil || "Cuate"}</p>
       <p>Folio {folio}{res.respondido ? <> · desde el {res.respondido}</> : res.fecha ? <> · registro del {res.fecha}</> : null}</p>
       {m && <><p className="cfo-h">Lo que puede incluir:</p><ul>{m.puedeIncluir.map((x) => <li key={x}>{x}</li>)}</ul></>}
-      <button type="button" className="cfo-tj" onClick={() => { abrirTarjeta(); }}>💳 Abrir mi tarjeta Cuate</button>
+      <button type="button" className="cfo-tj" onClick={() => { abrirTarjeta(); }}>💳 Abrir mi Pase Cuate</button>
       <small>Constancia comunitaria: no es un documento oficial ni una credencial. Tómale captura si quieres conservarla.</small>
     </div>
   );

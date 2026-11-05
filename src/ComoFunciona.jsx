@@ -120,6 +120,7 @@ export default function ComoFunciona({ onCerrar }) {
         <div className="cf-r" key={t}><em aria-hidden="true">{e}</em><div><b>{t}</b><span className="cf-d">{d}</span></div></div>
       ))}
       <div className="cf-b">
+        <button type="button" className="b" onClick={() => { registrar("club_pasos", { desde: "como-funciona" }); onCerrar(); setTimeout(() => window.dispatchEvent(new CustomEvent("dcuates:club-pasos")), 150); }}>1️⃣2️⃣3️⃣ Cómo ser Cuate del Club</button>
         <button type="button" className="a" onClick={irPuertas}>Empezar por los 4 botones ›</button>
         <button type="button" className="b" onClick={tour}>🧭 Prefiero el Tour guiado</button>
       </div>

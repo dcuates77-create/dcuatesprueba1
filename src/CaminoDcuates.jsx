@@ -33,7 +33,7 @@ export default function CaminoDcuates({ menu = {}, onAbrirProyecto = () => {}, c
   ];
   const extenso = !compacto || abierto;
   return (
-    <section className={"cm-sec" + (compacto ? " cm-compacto" : "")} id={pasos ? "camino-puerta" : "camino-dcuates"} aria-label="Camino DCUATES">
+    <section className={"cm-sec" + (compacto ? " cm-compacto" : "") + (compacto && /^TU CAMINO/.test(titulo) ? " cm-azul" : "")} id={pasos ? "camino-puerta" : "camino-dcuates"} aria-label="Camino DCUATES">
       {!compacto && <span className="cm-comp"><BotonCompartir hash="camino-dcuates" titulo="Camino DCUATES" texto="Conoce, participa, colabora y crece con DCUATES" variante="claro" /></span>}
       {compacto && (
         <div className="cm-fw">
@@ -61,6 +61,9 @@ export default function CaminoDcuates({ menu = {}, onAbrirProyecto = () => {}, c
       <style>{`
 .cm-sec{position:relative;max-width:72rem;margin:12px auto 6px;padding:14px 12px 12px;border-radius:20px;background:var(--tc,#1B6F8A);border:2px solid rgba(255,255,255,.35);box-shadow:0 6px 16px rgba(0,0,0,.18)}
 .cm-compacto{padding:10px 10px}
+.cm-azul,.pu-sec .cm-sec.cm-azul{background:#DCEEFF;border:2px solid #5AA9F0;border-radius:20px;padding:10px;box-shadow:0 5px 14px rgba(30,120,230,.22)}
+.cm-azul .cm-fw{border-color:#5AA9F0}.cm-azul .cm-franja{color:#0D3B7A;border-color:transparent}
+.cm-azul .cm-prog,.cm-azul .cm-soy{color:#0D3B7A}
 .cm-fw{display:flex;align-items:center;gap:6px;padding-right:8px;border:2px solid rgba(255,255,255,.85);border-bottom-width:6px;border-radius:18px}
 .cm-fw .cm-franja{flex:1;min-width:0;width:auto;border:0;border-radius:16px;padding:6px 4px 6px 10px}
 .cm-fw .cm-comp{position:static;flex:none}

@@ -2,32 +2,70 @@
 //  - ClubTarjeta (default): tarjeta de Inicio con un botón por modalidad.
 //  - BotonClubPuerta: botón «Únete al Club como … CUATE» dentro de cada puerta (no sensible).
 //  - ClubInfo: ventana «Qué incluye ser Cuate» (evento dcuates:club-info).
+//  - ClubPasos: «1-2-3 cómo ser Cuate» (evento dcuates:club-pasos). BotonPase: botón «Mi Pase Cuate» (Inicio, tras Micro-acciones).
 import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useAtras } from "./atras.js";
 import { registrar } from "./analitica.js";
 import { abrirRegistroPrevio } from "./RegistroPrevio.jsx";
+import { haySesionPase } from "./utilidades/tarjetaHoja.js";
 import { MODALIDADES, CLUB_TITULO, CLUB_LEMA, CLUB_REGLAS, NARANJA_CLUB, MODALIDAD_DE_PUERTA, modalidadPorId } from "./datos/club.js";
 
 export const abrirClubInfo = () => window.dispatchEvent(new CustomEvent("dcuates:club-info"));
 export const abrirTarjeta = () => window.dispatchEvent(new CustomEvent("dcuates:tarjeta"));
+export const abrirClubPasos = () => window.dispatchEvent(new CustomEvent("dcuates:club-pasos"));
+// true si este celular ya tiene un Pase guardado (se actualiza solo al entrar o salir)
+export function useTienePase() {
+  const [si, setSi] = useState(() => haySesionPase());
+  useEffect(() => {
+    const f = () => setSi(haySesionPase());
+    window.addEventListener("dcuates:pase-cambio", f);
+    window.addEventListener("storage", f);
+    return () => { window.removeEventListener("dcuates:pase-cambio", f); window.removeEventListener("storage", f); };
+  }, []);
+  return si;
+}
 const unirse = (m, desde) => { registrar("club_unirse", { m: m.id, desde }); abrirRegistroPrevio("club", { valores: { mod: m.nombre } }); };
 
+export function BotonPase({ desde = "inicio" }) {
+  const tiene = useTienePase();
+  return (
+    <>
+      <style>{CSS}</style>
+      <button type="button" className="clb-bp" onClick={() => { registrar("tarjeta_desde", { desde }); abrirTarjeta(); }}>
+        <span aria-hidden="true">💳</span><b>{tiene ? "Mi Pase Cuate" : "Zona CUATES · Mi Pase"}</b>
+      </button>
+    </>
+  );
+}
+
 export default function ClubTarjeta() {
+  const tiene = useTienePase();
   return (
     <section className="clb-sec" aria-label="Únete al Club DCUATES">
       <style>{CSS}</style>
       <h2 className="clb-t">🧡 {CLUB_TITULO}</h2>
       <p className="clb-l">· {CLUB_LEMA} ·</p>
-      <div className="clb-g">
-        {MODALIDADES.map((m) => (
-          <button key={m.id} type="button" className="clb-b" onClick={() => unirse(m, "inicio")}>
-            <span aria-hidden="true">{m.e}</span><b>{m.boton}</b>
-          </button>
-        ))}
-      </div>
-      <button type="button" className="clb-i" onClick={() => { registrar("club_info", { desde: "inicio" }); abrirClubInfo(); }}>🎁 ¿Qué incluye ser Cuate?</button>
-      <button type="button" className="clb-tj" onClick={() => { registrar("tarjeta_desde", { desde: "inicio" }); abrirTarjeta(); }}>💳 Ya soy Cuate: abrir mi tarjeta</button>
+      {tiene ? (
+        <>
+          <p className="clb-ya">¡Ya eres Cuate! Tu Pase está guardado en este celular.</p>
+          <button type="button" className="clb-u clb-pase" onClick={() => { registrar("tarjeta_desde", { desde: "inicio" }); abrirTarjeta(); }}>💳 Mi Pase Cuate</button>
+          <button type="button" className="clb-i" onClick={() => { registrar("club_info", { desde: "inicio" }); abrirClubInfo(); }}>🎁 ¿Qué incluye ser Cuate?</button>
+        </>
+      ) : (
+        <>
+          <div className="clb-g">
+            {MODALIDADES.map((m) => (
+              <button key={m.id} type="button" className="clb-b" onClick={() => unirse(m, "inicio")}>
+                <span aria-hidden="true">{m.e}</span><b>{m.boton}</b>
+              </button>
+            ))}
+          </div>
+          <button type="button" className="clb-i" onClick={() => { registrar("club_info", { desde: "inicio" }); abrirClubInfo(); }}>🎁 ¿Qué incluye ser Cuate?</button>
+          <button type="button" className="clb-3" onClick={() => { registrar("club_pasos", { desde: "inicio" }); abrirClubPasos(); }}>1️⃣2️⃣3️⃣ Cómo ser Cuate en 3 pasos</button>
+          <button type="button" className="clb-tj" onClick={() => { registrar("tarjeta_desde", { desde: "inicio" }); abrirTarjeta(); }}>💳 Ya soy Cuate: abrir mi Pase</button>
+        </>
+      )}
     </section>
   );
 }
@@ -62,7 +100,8 @@ export function ClubInfo() {
       <div className="clb-caja">
         <div className="clb-cab"><b>🧡 {CLUB_TITULO}</b><button type="button" onClick={cerrar} aria-label="Cerrar">✕</button></div>
         <p className="clb-s">{CLUB_LEMA}. Elige tu modalidad y mira lo que <i>puede incluir</i>.</p>
-        <button type="button" className="clb-tj clb-tj2" onClick={() => { registrar("tarjeta_desde", { desde: "info" }); cerrar(); setTimeout(abrirTarjeta, 80); }}>💳 Ya soy Cuate: abrir mi tarjeta</button>
+        <button type="button" className="clb-tj clb-tj2" onClick={() => { registrar("tarjeta_desde", { desde: "info" }); cerrar(); setTimeout(abrirTarjeta, 80); }}>💳 Ya soy Cuate: abrir mi Pase</button>
+        <button type="button" className="clb-tj clb-tj2" onClick={() => { registrar("club_pasos", { desde: "info" }); cerrar(); setTimeout(abrirClubPasos, 80); }}>1️⃣2️⃣3️⃣ Cómo ser Cuate en 3 pasos</button>
         {MODALIDADES.map((m) => (
           <div key={m.id} className="clb-m">
             <button type="button" className="clb-mh" aria-expanded={sel === m.id} onClick={() => setSel(sel === m.id ? "" : m.id)}>
@@ -86,7 +125,46 @@ export function ClubInfo() {
     document.body
   );
 }
+export function ClubPasos() {
+  const [abierto, setAbierto] = useState(false);
+  const cerrar = () => setAbierto(false);
+  const oculta = useAtras(abierto, cerrar, { hub: true });
+  useEffect(() => {
+    const abre = () => setAbierto(true);
+    window.addEventListener("dcuates:club-pasos", abre);
+    return () => window.removeEventListener("dcuates:club-pasos", abre);
+  }, []);
+  if (!abierto) return null;
+  const pasos = [
+    ["1", "Elige tu modalidad y regístrate", "Toca «Únete» en la modalidad que te quede (vecino, voluntari@, aliad@…) y llena el formulario corto."],
+    ["2", "DCUATES te revisa y te escribe", "Te mandamos por WhatsApp tu número de Cuate y tu PIN personal, con un enlace para abrir tu Pase."],
+    ["3", "Abre tu Pase y empieza a sumar", "Entra con tu PIN (solo la primera vez). Recibes 100 puntos de bienvenida y accedes a la Zona CUATES."]
+  ];
+  return createPortal(
+    <div className="clb-fondo" style={oculta ? { display: "none" } : undefined} role="dialog" aria-modal="true" aria-label="Cómo ser Cuate en 3 pasos" onClick={(e) => { if (e.target === e.currentTarget) cerrar(); }}>
+      <style>{CSS}</style>
+      <div className="clb-caja">
+        <div className="clb-cab"><b>1️⃣2️⃣3️⃣ Cómo ser Cuate</b><button type="button" onClick={cerrar} aria-label="Cerrar">✕</button></div>
+        <ol className="clb-pasos">
+          {pasos.map(([n, t, x]) => <li key={n}><span aria-hidden="true">{n}</span><div><b>{t}</b><p>{x}</p></div></li>)}
+        </ol>
+        <button type="button" className="clb-u" onClick={() => { registrar("club_pasos_unirse", {}); cerrar(); setTimeout(abrirClubInfo, 80); }}>🧡 Elegir mi modalidad</button>
+        <button type="button" className="clb-tj" onClick={() => { cerrar(); setTimeout(abrirTarjeta, 80); }}>💳 Ya tengo mi PIN: abrir mi Pase</button>
+      </div>
+    </div>,
+    document.body
+  );
+}
 const CSS = `
+.clb-bp{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:52px;margin:8px 0 0;padding:6px 12px;border:2px solid ${NARANJA_CLUB};border-radius:14px;background:#fff4ea;color:${NARANJA_CLUB};font:inherit;font-weight:900;font-size:15px;cursor:pointer;box-shadow:0 3px 0 rgba(230,81,0,.3)}
+.clb-bp span{font-size:22px}
+.clb-3{margin:0;min-height:44px;padding:0 14px;border:0;background:none;color:${NARANJA_CLUB};font:inherit;font-weight:900;font-size:14.5px;text-decoration:underline;cursor:pointer}
+.clb-ya{margin:4px 0 8px;font-size:14.5px;font-weight:800}
+.clb-pase{margin-top:2px}
+.clb-pasos{list-style:none;margin:0 0 10px;padding:0}
+.clb-pasos li{display:flex;gap:10px;align-items:flex-start;margin:0 0 8px;padding:10px;border:2px solid #f3c9a8;border-radius:14px;background:#fff}
+.clb-pasos li>span{flex:none;width:36px;height:36px;border-radius:50%;background:${NARANJA_CLUB};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:19px}
+.clb-pasos b{font-size:15px;font-weight:900}.clb-pasos p{margin:2px 0 0;font-size:13.5px;font-weight:600;line-height:1.35}
 .clb-sec{margin:12px 0 6px;padding:12px 10px;border:2px solid ${NARANJA_CLUB};border-radius:20px;background:#fff4ea;text-align:center;font-family:Nunito,system-ui,sans-serif;color:#0f2d1e;box-shadow:0 4px 0 rgba(230,81,0,.18)}
 .clb-t{margin:0;font-size:19px;font-weight:900;color:${NARANJA_CLUB};line-height:1.1}
 .clb-l{margin:2px 0 10px;font-size:15px;font-weight:900}

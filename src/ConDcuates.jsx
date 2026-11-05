@@ -45,7 +45,10 @@ const CSS = `
 .con-t{margin:0 0 2px;font-size:20px;font-weight:900;letter-spacing:.02em;line-height:1.1}
 .con-n{color:${NARANJA_CLUB};font-weight:900}
 .con-e{margin:0 0 10px;font-size:15px;font-weight:800;color:#2f4d3f}
-.con-g{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.con-g{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.con-b{min-width:0;overflow-wrap:anywhere}
+body.dc-letra-lg .con-g{grid-template-columns:minmax(0,1fr)}
+body.dc-letra-lg .con-b{flex-direction:row;text-align:left;gap:10px;min-height:64px;padding:8px 12px}
 .con-b{display:flex;flex-direction:column;align-items:center;gap:2px;min-height:112px;padding:10px 4px;border:2px solid #0f2d1e;border-radius:16px;background:#fbf7ec;color:#0f2d1e;font:inherit;cursor:pointer;box-shadow:0 3px 0 rgba(15,45,30,.25)}
 .con-b:active{transform:translateY(2px);box-shadow:none}
 .con-b b{font-size:14px;font-weight:900;letter-spacing:.01em}.con-b b .con-n{font-size:20px}
