@@ -80,6 +80,51 @@ export function FilaTicker({ items, index, onClose, mostrarCerrar }) {
   );
 }
 
+// BARRA DE NOVEDADES (e66): fusiona los LOGROS (antes debajo del encabezado) con los ANUNCIOS (antes en el cintillo inferior).
+// Va ARRIBA de todo, a dos renglones y con letra pequeña. Se alternan: logro, anuncio, logro, anuncio…
+// Los textos siguen saliendo de lo mismo: Baserow (NOMBRE LOGROS / NOMBRE TICKER) o src/datos/cintas.js.
+export function BarraNovedades() {
+  const [index, setIndex] = useState(0);
+  const [visible, setVisible] = useState(false);
+  const filasEnlaces = useFilasEnlaces();
+  const logrosBaserow = paresBaserow(filasEnlaces, "NOMBRE LOGROS", "ENLACE LOGROS", 20);
+  const logros = [...(logrosBaserow.length > 0 ? logrosBaserow : LOGROS_ITEMS), ...LOGROS_FIJOS].map((l) => ({ ico: "🏆", texto: l.texto || l.nombre, enlace: l.enlace }));
+  const tickerBaserow = paresBaserow(filasEnlaces, "NOMBRE TICKER", "ENLACE TICKER", 20).map((t) => ({ tipo: "aviso", texto: t.nombre, enlace: t.enlace }));
+  const anuncios = (tickerBaserow.length > 0 ? tickerBaserow : TICKER_ITEMS).map((t) => ({ ico: (TICKER_ETIQUETAS[t.tipo] || TICKER_ETIQUETAS.aviso || {}).emoji || "📣", texto: t.texto || t.nombre, enlace: t.enlace }));
+  const items = [];
+  for (let i = 0; i < Math.max(logros.length, anuncios.length); i++) { if (logros[i]) items.push(logros[i]); if (anuncios[i]) items.push(anuncios[i]); }
+  const item = items[index % Math.max(1, items.length)] || { ico: "", texto: "" };
+  const largo = String(item.texto || "").length;
+  useEffect(() => {
+    if (!items.length) return undefined;
+    const t = Math.max(4200, largo * 70);
+    const entra = setTimeout(() => setVisible(true), 60);
+    const sale = setTimeout(() => setVisible(false), 60 + t);
+    const sig = setTimeout(() => setIndex((i) => (i + 1) % items.length), 60 + t + 600);
+    return () => { clearTimeout(entra); clearTimeout(sale); clearTimeout(sig); };
+  }, [index, largo, items.length]);
+  if (!items.length) return null;
+  const esExterno = item.enlace && item.enlace.startsWith("http");
+  return (
+    <div className="bg-[#0f2d1e] border-b-2 border-emerald-700/50" data-testid="barra-novedades">
+      <a
+        href={item.enlace || "#"}
+        target={esExterno ? "_blank" : undefined}
+        rel={esExterno ? "noopener noreferrer" : undefined}
+        className="mx-auto max-w-6xl flex items-center gap-2 px-3 sm:px-4 py-1.5"
+      >
+        <span aria-hidden="true" style={{ fontSize: 17, flex: "none" }}>{item.ico}</span>
+        <span
+          className="flex-1 min-w-0 font-bold text-white text-[12.5px] sm:text-[15px]"
+          style={{ minHeight: "2.4em", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", opacity: visible ? 1 : 0, transition: "opacity .55s ease", lineHeight: 1.2 }}
+        >
+          {item.texto}
+        </span>
+      </a>
+    </div>
+  );
+}
+
 // Barra de Logros y Resultados — se coloca en el encabezado, debajo de la
 // barra de frases motivacionales (TickerFrases). Casi el doble de alta que
 // un renglón normal de ticker, para que los resultados/impacto de los
