@@ -1,5 +1,5 @@
 // =========================================================================
-// src/datos/tarjeta.js — TARJETA DIGITAL DEL CUATE (e64)
+// src/datos/tarjeta.js — PASE DIGITAL DEL CUATE (e64 «tarjeta» → e65 «Pase»)
 // AQUÍ SE EDITA lo visual y los textos de la tarjeta: colores por perfil, lemas, avatares y leyendas.
 // Los DATOS de cada Cuate (número, nombre, puntos) y los PREMIOS viven en tu hoja de Google (pestañas «Cuates», «Puntos» y «Premios»), no aquí.
 // El perfil se toma de la modalidad del Club (src/datos/club.js); aquí solo se le pone su «vestido»: colores, ícono, lemas y siluetas.
@@ -9,8 +9,24 @@ import { modalidadPorNombre } from "./club.js";
 export const PUNTOS_BIENVENIDA = 100;
 export const TARJETA_TITULO = "DCUATES";
 export const TARJETA_LEMA = "¡COMPARTE Y GANA!";
-export const TARJETA_LEGAL = "Constancia comunitaria del Club DCUATES: no es una credencial oficial ni una identificación. Los puntos son un reconocimiento de la comunidad: no tienen valor en dinero y se canjean por los recursos disponibles.";
+export const TARJETA_LEGAL = "Pase comunitario del Club DCUATES: no es una credencial oficial ni una identificación. Los puntos son un reconocimiento de la comunidad: no tienen valor en dinero y se canjean por los recursos disponibles.";
 export const TARJETA_PRIVACIDAD_FOTO = "Tu foto se queda solo en este celular: no se sube ni se guarda en ningún servidor.";
+export const TEXTO_CANJEAR = "Revisa por qué PREMIOS puedes cambiar tus puntos";
+export const TEXTO_SIGUE_SUMANDO = "Sigue SUMANDO y ganando";
+
+// Zona CUATES: pestañas en el orden en que aparecen. El contenido viene de la pestaña «Contenido Club» de tu hoja; una sección nueva escrita allí
+// aparece sola como pestaña nueva (con su nombre). Aquí solo se ponen el ícono y el nombre de las secciones conocidas.
+export const SECCIONES_CLUB = [
+  { id: "proyectos", ic: "🧭", t: "Proyectos" },
+  { id: "beneficios", ic: "🎁", t: "Beneficios" },
+  { id: "retos", ic: "🎯", t: "Retos" },
+  { id: "ganar", ic: "⭐", t: "Cómo ganar" },
+  { id: "novedades", ic: "📣", t: "Novedades" }
+];
+export const nombreSeccion = (id) => { const s = SECCIONES_CLUB.find((x) => x.id === id); return s ? { ic: s.ic, t: s.t } : { ic: "✨", t: String(id).replace(/-/g, " ").replace(/^./, (c) => c.toUpperCase()) }; };
+
+// Fondos de la tarjeta: intensidad del velo claro que se pone sobre la foto para que el texto se lea siempre
+export const VELOS = [{ id: "suave", t: "Suave", a: 0.4 }, { id: "medio", t: "Medio", a: 0.62 }, { id: "fuerte", t: "Fuerte", a: 0.8 }];
 
 // Las tres letras del número de Cuate → perfil (por si el nombre del perfil cambiara)
 export const PREFIJO_A_PERFIL = { VEC: "vecino", VOL: "voluntario", PAD: "padrino", ALI: "aliado", PAT: "patrocinador", ORG: "organizacion" };

@@ -88,7 +88,7 @@ export const MODALIDADES = [
 export const CLUB_REGLAS = [
   "Es un club comunitario: no tiene cuotas y no te hace socio(a) ni empleado(a) de DCUATES.",
   "«Puede incluir» son ideas de lo que el Club ofrece según lo disponible; no son promesas ni derechos.",
-  "Tu registro queda «En revisión». Cuando DCUATES lo apruebe, en «Consulta tu folio» verás que ya eres Cuate y tu constancia, y DCUATES te mandará por WhatsApp tu número de Cuate y tu código para abrir tu tarjeta digital.",
+  "Tu registro queda «En revisión». Cuando DCUATES lo apruebe, en «Consulta tu folio» verás que ya eres Cuate y tu constancia, y DCUATES te mandará por WhatsApp tu número de Cuate y tu PIN para abrir tu Pase digital y la Zona CUATES.",
   "Al ser Cuate recibes 100 puntos de bienvenida, que se canjean por recursos de la comunidad (un libro digital, una recomendación, un curso o taller, un regalo sorpresa…) según lo disponible. Los puntos son un reconocimiento: no valen dinero.",
   "La constancia es un reconocimiento comunitario: no es un documento oficial ni una credencial."
 ];
