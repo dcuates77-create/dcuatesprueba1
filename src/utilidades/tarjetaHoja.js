@@ -29,6 +29,33 @@ export const MENSAJE_TARJETA = {
   red: "No pudimos verificar tu Pase ahora. Intenta más tarde o escríbenos por WhatsApp.",
   forma: "Escribe tu PIN."
 };
+// Respuestas del canje (e67)
+export const MENSAJE_CANJE = {
+  puntos: "Tus puntos disponibles no alcanzan para este premio (los de canjes pendientes ya están apartados).",
+  agotado: "Ese premio se agotó por ahora. Revisa los otros o vuelve pronto.",
+  limite: "Ya usaste todas las veces que puedes canjear este premio.",
+  ya: "Ya tienes un canje de este premio en proceso. Míralo en «Mis canjes».",
+  premio: "Ese premio ya no está disponible. Actualiza tu Pase.",
+  clave: "Tu PIN ya no es válido. Vuelve a entrar a tu Pase.",
+  ocupado: "Hay muchos intentos en este momento. Espera un minuto e inténtalo de nuevo.",
+  red: "No pudimos registrar tu canje (sin conexión). Inténtalo de nuevo en un momento."
+};
+export const ESTADO_CANJE = { pendiente: { ic: "🕓", t: "Pendiente" }, listo: { ic: "📦", t: "Listo para entregar" }, entregado: { ic: "✅", t: "Entregado" }, cancelado: { ic: "✖️", t: "Cancelado" } };
+
+// Pide un canje. Devuelve { ok:true, canje, tarjeta } o { ok:false, motivo }.
+export const pedirCanje = async (pin, premio) => {
+  try {
+    const k = String(pin || "").trim();
+    if (!k || !premio) return { ok: false, motivo: "clave" };
+    if (!GOOGLE_SHEETS_URL) return { ok: false, motivo: "red" };
+    const r = await fetch(GOOGLE_SHEETS_URL + (GOOGLE_SHEETS_URL.includes("?") ? "&" : "?") + "a=canjear&k=" + encodeURIComponent(k) + "&p=" + encodeURIComponent(premio));
+    const j = await r.json();
+    if (j && j.ok && j.canje && j.tarjeta) return { ok: true, canje: j.canje, tarjeta: j.tarjeta };
+    if (j && j.ok && j.ocupado) return { ok: false, motivo: "ocupado" };
+    if (j && j.motivo && MENSAJE_CANJE[j.motivo]) return { ok: false, motivo: j.motivo };
+    return { ok: false, motivo: "red" };
+  } catch (e) { return { ok: false, motivo: "red" }; }
+};
 
 // Devuelve { ok:true, tarjeta } o { ok:false, motivo }.
 export const pedirTarjeta = async (pin, numero = "") => {
@@ -95,6 +122,13 @@ export function useTarjeta(activo) {
     return r;
   }, []);
 
+  // Pide un premio. Si sale bien, el Pase se actualiza con lo que devuelve la hoja (puntos comprometidos, «Mis canjes»…).
+  const canjear = useCallback(async (premio) => {
+    const r = await pedirCanje(pinGuardado(), premio);
+    if (r.ok) { escribir(LLAVE_DATOS, r.tarjeta); setTarjeta(r.tarjeta); }
+    return r;
+  }, []);
+
   const salir = useCallback(() => { borrar(LLAVE); borrar(LLAVE_DATOS); borrar(LLAVE_PREF); setPrefs({}); prefsRef.current = {}; setTarjeta(null); setSinConexion(false); setAviso(""); avisarCambio(); }, []);
 
   // Guarda gustos. Devuelve false si el celular no tiene espacio (p. ej. la imagen es muy pesada).
@@ -106,7 +140,7 @@ export function useTarjeta(activo) {
     return ok;
   }, [tarjeta]);
 
-  return { tarjeta, cargando, sinConexion, aviso, prefs, entrar, salir, guardarPrefs };
+  return { tarjeta, cargando, sinConexion, aviso, prefs, entrar, salir, guardarPrefs, canjear };
 }
 
 // Imagen del celular → JPG reducido (cuadrado de 256 px para la foto; 720 px de ancho máx. para el fondo). Nunca sale del celular.
