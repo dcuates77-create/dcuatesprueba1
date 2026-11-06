@@ -64,7 +64,7 @@ import BotonCompartir from "./BotonCompartir";
 import { iniciarAnalitica, registrar } from "./analitica";
 import { iniciarPWA } from "./pwa";
 
-// Ventanas poco usadas: se descargan solo la primera vez que alguien las abre.
+// Ventanas poco usadas2: se descargan solo la primera vez que alguien las abre.
 const cargarVentanas = () => import("./componentes/ventanasPesadas.jsx");
 const ContenidoModalProyecto = lazy(() => cargarVentanas().then((m) => ({ default: m.ContenidoModalProyecto })));
 const ModalAccesoRapido = lazy(() => cargarVentanas().then((m) => ({ default: m.ModalAccesoRapido })));
