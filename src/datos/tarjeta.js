@@ -6,7 +6,7 @@
 // =========================================================================
 import { modalidadPorNombre } from "./club.js";
 
-export const PUNTOS_BIENVENIDA = 100;
+export const PUNTOS_BIENVENIDA = 50;
 export const TARJETA_TITULO = "DCUATES";
 export const TARJETA_LEMA = "¡COMPARTE Y GANA!";
 export const TARJETA_LEGAL = "Pase comunitario del Club DCUATES: no es una credencial oficial ni una identificación. Los puntos son un reconocimiento de la comunidad: no tienen valor en dinero y se canjean por los recursos disponibles.";

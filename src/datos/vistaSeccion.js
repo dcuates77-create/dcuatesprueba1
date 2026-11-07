@@ -54,9 +54,9 @@ export const VISTA = {
     intro: "Una causa sin valores se queda en buena intención, y los valores sin causa se quedan en palabras. En nuestra comunidad van de la mano: la confianza, la honestidad y la solidaridad que practicamos son las que permiten que cada ayuda llegue a quien la necesita, y cada causa nos hace vivir mejor esos valores.",
     extras: [
       { ico: "🙏", t: "Apoyo voluntario, donativos y casos", d: "Tu ayuda cambia vidas; reporta o consulta casos.", anidada: "slot" },
-      { ico: "📚", t: "Recursos y recomendaciones", d: "Música, libros, películas, recomendaciones y preguntas.", anidada: "valores" },
-      { ico: "🎥", t: "Videos y galería", d: "Lo que tu ayuda ya ha logrado.", anidada: "portada" }
+      { ico: "📚", t: "Recursos y recomendaciones", d: "Música, libros, películas, recomendaciones y preguntas.", anidada: "valores" }
     ],
+    reel: true, // e69: los videos y la galería van como reel justo después de la portada (ya no como botón)
     cta: { t: "¿Quieres ayudar hoy?", d: "Regístrate como voluntario o donante.", a: { ir: "donaciones" } },
     sumar: {
       img: "/images/sumar-causas.webp",
