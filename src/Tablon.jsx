@@ -51,7 +51,7 @@ export default function Tablon() {
   }, []);
   useEffect(() => { if (abierto && items === null) cargarPublicados().then(setItems); }, [abierto, items]);
   if (!abierto) return null;
-  const lista = (items || []).filter((x) => !filtro || x.sec === filtro);
+  const lista = (items || []).filter((x) => (filtro ? x.sec === filtro : x.sec !== "Muro de gratitud"));
   const irPagina = (a) => { cerrar(); setTimeout(() => ejecutar(a), 120); };
   const ofrecer = () => abrirRegistroPrevio("ofrezco");
   const necesitar = () => abrirRegistroPrevio("necesito");
