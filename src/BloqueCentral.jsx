@@ -769,7 +769,7 @@ export default function BloqueCentral({
     fichas: fichasJsx,
     manifiesto: <Manifiesto />,
     reservado: tab.id === "reservado" ? <IndiceReservado /> : null,
-    portada: tab.id === "causas" && hayPortada ? <CarruselPortada items={portadasItems[tab.id] || []} tab={tab} fallback={imgs[tab.id]} cargando={cargando} /> : null
+    portada: tab.id === "causas" && hayPortada ? <CarruselPortada items={portadasItems[tab.id] || []} tab={tab} slogan={cfg.reel ? "🎥 Videos que inspiran" : undefined} reel={!!cfg.reel} fallback={imgs[tab.id]} cargando={cargando} /> : null
   };
 
   return (
@@ -819,6 +819,7 @@ export default function BloqueCentral({
               onBoton={() => ejecutar(cfg.boton?.a)}
             />
           )}
+          {cfg.reel && nido.portada ? <div className="sn-reel" id="reel-videos" data-testid="reel-causas">{nido.portada}</div> : null}
           <div id="sn-tarjetas" className="bc-ancla" aria-hidden="true" />
           <h3 className="sn-p">{cfg.pregunta || tab.invitacion?.titulo}</h3>
           <p className="sn-i">{cfg.intro || tab.invitacion?.texto}</p>

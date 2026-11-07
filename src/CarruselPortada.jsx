@@ -45,15 +45,17 @@ function animarScroll(el, destino, ms, alTerminar) {
   return id;
 }
 
-export default function CarruselPortada({ items = [], tab, slogan, fallback, cargando = false, inverso = false, mayusculas = false }) {
+export default function CarruselPortada({ items = [], tab, slogan, fallback, cargando = false, inverso = false, mayusculas = false, reel = false }) {
   const pistaRef = useRef(null);
   const indiceRef = useRef(0);
   const animRef = useRef(null);
   const reanudarRef = useRef(null);
   const ignorarScrollHasta = useRef(0);
   const [pausado, setPausado] = useState(false);          // pausa temporal (al tocar)
-  const [pausaManual, setPausaManual] = useState(false);   // pausa elegida con el botón
+  // e69: en el reel, si la persona pidió «reducir movimiento» en su equipo, empieza en pausa (puede tocar «Reanudar»).
+  const [pausaManual, setPausaManual] = useState(() => !!reel && typeof window !== "undefined" && !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches);
   const [desborda, setDesborda] = useState(false);
+  const [pos, setPos] = useState(0);                       // e69: cuadro actual (para el indicador del reel)
   const [respaldoRoto, setRespaldoRoto] = useState(false);
   useEffect(() => { setRespaldoRoto(false); }, [fallback]);
 
@@ -125,6 +127,7 @@ export default function CarruselPortada({ items = [], tab, slogan, fallback, car
       const destino = posicionDe(sig);
       if (destino == null) return;
       indiceRef.current = sig;
+      if (n > 0) setPos(((sig % n) + n) % n);
       ignorarScrollHasta.current = Date.now() + ANIMACION_MS + 400;
       pista.style.scrollSnapType = "none";
       if (animRef.current) animRef.current.cancelado = true;
@@ -157,6 +160,7 @@ export default function CarruselPortada({ items = [], tab, slogan, fallback, car
       if (d < dist) { dist = d; mejor = i; }
     }
     indiceRef.current = mejor;
+    if (n > 0) setPos(mejor % n);
   };
 
   const pausarUnRato = () => {
@@ -199,8 +203,16 @@ export default function CarruselPortada({ items = [], tab, slogan, fallback, car
         ))}
       </div>
       {desborda && (
-        <div className="cp-pie">
-          <button type="button" className="cp-pausa" onClick={() => setPausaManual((v) => !v)} aria-pressed={pausaManual}>
+        <div className={"cp-pie" + (reel ? " cp-pie-reel" : "")}>
+          {reel && (
+            <div className="cp-ind" data-testid="reel-indicador">
+              <span className="cp-ind-t" aria-hidden="true">❮ Desliza ❯</span>
+              <span className="cp-puntos" role="img" aria-label={`Cuadro ${pos + 1} de ${n}`}>
+                {n <= 12 ? base.map((_, i) => <i key={i} className={i === pos ? "cp-on" : ""} />) : <b>{pos + 1} / {n}</b>}
+              </span>
+            </div>
+          )}
+          <button type="button" className="cp-pausa" data-testid="reel-pausa" onClick={() => setPausaManual((v) => !v)} aria-pressed={pausaManual}>
             {pausaManual ? "▶ Reanudar" : "❚❚ Pausar"}
           </button>
         </div>
@@ -269,6 +281,14 @@ button.cp-cuadro,a.cp-cuadro{cursor:pointer}
 @keyframes cp-brilla{from{background-position:200% 0}to{background-position:-200% 0}}
 @media (prefers-reduced-motion:reduce){.cp-brilla{animation:none}}
 .cp-pie{display:flex;justify-content:flex-end;margin-top:-2px}
+.cp-pie-reel{justify-content:space-between;align-items:center;gap:8px;margin-top:2px}
+.cp-pie-reel .cp-pausa{min-height:44px;padding:0 16px;font-size:13px;background:#0f2d1e;color:#fff}
+.cp-ind{display:flex;flex-direction:column;gap:3px;min-width:0}
+.cp-ind-t{font-size:12px;font-weight:900;letter-spacing:.04em;color:#0f2d1e;text-transform:uppercase}
+.cp-puntos{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.cp-puntos i{width:8px;height:8px;border-radius:50%;background:rgba(15,45,30,.25);display:block}
+.cp-puntos i.cp-on{width:20px;border-radius:99px;background:#E65100}
+.cp-puntos b{font-size:13px;font-weight:900;color:#0f2d1e}
 .cp-pausa{border:0;border-radius:99px;background:rgba(31,42,55,.09);color:#1f2a37;font-family:inherit;font-weight:800;font-size:12px;padding:6px 14px;min-height:32px;cursor:pointer}
 .cp-pausa:hover{background:rgba(31,42,55,.16)}
 .cp-root button:focus-visible,.cp-root a:focus-visible{outline:3px solid #1f2a37;outline-offset:2px}

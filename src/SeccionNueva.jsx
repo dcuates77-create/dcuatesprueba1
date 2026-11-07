@@ -149,6 +149,7 @@ export const CSS_SN = `.sn-micro{margin:6px 0 10px}.sn-micro-l{display:flex;flex
 .sn-reto-b .sn-b1{background:#BF360C;color:#fff;border:0}.sn-reto-b .sn-b2{background:#fff;color:#BF360C;border:2px solid #BF360C}
 
 .emo-img{display:inline-block;width:1.2em;height:1.2em;vertical-align:-0.2em}
+.sn-reel{margin:0 0 14px}.sn-reel .cp-root{margin-bottom:0}
 .sn-banner{margin:-6px calc(-1 * var(--pad,16px)) 14px;border-radius:0;overflow:hidden;background:#fff;box-shadow:0 6px 18px rgba(15,45,30,.2)}
 .sn-banner-img{display:block;width:100%;height:auto}
 .sn-banner-t{padding:14px 16px 12px;background:#fff}

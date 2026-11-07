@@ -138,7 +138,7 @@ export function ClubPasos() {
   const pasos = [
     ["1", "Elige tu modalidad y regístrate", "Toca «Únete» en la modalidad que te quede (vecino, voluntari@, aliad@…) y llena el formulario corto."],
     ["2", "DCUATES te revisa y te escribe", "Te mandamos por WhatsApp tu número de Cuate y tu PIN personal, con un enlace para abrir tu Pase."],
-    ["3", "Abre tu Pase y empieza a sumar", "Entra con tu PIN (solo la primera vez). Recibes 100 puntos de bienvenida y accedes a la Zona CUATES."]
+    ["3", "Abre tu Pase y empieza a sumar", "Entra con tu PIN (solo la primera vez). Recibes 50 puntos de bienvenida y accedes a la Zona CUATES."]
   ];
   return createPortal(
     <div className="clb-fondo" style={oculta ? { display: "none" } : undefined} role="dialog" aria-modal="true" aria-label="Cómo ser Cuate en 3 pasos" onClick={(e) => { if (e.target === e.currentTarget) cerrar(); }}>
