@@ -11,6 +11,7 @@
 //   Nombre y WhatsApp se agregan solos (WhatsApp de 10 dígitos obligatorio).
 // =========================================================================
 import { MODALIDADES } from "./club.js";
+import { EJEMPLOS_GRACIAS, EJEMPLOS_RECONOCIMIENTOS, SECCION_MURO, TIPOS_RECONOCIMIENTO } from "./gratitud.js";
 
 const NOMBRE = { k: "nombre", etiqueta: "Tu nombre", campo: "Nombre", req: true, max: 80, ph: "Ej. Ana López" };
 const WHATS = { k: "wa", etiqueta: "Tu WhatsApp", campo: "Contacto", req: true, max: 20, ph: "10 dígitos. Ej. 5512345678" };
@@ -92,13 +93,21 @@ export const REGISTROS = {
   regalo: R("regalo", "🎁", "Propón un regalo", "REG", "Propuesta", "Regalos",
     "Un regalo que motive a la comunidad. Cuéntanos qué podrías aportar.",
     [{ k: "d", etiqueta: "Tu propuesta de regalo", tipo: "area", max: 400, req: true }], { perfil: "Regalo", wa: "¡Hola DCUATES! Acabo de enviar una propuesta de regalo." }),
-  reconocimiento: R("reconocimiento", "🏅", "Propón un reconocimiento", "REC", "Propuesta", "Reconocimientos",
-    "¿A quién reconocemos? Cuéntanos por qué inspira.",
+  // e68 — «Gracias y reconocimientos» (fusionados): un solo registro con folio GRA-…. Si la persona autoriza, el mensaje queda en «Registros»
+  //        con Título, Texto y Firma públicos ya llenos; tú das el visto bueno poniendo «Sí» en «¿Publicar?» y sale en el Muro de gratitud.
+  gratitud: R("gratitud", "💛", "Deja un gracias o propón un reconocimiento", "GRA", "Gratitud", SECCION_MURO,
+    "Cuéntanos a quién quieres agradecer o reconocer y por qué. Lo revisamos y, si nos autorizas, lo publicamos en el Muro de gratitud.",
     [
-      { k: "a", etiqueta: "¿A quién propones?", max: 100, req: true },
-      { k: "p", etiqueta: "¿Por qué merece el reconocimiento?", tipo: "area", max: 400, req: true },
-      { k: "perm", etiqueta: "¿Esa persona sabe que la propones?", tipo: "opciones", opciones: ["Sí", "No"] },
-    ], { perfil: "Reconocimiento", wa: "¡Hola DCUATES! Acabo de proponer a alguien para un reconocimiento." }),
+      { k: "q", etiqueta: "¿Qué quieres hacer?", tipo: "opciones", opciones: ["Dar las gracias a alguien", "Proponer un reconocimiento"], req: true },
+      { k: "a", pub: "Titulo", etiqueta: "¿A quién?", ph: "Nombre de la persona, negocio u organización", max: 90, req: true },
+      { k: "p", pub: "Texto", etiqueta: "¿Por qué?", tipo: "area", ph: "Cuéntanos qué hizo y cómo ayudó", max: 400, req: true },
+      { k: "t", pub: "Categoria", etiqueta: "Tipo de reconocimiento (si aplica)", tipo: "opciones", opciones: TIPOS_RECONOCIMIENTO },
+      { k: "firma", pub: "Firma", etiqueta: "Si lo publicamos, ¿cómo lo firmamos?", tipo: "opciones", opciones: ["Con mi nombre", "Como «Alguien de la comunidad»"] },
+      { k: "perm", pub: "Permiso", etiqueta: "¿Autorizas que publiquemos este mensaje en el Muro de gratitud, sin tu teléfono?", tipo: "opciones", opciones: ["Sí, publíquenlo", "No, solo para DCUATES"], req: true },
+      { k: "sabe", etiqueta: "¿Esa persona sabe que la mencionas?", tipo: "opciones", opciones: ["Sí", "No", "No sé"] },
+    ], { perfil: "Gratitud", seccion: SECCION_MURO, sinTablon: true, relacionados: ["reto", "regalo", "invitar"],
+      ejemplos: { boton: "👀 Ver ejemplos", titulo: "Ejemplos de reconocimientos", items: EJEMPLOS_RECONOCIMIENTOS, titulo2: "Ejemplos de «gracias»", items2: EJEMPLOS_GRACIAS },
+      wa: "¡Hola DCUATES! Quiero dejar un gracias o proponer un reconocimiento." }),
   extraviado: R("extraviado", "🐾", "Reportar un caso", "EXT", "Caso extraviado", "Extraviados",
     "Mascota, persona o cosa extraviada. Si es una persona en peligro, llama primero al 911.",
     [
@@ -243,7 +252,7 @@ export const opcionAportacion = (t) => {
 // =========================================================================
 // Campo opcional de evidencia: se guarda en la columna «Evidencia (enlace)» de «Registros». Las fotos también pueden mandarse por WhatsApp con el folio.
 const EVID = { k: "evid", pub: "Evidencia", etiqueta: "Enlace de fotos o evidencia", max: 300, ph: "Pega un enlace (Drive, Facebook…) o mándalas por WhatsApp al terminar" };
-const CON_EVIDENCIA = ["extraviado", "aportacion", "reconocimiento", "reto", "regalo", "ecatepets", "ofrezco", "necesito", "ventas", "bazar", "iniciativa", "libros"];
+const CON_EVIDENCIA = ["extraviado", "aportacion", "reto", "regalo", "ecatepets", "ofrezco", "necesito", "ventas", "bazar", "iniciativa", "libros"];
 // Lado de la dinámica OFREZCO / NECESITO (columna «Lado» de «Registros»). Vacío = mixto.
 const LADOS = {
   ofrezco: "Ofrezco", necesito: "Necesito", solicitud: "Necesito", asesorias: "Necesito", bienestar: "Necesito", interes: "Necesito", extraviado: "Necesito", interesa: "Necesito",
@@ -269,9 +278,9 @@ const RELACIONADOS = {
   necesito: ["ofrezco", "solicitud", "asesorias"],
   interesa: ["ofrezco", "necesito"],
   iniciativa: ["alianza", "voluntario", "invitar"],
-  reto: ["regalo", "reconocimiento", "invitar"],
-  regalo: ["reto", "reconocimiento", "aportacion"],
-  reconocimiento: ["reto", "regalo", "invitar"],
+  reto: ["regalo", "gratitud", "invitar"],
+  regalo: ["reto", "gratitud", "aportacion"],
+  gratitud: ["reto", "regalo", "invitar"],
   horario: ["alianza", "ventas", "noticias"],
   invitar: ["difusion", { reg: "voluntario", e: "🤝", t: "QUIERO APOYAR" }, { reg: "necesito", e: "🙏", t: "NECESITO ALGO" }, { acc: "beneficios", e: "🎁", t: "VER BENEFICIOS" }, "recomendar"],
   difusion: ["invitar", { reg: "voluntario", e: "🤝", t: "QUIERO APOYAR" }, { acc: "beneficios", e: "🎁", t: "VER BENEFICIOS" }, "reto"],

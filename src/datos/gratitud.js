@@ -12,3 +12,19 @@ export const AGRADECIMIENTOS = [
   { id: "negocios", ico: "🏪", perfil: "Negocios que suman", t: "A los negocios emergentes y a los que suman a las causas", d: "Gracias a quienes emprenden y, además, donan, dan descuentos, difunden o se alían con la comunidad. Compramos local porque ustedes creen en nosotros." },
   { id: "otras", ico: "💚", perfil: "Otras áreas", t: "A quienes ayudan en otras áreas", d: "Gracias a quienes prestan un libro, avisan de algo importante, ofrecen su tiempo o simplemente están cuando se les necesita. Lo pequeño también suma." }
 ];
+
+// e68 — EJEMPLOS que se ven al tocar «Ver ejemplos» (en el Muro y en el registro de gratitud). Cámbialos cuando quieras.
+export const EJEMPLOS_RECONOCIMIENTOS = [
+  "🏆 Vecino/a del Mes: por su ayuda constante a la comunidad.",
+  "🏪 Negocio con Causa del Mes: por apoyar a familias y causas sociales.",
+  "🤝 Voluntario/a Constante: por sumar tiempo y talento sin descanso.",
+  "🐾 Héroe/Heroína de Ecatepets: por rescatar, cuidar o dar hogar a una mascota.",
+  "👩‍🏫 Promotor/a de la Lectura: por acercar libros y educación a niñas y niños."
+];
+export const EJEMPLOS_GRACIAS = [
+  "«Gracias a Doña Mary, que cada semana presta su patio para el taller de lectura de los niños.»",
+  "«Gracias a la tienda de la esquina, que guardó mi pedido cuando no pude pasar por él.»",
+  "«Gracias a Luis, que me acompañó a mis citas cuando mi mamá estuvo enferma.»"
+];
+export const TIPOS_RECONOCIMIENTO = ["Vecino/a del Mes", "Negocio con Causa", "Voluntario/a Constante", "Héroe/Heroína de Ecatepets", "Promotor/a de la Lectura", "Otro"];
+export const SECCION_MURO = "Muro de gratitud";

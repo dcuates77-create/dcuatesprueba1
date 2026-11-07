@@ -95,16 +95,15 @@ export const VISTA = {
       { ico: "🎁", t: "Retos, regalos y reconocimientos", d: "Participa, comparte y envía tus propuestas.", anidada: "regalos" },
       { ico: "🎮", t: "Juega y diviértete", d: "Juegos DCUATES y tableros de regalos.", a: { zona: "juegos" } },
       { ico: "🏆", t: "Juega y gana", d: "Retos con premio para la comunidad.", a: { zona: "gana" } },
-      { ico: "🙏", t: "Reconocimientos", d: "Gracias por hacer el bien.", anidada: "slot" },
-      { ico: "💛", t: "Muro de gratitud", d: "Mensajes de la comunidad.", anidada: "muro" },
+      { ico: "💛", t: "Muro de gratitud y reconocimientos", d: "Deja un gracias, propón un reconocimiento y lee a la comunidad.", anidada: "muro" },
       { ico: "🤝", t: "Patrocinadores y alianzas", d: "Quienes nos ayudan a crecer.", a: { proy: "patrocinadores-alianzas" } }
     ],
-    cta: { t: "Cuéntanos a quién quieres agradecer", d: "Escríbenos por WhatsApp.", a: { wa: "¡Hola DCUATES! Quiero agradecer a alguien de la comunidad." } },
+    cta: { t: "Cuéntanos a quién quieres agradecer", d: "Regístrate en un minuto y recibe tu folio.", a: { reg: "gratitud" } },
     sumar: {
       img: "/images/sumar-regalos.jpg",
       titulo: "Suma con un reto, un regalo o un gracias",
       texto: "Compartir también es sumar. Propón un reto, regala una sonrisa, reconoce a alguien o patrocina un proyecto.",
-      botones: [{ t: "Propón un reto o regalo", a: { wa: "¡Hola DCUATES! Tengo una propuesta de reto o regalo." } }, { t: "Quiero ser patrocinador", a: { proy: "patrocinadores-alianzas" } }]
+      botones: [{ t: "Deja un gracias o reconocimiento", a: { reg: "gratitud" } }, { t: "Propón un reto o regalo", a: { wa: "¡Hola DCUATES! Tengo una propuesta de reto o regalo." } }, { t: "Quiero ser patrocinador", a: { proy: "patrocinadores-alianzas" } }]
     }
   },
   // OCTAVA PESTAÑA «Reservado» (e52): solo administración (?admin=1). Su contenido vive en tu hoja de Google.

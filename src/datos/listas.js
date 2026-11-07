@@ -263,6 +263,7 @@ export const RETOS_REGALOS_ITEMS = [
       "🐾 Héroe/Heroína de Ecatepets: por rescatar, cuidar o dar hogar a una mascota.",
       "👩‍🏫 Promotor/a de la Lectura: por acercar libros y educación a niñas y niños."
     ],
+    reg: "gratitud", // e68: abre el registro «Deja un gracias o propón un reconocimiento»
     cta: "🏅 Propón a quien merece un RECONOCIMIENTO",
     enlace: enlaceWhatsApp("¡Hola DCUATES! Quiero proponer a alguien para un Reconocimiento que inspira.")
   }
