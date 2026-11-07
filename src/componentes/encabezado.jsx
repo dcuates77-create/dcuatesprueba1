@@ -11,6 +11,40 @@ import { enlaceWhatsApp, irASeccion } from "../utilidades/baserow.js";
 import { registrar, registrarBusquedaVacia } from "../analitica";
 import BotonCompartir from "../BotonCompartir.jsx";
 
+// e68 (D454) — «¿No lo encontraste?»: abre la misma pregunta en un buscador o IA externa, en pestaña nueva.
+// El texto escrito se envía a ese servicio (no a DCUATES). Gemini no admite texto prellenado: se copia al portapapeles.
+const FUERA = [
+  ["Google", "🔎", (q) => "https://www.google.com/search?q=" + q],
+  ["ChatGPT", "💬", (q) => "https://chatgpt.com/?q=" + q],
+  ["Perplexity", "🧭", (q) => "https://www.perplexity.ai/search?q=" + q],
+  ["Copilot", "🪁", (q) => "https://copilot.microsoft.com/?q=" + q],
+  ["Claude", "✨", (q) => "https://claude.ai/new?q=" + q],
+  ["Gemini", "♊", () => "https://gemini.google.com/app", true]
+];
+export function BuscarFuera({ texto }) {
+  const q = String(texto || "").trim();
+  const [aviso, setAviso] = useState("");
+  if (q.length < 2) return null;
+  const ir = (nombre, url, copiar) => {
+    registrar("buscar_fuera", { a: nombre });
+    if (copiar) { try { navigator.clipboard && navigator.clipboard.writeText(q); setAviso("Copiamos tu pregunta: pégala en Gemini."); } catch (e) { setAviso("Escribe tu pregunta en Gemini."); } }
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+  return (
+    <div data-testid="buscar-fuera" style={{ borderTop: "1px solid #e3ece6", margin: "6px 12px 4px", paddingTop: 8 }}>
+      <p style={{ margin: "0 0 6px", fontSize: 13, fontWeight: 900, color: "#17472d" }}>¿No lo encontraste? Pregúntalo fuera de DCUATES:</p>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+        {FUERA.map(([n, e, f, copiar]) => (
+          <button key={n} type="button" onClick={() => ir(n, f(encodeURIComponent(q)), copiar)} style={{ minHeight: 44, padding: "0 12px", borderRadius: 999, border: "2px solid #17472d", background: "#fff", color: "#17472d", font: "inherit", fontWeight: 800, fontSize: 13, cursor: "pointer" }}>
+            <span aria-hidden="true">{e}</span> {n}
+          </button>
+        ))}
+      </div>
+      <p style={{ margin: "6px 0 0", fontSize: 12, fontWeight: 700, color: "#5b6b62", lineHeight: 1.3 }}>{aviso || "Se abre en otra pestaña y tu texto se envía a ese servicio. DCUATES no lo controla."}</p>
+    </div>
+  );
+}
+
 export function BarraBusqueda({ onAbrirProyecto, onAbrirCategoria, onAbrirFAQ, abierta, setAbierta }) {
   const [texto, setTexto] = useState("");
   const inputRef = React.useRef(null);
@@ -102,6 +136,7 @@ export function BarraBusqueda({ onAbrirProyecto, onAbrirCategoria, onAbrirFAQ, a
           </span>
         </button>
       ))}
+      <BuscarFuera texto={texto} />
     </div>, destino) : null;
 
   if (!abierta) {
@@ -163,6 +198,7 @@ export function BarraBusqueda({ onAbrirProyecto, onAbrirCategoria, onAbrirFAQ, a
                 </button>
               ))
             )}
+            <BuscarFuera texto={texto} />
           </div>
         )}
         <div className="mt-3 flex justify-end">
@@ -182,13 +218,13 @@ export function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirTerminos, onA
   const claseFila = "w-full flex items-center gap-3 px-4 py-2.5 text-left uppercase tracking-wide text-[11px] sm:text-xs font-black hover:bg-emerald-50 transition-colors";
   const claseIcono = "flex h-7 w-7 sm:h-9 sm:w-9 md:h-10 md:w-10 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-[#0f2d1e] transition-colors hover:bg-emerald-50";
   return (
-    <header className="border-b border-emerald-800/20 bg-white/95 py-2 px-4 shadow-sm text-slate-900 relative">
-      <div className="mx-auto flex items-center gap-3 max-w-6xl">
+    <header className="border-b border-emerald-800/20 bg-white/95 py-2 px-2 min-[360px]:px-4 shadow-sm text-slate-900 relative">
+      <div className="mx-auto flex items-center gap-2 min-[400px]:gap-3 max-w-6xl">
 
         {/* Logo + nombre — siempre primero, en la misma fila que las redes en móvil */}
         <div className="order-1 flex items-center gap-2 sm:gap-3 min-w-0 flex-1 md:flex-none">
         <a href="#inicio" className="flex items-center gap-2 sm:gap-3 shrink-0">
-          <span className="flex h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 items-center justify-center rounded-full overflow-hidden bg-[#0f2d1e] border-2 border-[#0f2d1e]/20 shadow-sm shrink-0">
+          <span className="flex h-11 w-11 min-[360px]:h-[52px] min-[360px]:w-[52px] min-[400px]:h-16 min-[400px]:w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 items-center justify-center rounded-full overflow-hidden bg-[#0f2d1e] border-2 border-[#0f2d1e]/20 shadow-sm shrink-0">
             <img
               src="/images/logo-circular.webp"
               alt="Logo DCUATES"
@@ -200,8 +236,8 @@ export function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirTerminos, onA
             />
           </span>
           <div className="flex flex-col leading-none">
-            <span className="text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-tight text-[#0f2d1e]">DCUATES</span>
-            <span className="text-xs sm:text-sm md:text-base font-black uppercase tracking-wide text-[#e65100] -mt-0.5">¡Comparte y Gana!</span>
+            <span className="text-xl min-[360px]:text-2xl min-[400px]:text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-tight text-[#0f2d1e]">DCUATES</span>
+            <span className="text-[10px] min-[360px]:text-xs sm:text-sm md:text-base font-black uppercase tracking-wide text-[#e65100] -mt-0.5 whitespace-nowrap">¡Comparte y Gana!</span>
           </div>
         </a>
         </div>
@@ -209,7 +245,7 @@ export function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirTerminos, onA
         {/* Íconos a la derecha, en dos filas: arriba las redes; abajo la lupa
             (bajo YouTube) y el menú de tres rayas (bajo TikTok). */}
         <div className="order-2 ml-auto flex flex-col items-end gap-1.5 sm:gap-2 shrink-0">
-          <div className="flex items-center gap-1.5 sm:gap-3">
+          <div className="flex items-center gap-1 min-[400px]:gap-1.5 sm:gap-3">
           <a href={REDES_SOCIALES.facebook} target="_blank" rel="noreferrer" className="flex h-7 w-7 sm:h-9 sm:w-9 md:h-10 md:w-10 items-center justify-center rounded-lg border border-emerald-800/20 bg-white text-emerald-800 transition-colors hover:bg-emerald-50" title="Facebook">
             <svg className="h-4 w-4 sm:h-5 sm:w-5 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" />

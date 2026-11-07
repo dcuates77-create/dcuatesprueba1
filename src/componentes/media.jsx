@@ -72,6 +72,9 @@ export function BotonesRetosRegalos({ indices }) {
                     </li>
                   ))}
                 </ul>
+                {item.reg ? (
+                  <button type="button" onClick={() => window.dispatchEvent(new CustomEvent("dcuates:registro-previo", { detail: { id: item.reg } }))} className="block w-full text-center rounded-full bg-[#17472d] hover:bg-[#0f2d1e] text-white font-black uppercase text-[11px] sm:text-xs tracking-wide px-4 py-2.5 transition-colors min-h-[44px]">{item.cta}</button>
+                ) : (
                 <a
                   href={item.enlace}
                   target="_blank"
@@ -80,6 +83,7 @@ export function BotonesRetosRegalos({ indices }) {
                 >
                   {item.cta}
                 </a>
+                )}
               </div>
             )}
           </div>
