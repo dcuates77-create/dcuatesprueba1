@@ -95,7 +95,8 @@ export const VISTA = {
       { ico: "🎁", t: "Retos, regalos y reconocimientos", d: "Participa, comparte y envía tus propuestas.", anidada: "regalos" },
       { ico: "🎮", t: "Juega y diviértete", d: "Juegos DCUATES y tableros de regalos.", a: { zona: "juegos" } },
       { ico: "🏆", t: "Juega y gana", d: "Retos con premio para la comunidad.", a: { zona: "gana" } },
-      { ico: "💛", t: "Muro de gratitud y reconocimientos", d: "Deja un gracias, propón un reconocimiento y lee a la comunidad.", anidada: "muro" },
+      { ico: "💛", t: "Gracias y reconocimientos", d: "Registra un gracias o propón un reconocimiento.", a: { gr: "registrar" } },
+      { ico: "🗣️", t: "Muro de gratitud", d: "Lo que dice la comunidad.", a: { gr: "muro" } },
       { ico: "🤝", t: "Patrocinadores y alianzas", d: "Quienes nos ayudan a crecer.", a: { proy: "patrocinadores-alianzas" } }
     ],
     cta: { t: "Cuéntanos a quién quieres agradecer", d: "Regístrate en un minuto y recibe tu folio.", a: { reg: "gratitud" } },

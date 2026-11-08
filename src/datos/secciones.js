@@ -23,6 +23,7 @@ export function ejecutar(a, abrirProyecto = () => {}) {
   else if (a.logros) abrirLogros();
   else if (a.acc) ev("dcuates:abrir-acceso", a.acc);
   else if (a.reg) ev("dcuates:registro-previo", typeof a.reg === "string" ? { id: a.reg } : a.reg);
+  else if (a.gr) ev("dcuates:abrir-gratitud", a.gr);
   else if (a.micro) ev("dcuates:abrir-micro", a.micro);
   else if (a.elegir) ev("dcuates:elegir-puerta");
   else if (a.bienvenida) ev("dcuates:bienvenida");
