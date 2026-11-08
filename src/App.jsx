@@ -22,7 +22,7 @@ import { BOTONES_PORTADA, CATEGORIAS_PROYECTOS, DEGRADADO_SUGERENCIAS, LOGOS_EXT
 import { detectarVideo, esPDF, galeriaDesdeColumna, irASeccion, paresBaserow, primerosValores, resolverSrcImagen, tituloProyecto, urlDesdeCeldaBaserow, useCarruselAutomatico, useFilasEnlaces, useFilasZona } from "./utilidades/baserow.js";
 import BloqueCentral, { CarruselFinal, TABS as TABS_BC, ID_A_TAB } from "./BloqueCentral";
 import InicioNuevo from "./InicioNuevo.jsx";
-import MuroGratitud from "./MuroGratitud.jsx";
+import GratitudVentanas from "./GratitudVentanas.jsx";
 import OpinionRapida from "./OpinionRapida.jsx";
 import Reservado from "./Reservado.jsx";
 import InvitaVecino from "./InvitaVecino.jsx";
@@ -699,7 +699,6 @@ export default function App() {
               nosotros={<PestanaNosotros  />}
               finales={finalesSecciones}
               colofon={colofon}
-              muro={<MuroGratitud filas={filasEnlaces} />}
               partes={{ qs: <PNQuienes />, mision: <PNMision />, sumar: <PNSumar /> }}
               causas={<PestanaCausas apoyoCausaAnimalLinks={apoyoCausaAnimalLinks} apoyoCosasCasosLinks={apoyoCosasCasosLinks} apoyoPersonasExtraviadasLinks={apoyoPersonasExtraviadasLinks} extraviadosResumenAbierto={extraviadosResumenAbierto} setExtraviadosResumenAbierto={setExtraviadosResumenAbierto} />}
             />
@@ -713,6 +712,7 @@ export default function App() {
       <MicroAcciones />
       <RegistroPrevio />
       <Tablon />
+      <GratitudVentanas filas={filasEnlaces} />
       <ConsultaFolio />
       <ClubInfo />
       <ClubPasos />
