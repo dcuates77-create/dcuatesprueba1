@@ -88,6 +88,7 @@ function Guia({ p, onCerrar, onAbrirProyecto, modo, setModo }) {
 }
 
 export const abrirPuerta = (id) => window.dispatchEvent(new CustomEvent("dcuates:abrir-puerta", { detail: id }));
+export const abrirVentanaEntrada = (v) => window.dispatchEvent(new CustomEvent("dcuates:ventana-entrada", { detail: v })); // "hoy" | "explora"
 export const elegirPuerta = () => window.dispatchEvent(new CustomEvent("dcuates:elegir-puerta"));
 const avisa = () => window.dispatchEvent(new CustomEvent("dcuates:puerta-cambio"));
 const leerPuerta = () => { const id = lee("dc_puerta"); return id && puertaPorId(id) ? id : null; };
@@ -212,10 +213,17 @@ function BotonLetraLista() {
   return <div className="zj-col"><button type="button" style={{ background: "#334155" }} onClick={ciclarLetra}>🔠 Tamaño de letra: {NOMBRES_LETRA[n]} (toca para cambiar)</button></div>;
 }
 
-export default function EntradaDcuates({ onAbrirProyecto = () => {}, agenda = [], filasZona = [], negocios = [] }) {
+export default function EntradaDcuates({ onAbrirProyecto = () => {}, agenda = [], filasZona = [], negocios = [], anfitrion = false }) {
   const puerta = usaPuerta();
   const actual = puerta ? puertaPorId(puerta) : null;
   const [ven, setVen] = useState(null); // "hoy" | "explora"
+  // Con anfitrion (portada v2) esta instancia atiende abrirVentanaEntrada("hoy" | "explora") desde las tarjetas nuevas.
+  useEffect(() => {
+    if (!anfitrion) return undefined;
+    const f = (e) => setVen(e.detail === "explora" ? "explora" : "hoy");
+    window.addEventListener("dcuates:ventana-entrada", f);
+    return () => window.removeEventListener("dcuates:ventana-entrada", f);
+  }, [anfitrion]);
   const modoAct = actual ? Math.min(leerModo(actual.id), actual.modos.length - 1) : 0;
   const dif = puertaPorId("dificil");
   const T = [

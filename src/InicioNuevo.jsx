@@ -29,7 +29,7 @@ const TILES = [
   ["cierre", "/images/eclipse.svg", "Súmate", "Tu parte hace la diferencia", "#E65100"]
 ];
 
-function Hoja({ abierta, onCerrar, titulo, children }) {
+export function Hoja({ abierta, onCerrar, titulo, children }) {
   const oculta = useAtras(abierta, onCerrar, { hub: true });
   if (!abierta) return null;
   return createPortal(
@@ -49,7 +49,7 @@ function Hoja({ abierta, onCerrar, titulo, children }) {
 const ATAJOS = ["Libros", "Mascotas", "Asesorías", "Negocios", "Apoyo", "Eventos", "Voluntariado", "Donar", "Cursos", "Empleo", "Cupones", "Seguridad"];
 
 // Atajos que avanzan solos (como carrusel); al tocar o deslizar con el dedo se detienen unos segundos.
-function Atajos() {
+export function Atajos() {
   const ref = useRef(null);
   const pausa = useRef(0);
   useEffect(() => {
@@ -226,7 +226,7 @@ export default function InicioNuevo({ onIr, logros = [], cargando = false, entra
   );
 }
 
-const CSS = `
+export const CSS = `
 .vi-root{background:#fbf7ec;color:#0f2d1e;font-family:"Nunito",ui-rounded,system-ui,sans-serif;padding:12px 12px 20px;border-radius:0 0 24px 24px}
 .vi-root *{font-family:inherit}
 .vi-hero{position:relative;overflow:hidden;border-radius:26px;background:#14532d;box-shadow:0 8px 22px rgba(15,45,30,.22)}
