@@ -556,7 +556,7 @@ export function BotonNecesidades({ onAbrirProyecto, onAccionEspecial, onAbrirFAQ
                   style={{ background: "#14532d", color: "#fff" }}
                 >
                   <span className="text-2xl" aria-hidden="true">➕</span>
-                  AGENDA PLUS: agenda, mapas, tablero y directorio
+                  AGENDA: calendario, mapas, tablero, directorio y más
                 </button>
                 <button
                   type="button"
