@@ -84,14 +84,15 @@ if (typeof console !== "undefined") console.info("[DCUATES] versión", VERSION_B
 // =========================================================================
 // 2. COMPONENTE PRINCIPAL (INICIO DEL RENDERIZADO) CLON12
 // =========================================================================
-// e71: portada nueva con ?v=2 (se recuerda en este celular); ?v=1 vuelve a la anterior.
+// Portadas de prueba: ?v=2 (tarjetas), ?v=3 (mosaico), ?v=4 (ruta); se recuerda en este celular. ?v=1 vuelve a la anterior.
 function leerV2() {
   try {
     const v = new URLSearchParams(window.location.search).get("v");
-    if (v === "2") { localStorage.setItem("dcuates_v2", "1"); return true; }
-    if (v === "1") { localStorage.removeItem("dcuates_v2"); return false; }
-    return localStorage.getItem("dcuates_v2") === "1";
-  } catch (e) { return false; }
+    if (v === "2" || v === "3" || v === "4") { localStorage.setItem("dcuates_v2", v); return v; }
+    if (v === "1") { localStorage.removeItem("dcuates_v2"); return ""; }
+    const g = localStorage.getItem("dcuates_v2");
+    return g === "1" ? "2" : g === "2" || g === "3" || g === "4" ? g : "";
+  } catch (e) { return ""; }
 }
 
 export default function App() {
@@ -670,11 +671,14 @@ export default function App() {
       <div data-vista="inicio" style={vista === "inicio" ? undefined : { display: "none" }}>
         {usarV2 ? (
           <InicioV2
+            variante={usarV2}
             onIr={(id) => { irVista("seccion"); window.dispatchEvent(new CustomEvent("dcuates:abrir-seccion", { detail: id })); }}
             logros={logrosBanda}
             cargando={!baserowListo}
             entrada={{ agenda: agendaEventos, filasZona, negocios: negociosBaserow, onAbrirProyecto: (id) => setModalProyecto(id) }}
             portadas={{ inicio: portadasItems.inicio, club: portadasItems.club }}
+            anuncios={normalizarAnuncios(filasEnlaces)}
+            onSugerencias={() => setModalFormulario("sugerencias")}
           />
         ) : (
           <InicioNuevo
@@ -684,7 +688,7 @@ export default function App() {
             entrada={{ agenda: agendaEventos, filasZona, negocios: negociosBaserow, onAbrirProyecto: (id) => setModalProyecto(id) }}
           />
         )}
-        <InvitaVecino />
+        {!usarV2 && <InvitaVecino />}
       </div>
 
       {/* VISTA 2 · PROYECTOS (pestañas) */}
