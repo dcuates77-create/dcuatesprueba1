@@ -6,7 +6,7 @@
 //   JUEGO TITULO (nombre nuevo) · JUEGO ACTIVO (no = se oculta)
 // =========================================================================
 export const CONTEXTOS = [
-  { id: "nosotros", nombre: "Nosotros", emoji: "🏠", color: "#1B6F8A",
+  { id: "nosotros", nombre: "Nosotros", emoji: "🤝", color: "#1B6F8A",
     pares: ["📚", "🚲", "🐾", "🤝", "🎓", "🌱"], buenos: ["🤝", "💛", "🌟"], malo: "⚠️", heroe: "🪁",
     meta: "¡Sumaste amigos a la comunidad!" },
   { id: "beneficios", nombre: "Beneficios", emoji: "🎁", color: "#F07A1A",
