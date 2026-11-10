@@ -23,7 +23,7 @@ export function BotonPlus() {
     <>
       <button type="button" className="ap-btn" onClick={() => abrirPlus()}>
         <span className="ap-btn-e" aria-hidden="true">+</span>
-        <span className="ap-btn-t"><b>AGENDA PLUS</b><small>Agenda · Mapas · Tablero · Directorio</small></span>
+        <span className="ap-btn-t"><b>AGENDA</b><small>Agenda · Mapas · Tablero · Directorio</small></span>
       </button>
       <style>{`.ap-btn{display:flex;align-items:center;gap:10px;width:100%;margin-top:10px;min-height:58px;padding:8px 14px;border:2px solid #fff;border-radius:16px;background:#14532d;color:#fff;font-family:inherit;text-align:left;cursor:pointer;box-shadow:0 5px 12px rgba(0,0,0,.25)}.ap-btn:active{filter:brightness(.92)}.ap-btn-e{flex:none;width:34px;height:34px;border-radius:50%;background:#fff;color:#14532d;font-size:28px;font-weight:900;line-height:32px;text-align:center}.ap-btn-t{display:flex;flex-direction:column}.ap-btn-t b{font-size:17px;font-weight:900;letter-spacing:.04em;color:#fff}.ap-btn-t small{font-size:12.5px;font-weight:700;opacity:.95;color:#fff}`}</style>
     </>

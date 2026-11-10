@@ -9,6 +9,7 @@ import { useAtras } from "./atras.js";
 import { registrar } from "./analitica.js";
 import { abrirRegistroPrevio } from "./RegistroPrevio.jsx";
 import { haySesionPase } from "./utilidades/tarjetaHoja.js";
+import MiniPase, { CSS_MINIPASE } from "./MiniPase.jsx";
 import { MODALIDADES, CLUB_TITULO, CLUB_LEMA, CLUB_REGLAS, NARANJA_CLUB, MODALIDAD_DE_PUERTA, modalidadPorId } from "./datos/club.js";
 
 export const abrirClubInfo = () => window.dispatchEvent(new CustomEvent("dcuates:club-info"));
@@ -39,11 +40,12 @@ export function BotonPase({ desde = "inicio" }) {
   );
 }
 
-export default function ClubTarjeta() {
+export default function ClubTarjeta({ ejemplos = false }) {
   const tiene = useTienePase();
   return (
     <section className="clb-sec" aria-label="Únete al Club DCUATES">
       <style>{CSS}</style>
+      {ejemplos && <style>{CSS_MINIPASE + ".clb-ej .clb-b{flex-direction:column;align-items:stretch;gap:5px;text-align:center}.clb-ej .clb-b>span:first-child{font-size:inherit}.clb-ej .clb-b b{font-size:13px}"}</style>}
       <h2 className="clb-t">🧡 {CLUB_TITULO}</h2>
       <p className="clb-l">· {CLUB_LEMA} ·</p>
       {tiene ? (
@@ -54,10 +56,10 @@ export default function ClubTarjeta() {
         </>
       ) : (
         <>
-          <div className="clb-g">
+          <div className={"clb-g" + (ejemplos ? " clb-ej" : "")}>
             {MODALIDADES.map((m) => (
               <button key={m.id} type="button" className="clb-b" onClick={() => unirse(m, "inicio")}>
-                <span aria-hidden="true">{m.e}</span><b>{m.boton}</b>
+                {ejemplos ? <MiniPase id={m.id} grande /> : <span aria-hidden="true">{m.e}</span>}<b>{m.boton}</b>
               </button>
             ))}
           </div>

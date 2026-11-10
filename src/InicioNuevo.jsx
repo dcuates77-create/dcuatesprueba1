@@ -88,7 +88,7 @@ export function Atajos() {
 }
 
 // Imagen a un lado y botones al otro (como el cierre de cada sección).
-function BloqueLado({ img, titulo, texto, botones = [], sinBorde = false }) {
+export function BloqueLado({ img, titulo, texto, botones = [], sinBorde = false }) {
   const [fallo, setFallo] = useState(false);
   return (
     <section className={"vi-llama" + (sinBorde ? " vi-sinb" : "")} aria-label={titulo}>

@@ -13,7 +13,7 @@ const PASOS = [
 const RESTO = [
   ["🤝", "¿Necesitas apoyo o tienes una urgencia?", "Es el botón rosa de abajo: te orientamos sin pedir datos."],
   ["🧭", "Tour DCUATES", "Un recorrido guiado para recordar cómo moverte por la página."],
-  ["➕", "Agenda Plus", "Agenda, mapas, anuncios y directorio de la comunidad."],
+  ["➕", "Agenda", "Agenda, mapas, anuncios y directorio de la comunidad."],
   ["🗂️", "Las 6 secciones", "Los cuadros de más abajo (Nosotros, Causas, Negocios, Beneficios, Gratitud y Súmate) ordenan todo por tema."],
   ["🏆", "Logros", "Lo que ya hemos conseguido juntos, para que veas que sí se puede."]
 ];

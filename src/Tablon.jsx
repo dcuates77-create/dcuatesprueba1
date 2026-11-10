@@ -20,7 +20,7 @@ const COLOR = { Ofrezco: "#1F7A46", Necesito: "#B7791F", Adopciones: "#8a4fbf", 
 // «Otros»: lo que ofrece la página misma (e59). a = acción de src/datos/secciones.js · f = filtro del tablón
 const DE_LA_PAGINA = [
   ["🎮", "Juegos y Semillas", "Juega, aprende y suma Semillas para canjear.", { z: "juegos" }],
-  ["📌", "Clasificados y avisos", "Publica o consulta avisos de la comunidad (Agenda Plus).", { plus: 1 }],
+  ["📌", "Clasificados y avisos", "Publica o consulta avisos de la comunidad (Agenda).", { plus: 1 }],
   ["⭐", "Recomendaciones públicas", "Lo que la comunidad recomienda, para todo mundo.", null, "Recomendaciones"],
   ["🛍️", "Compra, vende y dona con causa", "Productos y servicios que apoyan una causa.", { z: "causa" }],
   ["🏆", "Gana cupones", "Participa y obtén beneficios.", { z: "gana" }]

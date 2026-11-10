@@ -3,7 +3,8 @@
 import React, { useEffect, useState } from "react";
 import EntradaDcuates, { elegirPuerta, abrirVentanaEntrada, abrirTour } from "./PuertasDcuates.jsx";
 import { BandaImpacto, TABS } from "./BloqueCentral.jsx";
-import { Hoja, Atajos, CSS as CSS_VI } from "./InicioNuevo.jsx";
+import { Hoja, Atajos, BloqueLado, CSS as CSS_VI } from "./InicioNuevo.jsx";
+import MiniPase, { CSS_MINIPASE } from "./MiniPase.jsx";
 import { proximos, fechaLinda } from "./utilidades/calendario.js";
 import { agendaDesdeZona } from "./datos/zona.js";
 import { ANUNCIOS_EJEMPLO, tipoAnuncio } from "./datos/plus.js";
@@ -43,7 +44,8 @@ const TRAZOS = {
   dar: "M12 20s-8-5-8-11a4.5 4.5 0 018-2.8A4.5 4.5 0 0120 9c0 6-8 11-8 11zM12 9v5M9.5 11.5h5",
   mas: "M12 5v14M5 12h14",
   flecha: "M9 6l6 6-6 6",
-  perinola: "M12 2v3M9.5 3.5h5M5.5 10c0-3 3-5 6.500-5s6.500 2 6.500 5l-6.500 11zM5.5 10h13M9 10l3.500 11M15 10l-3.500 11",
+  alzada: "M8 13V6.500a1.500 1.500 0 013 0V11M11 11V4.500a1.500 1.500 0 013 0V11M14 11V5.500a1.500 1.500 0 013 0V13M17 9.500a1.500 1.500 0 013 0V15c0 4-3 6-6.500 6S8.500 19.500 6.500 16.500L4.500 13a1.500 1.500 0 012.500-1.500L8 13",
+  compartir: "M18 8a3 3 0 100-6 3 3 0 000 6zM6 15a3 3 0 100-6 3 3 0 000 6zM18 22a3 3 0 100-6 3 3 0 000 6zM8.600 13.500l6.800 4M15.400 6.500l-6.800 4",
   premio: "M12 14a5 5 0 100-10 5 5 0 000 10zM8.5 13.5L7 21l5-3 5 3-1.5-7.5",
   llave: "M8 15a4 4 0 110-8 4 4 0 010 8zM11 11h10M17 11v3M20 11v2",
   escudo: "M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6zM8.5 12l2.5 2.5 4.5-5",
@@ -59,6 +61,7 @@ function Ico({ n, c = "#08743B", s = 26 }) {
 const C = {
   verde: { f: "#E9F6D5", b: "#cfe5b0", t: "#26531f", i: "#2C8A2E" },
   naranja: { f: "#FFF0D9", b: "#f5d9ac", t: "#6a4310", i: "#E06A12" },
+  amarillo: { f: "#FFF0A8", b: "#FFD84D", t: "#6b5200", i: "#C99700" },
   azul: { f: "#DCE8FF", b: "#bcd0f7", t: "#1f3f87", i: "#2B5BD7" }
 };
 
@@ -140,38 +143,19 @@ function Actividades({ agenda = [], filasZona = [], anuncios = [] }) {
   );
 }
 
-// Franja propia del Aviso de privacidad (e72).
-function FranjaAviso() {
-  return (
-    <section className="v2-aviso" aria-label="Aviso de privacidad">
-      <span className="v2-aviso-i"><Ico n="escudo" c="#08743B" s={34} /></span>
-      <span className="v2-aviso-t"><b>Tu privacidad importa</b><small>Cuidamos tus datos: solo los usamos para lo que tú pides y nunca los vendemos.</small></span>
-      <button type="button" className="v2-ver" onClick={() => { registrar("v2_aviso"); abrirLegal("privacidad"); }}>Leer aviso ›</button>
-    </section>
-  );
-}
-
-// Pie de página de la portada nueva.
-function Pie({ onIr, abrirParticipar, abrirClub, onSugerencias }) {
-  const chat = () => window.open("https://wa.me/" + WHATSAPP_NUMERO + "?text=" + encodeURIComponent("¡Hola DCUATES! Quiero ponerme en contacto."), "_blank", "noopener,noreferrer");
+// Pie de página: solo avisos legales y de seguridad, flanqueado por DCUATES COMUNIDAD.
+function Pie({ onSugerencias }) {
   const L = [
-    ["Nuestro DCUATES", () => onIr("nosotros")],
     ["Políticas de privacidad", () => abrirLegal("privacidad")],
-    ["Términos y condiciones", () => abrirLegal("terminos")],
-    ["Contacto", chat],
-    ["¿Cómo puedes participar?", abrirParticipar],
-    ["Club DCUATES", abrirClub],
-    ["Blog", () => window.open("https://chuytrujillo.blogspot.com/", "_blank", "noopener,noreferrer")],
-    ["Preguntas frecuentes", () => abrirLegal("faq")],
+    ["Aviso de privacidad", () => abrirLegal("privacidad")],
     ["Aviso de seguridad", () => abrirLegal("seguridad")],
     ["Escudo de seguridad", () => abrirLegal("escudo")],
-    ["Mapa del sitio", () => window.dispatchEvent(new CustomEvent("dcuates:abrir-acceso", { detail: "mapa" }))],
     ...(onSugerencias ? [["Sugerencias y quejas", onSugerencias]] : [])
   ];
   return (
     <footer className="v2-pie">
-      <div className="v2-pie-l"><img src="/images/logo-circular.webp" alt="" width="30" height="30" /><b>DCUATES</b><span>COMUNIDAD</span></div>
-      <nav className="v2-pie-n" aria-label="Información y avisos">
+      <div className="v2-pie-l"><img src="/images/logo-circular.webp" alt="" width="30" height="30" /><b>DCUATES COMUNIDAD</b></div>
+      <nav className="v2-pie-n" aria-label="Avisos">
         {L.map(([t, f]) => <button key={t} type="button" onClick={f}>{t}</button>)}
       </nav>
       <p>© {new Date().getFullYear()} DCUATES, un programa de CONEXIONES CON CAUSA ♥</p>
@@ -229,7 +213,7 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
   );
   const base = (
     <>
-      <Ancho n="perinola" fam="azul" t="¿CÓMO PUEDO PARTICIPAR?" sub="Empieza aquí: es fácil y gratis" f={abre("participar")} />
+      <Ancho n="alzada" fam="azul" t="¿CÓMO PUEDO PARTICIPAR?" sub="Empieza aquí: es fácil y gratis" f={abre("participar")} />
       <div className="v2-tres">
         {tres.map(([k, t, s, fam, ic]) => (
           <button key={k} type="button" className="v2-card" style={{ background: C[fam].f, borderColor: C[fam].b, boxShadow: "0 4px 0 " + C[fam].b }} onClick={abre(k)}>
@@ -240,27 +224,35 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
           </button>
         ))}
       </div>
-      <Ancho n="mano" fam="verde" t="COMPARTIMOS" sub="Lo que hay y se recomienda" f={compartir} />
+      <Ancho n="compartir" fam="verde" t="COMPARTIMOS" sub="Lo que hay y se recomienda" f={compartir} />
     </>
   );
-  // v3 «Mosaico»: cuadrícula grande, todo a un toque, sin pasos intermedios.
-  const mosaico = (
-    <section className="v3-mos" aria-label="Todo en un vistazo">
-      {[
-        ["perinola", "¿Cómo puedo participar?", "azul", abre("participar")],
-        ["carita", "Quiero conocer DCUATES", "azul", abre("conocer")],
-        ["corazon", "Causas y Beneficios", "naranja", abre("causas")],
-        ["tienda", "Negocios, alianzas y patrocinios", "verde", abre("negocios")],
-        ["mano", "COMPARTIMOS", "verde", compartir],
-        ["regalo", "OFREZCO", "verde", reg3[0][5]],
-        ["ayuda", "NECESITO", "naranja", reg3[1][5]],
-        ["agenda", "REGISTROS", "azul", reg3[2][5]]
-      ].map(([ic, t, fam, f]) => (
-        <button key={t} type="button" className="v3-t" style={{ background: C[fam].f, borderColor: C[fam].b, boxShadow: "0 4px 0 " + C[fam].b }} onClick={f}>
-          <Ico n={ic} c={C[fam].i} s={68} /><b>{t}</b>
-        </button>
-      ))}
-    </section>
+  // v3 «Impacto»: bandas de color sólido (índigo · coral · dorado · verde azulado), letras blancas y ícono grande.
+  const banda = (k, ic, t, sub, g, f, oscuro) => (
+    <button key={k} type="button" className={"v3-b" + (oscuro ? " v3-osc" : "")} style={{ background: g }} onClick={f}>
+      <span className="v3-b-i"><Ico n={ic} c="#fff" s={52} /></span>
+      <span className="v3-b-t"><b>{t}</b><small>{sub}</small></span>
+      <span className="v3-b-f"><Ico n="flecha" c={oscuro ? "#3b2a00" : "#fff"} s={22} /></span>
+    </button>
+  );
+  const solido = (
+    <>
+      <section className="v3-sol" aria-label="Explora DCUATES">
+        {banda("c", "carita", "Quiero conocer DCUATES", "Todos ganamos", "linear-gradient(120deg,#3B3FA8,#6A6FE0)", abre("conocer"))}
+        {banda("p", "alzada", "¿Cómo puedo participar?", "Empieza aquí: es fácil y gratis", "linear-gradient(120deg,#E8553F,#FF8F6B)", abre("participar"))}
+        {banda("a", "corazon", "Causas y Beneficios", "Apoya y gana", "linear-gradient(120deg,#F2A900,#FFD24D)", abre("causas"), true)}
+        {banda("n", "tienda", "Ganar-Ganar", "Negocios, alianzas y patrocinios", "linear-gradient(120deg,#0B6E66,#2BB3A3)", abre("negocios"))}
+        {banda("s", "compartir", "COMPARTIMOS", "Lo que hay y se recomienda", "linear-gradient(120deg,#12355B,#2B5C93)", compartir)}
+      </section>
+      <section className="v3-reg" aria-label="Registra aquí tu información">
+        <div className="v2-reg-t"><span className="v2-reg-i" style={{ background: "#12355B" }}><Ico n="mas" c="#fff" s={22} /></span><b>Registra aquí tu información</b></div>
+        <div className="v2-reg-g">
+          {[["OFREZCO", "regalo", "#0B6E66", reg3[0][5]], ["NECESITO", "ayuda", "#E8553F", reg3[1][5]], ["REGISTROS", "agenda", "#3B3FA8", reg3[2][5]]].map(([t, ic, col, f]) => (
+            <button key={t} type="button" className="v3-rt" style={{ background: col }} onClick={f}><Ico n={ic} c="#fff" s={46} /><b>{t}</b></button>
+          ))}
+        </div>
+      </section>
+    </>
   );
   // v4 «Ruta»: recorrido guiado en cuatro pasos.
   const ruta = (
@@ -268,10 +260,10 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
       <section className="v4-ruta" aria-label="Tu ruta en DCUATES">
         <h2>Tu ruta en DCUATES</h2>
         {[
-          ["1", "Conoce", "Quiénes somos y qué hay", "azul", "carita", abre("conocer")],
-          ["2", "Participa", "Cómo puedes empezar hoy", "azul", "perinola", abre("participar")],
+          ["1", "Conoce", "Quiénes somos y qué hay", "amarillo", "carita", abre("conocer")],
+          ["2", "Participa", "Cómo puedes empezar hoy", "azul", "alzada", abre("participar")],
           ["3", "Apoya", "Causas y beneficios", "naranja", "corazon", abre("causas")],
-          ["4", "Crece juntos", "Negocios, alianzas y patrocinios", "verde", "tienda", abre("negocios")]
+          ["4", "Ganar-Ganar", "Negocios, alianzas y patrocinios", "verde", "tienda", abre("negocios")]
         ].map(([n, t, sub, fam, ic, f]) => (
           <button key={n} type="button" className="v4-p" onClick={f}>
             <span className="v4-n" style={{ background: C[fam].i }}>{n}</span>
@@ -283,7 +275,7 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
           </button>
         ))}
       </section>
-      <Ancho n="mano" fam="verde" t="COMPARTIMOS" sub="Lo que hay y se recomienda" f={compartir} />
+      <Ancho n="compartir" fam="verde" t="COMPARTIMOS" sub="Lo que hay y se recomienda" f={compartir} />
       {registra}
     </>
   );
@@ -292,33 +284,41 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
       <style>{CSS_VI}</style>
       <style>{CSS}</style>
       <HeroFade fotos={fotosHero} />
-      {variante === "3" ? mosaico : variante === "4" ? ruta : base}
+      {variante === "3" ? solido : variante === "4" ? ruta : base}
       <Atajos />
       <div id="vi-resultados" />
       {variante === "2" && registra}
       <button type="button" className="v2-club" onClick={abre("club")} aria-label="Club DCUATES: únete aquí">
-        <img src={fotoClub} alt="" onError={(e) => { e.currentTarget.style.display = "none"; }} />
-        <span className="v2-club-vel" aria-hidden="true" />
+        <style>{CSS_MINIPASE}</style>
         <span className="v2-club-t">
           <b>CLUB DCUATES</b>
-          <em>¡Ser Cuate tiene premio!</em>
-          <span className="v2-fichas">
-            <span><Ico n="estrella" c="#E06A12" s={30} />Puntos</span>
-            <span><Ico n="premio" c="#2C8A2E" s={30} />Premios</span>
-            <span><Ico n="llave" c="#2B5BD7" s={30} />Contenidos</span>
-          </span>
-          <span className="v2-ver v2-club-b">Únete aquí ›</span>
+          <em>Tu pase DCUATES te da BENEFICIOS ESPECIALES !</em>
         </span>
-        <strong className="v2-club-p">¡GRATIS!</strong>
+        <span className="v2-club-m">
+          <span className="v2-fichas">
+            <span><Ico n="estrella" c="#E06A12" s={26} />Puntos</span>
+            <span><Ico n="premio" c="#2C8A2E" s={26} />Premios</span>
+            <span><Ico n="llave" c="#2B5BD7" s={26} />Contenidos</span>
+          </span>
+          <span className="v2-pases"><MiniPase id="vecino" /><MiniPase id="aliado" /><MiniPase id="voluntario" /><MiniPase id="patrocinador" /></span>
+        </span>
+        <span className="v2-ver v2-club-b">Únete aquí ›</span>
       </button>
 
       <Actividades agenda={entrada.agenda} filasZona={entrada.filasZona} anuncios={anuncios} />
+
+      <BloqueLado
+        img="/images/inicio-llama.jpg"
+        titulo="Conoce DCUATES y las oportunidades para SUMAR"
+        texto="Somos una comunidad que teje confianza, suma voluntades y cosecha logros. Descubre qué es DCUATES, lo que te brinda y cómo puedes sumarte."
+        botones={[["Qué es DCUATES", () => onIr("nosotros")], ["Lo que te brindamos", () => onIr("beneficios")], ["Nuestras causas", () => onIr("causas")], ["Apoyos para tu emprendimiento", () => onIr("negocios")], ["Cómo sumarte", () => onIr("cierre")]]}
+      />
+
       <div className="vi-logros bc-root" style={{ "--tc": "#08743B" }}>
         <BandaImpacto logros={logros} cargando={cargando} tab={{ ...tabNosotros, banda: { titulo: "LO QUE HEMOS LOGRADO JUNTOS" } }} />
       </div>
 
-      <FranjaAviso />
-      <Pie onIr={onIr} abrirParticipar={() => setVen("participar")} abrirClub={() => setVen("club")} onSugerencias={onSugerencias} />
+      <Pie onSugerencias={onSugerencias} />
 
       {/* Anfitrión oculto: atiende las ventanas HOY y EXPLORA con los mismos datos de siempre. */}
       <div style={{ display: "none" }}><EntradaDcuates {...entrada} anfitrion /></div>
@@ -338,7 +338,7 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
         <p className="v2-p">Todos ganamos: conoce la comunidad y entra a lo que más te interese.</p>
         <Fila n="gente" t="Nosotros" s="Quiénes somos" fam="azul" f={va(() => onIr("nosotros"), "nosotros")} />
         <Fila n="brujula" t="Explora" s="Proyectos, juegos, servicios y más" fam="azul" f={va(() => abrirVentanaEntrada("explora"), "explora")} />
-        <Fila n="agenda" t="Agenda +" s="Eventos, avisos y convocatorias" fam="azul" f={va(() => abrirPlus(), "agenda")} extra={{ n: "sol", t: "HOY", f: va(() => abrirVentanaEntrada("hoy"), "hoy") }} />
+        <Fila n="agenda" t="Agenda" s="Eventos, avisos y convocatorias" fam="azul" f={va(() => abrirPlus(), "agenda")} extra={{ n: "sol", t: "HOY", f: va(() => abrirVentanaEntrada("hoy"), "hoy") }} />
         <Fila n="cohete" t="Súmate" s="Tu parte hace la diferencia" fam="azul" f={va(() => onIr("cierre"), "sumate")} />
       </Hoja>
 
@@ -359,7 +359,7 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
       </Hoja>
 
       <Hoja abierta={ven === "club"} onCerrar={cierra} titulo="Club DCUATES">
-        <ClubTarjeta />
+        <ClubTarjeta ejemplos />
       </Hoja>
     </div>
   );
@@ -381,18 +381,27 @@ const CSS = `
 .v2-fl-c{position:absolute;top:6px;right:6px;width:28px;height:28px}
 .v2-card{position:relative}
 .v2-ci{display:flex;margin-top:6px}
-.v2-fichas{display:flex;gap:6px;margin:4px 0}
-.v2-fichas span{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:1px;background:#fff;border:2px solid #efe6c8;border-radius:12px;padding:4px 2px;font-size:11px;font-weight:900;color:#0f3b22}
+.v2-fichas{display:flex;flex-direction:column;gap:6px}
+.v2-fichas span{min-width:0;display:flex;align-items:center;gap:6px;background:#fff;border:2px solid #efe6c8;border-radius:12px;padding:4px 6px;font-size:12px;font-weight:900;color:#0f3b22}
 .v2-aviso{display:flex;align-items:center;gap:10px;background:#fff;border:2px solid #cfe5b0;border-radius:18px;padding:10px}
 .v2-aviso-i{flex:none;width:52px;height:52px;border-radius:50%;background:#E9F6D5;display:flex;align-items:center;justify-content:center}
 .v2-aviso-t{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.2}.v2-aviso-t b{font-size:16px;font-weight:900}.v2-aviso-t small{font-size:12px;font-weight:700;color:#2f4d3f}
-.v3-mos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.v3-t{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;min-height:132px;padding:10px 6px;border:2px solid;border-radius:20px;cursor:pointer;color:#0f3b22;min-width:0}
-.v3-t b{font-size:15px;font-weight:900;line-height:1.1;overflow-wrap:anywhere}.v3-t:active{transform:scale(.97)}
+.v3-sol{display:flex;flex-direction:column;gap:10px}
+.v3-b{position:relative;display:flex;align-items:center;gap:12px;width:100%;min-height:96px;padding:10px 12px;border:0;border-radius:22px;color:#fff;text-align:left;cursor:pointer;box-shadow:0 6px 14px rgba(18,53,91,.22);overflow:hidden}
+.v3-b::after{content:"";position:absolute;right:-30px;top:-30px;width:110px;height:110px;border-radius:50%;background:rgba(255,255,255,.14)}
+.v3-b:active{transform:scale(.98)}
+.v3-b-i{flex:none;width:68px;height:68px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center}
+.v3-b-t{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.1;z-index:1}
+.v3-b-t b{font-size:19px;font-weight:900;letter-spacing:.2px;text-shadow:0 1px 2px rgba(0,0,0,.25)}
+.v3-b-t small{font-size:13px;font-weight:700;margin-top:3px;opacity:.95}
+.v3-b-f{flex:none;z-index:1;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center}
+.v3-osc{color:#3b2a00}.v3-osc .v3-b-t b{text-shadow:none}.v3-osc .v3-b-i{background:rgba(255,255,255,.55)}.v3-osc .v3-b-i svg{stroke:#8a5a00}
+.v3-reg{background:#fff;border:2px solid #dfe3ee;border-radius:20px;padding:10px 8px 12px}
+.v3-rt{display:flex;flex-direction:column;align-items:center;gap:6px;min-height:104px;justify-content:center;border:0;border-radius:18px;color:#fff;font-size:13.5px;font-weight:900;cursor:pointer;box-shadow:0 5px 10px rgba(0,0,0,.18)}
 .v4-ruta{display:flex;flex-direction:column;gap:10px;position:relative}
 .v4-ruta h2{margin:0 2px;font-size:20px;font-weight:900;color:#08743B}
 .v4-p{display:flex;align-items:center;gap:8px;width:100%;padding:0;border:0;background:transparent;text-align:left;cursor:pointer;position:relative}
-.v4-n{flex:none;width:34px;height:34px;border-radius:50%;color:#fff;font-size:18px;font-weight:900;display:flex;align-items:center;justify-content:center;z-index:1}
+.v4-n{flex:none;width:34px;height:34px;border-radius:50%;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35);font-size:18px;font-weight:900;display:flex;align-items:center;justify-content:center;z-index:1}
 .v4-p:not(:last-child)::before{content:"";position:absolute;left:16px;top:34px;bottom:-14px;width:3px;background:#d7e8bd}
 .v4-c{flex:1;min-width:0;display:flex;align-items:center;gap:10px;min-height:76px;padding:8px 10px;border:2px solid;border-radius:18px;color:#0f3b22}
 .v2-ver{flex:none;background:#08743B;color:#fff;font-weight:900;font-size:13.5px;border-radius:22px;min-height:44px;padding:0 12px;display:flex;align-items:center}
@@ -409,15 +418,13 @@ const CSS = `
 .v2-rb{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;min-height:116px;padding:10px 6px;border:2px solid;border-radius:16px;cursor:pointer;color:#0f3b22;min-width:0}
 .v2-rb b{font-size:14px;font-weight:900;letter-spacing:.3px}
 .v2-rb small{font-size:11.5px;font-weight:700;line-height:1.15}
-.v2-club{position:relative;display:block;width:100%;height:230px;padding:0;border-radius:20px;overflow:hidden;background:#FFFBEA;border:2px solid #e3dcae;text-align:left;cursor:pointer;flex:none;color:#0f3b22}
-.v2-club img{position:absolute;right:0;top:0;width:62%;height:100%;object-fit:cover;-webkit-mask-image:linear-gradient(to left,#000 62%,transparent);mask-image:linear-gradient(to left,#000 62%,transparent)}
-.v2-club-vel{position:absolute;inset:0;background:linear-gradient(to right,rgba(255,251,234,.98) 0%,rgba(255,251,234,.94) 52%,rgba(255,251,234,.55) 68%,rgba(255,251,234,0) 90%)}
-.v2-club-t{position:relative;display:flex;flex-direction:column;gap:4px;width:64%;height:100%;box-sizing:border-box;padding:12px}
+.v2-club{position:relative;display:flex;flex-direction:column;gap:8px;width:100%;padding:12px;border-radius:20px;background:linear-gradient(135deg,#FFFBEA,#FFF0D9);border:2px solid #f5d9ac;text-align:left;cursor:pointer;flex:none;color:#0f3b22;box-shadow:0 4px 0 #f5d9ac}
+.v2-club-t{display:flex;flex-direction:column;gap:3px}
+.v2-club-m{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.5fr);gap:8px;align-items:center}
+.v2-pases{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
 .v2-club-t b{font-size:21px;font-weight:900;line-height:1}
-.v2-club-t em{font-style:normal;font-size:14px;font-weight:900;color:#E06A12;line-height:1.2}
-.v2-club-t>span:not(.v2-ver):not(.v2-fichas){font-size:12px;font-weight:700}
-.v2-club-b{margin-top:auto;align-self:flex-start}
-.v2-club-p{position:absolute;right:10px;top:10px;background:#E06A12;color:#fff;font-size:14px;font-weight:900;border-radius:20px;padding:6px 12px;transform:rotate(6deg);box-shadow:0 3px 0 #a84a08}
+.v2-club-t em{font-style:normal;font-size:14.5px;font-weight:900;color:#E06A12;line-height:1.2}
+.v2-club-b{align-self:flex-start}
 .v2-act{background:#fff;border:2px solid #efe6c8;border-radius:18px;padding:10px 6px}
 .v2-act-h{display:flex;align-items:center;gap:8px;margin:0 2px 8px}
 .v2-act-h h2{flex:1;min-width:0;margin:0;font-size:20px;font-weight:900;line-height:1.05;color:#08743B}
@@ -433,7 +440,7 @@ const CSS = `
 .v2-it-t span{font-size:12.5px;font-weight:700;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .v2-pie{background:#E9F6D5;border-radius:18px;padding:12px 10px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;margin-bottom:56px}
 .v2-pie-l{display:flex;align-items:center;gap:8px}.v2-pie-l img{border-radius:50%}
-.v2-pie-l b{font-size:16px;font-weight:900;color:#08743B}.v2-pie-l span{font-size:11px;font-weight:900;letter-spacing:.12em;color:#E65100}
+.v2-pie-l b{font-size:16px;font-weight:900;color:#08743B}
 .v2-pie-n{display:flex;flex-wrap:wrap;gap:2px 14px;justify-content:center}
 .v2-pie-n button{min-height:36px;border:0;background:transparent;font-size:13px;font-weight:800;color:#1e4a2c;cursor:pointer;padding:0 2px}
 .v2-pie p{margin:0;font-size:11.5px;font-weight:800;color:#1e4a2c}

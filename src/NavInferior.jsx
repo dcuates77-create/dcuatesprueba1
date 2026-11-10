@@ -1,11 +1,11 @@
-// BARRA INFERIOR (e34): Inicio · Proyectos · Logros · Agenda Plus · ¿Qué necesitas? (antes «Contacto»; e66)
+// BARRA INFERIOR (e34): Inicio · Proyectos · Logros · Agenda · ¿Qué necesitas? (antes «Contacto»; e66)
 import React, { useLayoutEffect, useRef } from "react";
 
 const ITEMS = [
   ["inicio", "🏠", "Inicio"],
   ["proyectos", "🌱", "Proyectos"],
   ["logros", "🏆", "Logros"],
-  ["plus", "📅", "Agenda Plus"],
+  ["plus", "📅", "Agenda"],
   ["contacto", "💬", "¿Qué necesitas?"]
 ];
 
