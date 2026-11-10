@@ -76,3 +76,46 @@ export const CSS_PASEEJ = `
 .pe-t em{font-size:11.5px;font-weight:700;line-height:1.2}
 .pe-t small{font-size:10px;font-weight:800;opacity:.8}
 `;
+
+// Vista del Pase completo (como «Mi Pase», en miniatura) con foto de ejemplo. Si la foto falta, usa el avatar dibujado.
+export function PaseCompleto({ id = "vecino", quien = "mujer", foto, nombre = "Ana Pérez", num = "VEC100A", pts = 100, inclinar = 0 }) {
+  const t = TEMAS[id] || TEMAS.vecino;
+  const [falla, setFalla] = React.useState(false);
+  return (
+    <span className="pc" aria-hidden="true" style={{ background: "linear-gradient(160deg," + t.f1 + "," + t.f2 + ")", borderColor: t.c2, transform: "rotate(" + inclinar + "deg)" }}>
+      <span className="pc-top"><img src="/images/logo-circular.webp" alt="" width="16" height="16" /><b>DCUATES</b><i>¡COMPARTE Y GANA!</i></span>
+      <span className="pc-per">
+        <span className="pc-f" style={{ boxShadow: "0 0 0 2px " + t.c2 }}>
+          {foto && !falla ? <img src={foto} alt="" onError={() => setFalla(true)} /> : <Avatar quien={quien} t={t} />}
+        </span>
+        <span className="pc-n">
+          <b style={{ color: t.c1 }}>{nombre}</b>
+          <span className="pe-chip" style={{ background: t.c2 }}>{t.icono} {t.rotulo}</span>
+        </span>
+      </span>
+      <em style={{ color: t.c1 }}>{t.lemas[0]}</em>
+      <small style={{ color: t.c1 }}>No. de Cuate <u>{num}</u> · Cuate desde nov 2026</small>
+      <span className="pc-pan" style={{ background: t.c1 }}>PANEL DE PUNTOS & PROYECTOS</span>
+      <span className="pc-pts"><span style={{ color: "#E8A800" }}>✦</span> <b>{pts}</b> <span>Puntos DCUATES</span></span>
+      <span className="pc-bar"><span style={{ background: t.c2 }} /></span>
+      <span className="pc-prem">🎁 Revisa por qué PREMIOS puedes cambiar tus puntos</span>
+    </span>
+  );
+}
+export const CSS_PASECOMPLETO = `
+.pc{display:flex;flex-direction:column;gap:3px;width:100%;border:2px solid;border-radius:14px;padding:6px 6px 7px;box-shadow:0 5px 12px rgba(0,0,0,.28);text-align:left;min-width:0;box-sizing:border-box}
+.pc-top{display:flex;align-items:center;gap:3px;border-radius:8px;background:rgba(255,255,255,.7);padding:2px 4px}
+.pc-top b{font-size:9px;font-weight:900;color:#0B6E2E;letter-spacing:.02em}.pc-top i{font-style:normal;font-size:6px;font-weight:900;color:#E65100;line-height:1}
+.pc-per{display:flex;align-items:center;gap:5px;min-width:0}
+.pc-f{flex:none;width:40px;height:40px;border-radius:50%;overflow:hidden;border:2px solid #fff;display:block;background:#fff}
+.pc-f img,.pc-f svg{width:100%;height:100%;object-fit:cover;display:block}
+.pc-n{display:flex;flex-direction:column;gap:2px;min-width:0;align-items:flex-start}
+.pc-n b{font-size:12.5px;font-weight:900;line-height:1.05}
+.pc-n .pe-chip{font-size:7px;padding:1px 5px;border-radius:8px}
+.pc em{font-style:italic;font-size:8.5px;font-weight:700;line-height:1.15}
+.pc small{font-size:6.5px;font-weight:800;opacity:.85;line-height:1.2}.pc small u{text-decoration:none;background:rgba(255,255,255,.7);border-radius:3px;padding:0 2px}
+.pc-pan{color:#fff;font-size:6.5px;font-weight:900;letter-spacing:.04em;border-radius:6px 6px 0 0;padding:3px 5px}
+.pc-pts{display:flex;align-items:baseline;gap:3px;background:#fff;padding:2px 5px 0}.pc-pts b{font-size:19px;font-weight:900;color:#0f2d1e;line-height:1}.pc-pts span:last-child{font-size:8px;font-weight:800;color:#0f2d1e}
+.pc-bar{display:block;background:#fff;padding:0 5px 3px}.pc-bar span{display:block;height:5px;border-radius:3px;width:100%}
+.pc-prem{font-size:7px;font-weight:800;color:#1b5e20;background:#e9f6ec;border:1px solid #9bd0a9;border-radius:6px;padding:2px 4px;line-height:1.2}
+`;

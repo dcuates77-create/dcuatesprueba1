@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import EntradaDcuates, { elegirPuerta, abrirVentanaEntrada, abrirTour } from "./PuertasDcuates.jsx";
 import { BandaImpacto, TABS } from "./BloqueCentral.jsx";
 import { Hoja, Atajos, BloqueLado, CSS as CSS_VI } from "./InicioNuevo.jsx";
-import MiniPase, { PaseEjemplo, CSS_MINIPASE, CSS_PASEEJ } from "./MiniPase.jsx";
+import MiniPase, { PaseCompleto, CSS_MINIPASE, CSS_PASEEJ, CSS_PASECOMPLETO } from "./MiniPase.jsx";
 import { proximos, fechaLinda } from "./utilidades/calendario.js";
 import { agendaDesdeZona } from "./datos/zona.js";
 import { ANUNCIOS_EJEMPLO, tipoAnuncio } from "./datos/plus.js";
@@ -89,7 +89,7 @@ function Fila({ n, t, s, fam, f, extra, pal = C }) {
     <div className="v2-fila">
       <button type="button" className="v2-fb" style={{ background: c.f, borderColor: c.b }} onClick={f}>
         <span className="v2-fi" style={{ background: "#fff" }}><Ico n={n} c={c.i} s={28} /></span>
-        <span className="v2-ft"><b>{t}</b><small style={{ color: c.t }}>{s}</small></span>
+        <span className="v2-ft"><b style={c.tt ? { color: c.tt } : undefined}>{t}</b><small style={{ color: c.t }}>{s}</small></span>
         <Ico n="flecha" c={c.i} s={22} />
       </button>
       {extra && <button type="button" className="v2-fx" style={{ background: "#fff", borderColor: c.b, color: c.t }} onClick={extra.f}><Ico n={extra.n} c={c.i} s={20} />{extra.t}</button>}
@@ -182,12 +182,12 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
 
   const abre = (k) => () => { registrar("v2_tarjeta", { k }); setVen(k); };
   const P3 = {
-    conocer: { f: "#E4E6FA", b: "#B9BEF0", t: "#2A2E86", i: "#3B3FA8" },
-    participar: { f: "#FFE3DB", b: "#F7B7A5", t: "#9B2E1B", i: "#E8553F" },
-    causas: { f: "#DDE7F4", b: "#AFC4DE", t: "#12355B", i: "#12355B" },
-    negocios: { f: "#D8F1EC", b: "#9ED8CE", t: "#0B5A53", i: "#0B6E66" }
+    conocer: { f: "#EDE7FC", b: "#B9A7EE", t: "#4A2FB0", i: "#5B3FC0", tt: "#3A2394" },
+    participar: { f: "#FFE6DE", b: "#F6A996", t: "#A13520", i: "#E8553F", tt: "#B13A22" },
+    causas: { f: "#D6E2F2", b: "#7FA0CC", t: "#1C4577", i: "#12355B", tt: "#0E2B4C" },
+    negocios: { f: "#D6F1EC", b: "#82CFC2", t: "#0B5A53", i: "#0B6E66", tt: "#07504A" }
   };
-  const PAL = variante === "3" ? { ...C, ...P3 } : { ...C, conocer: C.azul, participar: C.azul, causas: C.naranja, negocios: C.verde };
+  const PAL = variante === "3" || variante === "5" ? { ...C, ...P3 } : { ...C, conocer: C.azul, participar: C.azul, causas: C.naranja, negocios: C.verde };
   const tres = [
     ["conocer", "Quiero conocer DCUATES", "Todos ganamos", "azul", "carita"],
     ["causas", "Causas y Beneficios", "Apoya y gana", "naranja", "corazon"],
@@ -245,7 +245,7 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
   const solido = (
     <>
       <section className="v3-sol" aria-label="Explora DCUATES">
-        {banda("c", "carita", "Quiero conocer DCUATES", "Todos ganamos", "linear-gradient(120deg,#3B3FA8,#6A6FE0)", abre("conocer"))}
+        {banda("c", "carita", "Quiero conocer DCUATES", "Todos ganamos", "linear-gradient(120deg,#5B3FC0,#8B6FE8)", abre("conocer"))}
         {banda("p", "alzada", "¿Cómo puedo participar?", "Empieza aquí: es fácil y gratis", "linear-gradient(120deg,#E8553F,#FF8F6B)", abre("participar"))}
         {banda("a", "corazon", "Causas y Beneficios", "Apoya y gana", "linear-gradient(120deg,#12355B,#2B5C93)", abre("causas"))}
         {banda("n", "tienda", "Ganar-Ganar", "Negocios, alianzas y patrocinios", "linear-gradient(120deg,#0B6E66,#2BB3A3)", abre("negocios"))}
@@ -257,6 +257,40 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
           {[["OFREZCO", "regalo", "#0B6E66", reg3[0][5]], ["NECESITO", "ayuda", "#E8553F", reg3[1][5]], ["REGISTROS", "agenda", "#3B3FA8", reg3[2][5]]].map(([t, ic, col, f]) => (
             <button key={t} type="button" className="v3-rt" style={{ background: col }} onClick={f}><Ico n={ic} c="#fff" s={46} /><b>{t}</b></button>
           ))}
+        </div>
+      </section>
+    </>
+  );
+  // v5 «Bento»: mosaico asimétrico sobre fondo azul noche, con un gran botón principal.
+  const bt = (k, cls, g, ic, t, sub, f, oscuro) => (
+    <button key={k} type="button" className={"v5-t " + cls + (oscuro ? " v5-osc" : "")} style={{ background: g }} onClick={f}>
+      <Ico n={ic} c={oscuro ? "#7a4b00" : "#fff"} s={cls === "v5-big" ? 88 : 44} />
+      <b>{t}</b>
+      {sub && <small>{sub}</small>}
+      {cls === "v5-big" && <span className="v5-cta">Empezar ›</span>}
+    </button>
+  );
+  const bento = (
+    <>
+      <section className="v5-wrap" aria-label="Elige tu camino">
+        <h2>Elige tu camino</h2>
+        <div className="v5-grid">
+          {bt("p", "v5-big", "linear-gradient(160deg,#E8553F,#FF9A6F)", "alzada", "¿CÓMO PUEDO PARTICIPAR?", "Empieza aquí: es fácil y gratis", abre("participar"))}
+          {bt("c", "v5-s", "linear-gradient(135deg,#5B3FC0,#8B6FE8)", "carita", "Quiero conocer DCUATES", "", abre("conocer"))}
+          {bt("a", "v5-s", "linear-gradient(135deg,#12355B,#2B5C93)", "corazon", "Causas y Beneficios", "", abre("causas"))}
+          {bt("n", "v5-m", "linear-gradient(135deg,#0B6E66,#2BB3A3)", "tienda", "Ganar-Ganar", "Negocios, alianzas y patrocinios", abre("negocios"))}
+          {bt("s", "v5-m", "linear-gradient(135deg,#F2A900,#FFD24D)", "compartir", "COMPARTIMOS", "Lo que hay y se recomienda", compartir, true)}
+          <button type="button" className="v5-hoy" onClick={() => { registrar("v2_tarjeta", { k: "hoy" }); abrirVentanaEntrada("hoy"); }}>
+            <Ico n="sol" c="#FFD24D" s={34} /><span><b>Hoy en DCUATES</b><small>Mira qué pasa hoy en tu comunidad</small></span><Ico n="flecha" c="#FFD24D" s={22} />
+          </button>
+        </div>
+        <div className="v5-reg">
+          <b>Registra aquí tu información</b>
+          <div className="v2-reg-g">
+            {[["OFREZCO", "regalo", "#0B6E66", reg3[0][5]], ["NECESITO", "ayuda", "#E8553F", reg3[1][5]], ["REGISTROS", "agenda", "#5B3FC0", reg3[2][5]]].map(([t, ic, col, f]) => (
+              <button key={t} type="button" className="v3-rt" style={{ background: col }} onClick={f}><Ico n={ic} c="#fff" s={42} /><b>{t}</b></button>
+            ))}
+          </div>
         </div>
       </section>
     </>
@@ -291,27 +325,31 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
       <style>{CSS_VI}</style>
       <style>{CSS}</style>
       <HeroFade fotos={fotosHero} />
-      {variante === "3" ? solido : variante === "4" ? ruta : base}
+      {variante === "3" ? solido : variante === "4" ? ruta : variante === "5" ? bento : base}
       <Atajos />
       <div id="vi-resultados" />
       {variante === "2" && registra}
       <button type="button" className="v2-club" onClick={abre("club")} aria-label="Club DCUATES: únete aquí">
         <style>{CSS_MINIPASE}</style>
-        <span className="v2-club-t">
-          <b>CLUB DCUATES</b>
-          <em>Tu pase DCUATES te da BENEFICIOS ESPECIALES !</em>
+        <style>{CSS_PASEEJ + CSS_PASECOMPLETO}</style>
+        <span className="v2-club-g">
+          <span className="v2-club-l">
+            <span className="v2-club-t">
+              <b>CLUB DCUATES</b>
+              <em>Tu pase DCUATES te da BENEFICIOS ESPECIALES !</em>
+            </span>
+            <span className="v2-fichas">
+              <span><Ico n="estrella" c="#E06A12" s={24} />Puntos</span>
+              <span><Ico n="premio" c="#2C8A2E" s={24} />Premios</span>
+              <span><Ico n="llave" c="#2B5BD7" s={24} />Contenidos</span>
+            </span>
+            <span className="v2-ver v2-club-b">Únete aquí ›</span>
+          </span>
+          <span className="v2-club-r">
+            <PaseCompleto id="vecino" quien="mujer" foto="/images/pase-ejemplo-mujer.jpg" nombre="Ana Pérez" num="VEC100A" pts={100} inclinar={-2} />
+            <PaseCompleto id="voluntario" quien="hombre" foto="/images/pase-ejemplo-hombre.jpg" nombre="Luis Ramírez" num="VOL250B" pts={250} inclinar={2} />
+          </span>
         </span>
-        <style>{CSS_PASEEJ}</style>
-        <span className="v2-pases2">
-          <PaseEjemplo id="vecino" quien="mujer" nombre="Ana Pérez" num="VEC-0001" pts={100} />
-          <PaseEjemplo id="voluntario" quien="hombre" nombre="Luis Ramírez" num="VOL-0001" pts={250} />
-        </span>
-        <span className="v2-fichas2">
-          <span><Ico n="estrella" c="#E06A12" s={22} />Puntos</span>
-          <span><Ico n="premio" c="#2C8A2E" s={22} />Premios</span>
-          <span><Ico n="llave" c="#2B5BD7" s={22} />Contenidos</span>
-        </span>
-        <span className="v2-ver v2-club-b">Únete aquí ›</span>
       </button>
 
       <Actividades agenda={entrada.agenda} filasZona={entrada.filasZona} anuncios={anuncios} />
@@ -407,6 +445,21 @@ const CSS = `
 .v3-osc{color:#3b2a00}.v3-osc .v3-b-t b{text-shadow:none}.v3-osc .v3-b-i{background:rgba(255,255,255,.55)}.v3-osc .v3-b-i svg{stroke:#8a5a00}
 .v3-reg{background:#fff;border:2px solid #dfe3ee;border-radius:20px;padding:10px 8px 12px}
 .v3-rt{display:flex;flex-direction:column;align-items:center;gap:6px;min-height:104px;justify-content:center;border:0;border-radius:18px;color:#fff;font-size:13.5px;font-weight:900;cursor:pointer;box-shadow:0 5px 10px rgba(0,0,0,.18)}
+.v5-wrap{background:linear-gradient(160deg,#0F2547,#1D3F73);border-radius:26px;padding:12px;display:flex;flex-direction:column;gap:10px;box-shadow:0 8px 18px rgba(15,37,71,.35)}
+.v5-wrap h2{margin:0 2px;font-size:19px;font-weight:900;color:#FFD24D;letter-spacing:.02em}
+.v5-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.v5-t{position:relative;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;gap:4px;border:0;border-radius:20px;padding:12px;color:#fff;text-align:left;cursor:pointer;overflow:hidden;min-width:0}
+.v5-t::after{content:"";position:absolute;right:-24px;top:-24px;width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,.15)}
+.v5-t svg{margin-bottom:auto}
+.v5-t b{font-size:15px;font-weight:900;line-height:1.1;z-index:1;overflow-wrap:anywhere}.v5-t small{font-size:12px;font-weight:700;opacity:.95;line-height:1.2;z-index:1}
+.v5-t:active{transform:scale(.97)}
+.v5-big{grid-row:span 2;min-height:222px}.v5-big b{font-size:18px;overflow-wrap:normal}.v5-big small{font-size:13px}
+.v5-s{min-height:106px}.v5-m{min-height:132px}
+.v5-cta{margin-top:6px;background:#fff;color:#B13A22;font-weight:900;font-size:13px;border-radius:20px;padding:8px 14px;z-index:1}
+.v5-osc{color:#3b2a00}
+.v5-hoy{grid-column:span 2;display:flex;align-items:center;gap:10px;border:2px solid rgba(255,210,77,.55);background:rgba(255,255,255,.08);border-radius:18px;padding:10px 12px;color:#fff;text-align:left;cursor:pointer}
+.v5-hoy span{flex:1;display:flex;flex-direction:column;line-height:1.15}.v5-hoy b{font-size:16px;font-weight:900}.v5-hoy small{font-size:12.5px;font-weight:700;opacity:.9}
+.v5-reg{display:flex;flex-direction:column;gap:8px}.v5-reg>b{font-size:15px;font-weight:900;color:#fff}
 .v4-ruta{display:flex;flex-direction:column;gap:10px;position:relative}
 .v4-ruta h2{margin:0 2px;font-size:20px;font-weight:900;color:#08743B}
 .v4-p{display:flex;align-items:center;gap:8px;width:100%;padding:0;border:0;background:transparent;text-align:left;cursor:pointer;position:relative}
@@ -427,15 +480,20 @@ const CSS = `
 .v2-rb{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;min-height:116px;padding:10px 6px;border:2px solid;border-radius:16px;cursor:pointer;color:#0f3b22;min-width:0}
 .v2-rb b{font-size:14px;font-weight:900;letter-spacing:.3px}
 .v2-rb small{font-size:11.5px;font-weight:700;line-height:1.15}
-.v2-club{position:relative;display:flex;flex-direction:column;gap:8px;width:100%;padding:12px;border-radius:20px;background:linear-gradient(135deg,#FFFBEA,#FFF0D9);border:2px solid #f5d9ac;text-align:left;cursor:pointer;flex:none;color:#0f3b22;box-shadow:0 4px 0 #f5d9ac}
+.v2-club{position:relative;display:block;width:100%;padding:12px;border-radius:22px;background:linear-gradient(135deg,#FFD24D 0%,#F7B500 55%,#E89B00 100%);border:2px solid #C98200;text-align:left;cursor:pointer;flex:none;color:#0B3D2E;box-shadow:0 5px 0 #B87400}
+.v2-club-g{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:8px;align-items:center}
+.v2-club-l{display:flex;flex-direction:column;gap:10px;min-width:0}
+.v2-club-r{display:flex;flex-direction:column;gap:0;min-width:0}
+.v2-club-r .pc+.pc{margin-top:-18px;margin-left:12px;width:calc(100% - 12px)}
+.v2-club-r .pc:first-child{width:calc(100% - 12px)}
 .v2-club-t{display:flex;flex-direction:column;gap:3px}
 .v2-pases2{display:flex;flex-direction:column;gap:8px}
 .v2-fichas2{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
 .v2-fichas2 span{display:flex;align-items:center;justify-content:center;gap:4px;background:#fff;border:2px solid #efe6c8;border-radius:12px;padding:5px 2px;font-size:11.5px;font-weight:900;color:#0f3b22}
 .v2-club-m{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.5fr);gap:8px;align-items:center}
 .v2-pases{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
-.v2-club-t b{font-size:21px;font-weight:900;line-height:1}
-.v2-club-t em{font-style:normal;font-size:14.5px;font-weight:900;color:#E06A12;line-height:1.2}
+.v2-club-t b{font-size:22px;font-weight:900;line-height:1;color:#0B3D2E;display:block}
+.v2-club-t em{font-style:normal;display:block;margin-top:5px;font-size:14px;font-weight:900;color:#12355B;line-height:1.2}
 .v2-club-b{align-self:flex-start}
 .v2-act{background:#fff;border:2px solid #efe6c8;border-radius:18px;padding:10px 6px}
 .v2-act-h{display:flex;align-items:center;gap:8px;margin:0 2px 8px}
@@ -455,7 +513,7 @@ const CSS = `
 .v2-pie-l b{font-size:16px;font-weight:900;color:#08743B}
 .v2-pie-n{display:flex;flex-wrap:wrap;gap:2px 14px;justify-content:center}
 .v2-pie-n button{min-height:38px;border:0;background:transparent;font-size:14.5px;font-weight:900;color:#0a2a18;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px;cursor:pointer;padding:0 2px}
-.v2-pie p{margin:0;font-size:11.5px;font-weight:800;color:#1e4a2c}
+.v2-pie p{margin:0;font-size:14px;font-weight:900;color:#0a2a18}
 .v2-p{margin:2px 2px 10px;font-size:14.5px;font-weight:700;color:#2f4d3f;line-height:1.35}
 .v2-fila{display:flex;gap:8px;align-items:stretch;margin-bottom:8px}
 .v2-fb{flex:1;min-width:0;display:flex;align-items:center;gap:10px;min-height:64px;padding:8px 12px;border:2px solid;border-radius:16px;text-align:left;cursor:pointer;color:#0f3b22}

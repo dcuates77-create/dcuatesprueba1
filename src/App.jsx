@@ -84,14 +84,14 @@ if (typeof console !== "undefined") console.info("[DCUATES] versión", VERSION_B
 // =========================================================================
 // 2. COMPONENTE PRINCIPAL (INICIO DEL RENDERIZADO) CLON12
 // =========================================================================
-// Portadas de prueba: ?v=2 (tarjetas), ?v=3 (mosaico), ?v=4 (ruta); se recuerda en este celular. ?v=1 vuelve a la anterior.
+// Portadas de prueba: ?v=2 (tarjetas), ?v=3 (impacto), ?v=4 (ruta), ?v=5 (bento); se recuerda en este celular. ?v=1 vuelve a la anterior.
 function leerV2() {
   try {
     const v = new URLSearchParams(window.location.search).get("v");
-    if (v === "2" || v === "3" || v === "4") { localStorage.setItem("dcuates_v2", v); return v; }
+    if (v === "2" || v === "3" || v === "4" || v === "5") { localStorage.setItem("dcuates_v2", v); return v; }
     if (v === "1") { localStorage.removeItem("dcuates_v2"); return ""; }
     const g = localStorage.getItem("dcuates_v2");
-    return g === "1" ? "2" : g === "2" || g === "3" || g === "4" ? g : "";
+    return g === "1" ? "2" : g === "2" || g === "3" || g === "4" || g === "5" ? g : "";
   } catch (e) { return ""; }
 }
 
