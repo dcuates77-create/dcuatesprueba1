@@ -605,7 +605,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#17472d] font-sans antialiased text-slate-900 selection:bg-emerald-500/30 relative pb-44 sm:pb-40">
+    <div className={`min-h-screen bg-[#17472d] font-sans antialiased text-slate-900 selection:bg-emerald-500/30 relative ${usarV2 && vista === "inicio" ? "pb-16" : "pb-44 sm:pb-40"}`}>
 
       {/* Barra de progreso de lectura — línea delgada pegada arriba de todo */}
       <div className="fixed top-0 left-0 right-0 z-[60] h-1 bg-black/10">

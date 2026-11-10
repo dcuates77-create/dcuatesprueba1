@@ -30,7 +30,7 @@ import { MENSAJE_INVITACION, URL_SITIO, esAdmin } from "./datos/config.js";
 
 export const TABS = [
   {
-    id: "nosotros", label: "Nosotros", emoji: "🤝", color: "#1B6F8A", pastel: "#E3F3F8",
+    id: "nosotros", label: "Nosotros", emoji: "🌟", color: "#1B6F8A", pastel: "#E3F3F8",
     boton: "#1B6F8A",
     cover: { slogan: "⭐⭐⭐ JUNTOS HACEMOS UNA MEJOR COMUNIDAD ⭐⭐⭐" }, slot: "nosotros",
     banda: { titulo: "Lo que hemos logrado juntos" }
@@ -435,7 +435,7 @@ export default function BloqueCentral({
   const [compensa, setCompensa] = useState(0);
   const tab = TABS_TODAS[idx];
   const cat = categorias.find((c) => c.id === tab.cat) || {};
-  const pct = Math.round(((idx + 1) / TABS_TODAS.length) * 100);
+  const pct = Math.round(((idx + 2) / (TABS_TODAS.length + 1)) * 100); // +1: el botón Inicio también cuenta en el menú
   const wa = (m) => `https://wa.me/${whatsappNumero}?text=${encodeURIComponent(m)}`;
   const slots = { nosotros, beneficios, causas, valores, negocios: negociosSeccion, regalos, gratitud };
   const imgs = { ...PORTADAS_BASE, ...portadas };
@@ -800,9 +800,9 @@ export default function BloqueCentral({
             ))}
           </div>
 
-          <div className="bc-prog" role="progressbar" aria-valuemin={1} aria-valuemax={TABS_TODAS.length} aria-valuenow={idx + 1} aria-label="Sección actual">
+          <div className="bc-prog" role="progressbar" aria-valuemin={1} aria-valuemax={TABS_TODAS.length + 1} aria-valuenow={idx + 2} aria-label="Sección actual">
             <div className="bc-track"><div className="bc-fill" style={{ width: `${pct}%`, background: tab.color }} /></div>
-            <div className="bc-prog-txt"><span>{pct}%</span><b>{idx + 1} / {TABS_TODAS.length}</b></div>
+            <div className="bc-prog-txt"><span>{pct}%</span><b>{idx + 2} / {TABS_TODAS.length + 1}</b></div>
           </div>
         </div>
 

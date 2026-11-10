@@ -1,4 +1,4 @@
-// AGENDA PLUS: ventana con 4 botones — Agenda-Calendario, Mapas de la zona, Tablero de anuncios y Directorio PLUS.
+// AGENDA (antes «Agenda Plus»): ventana con 4 botones — Agenda-Calendario, Mapas de la zona, Tablero de anuncios y Directorio PLUS.
 // Se abre con el evento dcuates:abrir-plus (detail opcional: "mapas" | "tablero" | "directorio") o con el hash #plus.
 import React, { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
@@ -205,10 +205,16 @@ function Principal({ onCerrar, abrirSub }) {
     ["📅", "Agenda-Calendario", "Eventos, cuenta regresiva, clima y recordatorios", () => window.dispatchEvent(new CustomEvent("dcuates:abrir-agenda"))],
     ["🗺️", "Mapas de la zona", "Jardines, Las Américas, Ciudad Azteca, CDMX y más", () => abrirSub("mapas")],
     ["📌", "Tablero de anuncios", "Rentas, felicitaciones, recomendaciones y eventos", () => abrirSub("tablero")],
-    ["📖", "Directorio PLUS", "Recomendaciones por áreas, públicas y con clave", () => abrirSub("directorio")]
+    ["📖", "Directorio PLUS", "Recomendaciones por áreas, públicas y con clave", () => abrirSub("directorio")],
+    ["🧡", "Club DCUATES", "Únete, mira qué incluye y abre tu Pase", () => ev("dcuates:club-info")],
+    ["⚡", "Micro-acciones", "Suma en pocos minutos", () => ev("dcuates:abrir-micro", "")],
+    ["💳", "Mi Pase Cuate", "Tus puntos, premios y canjes", () => ev("dcuates:tarjeta")],
+    ["🏆", "Juega y gana", "Semillas, cupones y regalos de aliados", () => ev("dcuates:abrir-zona", "gana")],
+    ["🙏", "Muro de gratitud", "Gracias y reconocimientos de la comunidad", () => ev("dcuates:abrir-gratitud", "muro")]
   ];
+  const ev = (n, d) => window.dispatchEvent(new CustomEvent(n, { detail: d }));
   return (
-    <Caja titulo="AGENDA PLUS" hash="plus" onCerrar={onCerrar} hub>
+    <Caja titulo="AGENDA" hash="plus" onCerrar={onCerrar} hub>
       <p className="zj-p">Todo lo útil de la zona, en un solo lugar.</p>
       <div className="ap-grid">
         {B.map(([e, t, s, f], i) => (
