@@ -86,13 +86,15 @@ if (typeof console !== "undefined") console.info("[DCUATES] versión", VERSION_B
 // =========================================================================
 // Portadas de prueba: ?v=2 (tarjetas), ?v=3 (impacto), ?v=4 (ruta), ?v=5 (bento), ?v=6 (vitrina); se recuerda en este celular. ?v=1 vuelve a la anterior.
 function leerV2() {
+  // Portada por defecto: v3 «Impacto». ?v=2..6 prueba otra; ?v=1 vuelve a la portada anterior (y se recuerda).
   try {
     const v = new URLSearchParams(window.location.search).get("v");
     if (v === "2" || v === "3" || v === "4" || v === "5" || v === "6") { localStorage.setItem("dcuates_v2", v); return v; }
-    if (v === "1") { localStorage.removeItem("dcuates_v2"); return ""; }
+    if (v === "1") { localStorage.setItem("dcuates_v2", "viejo"); return ""; }
     const g = localStorage.getItem("dcuates_v2");
-    return g === "1" ? "2" : g === "2" || g === "3" || g === "4" || g === "5" || g === "6" ? g : "";
-  } catch (e) { return ""; }
+    if (g === "viejo") return "";
+    return g === "2" || g === "3" || g === "4" || g === "5" || g === "6" ? g : "3";
+  } catch (e) { return "3"; }
 }
 
 export default function App() {
