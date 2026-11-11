@@ -22,7 +22,7 @@ export const YOUTUBE_VIDEO_ID = "SUnE27QnnyI";
 // iframe); no hace falta tocar nada más en el código.
 // Sello de versión: se ve en pequeño al final de los accesos rápidos y en la
 // consola del navegador. Sirve para comprobar que el celular ya cargó lo último.
-export const VERSION_BUILD = "CLON12 · e75";
+export const VERSION_BUILD = "CLON12 · e76";
 // e59 — versión del Aviso de Privacidad que acepta la persona al registrarse (se anota en la hoja, columna «Aceptó aviso»). Súbela cuando cambies el aviso.
 export const VERSION_AVISO = "oct-2026 (borrador)";
 
