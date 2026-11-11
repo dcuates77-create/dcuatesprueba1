@@ -1,5 +1,6 @@
 // INICIO NUEVO (e34) — portada estilo minimalista: foto + título + botón "Conoce cómo participar"
 // (abre ENTRADA DCUATES en una hoja), cuadrícula de 6 secciones y el carrusel de logros.
+import BotonCompartir from "./BotonCompartir.jsx";
 import React, { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import EntradaDcuates from "./PuertasDcuates.jsx";
@@ -29,7 +30,7 @@ const TILES = [
   ["cierre", "/images/eclipse.svg", "Súmate", "Tu parte hace la diferencia", "#E65100"]
 ];
 
-export function Hoja({ abierta, onCerrar, titulo, children }) {
+export function Hoja({ abierta, onCerrar, titulo, children, compartir }) {
   const oculta = useAtras(abierta, onCerrar, { hub: true });
   if (!abierta) return null;
   return createPortal(
@@ -37,7 +38,10 @@ export function Hoja({ abierta, onCerrar, titulo, children }) {
       <div className="vi-hoja" role="dialog" aria-modal="true" aria-label={titulo} onClick={(e) => e.stopPropagation()}>
         <div className="vi-hoja-cab">
           <b>{titulo}</b>
-          <button type="button" onClick={onCerrar} aria-label="Cerrar">✕</button>
+          <span className="vi-hoja-acc">
+            {compartir && <BotonCompartir variante="circulo" hash={compartir.hash} titulo={compartir.titulo || titulo} texto={compartir.texto || "Mira esto en DCUATES"} />}
+            <button type="button" onClick={onCerrar} aria-label="Cerrar">✕</button>
+          </span>
         </div>
         <div className="vi-hoja-cuerpo">{children}</div>
       </div>
@@ -291,7 +295,7 @@ export const CSS = `
 .vi-lg-b button{min-height:48px;border:0;border-radius:14px;background:#0e7c4f;color:#fff;font:inherit;font-weight:900;cursor:pointer}
 .vi-hoja{width:100%;max-width:640px;max-height:90dvh;display:flex;flex-direction:column;background:#fbf7ec;border-radius:26px 26px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.35);animation:vi-sube .28s ease-out}
 .vi-hoja-cab{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;font-weight:900;font-size:15px;letter-spacing:.02em;color:#0f2d1e;border-bottom:1px solid rgba(15,45,30,.12)}
-.vi-hoja-cab button{border:0;border-radius:50%;width:40px;height:40px;background:#0f2d1e;color:#fff;font-size:18px;font-weight:900;cursor:pointer}
+.vi-hoja-acc{display:flex;align-items:center;gap:8px}.vi-hoja-cab button{border:0;border-radius:50%;width:40px;height:40px;background:#0f2d1e;color:#fff;font-size:18px;font-weight:900;cursor:pointer}
 .vi-hoja-cuerpo{overflow-y:auto;padding:10px 12px 22px;overscroll-behavior:contain}
 @keyframes vi-sube{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
 @media (min-width:768px){.vi-hero-t h1{font-size:42px}.vi-hero-t{padding:26px 30px}.vi-fondo{align-items:center}.vi-hoja{border-radius:26px;max-height:86dvh}}

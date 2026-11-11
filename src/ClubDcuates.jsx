@@ -168,7 +168,7 @@ const CSS = `
 .clb-pasos li>span{flex:none;width:36px;height:36px;border-radius:50%;background:${NARANJA_CLUB};color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:19px}
 .clb-pasos b{font-size:15px;font-weight:900}.clb-pasos p{margin:2px 0 0;font-size:13.5px;font-weight:600;line-height:1.35}
 .clb-sec{margin:12px 0 6px;padding:12px 10px;border:2px solid ${NARANJA_CLUB};border-radius:20px;background:#fff4ea;text-align:center;font-family:Nunito,system-ui,sans-serif;color:#0f2d1e;box-shadow:0 4px 0 rgba(230,81,0,.18)}
-.clb-t{margin:0;font-size:19px;font-weight:900;color:${NARANJA_CLUB};line-height:1.1}
+.clb-t{margin:0;font-size:19px;font-weight:900;color:#0A7A3C;line-height:1.1}
 .clb-l{margin:2px 0 10px;font-size:15px;font-weight:900}
 .clb-g{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
 .clb-b{display:flex;align-items:center;gap:6px;min-height:52px;padding:6px 8px;border:2px solid ${NARANJA_CLUB};border-radius:14px;background:#fff;color:#0f2d1e;font:inherit;font-size:13.5px;text-align:left;cursor:pointer;box-shadow:0 3px 0 rgba(230,81,0,.3)}

@@ -12,6 +12,7 @@ import { NOTICIAS_GALERIA_ITEMS, CUPONES_PROMOS_ITEMS } from "./datos/proyectos.
 import { abrirLegal } from "./componentes/legal.jsx";
 import { WHATSAPP_NUMERO } from "./datos/config.js";
 import { ACTIVIDADES_FIJAS } from "./datos/actividadesFijas.js";
+import { PUNTOS_EJEMPLOS, PREMIOS_EJEMPLOS, BENEFICIOS_EJEMPLOS } from "./datos/clubEjemplos.js";
 import ClubTarjeta from "./ClubDcuates.jsx";
 import ComoFunciona from "./ComoFunciona.jsx";
 import { abrirTablon } from "./Tablon.jsx";
@@ -171,9 +172,18 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
   const tabNosotros = TABS[0];
   const ev = (n, d) => window.dispatchEvent(new CustomEvent(n, { detail: d }));
   const cierra = () => setVen(null);
-  // Cierra la ventana y, un instante después, hace lo que toca (para no apilar ventanas).
-  const va = (f, tag) => () => { if (tag) registrar("v2_boton", { b: tag }); setVen(null); setTimeout(f, 160); };
+  // La ventana se queda abierta debajo: al abrirse otra cosa encima (o al cambiar de sección) se oculta sola y REAPARECE al dar «Atrás».
+  const va = (f, tag) => () => { if (tag) registrar("v2_boton", { b: tag }); f(); };
 
+  useEffect(() => {
+    const HASH = { "quiero-conocer": "conocer", "como-participar": "participar", "causas-y-beneficios": "causas", "ganar-ganar": "negocios", "club-dcuates": "club", "club-puntos": "club-puntos", "club-premios": "club-premios", "club-beneficios": "club-benef" };
+    const leer = () => { const k = HASH[decodeURIComponent((window.location.hash || "").replace("#", ""))]; if (k) setTimeout(() => setVen(k), 400); };
+    leer();
+    const directo = () => setVen(null); // al tocar «Inicio» en el menú de abajo se ve la portada limpia
+    window.addEventListener("dcuates:inicio-directo", directo);
+    window.addEventListener("hashchange", leer);
+    return () => { window.removeEventListener("dcuates:inicio-directo", directo); window.removeEventListener("hashchange", leer); };
+  }, []);
   useEffect(() => {
     const abrir = () => setVen("participar");
     window.addEventListener("dcuates:abrir-entrada", abrir);
@@ -184,10 +194,10 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
   const P3 = {
     conocer: { f: "#EDE7FC", b: "#B9A7EE", t: "#4A2FB0", i: "#5B3FC0", tt: "#3A2394" },
     participar: { f: "#FFE6DE", b: "#F6A996", t: "#A13520", i: "#E8553F", tt: "#B13A22" },
-    causas: { f: "#D6E2F2", b: "#7FA0CC", t: "#1C4577", i: "#12355B", tt: "#0E2B4C" },
+    causas: { f: "#FFE0EC", b: "#F59CC0", t: "#A3144F", i: "#D6246E", tt: "#8E0F45" },
     negocios: { f: "#D6F1EC", b: "#82CFC2", t: "#0B5A53", i: "#0B6E66", tt: "#07504A" }
   };
-  const PAL = variante === "3" || variante === "5" ? { ...C, ...P3 } : { ...C, conocer: C.azul, participar: C.azul, causas: C.naranja, negocios: C.verde };
+  const PAL = variante === "3" || variante === "5" || variante === "6" ? { ...C, ...P3 } : { ...C, conocer: C.azul, participar: C.azul, causas: C.naranja, negocios: C.verde };
   const tres = [
     ["conocer", "Quiero conocer DCUATES", "Todos ganamos", "azul", "carita"],
     ["causas", "Causas y Beneficios", "Apoya y gana", "naranja", "corazon"],
@@ -247,7 +257,7 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
       <section className="v3-sol" aria-label="Explora DCUATES">
         {banda("c", "carita", "Quiero conocer DCUATES", "Todos ganamos", "linear-gradient(120deg,#5B3FC0,#8B6FE8)", abre("conocer"))}
         {banda("p", "alzada", "¿Cómo puedo participar?", "Empieza aquí: es fácil y gratis", "linear-gradient(120deg,#E8553F,#FF8F6B)", abre("participar"))}
-        {banda("a", "corazon", "Causas y Beneficios", "Apoya y gana", "linear-gradient(120deg,#12355B,#2B5C93)", abre("causas"))}
+        {banda("a", "corazon", "Causas y Beneficios", "Apoya y gana", "linear-gradient(120deg,#D6246E,#FF6FA3)", abre("causas"))}
         {banda("n", "tienda", "Ganar-Ganar", "Negocios, alianzas y patrocinios", "linear-gradient(120deg,#0B6E66,#2BB3A3)", abre("negocios"))}
         {banda("s", "compartir", "COMPARTIMOS", "Lo que hay y se recomienda", "linear-gradient(120deg,#F2A900,#FFD24D)", compartir, true)}
       </section>
@@ -277,7 +287,7 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
         <div className="v5-grid">
           {bt("p", "v5-big", "linear-gradient(160deg,#E8553F,#FF9A6F)", "alzada", "¿CÓMO PUEDO PARTICIPAR?", "Empieza aquí: es fácil y gratis", abre("participar"))}
           {bt("c", "v5-s", "linear-gradient(135deg,#5B3FC0,#8B6FE8)", "carita", "Quiero conocer DCUATES", "", abre("conocer"))}
-          {bt("a", "v5-s", "linear-gradient(135deg,#12355B,#2B5C93)", "corazon", "Causas y Beneficios", "", abre("causas"))}
+          {bt("a", "v5-s", "linear-gradient(135deg,#D6246E,#FF6FA3)", "corazon", "Causas y Beneficios", "", abre("causas"))}
           {bt("n", "v5-m", "linear-gradient(135deg,#0B6E66,#2BB3A3)", "tienda", "Ganar-Ganar", "Negocios, alianzas y patrocinios", abre("negocios"))}
           {bt("s", "v5-m", "linear-gradient(135deg,#F2A900,#FFD24D)", "compartir", "COMPARTIMOS", "Lo que hay y se recomienda", compartir, true)}
           <button type="button" className="v5-hoy" onClick={() => { registrar("v2_tarjeta", { k: "hoy" }); abrirVentanaEntrada("hoy"); }}>
@@ -291,6 +301,55 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
               <button key={t} type="button" className="v3-rt" style={{ background: col }} onClick={f}><Ico n={ic} c="#fff" s={42} /><b>{t}</b></button>
             ))}
           </div>
+        </div>
+      </section>
+    </>
+  );
+  // v6 «Vitrina»: accesos redondos arriba, gran tarjeta de bienvenida con 3 pasos y tarjetas "de cristal".
+  const hist = [
+    ["alzada", "Participa", "linear-gradient(135deg,#E8553F,#FF9A6F)", abre("participar")],
+    ["carita", "Conoce", "linear-gradient(135deg,#5B3FC0,#8B6FE8)", abre("conocer")],
+    ["corazon", "Causas", "linear-gradient(135deg,#D6246E,#FF6FA3)", abre("causas")],
+    ["tienda", "Ganar-Ganar", "linear-gradient(135deg,#0B6E66,#2BB3A3)", abre("negocios")],
+    ["compartir", "Compartimos", "linear-gradient(135deg,#F2A900,#FFD24D)", compartir],
+    ["regalo", "Ofrezco", "linear-gradient(135deg,#0B6E66,#2BB3A3)", reg3[0][5]],
+    ["ayuda", "Necesito", "linear-gradient(135deg,#E8553F,#FF9A6F)", reg3[1][5]],
+    ["agenda", "Registros", "linear-gradient(135deg,#5B3FC0,#8B6FE8)", reg3[2][5]]
+  ];
+  const tarjeta6 = (k, ic, t, sub, g, f, osc) => (
+    <button key={k} type="button" className={"v6-c" + (osc ? " v6-osc" : "")} onClick={f}>
+      <span className="v6-c-i" style={{ background: g }}><Ico n={ic} c={osc ? "#7a4b00" : "#fff"} s={40} /></span>
+      <b>{t}</b><small>{sub}</small>
+      <span className="v6-c-f" style={{ background: g }}><Ico n="flecha" c={osc ? "#7a4b00" : "#fff"} s={16} /></span>
+    </button>
+  );
+  const vitrina = (
+    <>
+      <nav className="v6-st" aria-label="Accesos rápidos">
+        {hist.map(([ic, t, g, f]) => (
+          <button key={t} type="button" onClick={f}><span className="v6-ring" style={{ background: g }}><span className="v6-in"><Ico n={ic} c="#2b2b2b" s={32} /></span></span><small>{t}</small></button>
+        ))}
+      </nav>
+      <button type="button" className="v6-feat" onClick={abre("participar")}>
+        <span className="v6-feat-h"><Ico n="alzada" c="#fff" s={64} /><span><b>¿CÓMO PUEDO PARTICIPAR?</b><small>Empieza aquí: es fácil y gratis</small></span></span>
+        <span className="v6-pasos"><span><i>1</i>Conoce</span><span><i>2</i>Elige tu puerta</span><span><i>3</i>Participa y gana</span></span>
+        <span className="v6-feat-b">Empezar ›</span>
+      </button>
+      <section className="v6-g">
+        {tarjeta6("c", "carita", "Quiero conocer DCUATES", "Todos ganamos", "linear-gradient(135deg,#5B3FC0,#8B6FE8)", abre("conocer"))}
+        {tarjeta6("a", "corazon", "Causas y Beneficios", "Apoya y gana", "linear-gradient(135deg,#D6246E,#FF6FA3)", abre("causas"))}
+        {tarjeta6("n", "tienda", "Ganar-Ganar", "Negocios, alianzas y patrocinios", "linear-gradient(135deg,#0B6E66,#2BB3A3)", abre("negocios"))}
+        {tarjeta6("s", "compartir", "COMPARTIMOS", "Lo que hay y se recomienda", "linear-gradient(135deg,#F2A900,#FFD24D)", compartir, true)}
+      </section>
+      <button type="button" className="v6-hoy" onClick={() => { registrar("v2_tarjeta", { k: "hoy" }); abrirVentanaEntrada("hoy"); }}>
+        <Ico n="sol" c="#B67A00" s={32} /><span><b>Hoy en DCUATES</b><small>Mira qué pasa hoy en tu comunidad</small></span><Ico n="flecha" c="#B67A00" s={22} />
+      </button>
+      <section className="v3-reg" aria-label="Registra aquí tu información">
+        <div className="v2-reg-t"><span className="v2-reg-i" style={{ background: "#5B3FC0" }}><Ico n="mas" c="#fff" s={22} /></span><b>Registra aquí tu información</b></div>
+        <div className="v2-reg-g">
+          {[["OFREZCO", "regalo", "#0B6E66", reg3[0][5]], ["NECESITO", "ayuda", "#E8553F", reg3[1][5]], ["REGISTROS", "agenda", "#5B3FC0", reg3[2][5]]].map(([t, ic, col, f]) => (
+            <button key={t} type="button" className="v3-rt" style={{ background: col }} onClick={f}><Ico n={ic} c="#fff" s={46} /><b>{t}</b></button>
+          ))}
         </div>
       </section>
     </>
@@ -325,32 +384,31 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
       <style>{CSS_VI}</style>
       <style>{CSS}</style>
       <HeroFade fotos={fotosHero} />
-      {variante === "3" ? solido : variante === "4" ? ruta : variante === "5" ? bento : base}
+      {variante === "3" ? solido : variante === "4" ? ruta : variante === "5" ? bento : variante === "6" ? vitrina : base}
       <Atajos />
       <div id="vi-resultados" />
       {variante === "2" && registra}
-      <button type="button" className="v2-club" onClick={abre("club")} aria-label="Club DCUATES: únete aquí">
-        <style>{CSS_MINIPASE}</style>
+      <section className="v2-club" aria-label="Club DCUATES">
         <style>{CSS_PASEEJ + CSS_PASECOMPLETO}</style>
-        <span className="v2-club-g">
-          <span className="v2-club-l">
-            <span className="v2-club-t">
-              <b>CLUB DCUATES</b>
+        <div className="v2-club-g">
+          <div className="v2-club-l">
+            <div className="v2-club-t">
+              <h2>CLUB DCUATES</h2>
               <em>Tu pase DCUATES te da BENEFICIOS ESPECIALES !</em>
-            </span>
-            <span className="v2-fichas">
-              <span><Ico n="estrella" c="#E06A12" s={24} />Puntos</span>
-              <span><Ico n="premio" c="#2C8A2E" s={24} />Premios</span>
-              <span><Ico n="llave" c="#2B5BD7" s={24} />Contenidos</span>
-            </span>
-            <span className="v2-ver v2-club-b">Únete aquí ›</span>
-          </span>
-          <span className="v2-club-r">
+            </div>
+            <div className="v2-fichas">
+              <button type="button" onClick={abre("club-puntos")}><Ico n="estrella" c="#E06A12" s={26} /><span>Puntos</span><i>›</i></button>
+              <button type="button" onClick={abre("club-premios")}><Ico n="premio" c="#2C8A2E" s={26} /><span>Premios</span><i>›</i></button>
+              <button type="button" onClick={abre("club-benef")}><Ico n="llave" c="#2B5BD7" s={26} /><span>Beneficios especiales</span><i>›</i></button>
+            </div>
+            <button type="button" className="v2-ver v2-club-b" onClick={abre("club")}>Únete aquí ›</button>
+          </div>
+          <button type="button" className="v2-club-r" onClick={abre("club")} aria-label="Mira cómo es tu Pase DCUATES">
             <PaseCompleto id="vecino" quien="mujer" foto="/images/pase-ejemplo-mujer.jpg" nombre="Ana Pérez" num="VEC100A" pts={100} inclinar={-2} />
             <PaseCompleto id="voluntario" quien="hombre" foto="/images/pase-ejemplo-hombre.jpg" nombre="Luis Ramírez" num="VOL250B" pts={250} inclinar={2} />
-          </span>
-        </span>
-      </button>
+          </button>
+        </div>
+      </section>
 
       <Actividades agenda={entrada.agenda} filasZona={entrada.filasZona} anuncios={anuncios} />
 
@@ -370,7 +428,7 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
       {/* Anfitrión oculto: atiende las ventanas HOY y EXPLORA con los mismos datos de siempre. */}
       <div style={{ display: "none" }}><EntradaDcuates {...entrada} anfitrion /></div>
 
-      <Hoja abierta={ven === "participar"} onCerrar={cierra} titulo="¿Cómo puedo participar?">
+      <Hoja abierta={ven === "participar"} onCerrar={cierra} titulo="¿Cómo puedo participar?" compartir={{ hash: "como-participar", texto: "Empieza aquí: es fácil y gratis" }}>
         <p className="v2-p">Elige por dónde empezar. Todo es gratis y puedes volver cuando quieras.</p>
         <Fila pal={PAL} n="ayuda" t="Cómo funciona" s="Te lo explicamos con ejemplos" fam="participar" f={() => { registrar("como_funciona"); setVen("como"); }} />
         <Fila pal={PAL} n="puerta" t="Puertas" s="Elige cómo quieres participar" fam="participar" f={va(elegirPuerta, "puertas")} />
@@ -381,7 +439,7 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
         <ComoFunciona onCerrar={() => setVen("participar")} />
       </Hoja>
 
-      <Hoja abierta={ven === "conocer"} onCerrar={cierra} titulo="Quiero conocer DCUATES">
+      <Hoja abierta={ven === "conocer"} onCerrar={cierra} titulo="Quiero conocer DCUATES" compartir={{ hash: "quiero-conocer", texto: "Todos ganamos" }}>
         <p className="v2-p">Todos ganamos: conoce la comunidad y entra a lo que más te interese.</p>
         <Fila pal={PAL} n="gente" t="Nosotros" s="Quiénes somos" fam="conocer" f={va(() => onIr("nosotros"), "nosotros")} />
         <Fila pal={PAL} n="brujula" t="Explora" s="Proyectos, juegos, servicios y más" fam="conocer" f={va(() => abrirVentanaEntrada("explora"), "explora")} />
@@ -389,7 +447,7 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
         <Fila pal={PAL} n="cohete" t="Súmate" s="Tu parte hace la diferencia" fam="conocer" f={va(() => onIr("cierre"), "sumate")} />
       </Hoja>
 
-      <Hoja abierta={ven === "causas"} onCerrar={cierra} titulo="Causas y Beneficios">
+      <Hoja abierta={ven === "causas"} onCerrar={cierra} titulo="Causas y Beneficios" compartir={{ hash: "causas-y-beneficios", texto: "Apoya y gana" }}>
         <p className="v2-p">Apoya una causa y gana beneficios para ti y tu comunidad.</p>
         <Fila pal={PAL} n="corazon" t="Causas" s="Lo que nos une" fam="causas" f={va(() => onIr("causas"), "causas")} />
         <Fila pal={PAL} n="regalo" t="Beneficios" s="Lo que puedes obtener" fam="causas" f={va(() => onIr("beneficios"), "beneficios")} />
@@ -397,7 +455,7 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
         <Fila pal={PAL} n="dar" t="Cómo apoyar causas" s="Dona o participa" fam="causas" f={va(() => irASeccion("donaciones"), "apoyar")} />
       </Hoja>
 
-      <Hoja abierta={ven === "negocios"} onCerrar={cierra} titulo="Negocios, alianzas y patrocinios">
+      <Hoja abierta={ven === "negocios"} onCerrar={cierra} titulo="Negocios, alianzas y patrocinios" compartir={{ hash: "ganar-ganar", texto: "Ganar-Ganar" }}>
         <p className="v2-p">Todos ganamos cuando los negocios, aliados y patrocinadores suman.</p>
         <Fila pal={PAL} n="tienda" t="Negocios" s="Emprendimientos que multiplican valor" fam="negocios" f={va(() => onIr("negocios"), "negocios")} />
         <Fila pal={PAL} n="estrella" t="Gratitud" s="Gracias, reconocimientos y muro" fam="negocios" f={va(() => onIr("gratitud"), "gratitud")} />
@@ -405,7 +463,28 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
         <Fila pal={PAL} n="libro" t="Patrocinios" s="Cómo patrocinar" fam="negocios" f={va(() => irASeccion("patrocinadores"), "patrocinios")} />
       </Hoja>
 
-      <Hoja abierta={ven === "club"} onCerrar={cierra} titulo="Club DCUATES">
+      <Hoja abierta={ven === "club-puntos"} onCerrar={cierra} titulo="Puntos DCUATES" compartir={{ hash: "club-puntos", texto: "Suma puntos y cámbialos por premios" }}>
+        <p className="v2-p">Cada vez que participas suma puntos, y los puntos se cambian por premios. <em>Ejemplos (los puntos reales los define la Tabla de puntos):</em></p>
+        {PUNTOS_EJEMPLOS.map((x) => <div key={x.t} className="v2-ej"><span className="v2-ej-i">{x.ic}</span><span className="v2-ej-t"><b>{x.t}</b><small>{x.d}</small></span><span className="v2-ej-p">+{x.p}</span></div>)}
+        <button type="button" className="v2-ej-b" onClick={va(() => ev("dcuates:tarjeta"), "ver_pase")}>💳 Ver mi Pase</button>
+        <button type="button" className="v2-ej-b v2-ej-b2" onClick={() => setVen("club")}>Quiero unirme al Club</button>
+      </Hoja>
+
+      <Hoja abierta={ven === "club-premios"} onCerrar={cierra} titulo="Premios del Club" compartir={{ hash: "club-premios", texto: "Cambia tus puntos por premios" }}>
+        <p className="v2-p">Con tus puntos eliges un premio. <em>Ejemplos de lo que puede haber (según disponibilidad):</em></p>
+        {PREMIOS_EJEMPLOS.map((x) => <div key={x.t} className="v2-ej"><span className="v2-ej-i">{x.ic}</span><span className="v2-ej-t"><b>{x.t}</b><small>{x.d}</small></span><span className="v2-ej-p v2-ej-p2">{x.p} pts</span></div>)}
+        <button type="button" className="v2-ej-b" onClick={va(() => ev("dcuates:tarjeta"), "canjear")}>🎁 Canjear con mi Pase</button>
+        <button type="button" className="v2-ej-b v2-ej-b2" onClick={() => setVen("club")}>Quiero unirme al Club</button>
+      </Hoja>
+
+      <Hoja abierta={ven === "club-benef"} onCerrar={cierra} titulo="Beneficios especiales" compartir={{ hash: "club-beneficios", texto: "Beneficios especiales para Cuates" }}>
+        <p className="v2-p">Tu Pase DCUATES te da acceso a esto y más. <em>Lo que puede incluir según tu modalidad:</em></p>
+        {BENEFICIOS_EJEMPLOS.map((x) => <div key={x.t} className="v2-ej"><span className="v2-ej-i">{x.ic}</span><span className="v2-ej-t"><b>{x.t}</b><small>{x.d}</small></span></div>)}
+        <button type="button" className="v2-ej-b" onClick={va(() => ev("dcuates:tarjeta"), "ver_pase")}>💳 Ver mi Pase</button>
+        <button type="button" className="v2-ej-b v2-ej-b2" onClick={() => setVen("club")}>Quiero unirme al Club</button>
+      </Hoja>
+
+      <Hoja abierta={ven === "club"} onCerrar={cierra} titulo="Club DCUATES" compartir={{ hash: "club-dcuates", texto: "Tu pase DCUATES te da beneficios especiales" }}>
         <ClubTarjeta ejemplos />
       </Hoja>
     </div>
@@ -429,7 +508,14 @@ const CSS = `
 .v2-card{position:relative}
 .v2-ci{display:flex;margin-top:6px}
 .v2-fichas{display:flex;flex-direction:column;gap:6px}
-.v2-fichas span{min-width:0;display:flex;align-items:center;gap:6px;background:#fff;border:2px solid #efe6c8;border-radius:12px;padding:4px 6px;font-size:12px;font-weight:900;color:#0f3b22}
+.v2-fichas button{display:flex;align-items:center;gap:6px;min-height:44px;width:100%;background:#fff;border:2px solid #efe6c8;border-radius:12px;padding:4px 8px;font-size:12px;font-weight:900;color:#0A5C2E;text-align:left;cursor:pointer;box-shadow:0 2px 0 #d9b24a}
+.v2-fichas button span{flex:1;min-width:0;line-height:1.1}.v2-fichas button i{font-style:normal;font-size:18px;color:#0A7A3C}
+.v2-club-r{display:flex;flex-direction:column;border:0;background:transparent;padding:0;cursor:pointer;text-align:left}
+.v2-ej{display:flex;align-items:center;gap:10px;background:#fff;border:2px solid #efe6c8;border-radius:14px;padding:8px 10px;margin-bottom:8px}
+.v2-ej-i{flex:none;width:44px;height:44px;border-radius:50%;background:#FFF0A8;display:flex;align-items:center;justify-content:center;font-size:24px}
+.v2-ej-t{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.15}.v2-ej-t b{font-size:15px;font-weight:900;color:#0A5C2E}.v2-ej-t small{font-size:12.5px;font-weight:700;color:#3b4f43}
+.v2-ej-p{flex:none;background:#08743B;color:#fff;font-weight:900;font-size:14px;border-radius:14px;padding:4px 10px}.v2-ej-p2{background:#E06A12}
+.v2-ej-b{display:block;width:100%;min-height:50px;border:0;border-radius:16px;background:#08743B;color:#fff;font-size:16px;font-weight:900;margin-top:6px;cursor:pointer}.v2-ej-b2{background:#FFD24D;color:#3b2a00}
 .v2-aviso{display:flex;align-items:center;gap:10px;background:#fff;border:2px solid #cfe5b0;border-radius:18px;padding:10px}
 .v2-aviso-i{flex:none;width:52px;height:52px;border-radius:50%;background:#E9F6D5;display:flex;align-items:center;justify-content:center}
 .v2-aviso-t{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.2}.v2-aviso-t b{font-size:16px;font-weight:900}.v2-aviso-t small{font-size:12px;font-weight:700;color:#2f4d3f}
@@ -460,6 +546,24 @@ const CSS = `
 .v5-hoy{grid-column:span 2;display:flex;align-items:center;gap:10px;border:2px solid rgba(255,210,77,.55);background:rgba(255,255,255,.08);border-radius:18px;padding:10px 12px;color:#fff;text-align:left;cursor:pointer}
 .v5-hoy span{flex:1;display:flex;flex-direction:column;line-height:1.15}.v5-hoy b{font-size:16px;font-weight:900}.v5-hoy small{font-size:12.5px;font-weight:700;opacity:.9}
 .v5-reg{display:flex;flex-direction:column;gap:8px}.v5-reg>b{font-size:15px;font-weight:900;color:#fff}
+.v6-st{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 6px;scrollbar-width:none}.v6-st::-webkit-scrollbar{display:none}
+.v6-st button{flex:none;width:74px;display:flex;flex-direction:column;align-items:center;gap:4px;background:transparent;border:0;cursor:pointer;padding:0}
+.v6-ring{width:68px;height:68px;border-radius:50%;padding:3px;display:flex;box-shadow:0 4px 10px rgba(0,0,0,.18)}.v6-in{flex:1;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center}
+.v6-st small{font-size:12px;font-weight:900;color:#0f2d1e;line-height:1.1;text-align:center}
+.v6-feat{display:flex;flex-direction:column;gap:10px;width:100%;border:0;border-radius:24px;padding:14px;background:linear-gradient(135deg,#E8553F,#FF9A6F 70%,#FFC38A);color:#fff;text-align:left;cursor:pointer;box-shadow:0 8px 18px rgba(232,85,63,.35);position:relative;overflow:hidden}
+.v6-feat::after{content:"";position:absolute;right:-40px;bottom:-40px;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,.16)}
+.v6-feat-h{display:flex;align-items:center;gap:12px}.v6-feat-h span{display:flex;flex-direction:column;line-height:1.1}.v6-feat-h b{font-size:20px;font-weight:900}.v6-feat-h small{font-size:13.5px;font-weight:700;margin-top:3px}
+.v6-pasos{display:flex;gap:6px;z-index:1}.v6-pasos span{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:3px;background:rgba(255,255,255,.22);border-radius:14px;padding:6px 4px;font-size:12px;font-weight:900;text-align:center;line-height:1.1}
+.v6-pasos i{font-style:normal;width:24px;height:24px;border-radius:50%;background:#fff;color:#C2402A;display:flex;align-items:center;justify-content:center;font-size:14px}
+.v6-feat-b{align-self:flex-start;background:#fff;color:#B13A22;border-radius:22px;padding:9px 18px;font-weight:900;font-size:14px;z-index:1}
+.v6-g{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.v6-c{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:4px;min-height:164px;padding:12px;border:2px solid rgba(255,255,255,.9);border-radius:22px;background:linear-gradient(160deg,#fff,#f4f1e6);box-shadow:0 8px 16px rgba(0,0,0,.12);text-align:left;cursor:pointer;color:#0f2d1e;min-width:0}
+.v6-c-i{width:62px;height:62px;border-radius:20px;display:flex;align-items:center;justify-content:center;box-shadow:0 5px 10px rgba(0,0,0,.2);margin-bottom:4px}
+.v6-c b{font-size:16px;font-weight:900;line-height:1.1;overflow-wrap:anywhere}.v6-c small{font-size:12.5px;font-weight:700;color:#3b4f43;line-height:1.2}
+.v6-c-f{position:absolute;right:10px;bottom:10px;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.v6-c:active{transform:scale(.97)}
+.v6-hoy{display:flex;align-items:center;gap:10px;width:100%;border:2px solid #F2D26B;background:#FFF7D6;border-radius:18px;padding:10px 12px;text-align:left;cursor:pointer;color:#3b2a00}
+.v6-hoy span{flex:1;display:flex;flex-direction:column;line-height:1.15}.v6-hoy b{font-size:16px;font-weight:900}.v6-hoy small{font-size:12.5px;font-weight:700}
 .v4-ruta{display:flex;flex-direction:column;gap:10px;position:relative}
 .v4-ruta h2{margin:0 2px;font-size:20px;font-weight:900;color:#08743B}
 .v4-p{display:flex;align-items:center;gap:8px;width:100%;padding:0;border:0;background:transparent;text-align:left;cursor:pointer;position:relative}
@@ -480,10 +584,10 @@ const CSS = `
 .v2-rb{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;min-height:116px;padding:10px 6px;border:2px solid;border-radius:16px;cursor:pointer;color:#0f3b22;min-width:0}
 .v2-rb b{font-size:14px;font-weight:900;letter-spacing:.3px}
 .v2-rb small{font-size:11.5px;font-weight:700;line-height:1.15}
-.v2-club{position:relative;display:block;width:100%;padding:12px;border-radius:22px;background:linear-gradient(135deg,#FFD24D 0%,#F7B500 55%,#E89B00 100%);border:2px solid #C98200;text-align:left;cursor:pointer;flex:none;color:#0B3D2E;box-shadow:0 5px 0 #B87400}
+.v2-club{position:relative;display:block;width:100%;padding:12px;border-radius:22px;background:linear-gradient(135deg,#FFD24D 0%,#F7B500 55%,#E89B00 100%);border:2px solid #C98200;text-align:left;flex:none;color:#0B3D2E;box-shadow:0 5px 0 #B87400}
 .v2-club-g{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:8px;align-items:center}
 .v2-club-l{display:flex;flex-direction:column;gap:10px;min-width:0}
-.v2-club-r{display:flex;flex-direction:column;gap:0;min-width:0}
+
 .v2-club-r .pc+.pc{margin-top:-18px;margin-left:12px;width:calc(100% - 12px)}
 .v2-club-r .pc:first-child{width:calc(100% - 12px)}
 .v2-club-t{display:flex;flex-direction:column;gap:3px}
@@ -492,7 +596,7 @@ const CSS = `
 .v2-fichas2 span{display:flex;align-items:center;justify-content:center;gap:4px;background:#fff;border:2px solid #efe6c8;border-radius:12px;padding:5px 2px;font-size:11.5px;font-weight:900;color:#0f3b22}
 .v2-club-m{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.5fr);gap:8px;align-items:center}
 .v2-pases{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
-.v2-club-t b{font-size:22px;font-weight:900;line-height:1;color:#0B3D2E;display:block}
+.v2-club-t h2{margin:0;font-size:22px;font-weight:900;line-height:1;color:#0A7A3C;text-shadow:0 1px 0 rgba(255,255,255,.55)}
 .v2-club-t em{font-style:normal;display:block;margin-top:5px;font-size:14px;font-weight:900;color:#12355B;line-height:1.2}
 .v2-club-b{align-self:flex-start}
 .v2-act{background:#fff;border:2px solid #efe6c8;border-radius:18px;padding:10px 6px}

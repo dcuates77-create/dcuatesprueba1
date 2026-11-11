@@ -109,6 +109,17 @@ function Atencion({ negocios, eventos }) {
 // ---------- Fechas especiales (e55): festivos, fases de la luna y otros calendarios tipo «fechas», aparte de los eventos ----------
 const MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
 const fDia = new Intl.DateTimeFormat("es-MX", { weekday: "short", day: "numeric", timeZone: "America/Mexico_City" });
+// Color y emoji por tipo de fecha especial (festivo, tradición, luna, estación…).
+const TIPOS_FE = [
+  [/luna|eclipse|perigeo|apogeo/i, "🌙", "#6D5BD0", "#EEEAFB"],
+  [/solsticio|equinoccio|primavera|verano|oto[ñn]o|invierno/i, "🌤️", "#0F8B8D", "#DDF3F3"],
+  [/navidad|noche ?buena|posada|reyes|a[ñn]o nuevo|fin de a[ñn]o/i, "🎄", "#C2255C", "#FDE3EE"],
+  [/muertos|halloween|catrina|ofrenda/i, "💀", "#E8590C", "#FFE8D6"],
+  [/madre|padre|ni[ñn]|amor|amistad|mujer|familia|abuel/i, "💝", "#D6336C", "#FFE3EE"],
+  [/independencia|revoluci[oó]n|constituci[oó]n|bandera|natalicio|benito|ju[aá]rez|patria|trabajo|cinco de mayo|5 de mayo/i, "🇲🇽", "#2B8A3E", "#DFF4E3"],
+  [/guadalupe|semana santa|pascua|candelaria|viernes|jueves santo|santo|virgen/i, "🕊️", "#1971C2", "#DCEBFA"]
+];
+const tipoFe = (e) => { const t = (e.titulo || "") + " " + (e.fuente || ""); const f = TIPOS_FE.find((x) => x[0].test(t)); return f ? { e: f[1], c: f[2], bg: f[3] } : { e: "🎉", c: "#B7791F", bg: "#FFF3D1" }; };
 function FechasEspeciales() {
   const todas = useFechasEspeciales();
   const [abierto, setAbierto] = useState(false);
@@ -140,7 +151,7 @@ function FechasEspeciales() {
           <p className="ag3-fe-t">{MESES[sel.m]} {sel.y}</p>
           {lista.length === 0
             ? <p className="ag3-vacio">No hay fechas especiales este mes con los calendarios elegidos.</p>
-            : lista.map((e, i) => <div className="ag3-fe-f" key={(e.id || "") + i}><b>{fDia.format(e.inicio).replace(".", "")}</b><span>{e.titulo}</span><small>{e.fuente || ""}</small></div>)}
+            : lista.map((e, i) => { const t = tipoFe(e); return <div className="ag3-fe-f" key={(e.id || "") + i} style={{ background: t.bg, borderLeft: "6px solid " + t.c, borderRadius: 12, padding: "6px 10px", marginBottom: 6 }}><b style={{ color: "#fff", background: t.c, borderRadius: 10, padding: "3px 8px" }}>{fDia.format(e.inicio).replace(".", "")}</b><span style={{ color: "#1f2937", fontWeight: 800 }}>{t.e} {e.titulo}</span><small style={{ color: t.c, fontWeight: 800 }}>{e.fuente || ""}</small></div>; })}
         </div>
       )}
     </div>
@@ -148,7 +159,7 @@ function FechasEspeciales() {
 }
 
 // ---------- Calendario completo (e55): se eligen los calendarios y la vista (Mes, Semana o Agenda) ----------
-const COLORES_CAL = ["#1B6F8A", "#7a5ad8", "#C2410C", "#2E9E5B", "#C2255C", "#B7791F", "#0F766E", "#6D28D9"];
+const COLORES_CAL = ["#1B6F8A", "#C2255C", "#E8590C", "#2B8A3E", "#6D5BD0", "#B7791F", "#0F8B8D", "#D6336C"];
 function CalendarioCompleto() {
   const cals = (estadoCal.calendarios && estadoCal.calendarios.length ? estadoCal.calendarios.filter((c) => c.ok !== false) : [{ id: CALENDARIO_ID_PUBLICO, nombre: "DCUATES", principal: true }]);
   const [quitados, setQuitados] = useState(() => cals.filter((c) => !c.principal).map((c) => c.id));
