@@ -3,7 +3,7 @@
 Un renglón por etapa. Al subir cada etapa a GitHub, usa como mensaje de commit el sello y el resumen
 (ejemplo: `CLON12 · e77: portada v3 por defecto`) y, si quieres, crea una «Release» con la etiqueta `e77`.
 
-| Etapa | Sello | Qué cambió |
+| Etapa | Sello | Qué cambió  |
 |---|---|---|
 | e70 | CLON12 · e70 | Gratitud separada en «Gracias y reconocimientos» y «Muro de gratitud». |
 | e71–e72 | CLON12 · e71–e72 | Portada nueva (?v=2): tarjetas y ventanas, actividades y pie legal. |
