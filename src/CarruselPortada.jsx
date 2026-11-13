@@ -61,8 +61,16 @@ export default function CarruselPortada({ items = [], tab, slogan, fallback, car
 
   // Sin contenido ni imagen de respaldo que exista, el carrusel no se muestra
   // (así no queda una tarjeta vacía con solo un emoji).
+  // e78: en el reel de Causas se ALTERNAN videos y logos/imágenes (video, logo, video, logo…) en lugar de ir todos los videos juntos.
+  const alternar = (lista) => {
+    const vid = lista.filter((x) => x && x.tipo === "video"), otros = lista.filter((x) => !(x && x.tipo === "video"));
+    if (!vid.length || !otros.length) return lista;
+    const sal = []; const m = Math.max(vid.length, otros.length);
+    for (let i = 0; i < m; i++) { if (i < vid.length) sal.push(vid[i]); if (i < otros.length) sal.push(otros[i]); }
+    return sal;
+  };
   const base = items.length > 0
-    ? items
+    ? (reel ? alternar(items) : items)
     : fallback && !respaldoRoto
       ? [{ id: "respaldo", tipo: "imagen", img: fallback, alFallar: () => setRespaldoRoto(true) }]
       : [];

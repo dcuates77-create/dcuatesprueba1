@@ -14,6 +14,7 @@ import { WHATSAPP_NUMERO } from "./datos/config.js";
 import { ACTIVIDADES_FIJAS } from "./datos/actividadesFijas.js";
 import { PUNTOS_EJEMPLOS, PREMIOS_EJEMPLOS, BENEFICIOS_EJEMPLOS } from "./datos/clubEjemplos.js";
 import ClubTarjeta from "./ClubDcuates.jsx";
+import { useMisPuntos } from "./utilidades/tarjetaHoja.js";
 import ComoFunciona from "./ComoFunciona.jsx";
 import { abrirTablon } from "./Tablon.jsx";
 import { abrirPlus } from "./AgendaPlus.jsx";
@@ -162,6 +163,31 @@ function Pie({ onSugerencias }) {
       <p>© {new Date().getFullYear()} DCUATES, un programa de CONEXIONES CON CAUSA ♥</p>
     </footer>
   );
+}
+
+// e78 — «MIS PUNTOS»: pequeña ventana en el Club de la portada. Con Pase guardado muestra los puntos (los ve solo ese celular); sin Pase invita a unirse.
+function MisPuntos({ onPase, onUnirse }) {
+  const m = useMisPuntos();
+  const num = !m.tiene ? "0" : m.oculto ? "•••" : m.puntos === null ? "…" : String(m.puntos);
+  const frase = !m.tiene ? "Únete y recibe 50 puntos de bienvenida"
+    : m.oculto || m.puntos === null ? "Toca para ver tu Pase y seguir sumando"
+    : m.faltan ? "¡Te faltan " + m.faltan + " para tu próximo premio!"
+    : m.puntos < 50 ? "¡Suma tus primeros puntos hoy!"
+    : "Sigue SUMANDO y ganando";
+  return (
+    <button type="button" className="v2-mp" onClick={() => { registrar("v2_mis_puntos", { tiene: m.tiene }); (m.tiene ? onPase : onUnirse)(); }} aria-label={"Mis puntos: " + num + ". " + frase}>
+      <span className="v2-mp-e" aria-hidden="true">✦</span>
+      <span className="v2-mp-t"><small>MIS PUNTOS</small><b>{num}</b></span>
+      <span className="v2-mp-f">{frase}</span>
+    </button>
+  );
+}
+// Frases que cambian solas (se detienen si la persona pidió menos movimiento: el CSS las deja fijas)
+const FRASES_CLUB = ["Suma, comparte y gana: ¡tu comunidad te espera!", "Cada recomendación y cada ayuda suman puntos.", "Canjea tus puntos por libros, cursos, regalos y más.", "¡Hoy es un buen día para ser CUATE!"];
+function FraseClub() {
+  const [i, setI] = useState(0);
+  useEffect(() => { const t = setInterval(() => setI((x) => (x + 1) % FRASES_CLUB.length), 4200); return () => clearInterval(t); }, []);
+  return <p className="v2-frase" key={i} aria-live="off">{FRASES_CLUB[i]}</p>;
 }
 
 export default function InicioV2({ onIr, logros = [], cargando = false, entrada = {}, portadas = {}, anuncios = [], onSugerencias, variante = "2" }) {
@@ -390,24 +416,27 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
       {variante === "2" && registra}
       <section className="v2-club" aria-label="Club DCUATES">
         <style>{CSS_PASEEJ + CSS_PASECOMPLETO}</style>
+        <span className="v2-sp s1" aria-hidden="true">✦</span><span className="v2-sp s2" aria-hidden="true">✦</span><span className="v2-sp s3" aria-hidden="true">✧</span><span className="v2-sp s4" aria-hidden="true">✦</span><span className="v2-sp s5" aria-hidden="true">✧</span>
         <div className="v2-club-g">
           <div className="v2-club-l">
             <div className="v2-club-t">
               <h2>CLUB DCUATES</h2>
               <em>Tu pase DCUATES te da BENEFICIOS ESPECIALES !</em>
             </div>
+            <MisPuntos onPase={() => ev("dcuates:tarjeta")} onUnirse={abre("club")} />
             <div className="v2-fichas">
               <button type="button" onClick={abre("club-puntos")}><Ico n="estrella" c="#E06A12" s={26} /><span>Puntos</span><i>›</i></button>
               <button type="button" onClick={abre("club-premios")}><Ico n="premio" c="#2C8A2E" s={26} /><span>Premios</span><i>›</i></button>
               <button type="button" onClick={abre("club-benef")}><Ico n="llave" c="#2B5BD7" s={26} /><span>Beneficios especiales</span><i>›</i></button>
             </div>
-            <button type="button" className="v2-ver v2-club-b" onClick={abre("club")}>Únete aquí ›</button>
           </div>
           <button type="button" className="v2-club-r" onClick={abre("club")} aria-label="Mira cómo es tu Pase DCUATES">
             <PaseCompleto id="vecino" quien="mujer" foto="/images/pase-ejemplo-mujer.jpg" nombre="Ana Pérez" num="VEC100A" pts={100} inclinar={-2} />
             <PaseCompleto id="voluntario" quien="hombre" foto="/images/pase-ejemplo-hombre.jpg" nombre="Luis Ramírez" num="VOL250B" pts={250} inclinar={2} />
           </button>
         </div>
+        <button type="button" className="v2-unete" onClick={abre("club")}><span>ÚNETE AL CLUB !!!</span><i aria-hidden="true"><Ico n="flecha" c="#0A5A2C" s={34} /></i></button>
+        <FraseClub />
       </section>
 
       <Actividades agenda={entrada.agenda} filasZona={entrada.filasZona} anuncios={anuncios} />
@@ -598,6 +627,37 @@ const CSS = `
 .v2-pases{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
 .v2-club-t h2{margin:0;font-size:22px;font-weight:900;line-height:1;color:#0A7A3C;text-shadow:0 1px 0 rgba(255,255,255,.55)}
 .v2-club-t em{font-style:normal;display:block;margin-top:5px;font-size:14px;font-weight:900;color:#12355B;line-height:1.2}
+/* e78 — Club: movimiento, MIS PUNTOS y botón ÚNETE; palpitar en secuencia en la v3 */
+.v2-club{overflow:hidden}
+.v2-club-l,.v2-club-r{position:relative;z-index:1}
+.v2-sp{position:absolute;z-index:0;color:#fff;font-size:20px;opacity:0;pointer-events:none;text-shadow:0 0 8px rgba(255,255,255,.9);animation:v2tw 4.5s ease-in-out infinite}
+.v2-sp.s1{left:6%;top:10%;animation-delay:0s}.v2-sp.s2{right:8%;top:6%;animation-delay:1.1s;font-size:26px}.v2-sp.s3{left:44%;top:42%;animation-delay:2.2s}.v2-sp.s4{right:6%;bottom:22%;animation-delay:3.1s;font-size:16px}.v2-sp.s5{left:4%;bottom:26%;animation-delay:1.7s;font-size:24px}
+@keyframes v2tw{0%,100%{opacity:0;transform:scale(.5) rotate(0)}45%{opacity:.95;transform:scale(1.15) rotate(20deg)}70%{opacity:0;transform:scale(.7) rotate(40deg)}}
+.v2-club-r .pc:first-child{animation:v2fl 4.2s ease-in-out infinite}
+.v2-club-r .pc+.pc{animation:v2fl 4.2s ease-in-out infinite;animation-delay:-2.1s}
+@keyframes v2fl{0%,100%{translate:0 0}50%{translate:0 -6px}}
+.v2-mp{display:grid;grid-template-columns:auto 1fr;grid-template-areas:"e t" "f f";gap:2px 8px;align-items:center;width:100%;padding:7px 9px;border:2px solid #fff;border-radius:14px;background:rgba(255,255,255,.92);text-align:left;cursor:pointer;color:#0f2d1e;font:inherit;box-shadow:0 3px 0 #C98200}
+.v2-mp:active{transform:translateY(2px);box-shadow:none}
+.v2-mp-e{grid-area:e;font-size:26px;line-height:1;color:#E89B00;animation:v2tw2 2.6s ease-in-out infinite}
+@keyframes v2tw2{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(1.2) rotate(12deg)}}
+.v2-mp-t{grid-area:t;display:flex;align-items:baseline;justify-content:space-between;gap:6px;min-width:0}
+.v2-mp-t small{font-size:11px;font-weight:900;letter-spacing:.3px;color:#12355B;white-space:nowrap}
+.v2-mp-t b{font-size:26px;font-weight:900;line-height:1;color:#0A7A3C}
+.v2-mp-f{grid-area:f;font-size:12.5px;font-weight:800;line-height:1.2;color:#7a3b00}
+.v2-unete{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;gap:12px;width:100%;min-height:62px;margin:12px 0 0;padding:6px 14px;border:2px solid #fff;border-radius:18px;background:linear-gradient(120deg,#0A7A3C,#12A057);color:#fff;font:inherit;cursor:pointer;box-shadow:0 5px 0 #06592B;z-index:1}
+.v2-unete span{font-size:22px;font-weight:900;letter-spacing:.4px;text-shadow:0 2px 2px rgba(0,0,0,.3)}
+.v2-unete i{flex:none;width:46px;height:46px;border-radius:50%;background:#FFD24D;display:flex;align-items:center;justify-content:center;animation:v2nudge 1.6s ease-in-out infinite}
+.v2-unete:active{transform:translateY(3px);box-shadow:0 2px 0 #06592B}
+.v2-unete::after{content:"";position:absolute;top:0;bottom:0;width:38%;left:-60%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.45),transparent);animation:v2sh 3.8s ease-in-out infinite}
+@keyframes v2sh{0%,55%{left:-60%}100%{left:130%}}
+@keyframes v2nudge{0%,100%{translate:0 0}50%{translate:5px 0}}
+.v2-frase{position:relative;z-index:1;margin:9px 4px 2px;text-align:center;font-size:15px;font-weight:900;line-height:1.25;color:#12355B;animation:v2fr .6s ease-out}
+@keyframes v2fr{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.v3-b-i,.v3-rt svg{animation:v3p 9.6s ease-in-out infinite}
+.v3-sol .v3-b:nth-child(1) .v3-b-i{animation-delay:0s}.v3-sol .v3-b:nth-child(2) .v3-b-i{animation-delay:1.2s}.v3-sol .v3-b:nth-child(3) .v3-b-i{animation-delay:2.4s}.v3-sol .v3-b:nth-child(4) .v3-b-i{animation-delay:3.6s}.v3-sol .v3-b:nth-child(5) .v3-b-i{animation-delay:4.8s}
+.v2-reg-g .v3-rt:nth-child(1) svg{animation-delay:6s}.v2-reg-g .v3-rt:nth-child(2) svg{animation-delay:7.2s}.v2-reg-g .v3-rt:nth-child(3) svg{animation-delay:8.4s}
+@keyframes v3p{0%{scale:1}5%{scale:1.18}10%{scale:1}100%{scale:1}}
+@media (prefers-reduced-motion:reduce){.v2-sp,.v2-club-r .pc,.v2-mp-e,.v2-unete i,.v2-unete::after,.v3-b-i,.v3-rt svg{animation:none!important}.v2-sp{display:none}.v2-frase{animation:none}}
 .v2-club-b{align-self:flex-start}
 .v2-act{background:#fff;border:2px solid #efe6c8;border-radius:18px;padding:10px 6px}
 .v2-act-h{display:flex;align-items:center;gap:8px;margin:0 2px 8px}

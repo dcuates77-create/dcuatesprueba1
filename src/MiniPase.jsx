@@ -2,8 +2,8 @@
 import React from "react";
 import { TEMAS } from "./datos/tarjeta.js";
 
-const CORTO = { vecino: "VECINO", aliado: "ALIAD@", voluntario: "VOLUNTARI@", patrocinador: "PATROCINADOR/A", padrino: "PADRINO/MADRINA", organizacion: "ORGANIZACIÓN" };
-const NUM = { vecino: "VEC", aliado: "ALI", voluntario: "VOL", patrocinador: "PAT", padrino: "PAD", organizacion: "ORG" };
+const CORTO = { vecino: "VECINO", aliado: "ALIAD@", voluntario: "VOLUNTARI@", patrocinador: "PATROCINADOR/A", padrino: "PADRINO/MADRINA", organizacion: "ORGANIZACIÓN", circulo: "CÍRCULO DE CONFIANZA", cortesia: "CORTESÍA" };
+const NUM = { vecino: "VEC", aliado: "ALI", voluntario: "VOL", patrocinador: "PAT", padrino: "PAD", organizacion: "ORG", circulo: "CIR", cortesia: "COR" };
 
 export default function MiniPase({ id = "vecino", grande = false }) {
   const t = TEMAS[id] || TEMAS.vecino;
