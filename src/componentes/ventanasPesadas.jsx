@@ -5,6 +5,7 @@ import { BotonCerrar, CasillaAcepto, ErrorAcepto, VentanaMarca, abrirLegal, useA
 import { Carrusel, FlechaBlanca, PasarelaVentasConCausa, TarjetaCarrusel } from "./media.jsx";
 import { ACCESOS_BENEFICIOS, ACCESOS_REGISTROS } from "../datos/accesos.js";
 import { abrirRegistroPrevio } from "../RegistroPrevio.jsx";
+import { modalidadPorId } from "../datos/club.js";
 import { useAtras } from "../atras.js";
 import { opcionAportacion } from "../datos/registros.js";
 import { PATROCINADORES_ALIANZAS_ITEMS } from "../datos/cintas.js";
@@ -995,6 +996,14 @@ export function ContenidoModalProyecto({ id, onCerrar }) {
           ) : (!proyecto.registro && !proyecto.micro) ? (
             <BotonModal href={proyecto.enlaceDirectoWA}>{proyecto.textoBoton}</BotonModal>
           ) : null}
+          {proyecto.clubModalidad && modalidadPorId(proyecto.clubModalidad) && (
+            <>
+              <BotonModal onClick={() => { registrar("club_unirse", { m: proyecto.clubModalidad, desde: "proyecto" }); abrirRegistroPrevio("club", { valores: { mod: modalidadPorId(proyecto.clubModalidad).nombre } }); }}>
+                🧡 Pase del Club: únete como {modalidadPorId(proyecto.clubModalidad).nombre}
+              </BotonModal>
+              <BotonModal variante="secundario" onClick={() => window.dispatchEvent(new CustomEvent("dcuates:tarjeta"))}>💳 Ya soy Cuate: abrir mi Pase</BotonModal>
+            </>
+          )}
           {proyecto.segundoBoton && (
             proyecto.segundoBoton.claveZona ? (
               <BotonModalProtegido zona={proyecto.segundoBoton.claveZona}>
