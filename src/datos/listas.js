@@ -57,6 +57,7 @@ export const INICIATIVAS_PRINCIPALES = [
     puntos: ["Perfiles verificados por confianza", "Sinergia que multiplica", "Red exclusiva de contactos"],
     textoBoton: "Me interesa sumar",
     enlaceDirectoWA: enlaceWhatsApp("¡Hola DCUATES! Me interesa sumarme al Círculo de Confianza y sus Apoyos y Beneficios Mutuos."),
+    clubModalidad: "circulo", // e78: muestra «Pase del Club» (Círculo de Confianza CUATE) en esta ventana
     segundoBoton: {
       titulo: "Únete a Nuestra Red de Confianza (Con Clave de Acceso)",
       // e63: el enlace del grupo ya no está en el código; se pide a la hoja (pestaña «Zonas», perfil circulo, bloque grupo) con la clave del Círculo

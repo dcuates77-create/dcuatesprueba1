@@ -81,6 +81,29 @@ export const MODALIDADES = [
       "Constancia de colaboración"
     ],
     compromiso: "Colaborar de buena fe y avisar de las actividades que quieras compartir con la comunidad."
+  },
+  {
+    id: "circulo", e: "🔒", nombre: "Círculo de Confianza CUATE", boton: "Círculo de Confianza CUATE",
+    quien: "Personas y negocios TOTALMENTE CONFIABLES que quieren sumar con otros perfiles en la misma sintonía, en la red de apoyos y beneficios mutuos.",
+    puedeIncluir: [
+      "Perfiles verificados por confianza",
+      "Acceso, con tu clave, al grupo de la Red de Confianza",
+      "Recomendaciones y conexiones de apoyo (dar y recibir)",
+      "Sinergia: intercambios y beneficios mutuos con otros Cuates",
+      "Tu Pase digital, tus puntos y la Zona CUATES"
+    ],
+    compromiso: "Actuar con confianza y respeto, y recomendar o pedir recomendaciones de buena fe. Tu ingreso se aprueba por confianza: DCUATES te escribe por WhatsApp."
+  },
+  {
+    id: "cortesia", e: "🎟️", nombre: "Cortesía CUATE", boton: "Pase de Cortesía",
+    quien: "Personas, organizaciones, instituciones, medios, creadores o colaboradores que no encajan en las otras modalidades y a quienes DCUATES invita a conocer el Club.",
+    puedeIncluir: [
+      "Tu Pase digital y la Zona CUATES para conocer cómo funciona el Club",
+      "Difusión de tus actividades en la Agenda (solo si lo autorizas)",
+      "Aviso de actividades y noticias de la comunidad",
+      "Posibilidad de convertirte después en Vecino, Voluntari@, Aliad@, Patrocinador/a u otra modalidad"
+    ],
+    compromiso: "Ninguno obligatorio: es una invitación de cortesía. DCUATES revisa cada solicitud y puede concederla por un tiempo (por ejemplo, 3 meses renovables) para que conozcas el Club."
   }
 ];
 

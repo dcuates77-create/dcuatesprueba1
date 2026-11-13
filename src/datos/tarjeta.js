@@ -17,10 +17,10 @@ export const TEXTO_SIGUE_SUMANDO = "Sigue SUMANDO y ganando";
 // Zona CUATES: pestañas en el orden en que aparecen. El contenido viene de la pestaña «Contenido Club» de tu hoja; una sección nueva escrita allí
 // aparece sola como pestaña nueva (con su nombre). Aquí solo se ponen el ícono y el nombre de las secciones conocidas.
 export const SECCIONES_CLUB = [
+  { id: "ganar", ic: "⭐", t: "Cómo ganar" },
   { id: "proyectos", ic: "🧭", t: "Proyectos" },
   { id: "beneficios", ic: "🎁", t: "Beneficios" },
   { id: "retos", ic: "🎯", t: "Retos" },
-  { id: "ganar", ic: "⭐", t: "Cómo ganar" },
   { id: "novedades", ic: "📣", t: "Novedades" }
 ];
 export const nombreSeccion = (id) => { const s = SECCIONES_CLUB.find((x) => x.id === id); return s ? { ic: s.ic, t: s.t } : { ic: "✨", t: String(id).replace(/-/g, " ").replace(/^./, (c) => c.toUpperCase()) }; };
@@ -29,7 +29,7 @@ export const nombreSeccion = (id) => { const s = SECCIONES_CLUB.find((x) => x.id
 export const VELOS = [{ id: "suave", t: "Suave", a: 0.4 }, { id: "medio", t: "Medio", a: 0.62 }, { id: "fuerte", t: "Fuerte", a: 0.8 }];
 
 // Las tres letras del número de Cuate → perfil (por si el nombre del perfil cambiara)
-export const PREFIJO_A_PERFIL = { VEC: "vecino", VOL: "voluntario", PAD: "padrino", ALI: "aliado", PAT: "patrocinador", ORG: "organizacion" };
+export const PREFIJO_A_PERFIL = { VEC: "vecino", VOL: "voluntario", PAD: "padrino", ALI: "aliado", PAT: "patrocinador", ORG: "organizacion", CIR: "circulo", COR: "cortesia" };
 
 // c1 = color oscuro (títulos y encabezado del panel) · c2 = color principal (insignia y barra) · f1→f2 = degradado del fondo
 // silueta: casas | ciudad | gente | corazon | corazones | edificio
@@ -53,6 +53,14 @@ export const TEMAS = {
   padrino: {
     rotulo: "CUATE PADRINO/MADRINA", icono: "💛", c1: "#8E1148", c2: "#D81B60", f1: "#FFE8F1", f2: "#F8B6D0", silueta: "corazones",
     lemas: ["Acompañar es sembrar futuro…", "Apadrinar es cuidar de cerca…", "Un gesto que se multiplica…"]
+  },
+  circulo: {
+    rotulo: "CUATE CÍRCULO DE CONFIANZA", icono: "🔒", c1: "#8B2E1A", c2: "#E4572E", f1: "#FFEDE6", f2: "#F7B9A6", silueta: "gente",
+    lemas: ["Confianza que suma y multiplica…", "Entre gente de confianza, todos ganamos…", "Mi círculo, nuestra fuerza…"]
+  },
+  cortesia: {
+    rotulo: "CUATE DE CORTESÍA", icono: "🎟️", c1: "#6B5200", c2: "#C99A0B", f1: "#FFF7D9", f2: "#F3DF8E", silueta: "corazon",
+    lemas: ["Una invitación para conocernos…", "Bienvenid@ a la comunidad…", "Hoy de cortesía, mañana Cuate de corazón…"]
   },
   organizacion: {
     rotulo: "CUATE ORGANIZACIÓN", icono: "🏛️", c1: "#004D40", c2: "#00897B", f1: "#DDF6F1", f2: "#A5E0D6", silueta: "edificio",
