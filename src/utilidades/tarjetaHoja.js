@@ -73,6 +73,33 @@ export const pedirTarjeta = async (pin, numero = "") => {
   } catch (e) { return { ok: false, motivo: "red" }; }
 };
 
+// e78 — «MIS PUNTOS» en la portada: lee lo último que este celular vio de su Pase (sin pedir nada) y, si hay Pase guardado,
+// lo actualiza una vez en silencio al abrir la página. Nunca borra la sesión (eso solo lo hace el Pase al abrirse).
+const misDatos = () => {
+  const tiene = haySesionPase(), d = leer(LLAVE_DATOS) || {}, pr = leer(LLAVE_PREF) || {};
+  const puntos = tiene && typeof d.puntos === "number" ? d.puntos : null;
+  const apart = Number(d.comprometidos) || 0;
+  const premios = Array.isArray(d.premios) ? d.premios : [];
+  const disp = puntos === null ? null : Math.max(0, puntos - apart);
+  const sig = disp === null ? null : premios.filter((x) => x && x.p > disp).sort((a, b) => a.p - b.p)[0] || null;
+  return { tiene, puntos, disp, oculto: !!pr.oculto, faltan: sig ? sig.p - disp : null, hayPremios: premios.length > 0 };
+};
+export function useMisPuntos() {
+  const [d, setD] = useState(misDatos);
+  useEffect(() => {
+    const f = () => setD(misDatos());
+    window.addEventListener("dcuates:pase-cambio", f);
+    window.addEventListener("storage", f);
+    let vivo = true;
+    const s = leer(LLAVE);
+    if (s && s.k && Date.now() - (s.t || 0) < DIAS * 86400000) {
+      pedirTarjeta(s.k, s.n).then((r) => { if (vivo && r.ok) { escribir(LLAVE_DATOS, r.tarjeta); setD(misDatos()); } });
+    }
+    return () => { vivo = false; window.removeEventListener("dcuates:pase-cambio", f); window.removeEventListener("storage", f); };
+  }, []);
+  return d;
+}
+
 // Hook. «activo» = true mientras la ventana está abierta (cada apertura revalida con la hoja).
 export function useTarjeta(activo) {
   const [tarjeta, setTarjeta] = useState(null);
