@@ -61,6 +61,17 @@ export const REGISTROS = {
       { k: "of", etiqueta: "¿Qué puedes ofrecer?", tipo: "area", max: 300, req: true },
       { k: "bus", etiqueta: "¿Qué buscas o necesitas?", tipo: "area", max: 300 },
     ], { wa: "¡Hola DCUATES! Acabo de registrar mi interés en una alianza." }),
+  pagina: R("pagina", "🏪", "Tu Página CUATE", "PAG", "Página CUATE", "Páginas CUATE · negocios",
+    "Cuéntanos de tu negocio para armar tu Página CUATE. Queda como borrador y la revisamos juntos por WhatsApp. Es gratuita si ofreces promociones o beneficios a los Cuates; si no, es de aportación voluntaria y la acordamos contigo.",
+    [
+      { k: "neg", etiqueta: "Nombre de tu negocio", max: 100, req: true },
+      { k: "cat", etiqueta: "¿A qué se dedica?", tipo: "opciones", opciones: ["Salud", "Alimentos", "Educación", "Servicios comunitarios", "Productos varios", "Servicios varios", "Mercados y tianguis", "Tecnología", "Belleza y bienestar", "Hogar y construcción", "Mascotas", "Transporte y reparto", "Ocio y cultura", "Altruismo", "Especialidades"], req: true },
+      { k: "mod", etiqueta: "¿Cómo quieres tu Página CUATE?", tipo: "opciones", opciones: ["Gratuita", "Aportación voluntaria"], req: true },
+      { k: "of", etiqueta: "¿Qué ofreces?", tipo: "area", max: 300, req: true, ph: "Ej. Tamales y atole, pedidos para eventos" },
+      { k: "promo", etiqueta: "Promoción o beneficio para los Cuates (si tienes)", tipo: "area", max: 300, ph: "Ej. 10% de descuento al mostrar su Pase CUATE" },
+      ZONA,
+      { k: "web", etiqueta: "Tu Facebook, Instagram o sitio (opcional)", max: 200 },
+    ], { wa: "¡Hola DCUATES! Acabo de registrar mi Página CUATE. Quiero platicar los detalles (y mi aportación voluntaria, si aplica) y enviarles mi logo y fotos." }),
   circulo: R("circulo", "🤝", "Círculo de Confianza", "CIR", "Registro de red", "Círculo de Confianza",
     "Súmate a los apoyos y beneficios mutuos. Cuéntanos qué aportas y qué necesitas.",
     [
@@ -256,7 +267,7 @@ const CON_EVIDENCIA = ["extraviado", "aportacion", "reto", "regalo", "ecatepets"
 // Lado de la dinámica OFREZCO / NECESITO (columna «Lado» de «Registros»). Vacío = mixto.
 const LADOS = {
   ofrezco: "Ofrezco", necesito: "Necesito", solicitud: "Necesito", asesorias: "Necesito", bienestar: "Necesito", interes: "Necesito", extraviado: "Necesito", interesa: "Necesito",
-  asesor: "Ofrezco", alianza: "Ofrezco", bazar: "Ofrezco", regalo: "Ofrezco", aportacion: "Ofrezco", horario: "Ofrezco", iniciativa: "Ofrezco", voluntario: "Ofrezco", ventas: "", invitar: "Ofrezco", difusion: "Ofrezco", recomendar: "Ofrezco", club: ""
+  asesor: "Ofrezco", alianza: "Ofrezco", pagina: "Ofrezco", bazar: "Ofrezco", regalo: "Ofrezco", aportacion: "Ofrezco", horario: "Ofrezco", iniciativa: "Ofrezco", voluntario: "Ofrezco", ventas: "", invitar: "Ofrezco", difusion: "Ofrezco", recomendar: "Ofrezco", club: ""
 };
 // Registros relacionados: aparecen como botones «¿Quieres también…?» dentro de la ventana y en el acuse.
 const RELACIONADOS = {
@@ -266,6 +277,7 @@ const RELACIONADOS = {
   asesorias: ["solicitud", "libros", "asesor"],
   asesor: ["voluntario", "libros", "asesorias"],
   alianza: ["ventas", "horario", "circulo", "invitar"],
+  pagina: ["alianza", "ventas", "invitar"],
   circulo: ["alianza", "invitar", "ofrezco", "necesito"],
   bazar: ["ventas", "alianza", "ofrezco"],
   ventas: ["bazar", "alianza", "ofrezco", "necesito"],

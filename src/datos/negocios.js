@@ -1,47 +1,58 @@
 // =========================================================================
-// src/datos/negocios.js (e79) — MINI PÁGINAS DE NEGOCIOS CUATE (dcuates.com/n/<slug>)
+// src/datos/negocios.js (e79, ampliado en e80) — PÁGINAS CUATE DE NEGOCIOS (dcuates.com/n/<slug>)
 // Los datos viven en tu hoja de Google, pestaña «NegociosCUATE» (una fila por negocio). Aquí solo hay:
-//  · las categorías (color e ícono),
-//  · dos negocios de EJEMPLO que solo se muestran si la hoja todavía no responde (para probar el diseño),
-//  · la función que pide el negocio al Apps Script (?a=negocio&slug=…).
+//  · las categorías (color e ícono): si agregas una categoría nueva en la hoja, hay que darla de alta aquí,
+//  · los niveles (Básico / Impulsor / Patrocinador),
+//  · las funciones que piden el negocio o el directorio al Apps Script (?a=negocio / ?a=negocios),
+//  · los negocios de EJEMPLO (negociosEjemplos.js), que solo se muestran si la hoja todavía no responde.
 // =========================================================================
 import { GOOGLE_SHEETS_URL } from "./config.js";
+import { EJEMPLOS, EJEMPLOS_DIRECTORIO } from "./negociosEjemplos.js";
 
-export const CATEGORIAS = {
-  SALUD: { e: "🩺", color: "#0E7490", nombre: "Salud" },
-  ALIMENTOS: { e: "🍽️", color: "#C2410C", nombre: "Alimentos" },
-  "EDUCACIÓN": { e: "🎓", color: "#4F46E5", nombre: "Educación" },
-  EDUCACION: { e: "🎓", color: "#4F46E5", nombre: "Educación" },
-  OCIO: { e: "🎭", color: "#7A5AD8", nombre: "Ocio" },
-  ALTRUISMO: { e: "🤲", color: "#BE185D", nombre: "Altruismo" },
-  SERVICIOS: { e: "🛠️", color: "#475569", nombre: "Servicios" },
-  COMERCIO: { e: "🛍️", color: "#B7791F", nombre: "Comercio" },
-  OTRO: { e: "🏪", color: "#1F7A46", nombre: "Negocio" }
-};
-export const categoriaDe = (c) => CATEGORIAS[String(c || "").toUpperCase()] || CATEGORIAS.OTRO;
+const K = (s) => String(s || "").toUpperCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\s+/g, " ").trim();
+const CATS = [
+  ["SALUD", "🩺", "#0E7490", "Salud"],
+  ["ALIMENTOS", "🍽️", "#C2410C", "Alimentos"],
+  ["EDUCACION", "🎓", "#4F46E5", "Educación"],
+  ["SERVICIOS COMUNITARIOS", "🤝", "#0F766E", "Servicios comunitarios"],
+  ["PRODUCTOS VARIOS", "🛍️", "#B45309", "Productos varios"],
+  ["SERVICIOS VARIOS", "🛠️", "#475569", "Servicios varios"],
+  ["MERCADOS Y TIANGUIS", "🧺", "#15803D", "Mercados y tianguis"],
+  ["TECNOLOGIA", "💻", "#1D4ED8", "Tecnología"],
+  ["BELLEZA Y BIENESTAR", "💆", "#A21CAF", "Belleza y bienestar"],
+  ["HOGAR Y CONSTRUCCION", "🏠", "#78350F", "Hogar y construcción"],
+  ["MASCOTAS", "🐾", "#4D7C0F", "Mascotas"],
+  ["TRANSPORTE Y REPARTO", "🚚", "#0369A1", "Transporte y reparto"],
+  ["OCIO Y CULTURA", "🎭", "#7A5AD8", "Ocio y cultura"],
+  ["ALTRUISMO", "💞", "#BE185D", "Altruismo"],
+  ["ESPECIALIDADES", "⭐", "#1F7A46", "Especialidades"]
+];
+export const CATEGORIAS = Object.fromEntries(CATS.map(([k, e, color, nombre]) => [k, { e, color, nombre }]));
+// Nombres anteriores (e79) que siguen funcionando
+CATEGORIAS.OCIO = CATEGORIAS["OCIO Y CULTURA"];
+CATEGORIAS.SERVICIOS = CATEGORIAS["SERVICIOS VARIOS"];
+CATEGORIAS.COMERCIO = CATEGORIAS["PRODUCTOS VARIOS"];
+CATEGORIAS.OTRO = CATEGORIAS.ESPECIALIDADES;
+export const LISTA_CATEGORIAS = CATS.map(([k, e, color, nombre]) => ({ k, e, color, nombre }));
+export const categoriaDe = (c) => CATEGORIAS[K(c)] || CATEGORIAS.ESPECIALIDADES;
+export const claveCategoria = (c) => { const x = CATEGORIAS[K(c)]; return x ? x.nombre : "Especialidades"; };
 
-const EJEMPLOS = {
-  "ejemplo-salud": {
-    s: "ejemplo-salud", n: "Fisioterapia Movimiento Vivo", e: "Muévete sin dolor, vive con ganas", c: "SALUD", patro: true,
-    d: "Consultorio de fisioterapia y rehabilitación en Jardines de Morelos. Atendemos dolor de espalda, lesiones deportivas y movilidad en adultos mayores, con trato cercano y precios justos.",
-    of: ["Valoración y plan de ejercicios", "Terapia para dolor de espalda y cuello", "Rehabilitación después de lesiones", "Activación física para adultos mayores"],
-    h: "Lun a Vie 9:00–19:00 · Sáb 9:00–14:00", dir: "Jardines de Morelos, Ecatepec (dirección de ejemplo)", mapa: "", wa: "525500000000", tel: "", web: "", fb: "", ig: "", logo: "", portada: "", gal: [],
-    ofT: "Valoración sin costo", ofD: "Presenta tu Pase CUATE y recibe tu primera valoración sin costo y 10% en tu plan de terapia.",
-    rec: "Valoración inicial sin costo y 10% de descuento para Cuates del Club", nec: "Voluntarios para jornadas de activación física en el parque", com: "Videos cortos de ejercicios de cuidado para adultos mayores",
-    club: true, cod: "NEG-1001-SLD",
-    red: [{ s: "ejemplo-alimentos", n: "Tamales Doña Chela", c: "ALIMENTOS", l: "", e: "Sabor casero, hecho con cariño" }]
-  },
-  "ejemplo-alimentos": {
-    s: "ejemplo-alimentos", n: "Tamales Doña Chela", e: "Sabor casero, hecho con cariño", c: "ALIMENTOS", patro: false,
-    d: "Tamales y atole hechos a diario con receta familiar. Pedidos para desayunos, reuniones y fechas especiales. Entrega gratis en la colonia.",
-    of: ["Tamales de rajas, mole, dulce y verde", "Atole y champurrado", "Pedidos para eventos", "Entrega a domicilio en la colonia"],
-    h: "Todos los días 7:00–13:00", dir: "Jardines de Morelos, Ecatepec (dirección de ejemplo)", mapa: "", wa: "525500000000", tel: "", web: "", fb: "", ig: "", logo: "", portada: "", gal: [],
-    ofT: "", ofD: "", rec: "Tamales y atole frescos todos los días; pedidos con un día de anticipación", nec: "Vecinos que quieran repartir pedidos en bicicleta", com: "Receta de atole y consejos para tus reuniones",
-    club: false, cod: "NEG-1002-ALM", red: []
-  }
+// Niveles: P = Patrocinador, I = Impulsor (aportación voluntaria), B = Básico (gratuito con promociones para Cuates)
+export const NIVELES = {
+  P: { t: "🌟 CUATE PATROCINADOR", color: "#8a5a0c", orden: 0 },
+  I: { t: "💛 CUATE IMPULSOR", color: "#7a5a00", orden: 1 },
+  B: { t: "", color: "#0f2d1e", orden: 2 }
 };
 
 const cache = {};
+const pedir = async (qs) => {
+  const ctl = new AbortController();
+  const t = setTimeout(() => ctl.abort(), 12000);
+  try {
+    const res = await fetch(`${GOOGLE_SHEETS_URL}?${qs}`, { signal: ctl.signal });
+    return await res.json();
+  } finally { clearTimeout(t); }
+};
 // Devuelve { ok:true, negocio, ejemplo? } o { ok:false, motivo }.
 export async function cargarNegocio(slug) {
   const s = String(slug || "").toLowerCase().replace(/[^a-z0-9-]/g, "");
@@ -49,15 +60,30 @@ export async function cargarNegocio(slug) {
   if (cache[s]) return cache[s];
   let r = null;
   try {
-    const ctl = new AbortController();
-    const t = setTimeout(() => ctl.abort(), 12000);
-    const res = await fetch(`${GOOGLE_SHEETS_URL}?a=negocio&slug=${encodeURIComponent(s)}`, { signal: ctl.signal });
-    clearTimeout(t);
-    const j = await res.json();
+    const j = await pedir(`a=negocio&slug=${encodeURIComponent(s)}`);
     if (j && j.ok && j.negocio) r = { ok: true, negocio: j.negocio };
     else if (j && j.motivo === "no-encontrado") r = { ok: false, motivo: "no-encontrado" };
   } catch (e) { /* sin respuesta: se intenta el ejemplo */ }
   if (!r) r = EJEMPLOS[s] ? { ok: true, negocio: EJEMPLOS[s], ejemplo: true } : { ok: false, motivo: "sin-conexion" };
   if (r.ok) cache[s] = r;
   return r;
+}
+// Directorio: { ok:true, items:[{s,n,c,e,l,col,niv,of}], ejemplo? }
+let dir = null;
+export async function cargarDirectorio() {
+  if (dir) return dir;
+  let r = null;
+  try {
+    const j = await pedir("a=negocios");
+    if (j && j.ok && Array.isArray(j.negocios)) r = { ok: true, items: j.negocios };
+  } catch (e) { /* sin respuesta */ }
+  if (!r) r = { ok: true, items: EJEMPLOS_DIRECTORIO, ejemplo: true };
+  dir = r;
+  return r;
+}
+// Orden del directorio: Patrocinador → Impulsor → Básico; dentro de cada nivel, un orden que cambia cada día (trato parejo).
+export function ordenarDirectorio(items) {
+  const d = new Date(); const sem = d.getFullYear() * 400 + d.getMonth() * 31 + d.getDate();
+  const h = (s) => { let x = sem; for (let i = 0; i < s.length; i++) x = (x * 31 + s.charCodeAt(i)) % 100003; return x; };
+  return [...items].sort((a, b) => (NIVELES[a.niv] || NIVELES.B).orden - (NIVELES[b.niv] || NIVELES.B).orden || h(a.s) - h(b.s));
 }
