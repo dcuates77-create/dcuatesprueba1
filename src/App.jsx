@@ -48,6 +48,7 @@ import TableroConoce from "./TableroConoce.jsx";
 import MicroAcciones from "./MicroAcciones.jsx";
 import RegistroPrevio from "./RegistroPrevio.jsx";
 import NegocioCuate from "./NegocioCuate.jsx";
+import DirectorioNegocios from "./DirectorioNegocios.jsx";
 import { cargarSinonimosHoja } from "./utilidades/sinonimosHoja.js";
 import { cargarPerfilesHoja } from "./utilidades/perfilesHoja.js";
 import HoyDcuates, { QueSigue, guardarUltimo, BotonRegistrate } from "./HoyDcuates.jsx";
@@ -741,6 +742,7 @@ export default function App() {
       <MicroAcciones />
       <RegistroPrevio />
       <NegocioCuate />
+      <DirectorioNegocios />
       <Tablon />
       <GratitudVentanas filas={filasEnlaces} />
       <ConsultaFolio />

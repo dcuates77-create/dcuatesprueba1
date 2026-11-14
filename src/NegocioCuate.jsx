@@ -6,7 +6,8 @@ import { createPortal } from "react-dom";
 import { useAtras } from "./atras.js";
 import { registrar } from "./analitica.js";
 import { abrirRegistroPrevio } from "./RegistroPrevio.jsx";
-import { cargarNegocio, categoriaDe } from "./datos/negocios.js";
+import { cargarNegocio, categoriaDe, NIVELES } from "./datos/negocios.js";
+import PaginaCuateCTA, { abrirDirectorio } from "./PaginaCuateCTA.jsx";
 import { URL_SITIO } from "./datos/config.js";
 
 export const abrirNegocio = (slug) => { try { window.dispatchEvent(new CustomEvent("dcuates:negocio", { detail: slug })); } catch (e) { /* sin eventos */ } };
@@ -98,7 +99,7 @@ export default function NegocioCuate() {
             {est.ejemplo && <p className="ng-ej">EJEMPLO ilustrativo · así se vería tu página</p>}
             <div className="ng-portada" style={n.portada ? { backgroundImage: `url("${n.portada}")` } : undefined}>
               <span className="ng-cat">{cat.e} {cat.nombre.toUpperCase()}</span>
-              {n.patro && <span className="ng-pat">🌟 CUATE PATROCINADOR</span>}
+              {NIVELES[n.niv] && NIVELES[n.niv].t && <span className="ng-pat">{NIVELES[n.niv].t}</span>}
             </div>
             <div className="ng-id">
               <div className="ng-logo">{n.logo ? <img src={n.logo} alt="" loading="lazy" /> : <span aria-hidden="true">{cat.e}</span>}</div>
@@ -128,7 +129,7 @@ export default function NegocioCuate() {
             {(n.rec || n.nec || n.com) && (
               <section className="ng-pase" data-testid="negocio-pase">
                 <header><span>PASE CUATE · {cat.nombre.toUpperCase()}</span><b>{n.n}</b></header>
-                {n.rec && <p><i>🎁 RECIBO</i>{n.rec}</p>}
+                {n.rec && <p><i>🎁 OFREZCO</i>{n.rec}</p>}
                 {n.nec && <p><i>🙋 NECESITO</i>{n.nec}</p>}
                 {n.com && <p><i>🤝 COMPARTO</i>{n.com}</p>}
               </section>
@@ -164,7 +165,8 @@ export default function NegocioCuate() {
                 {n.fb && <a href={n.fb} target="_blank" rel="noopener noreferrer" onClick={() => clic("fb")}>Facebook</a>}
                 {n.ig && <a href={n.ig} target="_blank" rel="noopener noreferrer" onClick={() => clic("ig")}>Instagram</a>}
               </div>
-              <button type="button" className="ng-b" onClick={() => { registrar("negocio_quiero", { s: slug }); abrirRegistroPrevio("alianza", {}); }}>🏪 ¿Quieres una página así para tu negocio?</button>
+              <button type="button" className="ng-b" onClick={() => { registrar("negocio_directorio", { s: slug }); abrirDirectorio(); }}>🔎 Ver todos los negocios CUATE</button>
+              <PaginaCuateCTA compacto />
             </section>
           </>
         )}
@@ -187,7 +189,7 @@ const CSS = `
 .ng-pat{color:#8a5a0c}
 .ng-id{margin:-44px 14px 0;position:relative;text-align:center}
 .ng-logo{width:88px;height:88px;margin:0 auto;border-radius:50%;background:#fff;border:4px solid #fff;box-shadow:0 3px 12px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:42px}
-.ng-logo img{width:100%;height:100%;object-fit:cover}
+.ng-logo img{width:100%;height:100%;object-fit:contain;padding:5px;box-sizing:border-box;background:#fff}
 .ng-id h1{margin:8px 0 2px;font-size:22px;font-weight:900;line-height:1.15}
 .ng-esl{margin:0;font-size:14.5px;font-weight:800;color:var(--c)}
 .ng-acc{display:flex;flex-wrap:wrap;gap:8px;margin:14px 14px 4px}

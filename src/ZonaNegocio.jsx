@@ -6,6 +6,7 @@ import { abrirRegistroPrevio } from "./RegistroPrevio.jsx";
 import { identidad } from "./datos/identidad.js";
 import { abrirAcceso } from "./Tablero.jsx";
 import { abrirServicios, abrirLogros } from "./Extras.jsx";
+import PaginaCuateCTA from "./PaginaCuateCTA.jsx";
 
 const zona = (id) => window.dispatchEvent(new CustomEvent("dcuates:abrir-zona", { detail: id }));
 
@@ -43,6 +44,7 @@ export default function Negocio({ onCerrar, onAbrirProyecto }) {
           <BotonCompartir hash="negocio" titulo="Tengo un negocio — DCUATES" texto="Publicidad gratuita, cupones, alianzas y más para negocios locales" variante="circulo" />
           <button type="button" className="zj-x" onClick={onCerrar} aria-label="Cerrar">✕</button></div>
         <p className="zj-p">Tu negocio crece más cuando la comunidad lo conoce y confía en él. Elige por dónde quieres empezar: todo es de apoyo mutuo y sin costo de inicio. 💛</p>
+        <PaginaCuateCTA directorio />
         {GRUPOS.map(([titulo, items]) => (
           <div key={titulo}>
             <p className="zj-et">{titulo}</p>

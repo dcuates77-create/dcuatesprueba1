@@ -1,5 +1,6 @@
 // VENTANAS EXTRA (se montan una sola vez en App): SERVICIOS Y PROMOCIONES ESPECIALES y SÉ PARTE DE NUESTROS LOGROS.
 // Se abren con eventos: dcuates:abrir-servicios y dcuates:abrir-logros (desde cualquier botón, tablero o lista).
+import PaginaCuateCTA from "./PaginaCuateCTA.jsx";
 import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { WHATSAPP_NUMERO } from "./datos/config.js";
@@ -52,6 +53,7 @@ export default function Extras({ logros = [] }) {
             <p className="zj-p">Además de los apoyos comunitarios, DCUATES y Conexiones con Causa ofrecen servicios y promociones especiales para personas, negocios y organizaciones. La lista se irá completando; mientras tanto, pide informes y te orientamos.</p>
             <p className="zj-et">Algunas áreas</p>
             <div className="ex-lista">{SERV.map(([e, t, d], i) => <div className="ag-ev ex-c" style={{ background: COLX[i % COLX.length] }} key={t}><b>{e} {t}</b><p>{d}</p></div>)}</div>
+            <PaginaCuateCTA directorio />
             <a className="in-btn" href={wa("Hola, me interesa recibir informes de los servicios y promociones especiales de DCUATES (coaching, consultoría y asesoría). Mi nombre es: ___ · Me interesa para: ___")} target="_blank" rel="noopener noreferrer">💬 Pedir informes por WhatsApp</a>
           </div>
         </div>, document.body)}

@@ -14,6 +14,7 @@ import { WHATSAPP_NUMERO } from "./datos/config.js";
 import { ACTIVIDADES_FIJAS } from "./datos/actividadesFijas.js";
 import { PUNTOS_EJEMPLOS, PREMIOS_EJEMPLOS, BENEFICIOS_EJEMPLOS } from "./datos/clubEjemplos.js";
 import ClubTarjeta from "./ClubDcuates.jsx";
+import PaginaCuateCTA, { abrirDirectorio } from "./PaginaCuateCTA.jsx";
 import { useMisPuntos } from "./utilidades/tarjetaHoja.js";
 import ComoFunciona from "./ComoFunciona.jsx";
 import { abrirTablon } from "./Tablon.jsx";
@@ -486,6 +487,8 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
 
       <Hoja abierta={ven === "negocios"} onCerrar={cierra} titulo="Negocios, alianzas y patrocinios" compartir={{ hash: "ganar-ganar", texto: "Ganar-Ganar" }}>
         <p className="v2-p">Todos ganamos cuando los negocios, aliados y patrocinadores suman.</p>
+        <Fila pal={PAL} n="tienda" t="Negocios CUATE" s="Directorio de Páginas CUATE" fam="negocios" f={va(() => abrirDirectorio(), "directorio")} />
+        <PaginaCuateCTA />
         <Fila pal={PAL} n="tienda" t="Negocios" s="Emprendimientos que multiplican valor" fam="negocios" f={va(() => onIr("negocios"), "negocios")} />
         <Fila pal={PAL} n="estrella" t="Gratitud" s="Gracias, reconocimientos y muro" fam="negocios" f={va(() => onIr("gratitud"), "gratitud")} />
         <Fila pal={PAL} n="alianza" t="Alianzas" s="Zona de aliados" fam="negocios" f={va(() => ejecutar({ aliados: 1 }), "alianzas")} />
@@ -515,6 +518,7 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
 
       <Hoja abierta={ven === "club"} onCerrar={cierra} titulo="Club DCUATES" compartir={{ hash: "club-dcuates", texto: "Tu pase DCUATES te da beneficios especiales" }}>
         <ClubTarjeta ejemplos />
+        <PaginaCuateCTA compacto />
       </Hoja>
     </div>
   );
