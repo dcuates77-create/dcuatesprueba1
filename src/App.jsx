@@ -47,6 +47,7 @@ import { aplicarLetra, leerLetra } from "./tamanoLetra.js";
 import TableroConoce from "./TableroConoce.jsx";
 import MicroAcciones from "./MicroAcciones.jsx";
 import RegistroPrevio from "./RegistroPrevio.jsx";
+import NegocioCuate from "./NegocioCuate.jsx";
 import { cargarSinonimosHoja } from "./utilidades/sinonimosHoja.js";
 import { cargarPerfilesHoja } from "./utilidades/perfilesHoja.js";
 import HoyDcuates, { QueSigue, guardarUltimo, BotonRegistrate } from "./HoyDcuates.jsx";
@@ -739,6 +740,7 @@ export default function App() {
       <TableroConoce />
       <MicroAcciones />
       <RegistroPrevio />
+      <NegocioCuate />
       <Tablon />
       <GratitudVentanas filas={filasEnlaces} />
       <ConsultaFolio />
