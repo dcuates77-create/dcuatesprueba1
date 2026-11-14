@@ -1,20 +1,32 @@
 {
   "rewrites": [
     {
+      "source": "/n/:slug",
+      "destination": "/api/n?slug=:slug"
+    },
+    {
       "source": "/:alias(libros|bienestar|asesorias|ecatepets|mascotas|circulo|publicidad|recomienda|alianzas|bazar|ventas|apoyo|donar|noticias|nosotros|beneficios|causas|negocios|valores|regalos|gratitud|solicitud|mapa|historias)",
       "destination": "/api/p?id=:alias"
-    },
-    { "source": "/admin/:path*", "destination": "/index.html" }
+    }
   ],
   "headers": [
-    { "source": "/admin/:path*", "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }, { "key": "Cache-Control", "value": "no-store" }] },
     {
       "source": "/sw.js",
-      "headers": [{ "key": "Cache-Control", "value": "no-cache" }]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache"
+        }
+      ]
     },
     {
       "source": "/manifest.webmanifest",
-      "headers": [{ "key": "Content-Type", "value": "application/manifest+json" }]
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/manifest+json"
+        }
+      ]
     }
   ]
 }
