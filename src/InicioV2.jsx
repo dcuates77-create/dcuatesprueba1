@@ -483,6 +483,7 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
         <Fila pal={PAL} n="regalo" t="Beneficios" s="Lo que puedes obtener" fam="causas" f={va(() => onIr("beneficios"), "beneficios")} />
         <Fila pal={PAL} n="video" t="Ejemplo: Chuy" s="Mira una causa que sí se logró" fam="causas" f={va(() => irASeccion("chuy-video"), "chuy")} />
         <Fila pal={PAL} n="dar" t="Cómo apoyar causas" s="Dona o participa" fam="causas" f={va(() => irASeccion("donaciones"), "apoyar")} />
+        <PaginaCuateCTA compacto />
       </Hoja>
 
       <Hoja abierta={ven === "negocios"} onCerrar={cierra} titulo="Negocios, alianzas y patrocinios" compartir={{ hash: "ganar-ganar", texto: "Ganar-Ganar" }}>

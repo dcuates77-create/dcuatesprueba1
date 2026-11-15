@@ -10,6 +10,7 @@ import { NARANJA_CLUB } from "./datos/club.js";
 import { REGISTROS } from "./datos/registros.js";
 import { abrirClubInfo, abrirClubPasos } from "./ClubDcuates.jsx";
 import { abrirRegistroPrevio } from "./RegistroPrevio.jsx";
+import PaginaCuateCTA from "./PaginaCuateCTA.jsx";
 import { useTarjeta, MENSAJE_TARJETA, MENSAJE_CANJE, ESTADO_CANJE, procesarFoto, procesarFondo, pinDeEnlace, pinGuardado } from "./utilidades/tarjetaHoja.js";
 import {
   TARJETA_TITULO, TARJETA_LEMA, TARJETA_LEGAL, TARJETA_PRIVACIDAD_FOTO, AVATARES_LOGO, AVATARES_EMOJI, rutaLogo, temaDe, iconoPremio, desdeTexto,
@@ -386,6 +387,7 @@ export default function TarjetaCuate({ onAbrirProyecto }) {
                   <h3 className="tj-h3">{nombreSeccion(vistaOk).ic} {nombreSeccion(vistaOk).t}</h3>
                   {contenido.filter((x) => x.s === vistaOk && !x.t).length > 0 && <ul className="tj-lista">{contenido.filter((x) => x.s === vistaOk && !x.t).map((x, i) => <ItemClub key={"l" + i} it={x} ir={ir} />)}</ul>}
                   {contenido.filter((x) => x.s === vistaOk && x.t).map((x, i) => <ItemClub key={"c" + i} it={x} ir={ir} />)}
+                  {vistaOk === "beneficios" && <PaginaCuateCTA compacto />}
                 </section>
               )}
 

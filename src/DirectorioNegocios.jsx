@@ -8,6 +8,7 @@ import { cargarDirectorio, ordenarDirectorio, categoriaDe, claveCategoria, NIVEL
 import { abrirNegocio } from "./NegocioCuate.jsx";
 import PaginaCuateCTA from "./PaginaCuateCTA.jsx";
 import { URL_SITIO } from "./datos/config.js";
+import { eventoNegocio } from "./utilidades/negocioStats.js";
 
 const sinAc = (s) => String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
 
@@ -17,6 +18,7 @@ export default function DirectorioNegocios() {
   const [q, setQ] = useState("");
   const [cat, setCat] = useState("");
   const [col, setCol] = useState("");
+  const [soloV, setSoloV] = useState(false);
   useEffect(() => {
     const quitar = () => { try { history.replaceState(history.state, "", window.location.pathname + window.location.search); } catch (x) { /* sin historial */ } };
     if (window.location.hash === "#negocios-cuate") quitar();
@@ -43,6 +45,7 @@ export default function DirectorioNegocios() {
   const lista = est.items.filter((i) => {
     if (cat && claveCategoria(i.c) !== cat) return false;
     if (col && (i.col || "").trim() !== col) return false;
+    if (soloV && !i.v) return false;
     if (q.trim()) { const t = sinAc([i.n, i.e, i.c, i.col].join(" ")); if (!sinAc(q).split(/\s+/).filter(Boolean).every((w) => t.includes(w))) return false; }
     return true;
   });
@@ -54,7 +57,7 @@ export default function DirectorioNegocios() {
     if (navigator.share) { navigator.share({ title: "Negocios CUATE", text: texto, url }).catch(() => {}); return; }
     window.open(`https://wa.me/?text=${encodeURIComponent(texto + " " + url)}`, "_blank", "noopener");
   };
-  const limpiar = () => { setQ(""); setCat(""); setCol(""); };
+  const limpiar = () => { setQ(""); setCat(""); setCol(""); setSoloV(false); };
   return createPortal(
     <div className="dn-fondo" style={oculta ? { display: "none" } : undefined} role="dialog" aria-modal="true" aria-label="Negocios CUATE" data-testid="directorio">
       <style>{CSS}</style>
@@ -75,20 +78,21 @@ export default function DirectorioNegocios() {
         </div>
         <div className="dn-chips" role="group" aria-label="Categorías">
           <button type="button" className={"dn-chip" + (cat === "" ? " on" : "")} onClick={() => setCat("")}>Todas ({est.items.length})</button>
+          {est.items.some((i) => i.v) && <button type="button" className={"dn-chip" + (soloV ? " on" : "")} aria-pressed={soloV} onClick={() => setSoloV(!soloV)}>✅ Solo verificados</button>}
           {cats.map((c) => <button type="button" key={c.k} className={"dn-chip" + (cat === c.k ? " on" : "")} onClick={() => setCat(cat === c.k ? "" : c.k)}>{categoriaDe(c.k).e} {c.k} ({c.n})</button>)}
         </div>
         {est.cargando && <p className="dn-m" role="status">Cargando…</p>}
-        {!est.cargando && <p className="dn-m" role="status" data-testid="dir-cuenta">{lista.length} {lista.length === 1 ? "negocio" : "negocios"}{(q || cat || col) && <> · <button type="button" className="dn-lk" onClick={limpiar}>Quitar filtros</button></>}</p>}
+        {!est.cargando && <p className="dn-m" role="status" data-testid="dir-cuenta">{lista.length} {lista.length === 1 ? "negocio" : "negocios"}{(q || cat || col || soloV) && <> · <button type="button" className="dn-lk" onClick={limpiar}>Quitar filtros</button></>}</p>}
         <div className="dn-lista">
           {lista.map((i) => {
             const c = categoriaDe(i.c); const nv = NIVELES[i.niv];
             return (
-              <button type="button" key={i.s} className="dn-card" style={{ "--c": c.color }} onClick={() => { registrar("directorio_clic", { s: i.s }); abrirNegocio(i.s); }}>
+              <button type="button" key={i.s} className="dn-card" style={{ "--c": c.color }} onClick={() => { registrar("directorio_clic", { s: i.s }); eventoNegocio(i.s, "directorio"); abrirNegocio(i.s); }}>
                 <span className="dn-lg">{i.l ? <img src={i.l} alt="" loading="lazy" /> : c.e}</span>
                 <span className="dn-t">
                   <b>{i.n}</b>
                   {i.e && <small>{i.e}</small>}
-                  <span className="dn-m2"><i>{c.e} {c.nombre}</i>{i.col && <i>📍 {i.col}</i>}{i.of && <i className="dn-of">🎟️ Oferta</i>}{nv && nv.t && <i className="dn-nv">{nv.t}</i>}</span>
+                  <span className="dn-m2"><i>{c.e} {c.nombre}</i>{i.col && <i>📍 {i.col}</i>}{i.v && <i className="dn-vr">✅ Verificado</i>}{i.of && <i className="dn-of">🎟️ Oferta</i>}{nv && nv.t && <i className="dn-nv">{nv.t}</i>}</span>
                 </span>
               </button>
             );
@@ -126,5 +130,5 @@ const CSS = `
 .dn-t small{font-size:12.5px;font-weight:700;color:#4a5b52;line-height:1.3}
 .dn-m2{display:flex;flex-wrap:wrap;gap:4px;margin-top:2px}
 .dn-m2 i{font-style:normal;font-size:11.5px;font-weight:800;color:var(--c);background:#f6f2e4;border-radius:999px;padding:2px 8px}
-.dn-m2 .dn-of{color:#8a5a0c;background:#FFF4D6}.dn-m2 .dn-nv{color:#7a4a00;background:#FFE9A8}
+.dn-m2 .dn-vr{color:#0b6b32;background:#DDF3E4}.dn-m2 .dn-of{color:#8a5a0c;background:#FFF4D6}.dn-m2 .dn-nv{color:#7a4a00;background:#FFE9A8}
 `;
