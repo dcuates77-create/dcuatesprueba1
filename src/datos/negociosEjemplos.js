@@ -75,7 +75,25 @@ export const EJEMPLOS = {
     "l": "",
     "e": "Tu computadora y tu celular, como nuevos"
    }
-  ]
+  ],
+  "ct": [
+   {
+    "n": "Valoración inicial",
+    "p": "Sin costo",
+    "d": "Solo con Pase CUATE"
+   },
+   {
+    "n": "Sesión de terapia",
+    "p": "$350",
+    "d": ""
+   },
+   {
+    "n": "Paquete de 5 sesiones",
+    "p": "$1,500",
+    "d": ""
+   }
+  ],
+  "v": true
  },
  "ejemplo-salud-dental": {
   "s": "ejemplo-salud-dental",
@@ -109,7 +127,9 @@ export const EJEMPLOS = {
   "com": "Consejos de higiene dental para niños",
   "club": true,
   "cod": "NEG-1002-SAL",
-  "red": []
+  "red": [],
+  "ct": [],
+  "v": false
  },
  "ejemplo-salud-nutricion": {
   "s": "ejemplo-salud-nutricion",
@@ -143,7 +163,9 @@ export const EJEMPLOS = {
   "com": "Recetas saludables y de bajo costo",
   "club": false,
   "cod": "NEG-1003-SAL",
-  "red": []
+  "red": [],
+  "ct": [],
+  "v": false
  },
  "ejemplo-alimentos": {
   "s": "ejemplo-alimentos",
@@ -177,7 +199,9 @@ export const EJEMPLOS = {
   "com": "Receta de atole y consejos para tus reuniones",
   "club": false,
   "cod": "NEG-1004-ALI",
-  "red": []
+  "red": [],
+  "ct": [],
+  "v": false
  },
  "ejemplo-alimentos-fonda": {
   "s": "ejemplo-alimentos-fonda",
@@ -211,7 +235,25 @@ export const EJEMPLOS = {
   "com": "Recetas económicas de guisados de temporada",
   "club": true,
   "cod": "NEG-1005-ALI",
-  "red": []
+  "red": [],
+  "ct": [
+   {
+    "n": "Comida corrida",
+    "p": "$75",
+    "d": "Sopa, guisado, arroz y agua"
+   },
+   {
+    "n": "Guisado por porción",
+    "p": "$45",
+    "d": ""
+   },
+   {
+    "n": "Caja para llevar",
+    "p": "$85",
+    "d": ""
+   }
+  ],
+  "v": false
  },
  "ejemplo-alimentos-panaderia": {
   "s": "ejemplo-alimentos-panaderia",
@@ -288,7 +330,30 @@ export const EJEMPLOS = {
     "l": "",
     "e": "Tu computadora y tu celular, como nuevos"
    }
-  ]
+  ],
+  "ct": [
+   {
+    "n": "Concha",
+    "p": "$12",
+    "d": "Pan de dulce recién horneado"
+   },
+   {
+    "n": "Bolillo",
+    "p": "$3",
+    "d": ""
+   },
+   {
+    "n": "Pastel por encargo",
+    "p": "desde $350",
+    "d": "Con un día de anticipación"
+   },
+   {
+    "n": "Pan integral",
+    "p": "$18",
+    "d": ""
+   }
+  ],
+  "v": true
  },
  "ejemplo-educacion": {
   "s": "ejemplo-educacion",
@@ -322,7 +387,9 @@ export const EJEMPLOS = {
   "com": "Guías de estudio gratuitas",
   "club": true,
   "cod": "NEG-1007-EDU",
-  "red": []
+  "red": [],
+  "ct": [],
+  "v": false
  },
  "ejemplo-comunitario": {
   "s": "ejemplo-comunitario",
@@ -356,7 +423,9 @@ export const EJEMPLOS = {
   "com": "Calendario de actividades de la colonia",
   "club": false,
   "cod": "NEG-1008-COM",
-  "red": []
+  "red": [],
+  "ct": [],
+  "v": false
  },
  "ejemplo-productos": {
   "s": "ejemplo-productos",
@@ -390,7 +459,9 @@ export const EJEMPLOS = {
   "com": "Ideas de decoración económica",
   "club": false,
   "cod": "NEG-1009-PRO",
-  "red": []
+  "red": [],
+  "ct": [],
+  "v": false
  },
  "ejemplo-servicios": {
   "s": "ejemplo-servicios",
@@ -424,7 +495,9 @@ export const EJEMPLOS = {
   "com": "Consejos para prevenir fugas en casa",
   "club": false,
   "cod": "NEG-1010-SER",
-  "red": []
+  "red": [],
+  "ct": [],
+  "v": false
  },
  "ejemplo-mercado": {
   "s": "ejemplo-mercado",
@@ -458,7 +531,9 @@ export const EJEMPLOS = {
   "com": "Directorio de locatarios y productos",
   "club": true,
   "cod": "NEG-1011-MER",
-  "red": []
+  "red": [],
+  "ct": [],
+  "v": false
  },
  "ejemplo-tecnologia": {
   "s": "ejemplo-tecnologia",
@@ -492,7 +567,9 @@ export const EJEMPLOS = {
   "com": "Tips de seguridad para celular y redes",
   "club": true,
   "cod": "NEG-1012-TEC",
-  "red": []
+  "red": [],
+  "ct": [],
+  "v": true
  },
  "ejemplo-belleza": {
   "s": "ejemplo-belleza",
@@ -526,7 +603,9 @@ export const EJEMPLOS = {
   "com": "Consejos de cuidado del cabello",
   "club": false,
   "cod": "NEG-1013-BEL",
-  "red": []
+  "red": [],
+  "ct": [],
+  "v": false
  },
  "ejemplo-hogar": {
   "s": "ejemplo-hogar",
@@ -560,7 +639,9 @@ export const EJEMPLOS = {
   "com": "Guía para cuidar tu obra y tu presupuesto",
   "club": false,
   "cod": "NEG-1014-HOG",
-  "red": []
+  "red": [],
+  "ct": [],
+  "v": false
  },
  "ejemplo-mascotas": {
   "s": "ejemplo-mascotas",
@@ -594,7 +675,9 @@ export const EJEMPLOS = {
   "com": "Consejos de cuidado y adopción responsable",
   "club": true,
   "cod": "NEG-1015-MAS",
-  "red": []
+  "red": [],
+  "ct": [],
+  "v": false
  },
  "ejemplo-transporte": {
   "s": "ejemplo-transporte",
@@ -628,7 +711,9 @@ export const EJEMPLOS = {
   "com": "Consejos para empacar y mudarte",
   "club": false,
   "cod": "NEG-1016-TRA",
-  "red": []
+  "red": [],
+  "ct": [],
+  "v": false
  },
  "ejemplo-ocio": {
   "s": "ejemplo-ocio",
@@ -662,7 +747,9 @@ export const EJEMPLOS = {
   "com": "Cartelera mensual",
   "club": false,
   "cod": "NEG-1017-OCI",
-  "red": []
+  "red": [],
+  "ct": [],
+  "v": false
  },
  "ejemplo-altruismo": {
   "s": "ejemplo-altruismo",
@@ -696,7 +783,9 @@ export const EJEMPLOS = {
   "com": "Informe de lo que se ha repartido",
   "club": false,
   "cod": "NEG-1018-ALT",
-  "red": []
+  "red": [],
+  "ct": [],
+  "v": false
  },
  "ejemplo-especialidades": {
   "s": "ejemplo-especialidades",
@@ -730,7 +819,9 @@ export const EJEMPLOS = {
   "com": "Consejos para cuidar tu instrumento",
   "club": false,
   "cod": "NEG-1019-ESP",
-  "red": []
+  "red": [],
+  "ct": [],
+  "v": false
  }
 };
-export const EJEMPLOS_DIRECTORIO = [{"s": "ejemplo-salud", "n": "Fisioterapia Movimiento Vivo", "c": "SALUD", "e": "Muévete sin dolor, vive con ganas", "l": "", "col": "Jardines de Morelos", "niv": "P", "of": true}, {"s": "ejemplo-salud-dental", "n": "Clínica Dental Sonrisa Cuate", "c": "SALUD", "e": "Cuidamos tu sonrisa y tu bolsillo", "l": "", "col": "Ciudad Azteca", "niv": "I", "of": true}, {"s": "ejemplo-salud-nutricion", "n": "Nutrición Plato Feliz", "c": "SALUD", "e": "Comer bien sí es posible", "l": "", "col": "Las Américas", "niv": "B", "of": true}, {"s": "ejemplo-alimentos", "n": "Tamales Doña Chela", "c": "ALIMENTOS", "e": "Sabor casero, hecho con cariño", "l": "", "col": "Jardines de Morelos", "niv": "B", "of": true}, {"s": "ejemplo-alimentos-fonda", "n": "Fonda La Güera", "c": "ALIMENTOS", "e": "Comida corrida como en casa", "l": "", "col": "Tulpetlac", "niv": "I", "of": true}, {"s": "ejemplo-alimentos-panaderia", "n": "Panadería El Buen Pan", "c": "ALIMENTOS", "e": "Pan calientito, dos veces al día", "l": "", "col": "Ciudad Azteca", "niv": "P", "of": true}, {"s": "ejemplo-educacion", "n": "Asesorías Aprende Fácil", "c": "EDUCACIÓN", "e": "Regularización con paciencia y buen humor", "l": "", "col": "Las Américas", "niv": "I", "of": true}, {"s": "ejemplo-comunitario", "n": "Comité Vecinal Unidos", "c": "SERVICIOS COMUNITARIOS", "e": "Tu colonia mejor, entre todos", "l": "", "col": "Xalostoc", "niv": "B", "of": true}, {"s": "ejemplo-productos", "n": "Regalos y Detalles Lupita", "c": "PRODUCTOS VARIOS", "e": "Un detalle para cada ocasión", "l": "", "col": "Santa Clara", "niv": "B", "of": true}, {"s": "ejemplo-servicios", "n": "Plomería y Gas Los Hermanos", "c": "SERVICIOS VARIOS", "e": "Fugas resueltas el mismo día", "l": "", "col": "Tulpetlac", "niv": "B", "of": true}, {"s": "ejemplo-mercado", "n": "Tianguis Sábados del Barrio", "c": "MERCADOS Y TIANGUIS", "e": "Productores y vecinos, cara a cara", "l": "", "col": "Ciudad Azteca", "niv": "I", "of": true}, {"s": "ejemplo-tecnologia", "n": "Compu Ayuda Express", "c": "TECNOLOGÍA", "e": "Tu computadora y tu celular, como nuevos", "l": "", "col": "Las Américas", "niv": "I", "of": true}, {"s": "ejemplo-belleza", "n": "Estética Brillo Cuate", "c": "BELLEZA Y BIENESTAR", "e": "Luce bien, sin gastar de más", "l": "", "col": "Santa Clara", "niv": "B", "of": true}, {"s": "ejemplo-hogar", "n": "Herrería y Construcción Ramírez", "c": "HOGAR Y CONSTRUCCIÓN", "e": "Obra limpia y a tiempo", "l": "", "col": "Xalostoc", "niv": "B", "of": true}, {"s": "ejemplo-mascotas", "n": "Veterinaria Patitas Felices", "c": "MASCOTAS", "e": "Cuidamos a tu mejor amigo", "l": "", "col": "Tulpetlac", "niv": "I", "of": true}, {"s": "ejemplo-transporte", "n": "Fletes y Mudanzas Vecinos", "c": "TRANSPORTE Y REPARTO", "e": "Tu mudanza sin dolor de cabeza", "l": "", "col": "Las Américas", "niv": "B", "of": true}, {"s": "ejemplo-ocio", "n": "Cine Club Vecinal", "c": "OCIO Y CULTURA", "e": "Cine, palomitas y plática", "l": "", "col": "Santa Clara", "niv": "B", "of": true}, {"s": "ejemplo-altruismo", "n": "Banco de Ropa Manos Amigas", "c": "ALTRUISMO", "e": "Lo que a ti ya no te sirve, a alguien le hace falta", "l": "", "col": "Xalostoc", "niv": "B", "of": true}, {"s": "ejemplo-especialidades", "n": "Taller Voz y Cuerda", "c": "ESPECIALIDADES", "e": "Instrumentos con alma", "l": "", "col": "Ciudad Azteca", "niv": "B", "of": true}];
+export const EJEMPLOS_DIRECTORIO = [{"s": "ejemplo-salud", "n": "Fisioterapia Movimiento Vivo", "c": "SALUD", "e": "Muévete sin dolor, vive con ganas", "l": "", "col": "Jardines de Morelos", "niv": "P", "of": true, "v": true}, {"s": "ejemplo-salud-dental", "n": "Clínica Dental Sonrisa Cuate", "c": "SALUD", "e": "Cuidamos tu sonrisa y tu bolsillo", "l": "", "col": "Ciudad Azteca", "niv": "I", "of": true, "v": false}, {"s": "ejemplo-salud-nutricion", "n": "Nutrición Plato Feliz", "c": "SALUD", "e": "Comer bien sí es posible", "l": "", "col": "Las Américas", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-alimentos", "n": "Tamales Doña Chela", "c": "ALIMENTOS", "e": "Sabor casero, hecho con cariño", "l": "", "col": "Jardines de Morelos", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-alimentos-fonda", "n": "Fonda La Güera", "c": "ALIMENTOS", "e": "Comida corrida como en casa", "l": "", "col": "Tulpetlac", "niv": "I", "of": true, "v": false}, {"s": "ejemplo-alimentos-panaderia", "n": "Panadería El Buen Pan", "c": "ALIMENTOS", "e": "Pan calientito, dos veces al día", "l": "", "col": "Ciudad Azteca", "niv": "P", "of": true, "v": true}, {"s": "ejemplo-educacion", "n": "Asesorías Aprende Fácil", "c": "EDUCACIÓN", "e": "Regularización con paciencia y buen humor", "l": "", "col": "Las Américas", "niv": "I", "of": true, "v": false}, {"s": "ejemplo-comunitario", "n": "Comité Vecinal Unidos", "c": "SERVICIOS COMUNITARIOS", "e": "Tu colonia mejor, entre todos", "l": "", "col": "Xalostoc", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-productos", "n": "Regalos y Detalles Lupita", "c": "PRODUCTOS VARIOS", "e": "Un detalle para cada ocasión", "l": "", "col": "Santa Clara", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-servicios", "n": "Plomería y Gas Los Hermanos", "c": "SERVICIOS VARIOS", "e": "Fugas resueltas el mismo día", "l": "", "col": "Tulpetlac", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-mercado", "n": "Tianguis Sábados del Barrio", "c": "MERCADOS Y TIANGUIS", "e": "Productores y vecinos, cara a cara", "l": "", "col": "Ciudad Azteca", "niv": "I", "of": true, "v": false}, {"s": "ejemplo-tecnologia", "n": "Compu Ayuda Express", "c": "TECNOLOGÍA", "e": "Tu computadora y tu celular, como nuevos", "l": "", "col": "Las Américas", "niv": "I", "of": true, "v": true}, {"s": "ejemplo-belleza", "n": "Estética Brillo Cuate", "c": "BELLEZA Y BIENESTAR", "e": "Luce bien, sin gastar de más", "l": "", "col": "Santa Clara", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-hogar", "n": "Herrería y Construcción Ramírez", "c": "HOGAR Y CONSTRUCCIÓN", "e": "Obra limpia y a tiempo", "l": "", "col": "Xalostoc", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-mascotas", "n": "Veterinaria Patitas Felices", "c": "MASCOTAS", "e": "Cuidamos a tu mejor amigo", "l": "", "col": "Tulpetlac", "niv": "I", "of": true, "v": false}, {"s": "ejemplo-transporte", "n": "Fletes y Mudanzas Vecinos", "c": "TRANSPORTE Y REPARTO", "e": "Tu mudanza sin dolor de cabeza", "l": "", "col": "Las Américas", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-ocio", "n": "Cine Club Vecinal", "c": "OCIO Y CULTURA", "e": "Cine, palomitas y plática", "l": "", "col": "Santa Clara", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-altruismo", "n": "Banco de Ropa Manos Amigas", "c": "ALTRUISMO", "e": "Lo que a ti ya no te sirve, a alguien le hace falta", "l": "", "col": "Xalostoc", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-especialidades", "n": "Taller Voz y Cuerda", "c": "ESPECIALIDADES", "e": "Instrumentos con alma", "l": "", "col": "Ciudad Azteca", "niv": "B", "of": true, "v": false}];
