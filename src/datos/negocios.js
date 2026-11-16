@@ -82,8 +82,19 @@ export async function cargarDirectorio() {
   return r;
 }
 // Orden del directorio: Patrocinador → Impulsor → Básico; dentro de cada nivel, un orden que cambia cada día (trato parejo).
-export function ordenarDirectorio(items) {
+export const ORDENES = [["destacados", "Destacados"], ["recientes", "Más recientes"], ["az", "A–Z"], ["ofertas", "Con oferta primero"]];
+// Orden del directorio. «destacados»: nivel (Patrocinador → Impulsor → Básico), luego «Prioridad» de la hoja (1 = primero) y, a igualdad, rotación diaria.
+export function ordenarDirectorio(items, modo = "destacados") {
   const d = new Date(); const sem = d.getFullYear() * 400 + d.getMonth() * 31 + d.getDate();
   const h = (s) => { let x = sem; for (let i = 0; i < s.length; i++) x = (x * 31 + s.charCodeAt(i)) % 100003; return x; };
-  return [...items].sort((a, b) => (NIVELES[a.niv] || NIVELES.B).orden - (NIVELES[b.niv] || NIVELES.B).orden || h(a.s) - h(b.s));
+  const lista = items.map((x, k) => ({ x, k }));
+  const niv = (a) => (NIVELES[a.niv] || NIVELES.B).orden;
+  const pr = (a) => (a.pr > 0 ? a.pr : 9999);
+  const dest = (a, b) => niv(a.x) - niv(b.x) || pr(a.x) - pr(b.x) || h(a.x.s) - h(b.x.s);
+  const rec = (a) => (a.x.f ? a.x.f : "") + "#" + String(100000 + (a.x.i != null ? a.x.i : a.k));
+  if (modo === "recientes") lista.sort((a, b) => (rec(b) < rec(a) ? -1 : rec(b) > rec(a) ? 1 : 0));
+  else if (modo === "az") lista.sort((a, b) => String(a.x.n || "").localeCompare(String(b.x.n || ""), "es"));
+  else if (modo === "ofertas") lista.sort((a, b) => (b.x.of ? 1 : 0) - (a.x.of ? 1 : 0) || dest(a, b));
+  else lista.sort(dest);
+  return lista.map((e) => e.x);
 }
