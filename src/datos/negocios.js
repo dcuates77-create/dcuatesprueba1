@@ -25,7 +25,8 @@ const CATS = [
   ["TRANSPORTE Y REPARTO", "🚚", "#0369A1", "Transporte y reparto"],
   ["OCIO Y CULTURA", "🎭", "#7A5AD8", "Ocio y cultura"],
   ["ALTRUISMO", "💞", "#BE185D", "Altruismo"],
-  ["ESPECIALIDADES", "⭐", "#1F7A46", "Especialidades"]
+  ["ESPECIALIDADES", "⭐", "#1F7A46", "Especialidades"],
+  ["DCUATES OFICIAL", "🌟", "#7A4A00", "Oficial DCUATES"]
 ];
 export const CATEGORIAS = Object.fromEntries(CATS.map(([k, e, color, nombre]) => [k, { e, color, nombre }]));
 // Nombres anteriores (e79) que siguen funcionando
@@ -82,6 +83,8 @@ export async function cargarDirectorio() {
   return r;
 }
 // Orden del directorio: Patrocinador → Impulsor → Básico; dentro de cada nivel, un orden que cambia cada día (trato parejo).
+// Páginas OFICIALES de DCUATES (ventas, vendedores, express): slug «dcuates-…». Salen siempre primero.
+export const esOficial = (s) => /^dcuates-/.test(String(s || ""));
 export const ORDENES = [["destacados", "Destacados"], ["recientes", "Más recientes"], ["az", "A–Z"], ["ofertas", "Con oferta primero"]];
 // Orden del directorio. «destacados»: nivel (Patrocinador → Impulsor → Básico), luego «Prioridad» de la hoja (1 = primero) y, a igualdad, rotación diaria.
 export function ordenarDirectorio(items, modo = "destacados") {
@@ -90,7 +93,8 @@ export function ordenarDirectorio(items, modo = "destacados") {
   const lista = items.map((x, k) => ({ x, k }));
   const niv = (a) => (NIVELES[a.niv] || NIVELES.B).orden;
   const pr = (a) => (a.pr > 0 ? a.pr : 9999);
-  const dest = (a, b) => niv(a.x) - niv(b.x) || pr(a.x) - pr(b.x) || h(a.x.s) - h(b.x.s);
+  const of0 = (a) => (esOficial(a.x.s) ? 0 : 1);
+  const dest = (a, b) => of0(a) - of0(b) || niv(a.x) - niv(b.x) || pr(a.x) - pr(b.x) || h(a.x.s) - h(b.x.s);
   const rec = (a) => (a.x.f ? a.x.f : "") + "#" + String(100000 + (a.x.i != null ? a.x.i : a.k));
   if (modo === "recientes") lista.sort((a, b) => (rec(b) < rec(a) ? -1 : rec(b) > rec(a) ? 1 : 0));
   else if (modo === "az") lista.sort((a, b) => String(a.x.n || "").localeCompare(String(b.x.n || ""), "es"));

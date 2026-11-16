@@ -76,6 +76,7 @@ export const EJEMPLOS = {
     "e": "Tu computadora y tu celular, como nuevos"
    }
   ],
+  "cc": "",
   "ct": [
    {
     "n": "Valoración inicial",
@@ -128,6 +129,7 @@ export const EJEMPLOS = {
   "club": true,
   "cod": "NEG-1002-SAL",
   "red": [],
+  "cc": "",
   "ct": [],
   "v": false
  },
@@ -164,6 +166,7 @@ export const EJEMPLOS = {
   "club": false,
   "cod": "NEG-1003-SAL",
   "red": [],
+  "cc": "",
   "ct": [],
   "v": false
  },
@@ -200,6 +203,7 @@ export const EJEMPLOS = {
   "club": false,
   "cod": "NEG-1004-ALI",
   "red": [],
+  "cc": "",
   "ct": [],
   "v": false
  },
@@ -236,6 +240,7 @@ export const EJEMPLOS = {
   "club": true,
   "cod": "NEG-1005-ALI",
   "red": [],
+  "cc": "",
   "ct": [
    {
     "n": "Comida corrida",
@@ -331,6 +336,7 @@ export const EJEMPLOS = {
     "e": "Tu computadora y tu celular, como nuevos"
    }
   ],
+  "cc": "",
   "ct": [
    {
     "n": "Concha",
@@ -388,6 +394,7 @@ export const EJEMPLOS = {
   "club": true,
   "cod": "NEG-1007-EDU",
   "red": [],
+  "cc": "",
   "ct": [],
   "v": false
  },
@@ -424,6 +431,7 @@ export const EJEMPLOS = {
   "club": false,
   "cod": "NEG-1008-COM",
   "red": [],
+  "cc": "",
   "ct": [],
   "v": false
  },
@@ -460,6 +468,7 @@ export const EJEMPLOS = {
   "club": false,
   "cod": "NEG-1009-PRO",
   "red": [],
+  "cc": "",
   "ct": [],
   "v": false
  },
@@ -496,6 +505,7 @@ export const EJEMPLOS = {
   "club": false,
   "cod": "NEG-1010-SER",
   "red": [],
+  "cc": "",
   "ct": [],
   "v": false
  },
@@ -532,6 +542,7 @@ export const EJEMPLOS = {
   "club": true,
   "cod": "NEG-1011-MER",
   "red": [],
+  "cc": "",
   "ct": [],
   "v": false
  },
@@ -568,6 +579,7 @@ export const EJEMPLOS = {
   "club": true,
   "cod": "NEG-1012-TEC",
   "red": [],
+  "cc": "",
   "ct": [],
   "v": true
  },
@@ -604,6 +616,7 @@ export const EJEMPLOS = {
   "club": false,
   "cod": "NEG-1013-BEL",
   "red": [],
+  "cc": "",
   "ct": [],
   "v": false
  },
@@ -640,6 +653,7 @@ export const EJEMPLOS = {
   "club": false,
   "cod": "NEG-1014-HOG",
   "red": [],
+  "cc": "",
   "ct": [],
   "v": false
  },
@@ -676,6 +690,7 @@ export const EJEMPLOS = {
   "club": true,
   "cod": "NEG-1015-MAS",
   "red": [],
+  "cc": "",
   "ct": [],
   "v": false
  },
@@ -712,6 +727,7 @@ export const EJEMPLOS = {
   "club": false,
   "cod": "NEG-1016-TRA",
   "red": [],
+  "cc": "",
   "ct": [],
   "v": false
  },
@@ -748,6 +764,7 @@ export const EJEMPLOS = {
   "club": false,
   "cod": "NEG-1017-OCI",
   "red": [],
+  "cc": "",
   "ct": [],
   "v": false
  },
@@ -784,6 +801,7 @@ export const EJEMPLOS = {
   "club": false,
   "cod": "NEG-1018-ALT",
   "red": [],
+  "cc": "",
   "ct": [],
   "v": false
  },
@@ -820,8 +838,179 @@ export const EJEMPLOS = {
   "club": false,
   "cod": "NEG-1019-ESP",
   "red": [],
+  "cc": "",
   "ct": [],
   "v": false
+ },
+ "dcuates-ventas": {
+  "s": "dcuates-ventas",
+  "n": "Ventas DCUATES",
+  "e": "Lo que ofrecemos directo y lo que otros Cuates venden",
+  "c": "DCUATES OFICIAL",
+  "niv": "P",
+  "d": "Aquí está todo lo que DCUATES ofrece directamente a la comunidad y lo que otros Cuates venden por comisión. Pide por WhatsApp: tu pedido queda registrado y te atendemos personalmente.",
+  "of": [
+   "Productos y servicios de DCUATES",
+   "Productos de Cuates vendedores (por comisión)",
+   "Pedidos por WhatsApp",
+   "Entregas y puntos de encuentro en la comunidad"
+  ],
+  "h": "Lun a Sáb 10:00–19:00",
+  "dir": "",
+  "col": "En línea y en la comunidad",
+  "mapa": "",
+  "wa": "525540476247",
+  "tel": "",
+  "web": "https://dcuates.com",
+  "fb": "https://www.facebook.com/abelzarem/",
+  "ig": "https://www.instagram.com/conexionesconcausa/",
+  "logo": "",
+  "portada": "",
+  "gal": [],
+  "ofT": "Beneficios para Cuates",
+  "ofD": "Muestra tu Pase CUATE y pregunta por los beneficios de cada producto.",
+  "rec": "Productos y servicios para la comunidad",
+  "nec": "Cuates vendedores con ganas de crecer",
+  "com": "Información clara de lo que hay a la venta",
+  "club": true,
+  "cod": "NEG-1020-DCU",
+  "red": [
+   {
+    "s": "dcuates-vendedores",
+    "n": "Vendedores DCUATES",
+    "c": "DCUATES OFICIAL",
+    "l": "",
+    "e": "Vende lo que te gusta y gana comisión"
+   },
+   {
+    "s": "dcuates-express",
+    "n": "DCUATES Express",
+    "c": "DCUATES OFICIAL",
+    "l": "",
+    "e": "Todo DCUATES en una sola página"
+   }
+  ],
+  "cc": "",
+  "ct": [
+   {
+    "n": "Producto de ejemplo 1",
+    "p": "$0",
+    "d": "(EJEMPLO) Reemplaza este renglón en la columna Catálogo"
+   },
+   {
+    "n": "Producto de ejemplo 2",
+    "p": "$0",
+    "d": "(EJEMPLO) Un renglón por producto"
+   }
+  ],
+  "v": true
+ },
+ "dcuates-vendedores": {
+  "s": "dcuates-vendedores",
+  "n": "Vendedores DCUATES",
+  "e": "Vende lo que te gusta y gana comisión",
+  "c": "DCUATES OFICIAL",
+  "niv": "P",
+  "d": "Si quieres vender productos o servicios de la comunidad por comisión, esta es tu puerta: te explicamos cómo funciona, qué puedes vender y cuánto se gana. Las condiciones se acuerdan por WhatsApp según el producto.",
+  "of": [
+   "Cómo ser vendedor Cuate",
+   "Catálogo de lo que puedes vender",
+   "Comisión acordada por producto",
+   "Acompañamiento para empezar",
+   "Reconocimiento en la comunidad"
+  ],
+  "h": "Lun a Sáb 10:00–19:00",
+  "dir": "",
+  "col": "En línea y en la comunidad",
+  "mapa": "",
+  "wa": "525540476247",
+  "tel": "",
+  "web": "https://dcuates.com",
+  "fb": "https://www.facebook.com/abelzarem/",
+  "ig": "https://www.instagram.com/conexionesconcausa/",
+  "logo": "",
+  "portada": "",
+  "gal": [],
+  "ofT": "Empieza a vender",
+  "ofD": "Escríbenos por WhatsApp y te contamos qué hay para vender y cuánto se gana.",
+  "rec": "Oportunidad de generar ingresos extra",
+  "nec": "Cuates con ganas de vender",
+  "com": "Tu experiencia y tus contactos",
+  "club": true,
+  "cod": "NEG-1021-DCU",
+  "red": [
+   {
+    "s": "dcuates-ventas",
+    "n": "Ventas DCUATES",
+    "c": "DCUATES OFICIAL",
+    "l": "",
+    "e": "Lo que ofrecemos directo y lo que otros Cuates venden"
+   },
+   {
+    "s": "dcuates-express",
+    "n": "DCUATES Express",
+    "c": "DCUATES OFICIAL",
+    "l": "",
+    "e": "Todo DCUATES en una sola página"
+   }
+  ],
+  "cc": "",
+  "ct": [],
+  "v": true
+ },
+ "dcuates-express": {
+  "s": "dcuates-express",
+  "n": "DCUATES Express",
+  "e": "Todo DCUATES en una sola página",
+  "c": "DCUATES OFICIAL",
+  "niv": "P",
+  "d": "La puerta de entrada rápida a DCUATES: qué es, qué puedes hacer y por dónde empezar, en menos de un minuto.",
+  "of": [
+   "Pase CUATE y Club DCUATES: puntos, premios y beneficios",
+   "Directorio de negocios CUATE con promociones",
+   "Voluntariado, causas y beneficios",
+   "Bazar, Ventas DCUATES y vendedores por comisión",
+   "Tu propia Página CUATE (gratis o de aportación voluntaria)",
+   "Libros, asesorías, mascotas y más proyectos comunitarios"
+  ],
+  "h": "Siempre disponible en dcuates.com",
+  "dir": "",
+  "col": "En línea",
+  "mapa": "",
+  "wa": "525540476247",
+  "tel": "",
+  "web": "https://dcuates.com",
+  "fb": "https://www.facebook.com/abelzarem/",
+  "ig": "https://www.instagram.com/conexionesconcausa/",
+  "logo": "",
+  "portada": "",
+  "gal": [],
+  "ofT": "Únete al Club",
+  "ofD": "Regístrate y recibe tu Pase CUATE para sumar puntos y aprovechar promociones.",
+  "rec": "Comunidad, apoyo mutuo y beneficios",
+  "nec": "Vecinos, negocios y voluntarios",
+  "com": "Tu participación",
+  "club": true,
+  "cod": "NEG-1022-DCU",
+  "red": [
+   {
+    "s": "dcuates-ventas",
+    "n": "Ventas DCUATES",
+    "c": "DCUATES OFICIAL",
+    "l": "",
+    "e": "Lo que ofrecemos directo y lo que otros Cuates venden"
+   },
+   {
+    "s": "dcuates-vendedores",
+    "n": "Vendedores DCUATES",
+    "c": "DCUATES OFICIAL",
+    "l": "",
+    "e": "Vende lo que te gusta y gana comisión"
+   }
+  ],
+  "cc": "",
+  "ct": [],
+  "v": true
  }
 };
-export const EJEMPLOS_DIRECTORIO = [{"s": "ejemplo-salud", "n": "Fisioterapia Movimiento Vivo", "c": "SALUD", "e": "Muévete sin dolor, vive con ganas", "l": "", "col": "Jardines de Morelos", "niv": "P", "of": true, "v": true}, {"s": "ejemplo-salud-dental", "n": "Clínica Dental Sonrisa Cuate", "c": "SALUD", "e": "Cuidamos tu sonrisa y tu bolsillo", "l": "", "col": "Ciudad Azteca", "niv": "I", "of": true, "v": false}, {"s": "ejemplo-salud-nutricion", "n": "Nutrición Plato Feliz", "c": "SALUD", "e": "Comer bien sí es posible", "l": "", "col": "Las Américas", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-alimentos", "n": "Tamales Doña Chela", "c": "ALIMENTOS", "e": "Sabor casero, hecho con cariño", "l": "", "col": "Jardines de Morelos", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-alimentos-fonda", "n": "Fonda La Güera", "c": "ALIMENTOS", "e": "Comida corrida como en casa", "l": "", "col": "Tulpetlac", "niv": "I", "of": true, "v": false}, {"s": "ejemplo-alimentos-panaderia", "n": "Panadería El Buen Pan", "c": "ALIMENTOS", "e": "Pan calientito, dos veces al día", "l": "", "col": "Ciudad Azteca", "niv": "P", "of": true, "v": true}, {"s": "ejemplo-educacion", "n": "Asesorías Aprende Fácil", "c": "EDUCACIÓN", "e": "Regularización con paciencia y buen humor", "l": "", "col": "Las Américas", "niv": "I", "of": true, "v": false}, {"s": "ejemplo-comunitario", "n": "Comité Vecinal Unidos", "c": "SERVICIOS COMUNITARIOS", "e": "Tu colonia mejor, entre todos", "l": "", "col": "Xalostoc", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-productos", "n": "Regalos y Detalles Lupita", "c": "PRODUCTOS VARIOS", "e": "Un detalle para cada ocasión", "l": "", "col": "Santa Clara", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-servicios", "n": "Plomería y Gas Los Hermanos", "c": "SERVICIOS VARIOS", "e": "Fugas resueltas el mismo día", "l": "", "col": "Tulpetlac", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-mercado", "n": "Tianguis Sábados del Barrio", "c": "MERCADOS Y TIANGUIS", "e": "Productores y vecinos, cara a cara", "l": "", "col": "Ciudad Azteca", "niv": "I", "of": true, "v": false}, {"s": "ejemplo-tecnologia", "n": "Compu Ayuda Express", "c": "TECNOLOGÍA", "e": "Tu computadora y tu celular, como nuevos", "l": "", "col": "Las Américas", "niv": "I", "of": true, "v": true}, {"s": "ejemplo-belleza", "n": "Estética Brillo Cuate", "c": "BELLEZA Y BIENESTAR", "e": "Luce bien, sin gastar de más", "l": "", "col": "Santa Clara", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-hogar", "n": "Herrería y Construcción Ramírez", "c": "HOGAR Y CONSTRUCCIÓN", "e": "Obra limpia y a tiempo", "l": "", "col": "Xalostoc", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-mascotas", "n": "Veterinaria Patitas Felices", "c": "MASCOTAS", "e": "Cuidamos a tu mejor amigo", "l": "", "col": "Tulpetlac", "niv": "I", "of": true, "v": false}, {"s": "ejemplo-transporte", "n": "Fletes y Mudanzas Vecinos", "c": "TRANSPORTE Y REPARTO", "e": "Tu mudanza sin dolor de cabeza", "l": "", "col": "Las Américas", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-ocio", "n": "Cine Club Vecinal", "c": "OCIO Y CULTURA", "e": "Cine, palomitas y plática", "l": "", "col": "Santa Clara", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-altruismo", "n": "Banco de Ropa Manos Amigas", "c": "ALTRUISMO", "e": "Lo que a ti ya no te sirve, a alguien le hace falta", "l": "", "col": "Xalostoc", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-especialidades", "n": "Taller Voz y Cuerda", "c": "ESPECIALIDADES", "e": "Instrumentos con alma", "l": "", "col": "Ciudad Azteca", "niv": "B", "of": true, "v": false}];
+export const EJEMPLOS_DIRECTORIO = [{"s": "ejemplo-salud", "n": "Fisioterapia Movimiento Vivo", "c": "SALUD", "e": "Muévete sin dolor, vive con ganas", "l": "", "col": "Jardines de Morelos", "niv": "P", "of": true, "v": true}, {"s": "ejemplo-salud-dental", "n": "Clínica Dental Sonrisa Cuate", "c": "SALUD", "e": "Cuidamos tu sonrisa y tu bolsillo", "l": "", "col": "Ciudad Azteca", "niv": "I", "of": true, "v": false}, {"s": "ejemplo-salud-nutricion", "n": "Nutrición Plato Feliz", "c": "SALUD", "e": "Comer bien sí es posible", "l": "", "col": "Las Américas", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-alimentos", "n": "Tamales Doña Chela", "c": "ALIMENTOS", "e": "Sabor casero, hecho con cariño", "l": "", "col": "Jardines de Morelos", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-alimentos-fonda", "n": "Fonda La Güera", "c": "ALIMENTOS", "e": "Comida corrida como en casa", "l": "", "col": "Tulpetlac", "niv": "I", "of": true, "v": false}, {"s": "ejemplo-alimentos-panaderia", "n": "Panadería El Buen Pan", "c": "ALIMENTOS", "e": "Pan calientito, dos veces al día", "l": "", "col": "Ciudad Azteca", "niv": "P", "of": true, "v": true}, {"s": "ejemplo-educacion", "n": "Asesorías Aprende Fácil", "c": "EDUCACIÓN", "e": "Regularización con paciencia y buen humor", "l": "", "col": "Las Américas", "niv": "I", "of": true, "v": false}, {"s": "ejemplo-comunitario", "n": "Comité Vecinal Unidos", "c": "SERVICIOS COMUNITARIOS", "e": "Tu colonia mejor, entre todos", "l": "", "col": "Xalostoc", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-productos", "n": "Regalos y Detalles Lupita", "c": "PRODUCTOS VARIOS", "e": "Un detalle para cada ocasión", "l": "", "col": "Santa Clara", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-servicios", "n": "Plomería y Gas Los Hermanos", "c": "SERVICIOS VARIOS", "e": "Fugas resueltas el mismo día", "l": "", "col": "Tulpetlac", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-mercado", "n": "Tianguis Sábados del Barrio", "c": "MERCADOS Y TIANGUIS", "e": "Productores y vecinos, cara a cara", "l": "", "col": "Ciudad Azteca", "niv": "I", "of": true, "v": false}, {"s": "ejemplo-tecnologia", "n": "Compu Ayuda Express", "c": "TECNOLOGÍA", "e": "Tu computadora y tu celular, como nuevos", "l": "", "col": "Las Américas", "niv": "I", "of": true, "v": true}, {"s": "ejemplo-belleza", "n": "Estética Brillo Cuate", "c": "BELLEZA Y BIENESTAR", "e": "Luce bien, sin gastar de más", "l": "", "col": "Santa Clara", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-hogar", "n": "Herrería y Construcción Ramírez", "c": "HOGAR Y CONSTRUCCIÓN", "e": "Obra limpia y a tiempo", "l": "", "col": "Xalostoc", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-mascotas", "n": "Veterinaria Patitas Felices", "c": "MASCOTAS", "e": "Cuidamos a tu mejor amigo", "l": "", "col": "Tulpetlac", "niv": "I", "of": true, "v": false}, {"s": "ejemplo-transporte", "n": "Fletes y Mudanzas Vecinos", "c": "TRANSPORTE Y REPARTO", "e": "Tu mudanza sin dolor de cabeza", "l": "", "col": "Las Américas", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-ocio", "n": "Cine Club Vecinal", "c": "OCIO Y CULTURA", "e": "Cine, palomitas y plática", "l": "", "col": "Santa Clara", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-altruismo", "n": "Banco de Ropa Manos Amigas", "c": "ALTRUISMO", "e": "Lo que a ti ya no te sirve, a alguien le hace falta", "l": "", "col": "Xalostoc", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-especialidades", "n": "Taller Voz y Cuerda", "c": "ESPECIALIDADES", "e": "Instrumentos con alma", "l": "", "col": "Ciudad Azteca", "niv": "B", "of": true, "v": false}, {"s": "dcuates-ventas", "n": "Ventas DCUATES", "c": "DCUATES OFICIAL", "e": "Lo que ofrecemos directo y lo que otros Cuates venden", "l": "", "col": "En línea y en la comunidad", "niv": "P", "of": true, "v": true}, {"s": "dcuates-vendedores", "n": "Vendedores DCUATES", "c": "DCUATES OFICIAL", "e": "Vende lo que te gusta y gana comisión", "l": "", "col": "En línea y en la comunidad", "niv": "P", "of": true, "v": true}, {"s": "dcuates-express", "n": "DCUATES Express", "c": "DCUATES OFICIAL", "e": "Todo DCUATES en una sola página", "l": "", "col": "En línea", "niv": "P", "of": true, "v": true}];
