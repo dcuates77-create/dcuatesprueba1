@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { useAtras } from "./atras.js";
 import { registrar } from "./analitica.js";
-import { cargarDirectorio, ordenarDirectorio, categoriaDe, claveCategoria, NIVELES } from "./datos/negocios.js";
+import { cargarDirectorio, ordenarDirectorio, ORDENES, categoriaDe, claveCategoria, NIVELES } from "./datos/negocios.js";
 import { abrirNegocio } from "./NegocioCuate.jsx";
 import PaginaCuateCTA from "./PaginaCuateCTA.jsx";
 import { URL_SITIO } from "./datos/config.js";
@@ -19,6 +19,7 @@ export default function DirectorioNegocios() {
   const [cat, setCat] = useState("");
   const [col, setCol] = useState("");
   const [soloV, setSoloV] = useState(false);
+  const [orden, setOrden] = useState("destacados");
   useEffect(() => {
     const quitar = () => { try { history.replaceState(history.state, "", window.location.pathname + window.location.search); } catch (x) { /* sin historial */ } };
     if (window.location.hash === "#negocios-cuate") quitar();
@@ -34,7 +35,7 @@ export default function DirectorioNegocios() {
     if (!abierto) return undefined;
     let vivo = true;
     registrar("directorio_abrir");
-    cargarDirectorio().then((r) => { if (vivo) setEst({ cargando: false, items: ordenarDirectorio(r.items || []), ejemplo: !!r.ejemplo }); });
+    cargarDirectorio().then((r) => { if (vivo) setEst({ cargando: false, items: r.items || [], ejemplo: !!r.ejemplo }); });
     return () => { vivo = false; };
   }, [abierto]);
   const cats = useMemo(() => {
@@ -42,7 +43,8 @@ export default function DirectorioNegocios() {
     return Object.keys(m).sort((a, b) => a.localeCompare(b, "es")).map((k) => ({ k, n: m[k] }));
   }, [est.items]);
   const cols = useMemo(() => [...new Set(est.items.map((i) => (i.col || "").trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b, "es")), [est.items]);
-  const lista = est.items.filter((i) => {
+  const ordenados = useMemo(() => ordenarDirectorio(est.items, orden), [est.items, orden]);
+  const lista = ordenados.filter((i) => {
     if (cat && claveCategoria(i.c) !== cat) return false;
     if (col && (i.col || "").trim() !== col) return false;
     if (soloV && !i.v) return false;
@@ -74,6 +76,9 @@ export default function DirectorioNegocios() {
           <select className="dn-s" value={col} onChange={(e) => setCol(e.target.value)} aria-label="Colonia o municipio">
             <option value="">Todas las colonias</option>
             {cols.map((c) => <option key={c} value={c}>{c}</option>)}
+          </select>
+          <select className="dn-s" value={orden} onChange={(e) => { setOrden(e.target.value); registrar("directorio_orden", { o: e.target.value }); }} aria-label="Ordenar por" data-testid="dir-orden">
+            {ORDENES.map(([k, t]) => <option key={k} value={k}>Orden: {t}</option>)}
           </select>
         </div>
         <div className="dn-chips" role="group" aria-label="Categorías">

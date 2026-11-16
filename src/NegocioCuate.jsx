@@ -50,6 +50,17 @@ export default function NegocioCuate() {
   }, []);
   const cerrar = () => setSlug("");
   const oculta = useAtras(!!slug, cerrar);
+  // Mientras la página está abierta la dirección es dcuates.com/n/<slug>: al refrescar se vuelve a abrir (Vercel la redirige). Al cerrar se regresa a la principal.
+  // (con una pausa: primero debe quedar registrada la entrada de «Atrás», para no ensuciar la entrada original)
+  useEffect(() => {
+    const id = setTimeout(() => {
+      try {
+        if (slug) { if (window.location.pathname !== "/n/" + slug) history.replaceState(history.state, "", "/n/" + slug); }
+        else if (/^\/n\//.test(window.location.pathname)) history.replaceState(history.state, "", "/");
+      } catch (x) { /* sin historial */ }
+    }, slug ? 60 : 250);
+    return () => clearTimeout(id);
+  }, [slug]);
   useEffect(() => {
     if (!slug) return undefined;
     let vivo = true;
@@ -115,6 +126,13 @@ export default function NegocioCuate() {
               {n.tel && <a className="ng-b" href={telHref(n.tel)} onClick={() => clic("tel")}>📞 Llamar</a>}
               {(n.mapa || n.dir) && <a className="ng-b" href={n.mapa || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(n.dir + " " + n.n)}`} target="_blank" rel="noopener noreferrer" onClick={() => clic("mapa")}>📍 Cómo llegar</a>}
             </div>
+            {(n.web || n.fb || n.ig) && (
+              <div className="ng-soc" data-testid="negocio-ligas">
+                {n.web && <a className="ng-sw" href={n.web} target="_blank" rel="noopener noreferrer" onClick={() => clic("web")}><span aria-hidden="true">🌐</span> Sitio web</a>}
+                {n.fb && <a className="ng-sf" href={n.fb} target="_blank" rel="noopener noreferrer" onClick={() => clic("fb")}><span aria-hidden="true">📘</span> Facebook</a>}
+                {n.ig && <a className="ng-si" href={n.ig} target="_blank" rel="noopener noreferrer" onClick={() => clic("ig")}><span aria-hidden="true">📸</span> Instagram</a>}
+              </div>
+            )}
             {n.gal && n.gal.length > 0 && <ReelNegocio items={n.gal} nombre={n.n} />}
             {n.d && <section className="ng-s"><p className="ng-d">{n.d}</p></section>}
             {n.of && n.of.length > 0 && (
@@ -132,6 +150,7 @@ export default function NegocioCuate() {
                     </li>
                   ))}
                 </ul>
+                {n.cc && <a className="ng-cc" href={n.cc} target="_blank" rel="noopener noreferrer" onClick={() => clic("catalogo")} data-testid="negocio-catalogo-completo">📖 Ver catálogo completo</a>}
               </section>
             )}
             {(n.h || n.dir) && (
@@ -176,11 +195,6 @@ export default function NegocioCuate() {
             )}
             <section className="ng-pie">
               <p>🌐 Esta página es parte de la red <b>CUATE</b> de DCUATES, comunidad de apoyo mutuo.</p>
-              <div className="ng-redes">
-                {n.web && <a href={n.web} target="_blank" rel="noopener noreferrer" onClick={() => clic("web")}>🌐 Sitio</a>}
-                {n.fb && <a href={n.fb} target="_blank" rel="noopener noreferrer" onClick={() => clic("fb")}>Facebook</a>}
-                {n.ig && <a href={n.ig} target="_blank" rel="noopener noreferrer" onClick={() => clic("ig")}>Instagram</a>}
-              </div>
               <button type="button" className="ng-b" onClick={() => { registrar("negocio_directorio", { s: slug }); abrirDirectorio(); }}>🔎 Ver todos los negocios CUATE</button>
               <PaginaCuateCTA compacto />
               <button type="button" className="ng-b ng-dueno" onClick={() => abrirPanelNegocio(slug)}>🔑 Soy el dueño: administrar mi página</button>
@@ -233,6 +247,11 @@ const CSS = `
 .ng-pase p{margin:8px 14px 0;font-size:14px;font-weight:700;line-height:1.35}.ng-pase i{display:block;font-style:normal;font-size:11px;font-weight:900;opacity:.85;letter-spacing:.05em}
 .ng-club{margin:14px;padding:14px;border-radius:18px;background:#fff;border:2px solid var(--c);display:flex;flex-direction:column;gap:8px}
 .ng-club h2{margin:0;font-size:17px;font-weight:900;color:var(--c)}.ng-club p{margin:0;font-size:14px;font-weight:700;line-height:1.4}
+.ng-soc{display:flex;flex-direction:column;gap:8px;padding:12px 14px 0}
+.ng-soc a{display:flex;align-items:center;justify-content:center;gap:10px;min-height:54px;border-radius:14px;font-size:17px;font-weight:900;text-decoration:none;color:#fff;box-shadow:0 2px 0 rgba(0,0,0,.18)}
+.ng-soc a span{font-size:22px}
+.ng-sw{background:#0f4c5c}.ng-sf{background:#1877f2}.ng-si{background:linear-gradient(45deg,#f09433,#dc2743 55%,#bc1888)}
+.ng-cc{display:flex;align-items:center;justify-content:center;gap:8px;min-height:54px;margin-top:12px;border-radius:14px;background:#FFD54A;border:3px solid #B8860B;color:#3b2a00;font-size:17px;font-weight:900;text-decoration:none}
 .ng-red{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px}
 .ng-rd{flex:0 0 132px;min-height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:8px;border:2px solid var(--c);border-radius:14px;background:#fff;color:#0f2d1e;font:inherit;cursor:pointer}
 .ng-rl{width:44px;height:44px;border-radius:50%;background:#f1ecdc;display:flex;align-items:center;justify-content:center;font-size:22px;overflow:hidden}.ng-rl img{width:100%;height:100%;object-fit:cover}
