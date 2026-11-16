@@ -5,6 +5,7 @@ import { useAtras } from "./atras.js";
 import { elegirPuerta } from "./PuertasDcuates.jsx";
 import { OpcionesLeer } from "./accesibilidad.jsx";
 import BotonCompartir from "./BotonCompartir.jsx";
+import { abrirNegocio } from "./NegocioCuate.jsx";
 
 const PASOS = [
   ["👋", "¡Bienvenido(a) a DCUATES!", "Somos una comunidad de apoyo mutuo: libros, asesorías, mascotas, cupones y mucho más. Todo con confianza y sin costo de entrada. 💛", "opciones"],
@@ -45,7 +46,8 @@ export default function PrimeraVisita() {
         <div className="zj-col">
           {ultimo
             ? <><button type="button" style={{ background: "#2E9E5B" }} onClick={() => { cerrar(); setTimeout(elegirPuerta, 120); }}>🚪 Elegir mi puerta</button>
-              <button type="button" style={{ background: "#1B6F8A" }} onClick={() => { cerrar(); setTimeout(() => window.dispatchEvent(new CustomEvent("dcuates:abrir-tablero", { detail: "conoce" })), 120); }}>📚 Ver los proyectos</button></>
+              <button type="button" style={{ background: "#1B6F8A" }} onClick={() => { cerrar(); setTimeout(() => window.dispatchEvent(new CustomEvent("dcuates:abrir-tablero", { detail: "conoce" })), 120); }}>📚 Ver los proyectos</button>
+              <button type="button" style={{ background: "#7A4A00" }} data-testid="tour-express" onClick={() => { cerrar(); setTimeout(() => abrirNegocio("dcuates-express"), 120); }}>⚡ DCUATES Express: todo en una página</button></>
             : <button type="button" style={{ background: "#2E9E5B" }} onClick={() => setPaso(paso + 1)}>Siguiente ›</button>}
           <button type="button" className="pv-sec" onClick={cerrar}>{ultimo ? "🌐 Ir a la página" : "Saltar"}</button>
         </div>

@@ -6,7 +6,7 @@ import { createPortal } from "react-dom";
 import { useAtras } from "./atras.js";
 import { registrar } from "./analitica.js";
 import { abrirRegistroPrevio } from "./RegistroPrevio.jsx";
-import { cargarNegocio, categoriaDe, NIVELES } from "./datos/negocios.js";
+import { cargarNegocio, categoriaDe, NIVELES, esOficial } from "./datos/negocios.js";
 import PaginaCuateCTA, { abrirDirectorio } from "./PaginaCuateCTA.jsx";
 import ReelNegocio from "./ReelNegocio.jsx";
 import { abrirPanelNegocio } from "./PanelNegocio.jsx";
@@ -113,7 +113,7 @@ export default function NegocioCuate() {
             {est.ejemplo && <p className="ng-ej">EJEMPLO ilustrativo · así se vería tu página</p>}
             <div className="ng-portada" style={n.portada ? { backgroundImage: `url("${n.portada}")` } : undefined}>
               <span className="ng-cat">{cat.e} {cat.nombre.toUpperCase()}</span>
-              {NIVELES[n.niv] && NIVELES[n.niv].t && <span className="ng-pat">{NIVELES[n.niv].t}</span>}
+              {esOficial(n.s) ? <span className="ng-pat">🌟 OFICIAL DCUATES</span> : NIVELES[n.niv] && NIVELES[n.niv].t && <span className="ng-pat">{NIVELES[n.niv].t}</span>}
             </div>
             <div className="ng-id">
               <div className="ng-logo">{n.logo ? <img src={n.logo} alt="" loading="lazy" /> : <span aria-hidden="true">{cat.e}</span>}</div>

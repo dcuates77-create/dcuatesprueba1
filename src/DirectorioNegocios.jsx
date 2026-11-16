@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { useAtras } from "./atras.js";
 import { registrar } from "./analitica.js";
-import { cargarDirectorio, ordenarDirectorio, ORDENES, categoriaDe, claveCategoria, NIVELES } from "./datos/negocios.js";
+import { cargarDirectorio, ordenarDirectorio, ORDENES, categoriaDe, claveCategoria, NIVELES, esOficial } from "./datos/negocios.js";
 import { abrirNegocio } from "./NegocioCuate.jsx";
 import PaginaCuateCTA from "./PaginaCuateCTA.jsx";
 import { URL_SITIO } from "./datos/config.js";
@@ -97,7 +97,7 @@ export default function DirectorioNegocios() {
                 <span className="dn-t">
                   <b>{i.n}</b>
                   {i.e && <small>{i.e}</small>}
-                  <span className="dn-m2"><i>{c.e} {c.nombre}</i>{i.col && <i>📍 {i.col}</i>}{i.v && <i className="dn-vr">✅ Verificado</i>}{i.of && <i className="dn-of">🎟️ Oferta</i>}{nv && nv.t && <i className="dn-nv">{nv.t}</i>}</span>
+                  <span className="dn-m2"><i>{c.e} {c.nombre}</i>{i.col && <i>📍 {i.col}</i>}{i.v && <i className="dn-vr">✅ Verificado</i>}{i.of && <i className="dn-of">🎟️ Oferta</i>}{esOficial(i.s) ? <i className="dn-nv">🌟 OFICIAL DCUATES</i> : nv && nv.t && <i className="dn-nv">{nv.t}</i>}</span>
                 </span>
               </button>
             );
