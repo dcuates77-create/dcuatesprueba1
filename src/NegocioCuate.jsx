@@ -7,8 +7,9 @@ import { useAtras } from "./atras.js";
 import { registrar } from "./analitica.js";
 import { abrirRegistroPrevio } from "./RegistroPrevio.jsx";
 import { cargarNegocio, categoriaDe, NIVELES, esOficial } from "./datos/negocios.js";
-import PaginaCuateCTA, { abrirDirectorio } from "./PaginaCuateCTA.jsx";
+import PaginaCuateCTA from "./PaginaCuateCTA.jsx";
 import ReelNegocio from "./ReelNegocio.jsx";
+import { ListaNegocios, PaginaCategoria, esSlugCategoria, categoriaDeSlug } from "./PaginaCategoria.jsx";
 import { abrirPanelNegocio } from "./PanelNegocio.jsx";
 import { eventoNegocio } from "./utilidades/negocioStats.js";
 import { registrarPedido, confirmarPedido, descartarPedido, pedidoPendiente, paseGuardado } from "./utilidades/pedidos.js";
@@ -107,6 +108,7 @@ export default function NegocioCuate() {
   useEffect(() => {
     if (!slug) return undefined;
     let vivo = true;
+    if (esSlugCategoria(slug)) { setEst({ cargando: false, ok: false, categoria: true }); return () => { vivo = false; }; }
     setEst({ cargando: true });
     cargarNegocio(slug).then((r) => {
       if (!vivo) return;
@@ -124,6 +126,8 @@ export default function NegocioCuate() {
     return () => { document.title = ant; };
   }, [slug, est]);
   if (!slug) return null;
+  const esCat = esSlugCategoria(slug);
+  const catPag = esCat ? categoriaDeSlug(slug) : null;
   const n = est.ok ? est.negocio : null;
   const cat = categoriaDe(n && n.c);
   const url = `${URL_SITIO}/n/${slug}`;
@@ -141,11 +145,12 @@ export default function NegocioCuate() {
       <div className="ng-caja" style={{ "--c": cat.color }}>
         <div className="ng-bar">
           <button type="button" className="ng-x" onClick={cerrar} aria-label="Cerrar">✕</button>
-          <b>{n ? n.n : "Negocio CUATE"}</b>
+          <b>{n ? n.n : esCat ? (catPag ? catPag.nombre : "Negocios CUATE") : "Negocio CUATE"}</b>
           {n && <button type="button" className="ng-sh" onClick={compartir} aria-label="Compartir">📤</button>}
         </div>
-        {est.cargando && <p className="ng-msg" role="status">Cargando…</p>}
-        {!est.cargando && !est.ok && (
+        {esCat && <PaginaCategoria slug={slug} />}
+        {est.cargando && !esCat && <p className="ng-msg" role="status">Cargando…</p>}
+        {!est.cargando && !est.ok && !esCat && (
           <div className="ng-msg">
             <p><b>{est.motivo === "no-encontrado" ? "No encontramos esta página." : "No pudimos cargar esta página ahora."}</b></p>
             <p>{est.motivo === "no-encontrado" ? "Puede que el enlace esté mal escrito o que el negocio aún no esté publicado." : "Revisa tu conexión e inténtalo de nuevo."}</p>
@@ -240,7 +245,7 @@ export default function NegocioCuate() {
             )}
             <section className="ng-pie">
               <p>🌐 Esta página es parte de la red <b>CUATE</b> de DCUATES, comunidad de apoyo mutuo.</p>
-              <button type="button" className="ng-b" onClick={() => { registrar("negocio_directorio", { s: slug }); abrirDirectorio(); }}>🔎 Ver todos los negocios CUATE</button>
+              <ListaNegocios actual={slug} />
               <PaginaCuateCTA compacto />
               <button type="button" className="ng-b ng-dueno" onClick={() => abrirPanelNegocio(slug)}>🔑 Soy el dueño: administrar mi página</button>
             </section>

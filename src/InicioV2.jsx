@@ -12,6 +12,7 @@ import { NOTICIAS_GALERIA_ITEMS, CUPONES_PROMOS_ITEMS } from "./datos/proyectos.
 import { abrirLegal } from "./componentes/legal.jsx";
 import { WHATSAPP_NUMERO } from "./datos/config.js";
 import { ACTIVIDADES_FIJAS } from "./datos/actividadesFijas.js";
+import { VERSION_BUILD, esAdmin } from "./datos/config.js";
 import { PUNTOS_EJEMPLOS, PREMIOS_EJEMPLOS, BENEFICIOS_EJEMPLOS } from "./datos/clubEjemplos.js";
 import ClubTarjeta from "./ClubDcuates.jsx";
 import PaginaCuateCTA, { abrirDirectorio } from "./PaginaCuateCTA.jsx";
@@ -163,6 +164,7 @@ function Pie({ onSugerencias }) {
         {L.map(([t, f]) => <button key={t} type="button" onClick={f}>{t}</button>)}
       </nav>
       <p>© {new Date().getFullYear()} DCUATES, un programa de CONEXIONES CON CAUSA ♥</p>
+      {esAdmin() && <p className="v2-sello" data-testid="sello-version">Versión {VERSION_BUILD}</p>}
     </footer>
   );
 }
@@ -719,5 +721,6 @@ const CSS = `
 .v2-ft small{font-size:13px;font-weight:700}
 .v2-fx{flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:64px;border:2px solid;border-radius:16px;font-size:13px;font-weight:900;cursor:pointer}
 .v2-root .vi-logros{margin:0}
+.v2-sello{margin:10px 0 0;text-align:center;font-size:12px;font-weight:800;color:#0a2a18}
 @media (prefers-reduced-motion:reduce){.v2-hero-i{transition:none}}
 `;
