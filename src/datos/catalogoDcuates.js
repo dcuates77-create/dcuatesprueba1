@@ -1,0 +1,60 @@
+// CATÁLOGO «LO QUE COMPARTIMOS EN DCUATES» (e83a): todo lo que DCUATES pone a disposición, con sus características y cómo solicitarlo.
+// Se muestra en «Lo que compartimos» > «🗂️ Catálogo». Solo textos: edítalos aquí sin tocar la lógica.
+// a = qué pasa al tocar «Solicitar»:  { reg: "id" } abre ese registro · { neg: "slug" } abre una Página CUATE · { z: "zona" } abre una zona · { plus: 1 } abre la Agenda · { tablon: "Ofrezco" } abre el tablón filtrado
+export const GRUPOS_CATALOGO = ["Aprende y cuida", "Apoyo y causas", "Negocios y ventas", "Comunidad y Club"];
+
+export const CATALOGO_DCUATES = [
+  { g: 0, e: "📚", t: "Bibliobici · préstamo de libros", costo: "Gratis", d: "Libros y materiales prestados sin costo, y recepción de donaciones.",
+    car: ["Pides el libro o material que necesitas", "También puedes donar o compartir libros", "Te contactamos por WhatsApp para coordinar"], btn: "Pedir un libro", a: { reg: "libros" } },
+  { g: 0, e: "🎓", t: "Asesorías gratuitas", costo: "Gratis", d: "Orientación gratuita de voluntarios sobre el tema que necesites.",
+    car: ["Dices qué tipo de orientación necesitas", "Es gratuita", "Te contactamos por WhatsApp"], btn: "Pedir una asesoría", a: { reg: "asesorias" } },
+  { g: 0, e: "🧑‍🏫", t: "Ser asesor voluntario", costo: "Gratis", d: "Comparte lo que sabes y orienta a otros Cuates.",
+    car: ["Cuentas en qué puedes orientar", "Tú decides tu tiempo", "Suma reconocimiento y puntos en la comunidad"], btn: "Quiero ser asesor", a: { reg: "asesor" } },
+  { g: 0, e: "🌿", t: "Bienestar y recreación", costo: "Gratis", d: "Talleres y actividades de bienestar para la comunidad.",
+    car: ["Eliges qué te interesa", "Te avisamos de talleres y actividades", "Por WhatsApp"], btn: "Quiero que me avisen", a: { reg: "bienestar" } },
+  { g: 0, e: "🐾", t: "Ecatepets · bienestar animal", costo: "Gratis", d: "Apoyo y adopciones de mascotas y peluditos de la comunidad.",
+    car: ["Cuentas cómo quieres sumarte o qué necesita un peludito", "Adopciones y apoyo animal", "Te contactamos por WhatsApp"], btn: "Quiero participar", a: { reg: "ecatepets" } },
+  { g: 0, e: "🔎", t: "Mascotas o cosas extraviadas", costo: "Gratis", d: "Reporta o ayuda a encontrar mascotas y objetos perdidos.",
+    car: ["Reportas el caso", "Se difunde en la comunidad", "Si es una persona en peligro, llama primero al 911"], btn: "Reportar un caso", a: { reg: "extraviado" } },
+
+  { g: 1, e: "🆘", t: "Solicitud de apoyo", costo: "Gratis", d: "Cuéntanos qué apoyo necesitas y te respondemos.",
+    car: ["Registras tu solicitud", "Te respondemos por WhatsApp", "Para urgencias usa el botón rosa «¿Necesitas apoyo o tienes una urgencia?»"], btn: "Pedir apoyo", a: { reg: "solicitud" } },
+  { g: 1, e: "🙋", t: "Voluntariado", costo: "Gratis", d: "Suma tu tiempo y tus manos a las causas de la comunidad.",
+    car: ["Dices en qué te gustaría ayudar", "Participas cuando puedes", "Recibes reconocimiento"], btn: "Quiero ser voluntario", a: { reg: "voluntario" } },
+  { g: 1, e: "💛", t: "Aportación para causas", costo: "Voluntaria", d: "Aporta a una causa de forma segura.",
+    car: ["Tú decides cómo aportar", "Te contactamos por WhatsApp para hacerlo de forma segura", "Esta página nunca cobra"], btn: "Quiero aportar", a: { reg: "aportacion" } },
+  { g: 1, e: "🛍️", t: "Ventas con causa", costo: "Parte apoya una causa", d: "Productos y servicios cuya venta apoya una causa.",
+    car: ["Ofreces o buscas productos y servicios", "Parte de lo que se vende apoya una causa", "Lo revisamos y lo publicamos"], btn: "Ofrecer o buscar", a: { reg: "ventas" } },
+  { g: 1, e: "🤝", t: "Círculo de Confianza", costo: "Gratis", d: "Apoyos y beneficios mutuos entre Cuates de confianza.",
+    car: ["Cuentas qué aportas y qué necesitas", "Beneficios mutuos", "Se forma con personas que ya participan"], btn: "Quiero sumarme", a: { reg: "circulo" } },
+  { g: 1, e: "🎁", t: "Ofrezco · Necesito", costo: "Gratis", d: "Lo que puedes dar, prestar o hacer por alguien, y lo que te hace falta.",
+    car: ["Se publica sin tu nombre ni tu teléfono", "Otros Cuates tocan «Me interesa»", "DCUATES hace la conexión"], btn: "Ver el tablón", a: { tablon: "Ofrezco" } },
+
+  { g: 2, e: "🏪", t: "Tu Página CUATE", costo: "Gratis con promo · si no, aportación voluntaria", d: "Tu negocio con página propia, WhatsApp, promociones y Pase.",
+    car: ["Enlace propio dcuates.com/n/tu-negocio", "Catálogo, galería y Pase del negocio", "Gratis si ofreces promociones a los Cuates; si no, de aportación voluntaria"], btn: "Registrar mi negocio", a: { reg: "pagina" } },
+  { g: 2, e: "🛒", t: "Ventas DCUATES", costo: "Según producto", d: "Lo que DCUATES ofrece directo y lo que otros Cuates venden por comisión.",
+    car: ["Pides por WhatsApp", "El pedido queda registrado", "Beneficios para Cuates"], btn: "Ver qué hay a la venta", a: { neg: "dcuates-ventas" } },
+  { g: 2, e: "💼", t: "Vendedores por comisión", costo: "Comisión por producto", d: "Vende productos o servicios de la comunidad y gana comisión.",
+    car: ["Te explicamos cómo funciona", "Condiciones por WhatsApp según el producto", "Acompañamiento para empezar"], btn: "Quiero vender", a: { neg: "dcuates-vendedores" } },
+  { g: 2, e: "🤝", t: "Alianzas ganar-ganar", costo: "Gratis", d: "Alianzas con negocios y organizaciones para generar beneficios mutuos.",
+    car: ["Platicamos cómo sumar", "Beneficios y apoyos mutuos", "Te contactamos por WhatsApp"], btn: "Quiero una alianza", a: { reg: "alianza" } },
+  { g: 2, e: "🧺", t: "Bazares y mercados", costo: "Según evento", d: "Espacio para ofrecer tus productos en los próximos bazares.",
+    car: ["Cuentas qué ofreces", "Te incluimos en los próximos bazares"], btn: "Quiero participar", a: { reg: "bazar" } },
+  { g: 2, e: "🔎", t: "Directorio de negocios CUATE", costo: "Gratis", d: "Negocios de la comunidad con promociones para Cuates.",
+    car: ["Busca por categoría o colonia", "Promociones con tu Pase CUATE", "Ordena por destacados, recientes o con oferta"], btn: "Ver negocios", a: { dir: 1 } },
+
+  { g: 3, e: "🧡", t: "Club DCUATES", costo: "Sin cuotas", d: "Sé NUESTRO CUATE: tu Pase, tus puntos y tus premios.",
+    car: ["Eliges tu modalidad y con qué te comprometes", "Tu Pase CUATE suma puntos", "No hay cuotas: esta página nunca cobra"], btn: "Unirme al Club", a: { reg: "club" } },
+  { g: 3, e: "🎮", t: "Juegos y Semillas", costo: "Gratis", d: "Juega, aprende y suma Semillas para canjear.",
+    car: ["Juegos con tu tema", "Semillas y premios", "Para toda la familia"], btn: "Jugar", a: { z: "juegos" } },
+  { g: 3, e: "📌", t: "Agenda y noticias", costo: "Gratis", d: "Actividades, avisos y noticias de la comunidad.",
+    car: ["Consulta o publica avisos", "Puedes sumar tus actividades", "Elige qué temas recibir"], btn: "Ver la Agenda", a: { plus: 1 } },
+  { g: 3, e: "⭐", t: "Recomendaciones", costo: "Gratis", d: "Recomienda a alguien, de forma pública o privada.",
+    car: ["Pública: la ve todo mundo, sin tu nombre ni tu teléfono", "Privada: no se publica", "No escribas teléfonos ni datos personales"], btn: "Recomendar", a: { reg: "recomendar" } },
+  { g: 3, e: "🙏", t: "Muro de gratitud", costo: "Gratis", d: "Deja un gracias o propón un reconocimiento.",
+    car: ["Cuentas a quién agradecer y por qué", "Lo revisamos y, si nos autorizas, lo publicamos"], btn: "Dar las gracias", a: { reg: "gratitud" } },
+  { g: 3, e: "💚", t: "Invita a tu comunidad", costo: "Gratis", d: "Invita a un vecino y recibe reconocimiento cuando se registre.",
+    car: ["Te damos un enlace con tu código", "Sabremos que vino de ti", "No pedimos los datos de quien invitas"], btn: "Invitar", a: { reg: "invitar" } },
+  { g: 3, e: "💡", t: "Propón una iniciativa, reto o regalo", costo: "Gratis", d: "Tu idea puede convertirse en un beneficio para todos.",
+    car: ["Nos cuentas tu idea", "La revisamos y vemos cómo sumarla"], btn: "Proponer", a: { reg: "iniciativa" } }
+];

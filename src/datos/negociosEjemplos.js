@@ -301,6 +301,20 @@ export const EJEMPLOS = {
     "e": "Comida corrida como en casa"
    },
    {
+    "s": "ejemplo-comida-llevar",
+    "n": "Sazón para Llevar",
+    "c": "ALIMENTOS",
+    "l": "",
+    "e": "Comida casera lista para tu mesa"
+   },
+   {
+    "s": "ejemplo-cafeteria",
+    "n": "Café Cuate",
+    "c": "ALIMENTOS",
+    "l": "",
+    "e": "Un buen café y un buen rato"
+   },
+   {
     "s": "ejemplo-salud",
     "n": "Fisioterapia Movimiento Vivo",
     "c": "SALUD",
@@ -320,20 +334,6 @@ export const EJEMPLOS = {
     "c": "EDUCACIÓN",
     "l": "",
     "e": "Regularización con paciencia y buen humor"
-   },
-   {
-    "s": "ejemplo-mercado",
-    "n": "Tianguis Sábados del Barrio",
-    "c": "MERCADOS Y TIANGUIS",
-    "l": "",
-    "e": "Productores y vecinos, cara a cara"
-   },
-   {
-    "s": "ejemplo-tecnologia",
-    "n": "Compu Ayuda Express",
-    "c": "TECNOLOGÍA",
-    "l": "",
-    "e": "Tu computadora y tu celular, como nuevos"
    }
   ],
   "cc": "",
@@ -1011,6 +1011,826 @@ export const EJEMPLOS = {
   "cc": "",
   "ct": [],
   "v": true
+ },
+ "ejemplo-construccion": {
+  "s": "ejemplo-construccion",
+  "n": "Materiales La Obra Firme",
+  "e": "Todo para tu obra, al mejor precio",
+  "c": "HOGAR Y CONSTRUCCIÓN",
+  "niv": "I",
+  "d": "Materiales de construcción para tu casa o tu negocio: cemento, varilla, block, arena, grava, pintura y herramienta. Cotizamos tu obra sin costo y llevamos el material hasta tu puerta.",
+  "of": [
+   "Cemento, varilla, block y grava",
+   "Pintura, impermeabilizante y herramienta",
+   "Cotización de obra sin costo",
+   "Entrega a domicilio",
+   "Descuento a Cuates en compras mayores"
+  ],
+  "h": "Lun a Sáb 8:00–18:00",
+  "dir": "Jardines de Morelos, Ecatepec (dirección de ejemplo)",
+  "col": "Jardines de Morelos",
+  "mapa": "",
+  "wa": "525500000000",
+  "tel": "",
+  "web": "",
+  "fb": "",
+  "ig": "",
+  "logo": "",
+  "portada": "",
+  "gal": [],
+  "ofT": "10% a Cuates",
+  "ofD": "En materiales seleccionados presentando tu Pase CUATE.",
+  "rec": "Materiales de construcción",
+  "nec": "Albañiles y contratistas de confianza",
+  "com": "Consejos para presupuestar tu obra",
+  "club": true,
+  "cod": "NEG-1023-CON",
+  "red": [],
+  "cc": "",
+  "ct": [
+   {
+    "n": "Cemento 50 kg",
+    "p": "$240",
+    "d": "Gris, saco de 50 kg"
+   },
+   {
+    "n": "Varilla 3/8",
+    "p": "$190",
+    "d": "Pieza de 12 m"
+   },
+   {
+    "n": "Block 15 cm",
+    "p": "$14",
+    "d": "Pieza"
+   },
+   {
+    "n": "Pintura vinílica 19 L",
+    "p": "$1,350",
+    "d": "Blanca"
+   }
+  ],
+  "v": true
+ },
+ "ejemplo-comida-llevar": {
+  "s": "ejemplo-comida-llevar",
+  "n": "Sazón para Llevar",
+  "e": "Comida casera lista para tu mesa",
+  "c": "ALIMENTOS",
+  "niv": "I",
+  "d": "Comida corrida y guisados caseros para llevar, por porción o por charola. Pedidos para fiestas y reuniones con anticipación.",
+  "of": [
+   "Comida corrida y guisados",
+   "Charolas para fiestas y reuniones",
+   "Pedidos con anticipación",
+   "Entrega en la colonia"
+  ],
+  "h": "Lun a Dom 12:00–17:00",
+  "dir": "Jardines de Morelos, Ecatepec (dirección de ejemplo)",
+  "col": "Xalostoc",
+  "mapa": "",
+  "wa": "525500000000",
+  "tel": "",
+  "web": "",
+  "fb": "",
+  "ig": "",
+  "logo": "",
+  "portada": "",
+  "gal": [],
+  "ofT": "Postre gratis",
+  "ofD": "Con tu comida corrida, un postre de la casa presentando tu Pase CUATE.",
+  "rec": "Comida casera para llevar",
+  "nec": "Repartidores de la zona",
+  "com": "Recetas caseras para el día a día",
+  "club": true,
+  "cod": "NEG-1024-COM",
+  "red": [],
+  "cc": "",
+  "ct": [
+   {
+    "n": "Comida corrida",
+    "p": "$75",
+    "d": "Sopa, guisado, arroz y agua"
+   },
+   {
+    "n": "Charola para 10",
+    "p": "$650",
+    "d": "Pedido con un día de anticipación"
+   },
+   {
+    "n": "Postre del día",
+    "p": "$25",
+    "d": ""
+   }
+  ],
+  "v": false
+ },
+ "ejemplo-tatuajes": {
+  "s": "ejemplo-tatuajes",
+  "n": "Tinta Cuate Studio",
+  "e": "Arte en la piel, con higiene y respeto",
+  "c": "BELLEZA Y BIENESTAR",
+  "niv": "B",
+  "d": "Estudio de tatuajes y perforaciones con material nuevo y esterilizado. Diseños personalizados, cubrimientos y retoques. Se atiende solo a mayores de edad.",
+  "of": [
+   "Tatuajes a medida",
+   "Cubrimientos y retoques",
+   "Perforaciones",
+   "Material esterilizado y desechable",
+   "Solo mayores de edad"
+  ],
+  "h": "Mar a Sáb 12:00–20:00",
+  "dir": "Jardines de Morelos, Ecatepec (dirección de ejemplo)",
+  "col": "Ciudad Azteca",
+  "mapa": "",
+  "wa": "525500000000",
+  "tel": "",
+  "web": "",
+  "fb": "",
+  "ig": "",
+  "logo": "",
+  "portada": "",
+  "gal": [],
+  "ofT": "Diseño sin costo",
+  "ofD": "Cotización y boceto sin costo con tu Pase CUATE.",
+  "rec": "Arte corporal seguro",
+  "nec": "Modelos para portafolio",
+  "com": "Cuidados para sanar tu tatuaje",
+  "club": false,
+  "cod": "NEG-1025-TAT",
+  "red": [],
+  "cc": "",
+  "ct": [],
+  "v": false
+ },
+ "ejemplo-maderia": {
+  "s": "ejemplo-maderia",
+  "n": "Maderería y Carpintería El Roble",
+  "e": "Madera de calidad y muebles a tu medida",
+  "c": "HOGAR Y CONSTRUCCIÓN",
+  "niv": "I",
+  "d": "Venta de madera, triplay y herrajes, y fabricación de muebles a medida: closets, cocinas, libreros y puertas. Cortes a medida en el momento.",
+  "of": [
+   "Madera, triplay y MDF",
+   "Cortes a medida",
+   "Muebles a la medida",
+   "Herrajes y barnices",
+   "Reparación de muebles"
+  ],
+  "h": "Lun a Sáb 8:00–18:00",
+  "dir": "Jardines de Morelos, Ecatepec (dirección de ejemplo)",
+  "col": "Ecatepec Centro",
+  "mapa": "",
+  "wa": "525500000000",
+  "tel": "",
+  "web": "",
+  "fb": "",
+  "ig": "",
+  "logo": "",
+  "portada": "",
+  "gal": [],
+  "ofT": "Cortes sin costo",
+  "ofD": "Hasta 3 cortes sin costo en tu compra de madera con tu Pase CUATE.",
+  "rec": "Madera y muebles a medida",
+  "nec": "Ayudantes de carpintería",
+  "com": "Consejos para cuidar la madera",
+  "club": true,
+  "cod": "NEG-1026-MAD",
+  "red": [],
+  "cc": "",
+  "ct": [
+   {
+    "n": "Triplay 18 mm",
+    "p": "$780",
+    "d": "Hoja de 1.22 x 2.44 m"
+   },
+   {
+    "n": "Pino cepillado",
+    "p": "$95",
+    "d": "Por tabla"
+   },
+   {
+    "n": "Closet a medida",
+    "p": "desde $4,500",
+    "d": "Cotización sin costo"
+   }
+  ],
+  "v": false
+ },
+ "ejemplo-barberia": {
+  "s": "ejemplo-barberia",
+  "n": "Barbería El Corte Cuate",
+  "e": "Buen corte, buena plática",
+  "c": "BELLEZA Y BIENESTAR",
+  "niv": "B",
+  "d": "Cortes clásicos y modernos, arreglo de barba y corte infantil. Sin cita los días de semana, con cita los fines de semana.",
+  "of": [
+   "Corte clásico y moderno",
+   "Arreglo de barba",
+   "Corte infantil",
+   "Cita por WhatsApp"
+  ],
+  "h": "Lun a Dom 10:00–20:00",
+  "dir": "Jardines de Morelos, Ecatepec (dirección de ejemplo)",
+  "col": "Jardines de Morelos",
+  "mapa": "",
+  "wa": "525500000000",
+  "tel": "",
+  "web": "",
+  "fb": "",
+  "ig": "",
+  "logo": "",
+  "portada": "",
+  "gal": [],
+  "ofT": "Corte infantil -20%",
+  "ofD": "Corte infantil con 20% de descuento presentando tu Pase CUATE.",
+  "rec": "Cortes y arreglo personal",
+  "nec": "Barberos con ganas de crecer",
+  "com": "Cuidado del cabello y la barba",
+  "club": false,
+  "cod": "NEG-1027-BAR",
+  "red": [],
+  "cc": "",
+  "ct": [],
+  "v": false
+ },
+ "ejemplo-abarrotes": {
+  "s": "ejemplo-abarrotes",
+  "n": "Abarrotes Doña Mary",
+  "e": "Todo lo del diario, cerquita de ti",
+  "c": "PRODUCTOS VARIOS",
+  "niv": "B",
+  "d": "Tienda de abarrotes de barrio: despensa, lácteos, botanas, bebidas y artículos de limpieza. Servicio a domicilio en la colonia y fiado de confianza a vecinos de siempre.",
+  "of": [
+   "Despensa y lácteos",
+   "Botanas y bebidas",
+   "Artículos de limpieza",
+   "Servicio a domicilio",
+   "Pago de servicios"
+  ],
+  "h": "Lun a Dom 7:00–22:00",
+  "dir": "Jardines de Morelos, Ecatepec (dirección de ejemplo)",
+  "col": "Xalostoc",
+  "mapa": "",
+  "wa": "525500000000",
+  "tel": "",
+  "web": "",
+  "fb": "",
+  "ig": "",
+  "logo": "",
+  "portada": "",
+  "gal": [],
+  "ofT": "Agua de regalo",
+  "ofD": "Tu garrafón con descuento presentando tu Pase CUATE.",
+  "rec": "Productos del diario",
+  "nec": "Proveedores locales",
+  "com": "Ahorros en la despensa",
+  "club": false,
+  "cod": "NEG-1028-ABA",
+  "red": [],
+  "cc": "",
+  "ct": [],
+  "v": false
+ },
+ "ejemplo-rescate": {
+  "s": "ejemplo-rescate",
+  "n": "Patitas al Rescate",
+  "e": "Rescatamos, curamos y damos hogar",
+  "c": "MASCOTAS",
+  "niv": "B",
+  "d": "Grupo de rescatistas y apoyo animal: rescatamos perros y gatos en la calle, los esterilizamos y buscamos hogar responsable. Recibimos donativos, croquetas y voluntarios.",
+  "of": [
+   "Rescate de perros y gatos",
+   "Adopciones responsables",
+   "Campañas de esterilización",
+   "Hogares temporales",
+   "Recibimos croquetas y donativos"
+  ],
+  "h": "Todos los días, con cita por WhatsApp",
+  "dir": "Jardines de Morelos, Ecatepec (dirección de ejemplo)",
+  "col": "Ecatepec",
+  "mapa": "",
+  "wa": "525500000000",
+  "tel": "",
+  "web": "",
+  "fb": "",
+  "ig": "",
+  "logo": "",
+  "portada": "",
+  "gal": [],
+  "ofT": "Adopta con descuento",
+  "ofD": "Esterilización y vacunas incluidas en cada adopción.",
+  "rec": "Adopciones y rescate animal",
+  "nec": "Voluntarios, hogares temporales y croquetas",
+  "com": "Consejos de cuidado y adopción",
+  "club": false,
+  "cod": "NEG-1029-RES",
+  "red": [],
+  "cc": "",
+  "ct": [],
+  "v": false
+ },
+ "ejemplo-mascotas-alimento": {
+  "s": "ejemplo-mascotas-alimento",
+  "n": "Mundo Mascota Cuate",
+  "e": "Alimento y accesorios para tu mejor amigo",
+  "c": "MASCOTAS",
+  "niv": "I",
+  "d": "Tienda de alimento a granel y de marca, accesorios, camas, juguetes y arneses para perros y gatos. Servicio a domicilio.",
+  "of": [
+   "Alimento a granel y de marca",
+   "Camas, collares y arneses",
+   "Juguetes y premios",
+   "Servicio a domicilio"
+  ],
+  "h": "Lun a Sáb 9:00–19:00",
+  "dir": "Jardines de Morelos, Ecatepec (dirección de ejemplo)",
+  "col": "Jardines de Morelos",
+  "mapa": "",
+  "wa": "525500000000",
+  "tel": "",
+  "web": "",
+  "fb": "",
+  "ig": "",
+  "logo": "",
+  "portada": "",
+  "gal": [],
+  "ofT": "Premio de regalo",
+  "ofD": "Un premio para tu mascota en compras mayores a $300 con tu Pase CUATE.",
+  "rec": "Alimento y accesorios",
+  "nec": "Proveedores de alimento",
+  "com": "Cuidado y alimentación de mascotas",
+  "club": true,
+  "cod": "NEG-1030-MAS",
+  "red": [],
+  "cc": "",
+  "ct": [
+   {
+    "n": "Croquetas adulto 20 kg",
+    "p": "$690",
+    "d": ""
+   },
+   {
+    "n": "Cama mediana",
+    "p": "$280",
+    "d": ""
+   },
+   {
+    "n": "Arnés ajustable",
+    "p": "$120",
+    "d": ""
+   },
+   {
+    "n": "Alimento para gato 8 kg",
+    "p": "$320",
+    "d": ""
+   }
+  ],
+  "v": false
+ },
+ "ejemplo-catalogo": {
+  "s": "ejemplo-catalogo",
+  "n": "Ventas por Catálogo Rosa",
+  "e": "Todo en un solo catálogo, a tu puerta",
+  "c": "PRODUCTOS VARIOS",
+  "niv": "P",
+  "d": "Venta por catálogo de ropa, calzado, hogar, perfumería y regalos. Pides por WhatsApp, te llevamos el catálogo y entregamos en tu domicilio o en un punto de encuentro.",
+  "of": [
+   "Ropa y calzado",
+   "Perfumería y cuidado personal",
+   "Hogar y regalos",
+   "Pedidos por WhatsApp",
+   "Entrega en punto de encuentro"
+  ],
+  "h": "Lun a Sáb 10:00–19:00",
+  "dir": "Jardines de Morelos, Ecatepec (dirección de ejemplo)",
+  "col": "Ciudad Azteca",
+  "mapa": "",
+  "wa": "525500000000",
+  "tel": "",
+  "web": "",
+  "fb": "",
+  "ig": "",
+  "logo": "",
+  "portada": "",
+  "gal": [],
+  "ofT": "Envío gratis",
+  "ofD": "Envío sin costo en tu primer pedido con tu Pase CUATE.",
+  "rec": "Productos por catálogo",
+  "nec": "Nuevas vendedoras",
+  "com": "Ideas de regalo y ofertas de temporada",
+  "club": true,
+  "cod": "NEG-1031-CAT",
+  "red": [
+   {
+    "s": "ejemplo-artesanias",
+    "n": "Manos Creativas",
+    "c": "PRODUCTOS VARIOS",
+    "l": "",
+    "e": "Hecho a mano con cariño"
+   },
+   {
+    "s": "ejemplo-salud",
+    "n": "Fisioterapia Movimiento Vivo",
+    "c": "SALUD",
+    "l": "",
+    "e": "Muévete sin dolor, vive con ganas"
+   },
+   {
+    "s": "ejemplo-salud-dental",
+    "n": "Clínica Dental Sonrisa Cuate",
+    "c": "SALUD",
+    "l": "",
+    "e": "Cuidamos tu sonrisa y tu bolsillo"
+   },
+   {
+    "s": "ejemplo-alimentos-fonda",
+    "n": "Fonda La Güera",
+    "c": "ALIMENTOS",
+    "l": "",
+    "e": "Comida corrida como en casa"
+   },
+   {
+    "s": "ejemplo-alimentos-panaderia",
+    "n": "Panadería El Buen Pan",
+    "c": "ALIMENTOS",
+    "l": "",
+    "e": "Pan calientito, dos veces al día"
+   },
+   {
+    "s": "ejemplo-educacion",
+    "n": "Asesorías Aprende Fácil",
+    "c": "EDUCACIÓN",
+    "l": "",
+    "e": "Regularización con paciencia y buen humor"
+   }
+  ],
+  "cc": "",
+  "ct": [
+   {
+    "n": "Blusa de temporada",
+    "p": "$250",
+    "d": "Tallas CH a XL"
+   },
+   {
+    "n": "Perfume 100 ml",
+    "p": "$320",
+    "d": ""
+   },
+   {
+    "n": "Juego de sábanas",
+    "p": "$380",
+    "d": ""
+   },
+   {
+    "n": "Tenis casuales",
+    "p": "$520",
+    "d": ""
+   }
+  ],
+  "v": false
+ },
+ "ejemplo-cafeteria": {
+  "s": "ejemplo-cafeteria",
+  "n": "Café Cuate",
+  "e": "Un buen café y un buen rato",
+  "c": "ALIMENTOS",
+  "niv": "I",
+  "d": "Cafetería de barrio con café de altura, frappés, pan y desayunos. Espacio tranquilo con wifi para estudiar o trabajar.",
+  "of": [
+   "Café de altura y frappés",
+   "Pan y desayunos",
+   "Wifi y espacio para trabajar",
+   "Pedidos para llevar"
+  ],
+  "h": "Lun a Dom 8:00–21:00",
+  "dir": "Jardines de Morelos, Ecatepec (dirección de ejemplo)",
+  "col": "Ecatepec Centro",
+  "mapa": "",
+  "wa": "525500000000",
+  "tel": "",
+  "web": "",
+  "fb": "",
+  "ig": "",
+  "logo": "",
+  "portada": "",
+  "gal": [],
+  "ofT": "Segundo café -50%",
+  "ofD": "El segundo café a mitad de precio con tu Pase CUATE (lunes a jueves).",
+  "rec": "Café y desayunos",
+  "nec": "Músicos locales para tardes culturales",
+  "com": "Un espacio para reunirse",
+  "club": true,
+  "cod": "NEG-1032-CAF",
+  "red": [],
+  "cc": "",
+  "ct": [
+   {
+    "n": "Café americano",
+    "p": "$35",
+    "d": ""
+   },
+   {
+    "n": "Frappé",
+    "p": "$60",
+    "d": "Moka o vainilla"
+   },
+   {
+    "n": "Pan dulce",
+    "p": "$15",
+    "d": ""
+   },
+   {
+    "n": "Desayuno completo",
+    "p": "$85",
+    "d": ""
+   }
+  ],
+  "v": true
+ },
+ "ejemplo-artesanias": {
+  "s": "ejemplo-artesanias",
+  "n": "Manos Creativas",
+  "e": "Hecho a mano con cariño",
+  "c": "PRODUCTOS VARIOS",
+  "niv": "I",
+  "d": "Artesanías y manualidades hechas a mano por artesanas de la comunidad: bordados, tejidos, velas, joyería y decoración. Pedidos personalizados y talleres para aprender.",
+  "of": [
+   "Bordados y tejidos",
+   "Velas y decoración",
+   "Joyería artesanal",
+   "Pedidos personalizados",
+   "Talleres para aprender"
+  ],
+  "h": "Mar a Dom 11:00–18:00",
+  "dir": "Jardines de Morelos, Ecatepec (dirección de ejemplo)",
+  "col": "Xalostoc",
+  "mapa": "",
+  "wa": "525500000000",
+  "tel": "",
+  "web": "",
+  "fb": "",
+  "ig": "",
+  "logo": "",
+  "portada": "",
+  "gal": [],
+  "ofT": "Taller con descuento",
+  "ofD": "Descuento en talleres presentando tu Pase CUATE.",
+  "rec": "Artesanías y manualidades",
+  "nec": "Más artesanas y materiales",
+  "com": "Técnicas y patrones para aprender",
+  "club": true,
+  "cod": "NEG-1033-ART",
+  "red": [],
+  "cc": "",
+  "ct": [
+   {
+    "n": "Servilleta bordada",
+    "p": "$90",
+    "d": ""
+   },
+   {
+    "n": "Vela aromática",
+    "p": "$120",
+    "d": ""
+   },
+   {
+    "n": "Pulsera tejida",
+    "p": "$60",
+    "d": ""
+   },
+   {
+    "n": "Taller de bordado",
+    "p": "$150",
+    "d": "Incluye material"
+   }
+  ],
+  "v": false
+ },
+ "ejemplo-spa": {
+  "s": "ejemplo-spa",
+  "n": "Spa Raíces",
+  "e": "Relájate, te lo mereces",
+  "c": "BELLEZA Y BIENESTAR",
+  "niv": "P",
+  "d": "Spa con masajes relajantes y descontracturantes, faciales, aromaterapia y paquetes para parejas. Ambiente tranquilo y atención personalizada.",
+  "of": [
+   "Masaje relajante y descontracturante",
+   "Faciales y aromaterapia",
+   "Paquetes para parejas",
+   "Citas por WhatsApp",
+   "Certificados de regalo"
+  ],
+  "h": "Lun a Sáb 10:00–20:00",
+  "dir": "Jardines de Morelos, Ecatepec (dirección de ejemplo)",
+  "col": "Jardines de Morelos",
+  "mapa": "",
+  "wa": "525500000000",
+  "tel": "",
+  "web": "",
+  "fb": "",
+  "ig": "",
+  "logo": "",
+  "portada": "",
+  "gal": [],
+  "ofT": "15% a Cuates",
+  "ofD": "15% de descuento en tu primer masaje presentando tu Pase CUATE.",
+  "rec": "Bienestar y relajación",
+  "nec": "Terapeutas certificados",
+  "com": "Técnicas de relajación en casa",
+  "club": true,
+  "cod": "NEG-1034-SPA",
+  "red": [
+   {
+    "s": "ejemplo-salud",
+    "n": "Fisioterapia Movimiento Vivo",
+    "c": "SALUD",
+    "l": "",
+    "e": "Muévete sin dolor, vive con ganas"
+   },
+   {
+    "s": "ejemplo-salud-dental",
+    "n": "Clínica Dental Sonrisa Cuate",
+    "c": "SALUD",
+    "l": "",
+    "e": "Cuidamos tu sonrisa y tu bolsillo"
+   },
+   {
+    "s": "ejemplo-alimentos-fonda",
+    "n": "Fonda La Güera",
+    "c": "ALIMENTOS",
+    "l": "",
+    "e": "Comida corrida como en casa"
+   },
+   {
+    "s": "ejemplo-alimentos-panaderia",
+    "n": "Panadería El Buen Pan",
+    "c": "ALIMENTOS",
+    "l": "",
+    "e": "Pan calientito, dos veces al día"
+   },
+   {
+    "s": "ejemplo-educacion",
+    "n": "Asesorías Aprende Fácil",
+    "c": "EDUCACIÓN",
+    "l": "",
+    "e": "Regularización con paciencia y buen humor"
+   },
+   {
+    "s": "ejemplo-mercado",
+    "n": "Tianguis Sábados del Barrio",
+    "c": "MERCADOS Y TIANGUIS",
+    "l": "",
+    "e": "Productores y vecinos, cara a cara"
+   }
+  ],
+  "cc": "",
+  "ct": [
+   {
+    "n": "Masaje relajante 60 min",
+    "p": "$450",
+    "d": ""
+   },
+   {
+    "n": "Facial hidratante",
+    "p": "$380",
+    "d": ""
+   },
+   {
+    "n": "Paquete para parejas",
+    "p": "$1,200",
+    "d": "Masaje y aromaterapia"
+   }
+  ],
+  "v": true
+ },
+ "ejemplo-electricista": {
+  "s": "ejemplo-electricista",
+  "n": "Electricista Rayo Rápido",
+  "e": "Luz segura en tu casa y negocio",
+  "c": "SERVICIOS VARIOS",
+  "niv": "B",
+  "d": "Instalaciones y reparaciones eléctricas: contactos, apagadores, centros de carga, cortos y lámparas. Revisión de seguridad y atención de urgencias.",
+  "of": [
+   "Instalaciones y reparaciones",
+   "Centros de carga y cortos",
+   "Lámparas y ventiladores",
+   "Revisión de seguridad",
+   "Urgencias"
+  ],
+  "h": "Lun a Dom 8:00–20:00",
+  "dir": "Jardines de Morelos, Ecatepec (dirección de ejemplo)",
+  "col": "Ecatepec",
+  "mapa": "",
+  "wa": "525500000000",
+  "tel": "",
+  "web": "",
+  "fb": "",
+  "ig": "",
+  "logo": "",
+  "portada": "",
+  "gal": [],
+  "ofT": "Revisión sin costo",
+  "ofD": "Revisión de tu instalación sin costo con tu Pase CUATE.",
+  "rec": "Servicios eléctricos",
+  "nec": "Ayudantes electricistas",
+  "com": "Consejos de seguridad eléctrica",
+  "club": false,
+  "cod": "NEG-1035-ELE",
+  "red": [],
+  "cc": "",
+  "ct": [],
+  "v": false
+ },
+ "ejemplo-mecanico": {
+  "s": "ejemplo-mecanico",
+  "n": "Taller Mecánico Los Cuates",
+  "e": "Tu auto en buenas manos",
+  "c": "TRANSPORTE Y REPARTO",
+  "niv": "I",
+  "d": "Taller mecánico: afinaciones, frenos, suspensión, cambio de aceite y diagnóstico con scanner. Presupuesto por escrito antes de empezar.",
+  "of": [
+   "Afinación y cambio de aceite",
+   "Frenos y suspensión",
+   "Diagnóstico con scanner",
+   "Presupuesto por escrito",
+   "Garantía en mano de obra"
+  ],
+  "h": "Lun a Sáb 9:00–18:00",
+  "dir": "Jardines de Morelos, Ecatepec (dirección de ejemplo)",
+  "col": "Ciudad Azteca",
+  "mapa": "",
+  "wa": "525500000000",
+  "tel": "",
+  "web": "",
+  "fb": "",
+  "ig": "",
+  "logo": "",
+  "portada": "",
+  "gal": [],
+  "ofT": "Diagnóstico gratis",
+  "ofD": "Diagnóstico sin costo con tu Pase CUATE.",
+  "rec": "Servicio automotriz",
+  "nec": "Refacciones y mecánicos",
+  "com": "Consejos para cuidar tu auto",
+  "club": true,
+  "cod": "NEG-1036-MEC",
+  "red": [],
+  "cc": "",
+  "ct": [
+   {
+    "n": "Afinación mayor",
+    "p": "desde $950",
+    "d": ""
+   },
+   {
+    "n": "Cambio de aceite",
+    "p": "desde $480",
+    "d": ""
+   },
+   {
+    "n": "Diagnóstico scanner",
+    "p": "$250",
+    "d": "Gratis con tu Pase CUATE"
+   }
+  ],
+  "v": false
+ },
+ "ejemplo-unas": {
+  "s": "ejemplo-unas",
+  "n": "Uñas y Maquillaje Bella",
+  "e": "Luce increíble en tu día especial",
+  "c": "BELLEZA Y BIENESTAR",
+  "niv": "B",
+  "d": "Uñas acrílicas y de gel, manicure y pedicure, maquillaje para eventos y peinados. Atención a domicilio con cita.",
+  "of": [
+   "Uñas acrílicas y de gel",
+   "Manicure y pedicure",
+   "Maquillaje y peinado para eventos",
+   "Servicio a domicilio"
+  ],
+  "h": "Lun a Dom 10:00–19:00",
+  "dir": "Jardines de Morelos, Ecatepec (dirección de ejemplo)",
+  "col": "Xalostoc",
+  "mapa": "",
+  "wa": "525500000000",
+  "tel": "",
+  "web": "",
+  "fb": "",
+  "ig": "",
+  "logo": "",
+  "portada": "",
+  "gal": [],
+  "ofT": "Diseño de regalo",
+  "ofD": "Un diseño de regalo en tus uñas con tu Pase CUATE.",
+  "rec": "Belleza y arreglo personal",
+  "nec": "Productos y proveedoras",
+  "com": "Tips de cuidado de uñas y piel",
+  "club": false,
+  "cod": "NEG-1037-UNA",
+  "red": [],
+  "cc": "",
+  "ct": [],
+  "v": false
  }
 };
-export const EJEMPLOS_DIRECTORIO = [{"s": "ejemplo-salud", "n": "Fisioterapia Movimiento Vivo", "c": "SALUD", "e": "Muévete sin dolor, vive con ganas", "l": "", "col": "Jardines de Morelos", "niv": "P", "of": true, "v": true}, {"s": "ejemplo-salud-dental", "n": "Clínica Dental Sonrisa Cuate", "c": "SALUD", "e": "Cuidamos tu sonrisa y tu bolsillo", "l": "", "col": "Ciudad Azteca", "niv": "I", "of": true, "v": false}, {"s": "ejemplo-salud-nutricion", "n": "Nutrición Plato Feliz", "c": "SALUD", "e": "Comer bien sí es posible", "l": "", "col": "Las Américas", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-alimentos", "n": "Tamales Doña Chela", "c": "ALIMENTOS", "e": "Sabor casero, hecho con cariño", "l": "", "col": "Jardines de Morelos", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-alimentos-fonda", "n": "Fonda La Güera", "c": "ALIMENTOS", "e": "Comida corrida como en casa", "l": "", "col": "Tulpetlac", "niv": "I", "of": true, "v": false}, {"s": "ejemplo-alimentos-panaderia", "n": "Panadería El Buen Pan", "c": "ALIMENTOS", "e": "Pan calientito, dos veces al día", "l": "", "col": "Ciudad Azteca", "niv": "P", "of": true, "v": true}, {"s": "ejemplo-educacion", "n": "Asesorías Aprende Fácil", "c": "EDUCACIÓN", "e": "Regularización con paciencia y buen humor", "l": "", "col": "Las Américas", "niv": "I", "of": true, "v": false}, {"s": "ejemplo-comunitario", "n": "Comité Vecinal Unidos", "c": "SERVICIOS COMUNITARIOS", "e": "Tu colonia mejor, entre todos", "l": "", "col": "Xalostoc", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-productos", "n": "Regalos y Detalles Lupita", "c": "PRODUCTOS VARIOS", "e": "Un detalle para cada ocasión", "l": "", "col": "Santa Clara", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-servicios", "n": "Plomería y Gas Los Hermanos", "c": "SERVICIOS VARIOS", "e": "Fugas resueltas el mismo día", "l": "", "col": "Tulpetlac", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-mercado", "n": "Tianguis Sábados del Barrio", "c": "MERCADOS Y TIANGUIS", "e": "Productores y vecinos, cara a cara", "l": "", "col": "Ciudad Azteca", "niv": "I", "of": true, "v": false}, {"s": "ejemplo-tecnologia", "n": "Compu Ayuda Express", "c": "TECNOLOGÍA", "e": "Tu computadora y tu celular, como nuevos", "l": "", "col": "Las Américas", "niv": "I", "of": true, "v": true}, {"s": "ejemplo-belleza", "n": "Estética Brillo Cuate", "c": "BELLEZA Y BIENESTAR", "e": "Luce bien, sin gastar de más", "l": "", "col": "Santa Clara", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-hogar", "n": "Herrería y Construcción Ramírez", "c": "HOGAR Y CONSTRUCCIÓN", "e": "Obra limpia y a tiempo", "l": "", "col": "Xalostoc", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-mascotas", "n": "Veterinaria Patitas Felices", "c": "MASCOTAS", "e": "Cuidamos a tu mejor amigo", "l": "", "col": "Tulpetlac", "niv": "I", "of": true, "v": false}, {"s": "ejemplo-transporte", "n": "Fletes y Mudanzas Vecinos", "c": "TRANSPORTE Y REPARTO", "e": "Tu mudanza sin dolor de cabeza", "l": "", "col": "Las Américas", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-ocio", "n": "Cine Club Vecinal", "c": "OCIO Y CULTURA", "e": "Cine, palomitas y plática", "l": "", "col": "Santa Clara", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-altruismo", "n": "Banco de Ropa Manos Amigas", "c": "ALTRUISMO", "e": "Lo que a ti ya no te sirve, a alguien le hace falta", "l": "", "col": "Xalostoc", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-especialidades", "n": "Taller Voz y Cuerda", "c": "ESPECIALIDADES", "e": "Instrumentos con alma", "l": "", "col": "Ciudad Azteca", "niv": "B", "of": true, "v": false}, {"s": "dcuates-ventas", "n": "Ventas DCUATES", "c": "DCUATES OFICIAL", "e": "Lo que ofrecemos directo y lo que otros Cuates venden", "l": "", "col": "En línea y en la comunidad", "niv": "P", "of": true, "v": true}, {"s": "dcuates-vendedores", "n": "Vendedores DCUATES", "c": "DCUATES OFICIAL", "e": "Vende lo que te gusta y gana comisión", "l": "", "col": "En línea y en la comunidad", "niv": "P", "of": true, "v": true}, {"s": "dcuates-express", "n": "DCUATES Express", "c": "DCUATES OFICIAL", "e": "Todo DCUATES en una sola página", "l": "", "col": "En línea", "niv": "P", "of": true, "v": true}];
+export const EJEMPLOS_DIRECTORIO = [{"s": "ejemplo-salud", "n": "Fisioterapia Movimiento Vivo", "c": "SALUD", "e": "Muévete sin dolor, vive con ganas", "l": "", "col": "Jardines de Morelos", "niv": "P", "of": true, "v": true}, {"s": "ejemplo-salud-dental", "n": "Clínica Dental Sonrisa Cuate", "c": "SALUD", "e": "Cuidamos tu sonrisa y tu bolsillo", "l": "", "col": "Ciudad Azteca", "niv": "I", "of": true, "v": false}, {"s": "ejemplo-salud-nutricion", "n": "Nutrición Plato Feliz", "c": "SALUD", "e": "Comer bien sí es posible", "l": "", "col": "Las Américas", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-alimentos", "n": "Tamales Doña Chela", "c": "ALIMENTOS", "e": "Sabor casero, hecho con cariño", "l": "", "col": "Jardines de Morelos", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-alimentos-fonda", "n": "Fonda La Güera", "c": "ALIMENTOS", "e": "Comida corrida como en casa", "l": "", "col": "Tulpetlac", "niv": "I", "of": true, "v": false}, {"s": "ejemplo-alimentos-panaderia", "n": "Panadería El Buen Pan", "c": "ALIMENTOS", "e": "Pan calientito, dos veces al día", "l": "", "col": "Ciudad Azteca", "niv": "P", "of": true, "v": true}, {"s": "ejemplo-educacion", "n": "Asesorías Aprende Fácil", "c": "EDUCACIÓN", "e": "Regularización con paciencia y buen humor", "l": "", "col": "Las Américas", "niv": "I", "of": true, "v": false}, {"s": "ejemplo-comunitario", "n": "Comité Vecinal Unidos", "c": "SERVICIOS COMUNITARIOS", "e": "Tu colonia mejor, entre todos", "l": "", "col": "Xalostoc", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-productos", "n": "Regalos y Detalles Lupita", "c": "PRODUCTOS VARIOS", "e": "Un detalle para cada ocasión", "l": "", "col": "Santa Clara", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-servicios", "n": "Plomería y Gas Los Hermanos", "c": "SERVICIOS VARIOS", "e": "Fugas resueltas el mismo día", "l": "", "col": "Tulpetlac", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-mercado", "n": "Tianguis Sábados del Barrio", "c": "MERCADOS Y TIANGUIS", "e": "Productores y vecinos, cara a cara", "l": "", "col": "Ciudad Azteca", "niv": "I", "of": true, "v": false}, {"s": "ejemplo-tecnologia", "n": "Compu Ayuda Express", "c": "TECNOLOGÍA", "e": "Tu computadora y tu celular, como nuevos", "l": "", "col": "Las Américas", "niv": "I", "of": true, "v": true}, {"s": "ejemplo-belleza", "n": "Estética Brillo Cuate", "c": "BELLEZA Y BIENESTAR", "e": "Luce bien, sin gastar de más", "l": "", "col": "Santa Clara", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-hogar", "n": "Herrería y Construcción Ramírez", "c": "HOGAR Y CONSTRUCCIÓN", "e": "Obra limpia y a tiempo", "l": "", "col": "Xalostoc", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-mascotas", "n": "Veterinaria Patitas Felices", "c": "MASCOTAS", "e": "Cuidamos a tu mejor amigo", "l": "", "col": "Tulpetlac", "niv": "I", "of": true, "v": false}, {"s": "ejemplo-transporte", "n": "Fletes y Mudanzas Vecinos", "c": "TRANSPORTE Y REPARTO", "e": "Tu mudanza sin dolor de cabeza", "l": "", "col": "Las Américas", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-ocio", "n": "Cine Club Vecinal", "c": "OCIO Y CULTURA", "e": "Cine, palomitas y plática", "l": "", "col": "Santa Clara", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-altruismo", "n": "Banco de Ropa Manos Amigas", "c": "ALTRUISMO", "e": "Lo que a ti ya no te sirve, a alguien le hace falta", "l": "", "col": "Xalostoc", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-especialidades", "n": "Taller Voz y Cuerda", "c": "ESPECIALIDADES", "e": "Instrumentos con alma", "l": "", "col": "Ciudad Azteca", "niv": "B", "of": true, "v": false}, {"s": "dcuates-ventas", "n": "Ventas DCUATES", "c": "DCUATES OFICIAL", "e": "Lo que ofrecemos directo y lo que otros Cuates venden", "l": "", "col": "En línea y en la comunidad", "niv": "P", "of": true, "v": true}, {"s": "dcuates-vendedores", "n": "Vendedores DCUATES", "c": "DCUATES OFICIAL", "e": "Vende lo que te gusta y gana comisión", "l": "", "col": "En línea y en la comunidad", "niv": "P", "of": true, "v": true}, {"s": "dcuates-express", "n": "DCUATES Express", "c": "DCUATES OFICIAL", "e": "Todo DCUATES en una sola página", "l": "", "col": "En línea", "niv": "P", "of": true, "v": true}, {"s": "ejemplo-construccion", "n": "Materiales La Obra Firme", "c": "HOGAR Y CONSTRUCCIÓN", "e": "Todo para tu obra, al mejor precio", "l": "", "col": "Jardines de Morelos", "niv": "I", "of": true, "v": true}, {"s": "ejemplo-comida-llevar", "n": "Sazón para Llevar", "c": "ALIMENTOS", "e": "Comida casera lista para tu mesa", "l": "", "col": "Xalostoc", "niv": "I", "of": true, "v": false}, {"s": "ejemplo-tatuajes", "n": "Tinta Cuate Studio", "c": "BELLEZA Y BIENESTAR", "e": "Arte en la piel, con higiene y respeto", "l": "", "col": "Ciudad Azteca", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-maderia", "n": "Maderería y Carpintería El Roble", "c": "HOGAR Y CONSTRUCCIÓN", "e": "Madera de calidad y muebles a tu medida", "l": "", "col": "Ecatepec Centro", "niv": "I", "of": true, "v": false}, {"s": "ejemplo-barberia", "n": "Barbería El Corte Cuate", "c": "BELLEZA Y BIENESTAR", "e": "Buen corte, buena plática", "l": "", "col": "Jardines de Morelos", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-abarrotes", "n": "Abarrotes Doña Mary", "c": "PRODUCTOS VARIOS", "e": "Todo lo del diario, cerquita de ti", "l": "", "col": "Xalostoc", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-rescate", "n": "Patitas al Rescate", "c": "MASCOTAS", "e": "Rescatamos, curamos y damos hogar", "l": "", "col": "Ecatepec", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-mascotas-alimento", "n": "Mundo Mascota Cuate", "c": "MASCOTAS", "e": "Alimento y accesorios para tu mejor amigo", "l": "", "col": "Jardines de Morelos", "niv": "I", "of": true, "v": false}, {"s": "ejemplo-catalogo", "n": "Ventas por Catálogo Rosa", "c": "PRODUCTOS VARIOS", "e": "Todo en un solo catálogo, a tu puerta", "l": "", "col": "Ciudad Azteca", "niv": "P", "of": true, "v": false}, {"s": "ejemplo-cafeteria", "n": "Café Cuate", "c": "ALIMENTOS", "e": "Un buen café y un buen rato", "l": "", "col": "Ecatepec Centro", "niv": "I", "of": true, "v": true}, {"s": "ejemplo-artesanias", "n": "Manos Creativas", "c": "PRODUCTOS VARIOS", "e": "Hecho a mano con cariño", "l": "", "col": "Xalostoc", "niv": "I", "of": true, "v": false}, {"s": "ejemplo-spa", "n": "Spa Raíces", "c": "BELLEZA Y BIENESTAR", "e": "Relájate, te lo mereces", "l": "", "col": "Jardines de Morelos", "niv": "P", "of": true, "v": true}, {"s": "ejemplo-electricista", "n": "Electricista Rayo Rápido", "c": "SERVICIOS VARIOS", "e": "Luz segura en tu casa y negocio", "l": "", "col": "Ecatepec", "niv": "B", "of": true, "v": false}, {"s": "ejemplo-mecanico", "n": "Taller Mecánico Los Cuates", "c": "TRANSPORTE Y REPARTO", "e": "Tu auto en buenas manos", "l": "", "col": "Ciudad Azteca", "niv": "I", "of": true, "v": false}, {"s": "ejemplo-unas", "n": "Uñas y Maquillaje Bella", "c": "BELLEZA Y BIENESTAR", "e": "Luce increíble en tu día especial", "l": "", "col": "Xalostoc", "niv": "B", "of": true, "v": false}];
