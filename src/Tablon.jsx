@@ -12,10 +12,13 @@ import { cargarPublicados } from "./utilidades/hojaPublica.js";
 import { abrirRegistroPrevio } from "./RegistroPrevio.jsx";
 import { registrar } from "./analitica.js";
 import { ejecutar } from "./datos/secciones.js";
+import { CATALOGO_DCUATES, GRUPOS_CATALOGO } from "./datos/catalogoDcuates.js";
+import { abrirNegocio } from "./NegocioCuate.jsx";
+import { abrirDirectorio } from "./PaginaCuateCTA.jsx";
 
 export const abrirTablon = (filtro = "") => window.dispatchEvent(new CustomEvent("dcuates:abrir-tablon", { detail: filtro }));
 
-const FILTROS = [["", "Todo"], ["Ofrezco", "🎁 Ofrezco"], ["Necesito", "🙏 Necesito"], ["Adopciones", "🐾 Adopciones"], ["Libros", "📚 Libros"], ["Recomendaciones", "⭐ Recomendaciones"], ["Otros", "✨ Otros"]];
+const FILTROS = [["", "Todo"], ["Ofrezco", "🎁 Ofrezco"], ["Necesito", "🙏 Necesito"], ["Adopciones", "🐾 Adopciones"], ["Libros", "📚 Libros"], ["Recomendaciones", "⭐ Recomendaciones"], ["Otros", "🗂️ Catálogo DCUATES"]];
 const COLOR = { Ofrezco: "#1F7A46", Necesito: "#B7791F", Adopciones: "#8a4fbf", Libros: "#1B6F8A", Recomendaciones: "#B45309", Otros: "#5b4bb5" };
 // «Otros»: lo que ofrece la página misma (e59). a = acción de src/datos/secciones.js · f = filtro del tablón
 const DE_LA_PAGINA = [
@@ -42,6 +45,9 @@ export default function Tablon() {
   const [abierto, setAbierto] = useState(false);
   const [filtro, setFiltro] = useState("");
   const [items, setItems] = useState(null);
+  const [grupo, setGrupo] = useState(-1);
+  const [q, setQ] = useState("");
+  const [ver, setVer] = useState("");
   const cerrar = () => setAbierto(false);
   const oculta = useAtras(abierto, cerrar, { hub: true }); // hub: se oculta mientras hay otra ventana encima y reaparece al cerrarla
   useEffect(() => {
@@ -53,6 +59,15 @@ export default function Tablon() {
   if (!abierto) return null;
   const lista = (items || []).filter((x) => (filtro ? x.sec === filtro : x.sec !== "Muro de gratitud"));
   const irPagina = (a) => { cerrar(); setTimeout(() => ejecutar(a), 120); };
+  const solicitar = (it) => {
+    registrar("catalogo_solicitar", { t: it.t });
+    const a = it.a;
+    if (a.tablon !== undefined) { setFiltro(a.tablon); return; }
+    cerrar();
+    setTimeout(() => { if (a.neg) abrirNegocio(a.neg); else if (a.dir) abrirDirectorio(); else ejecutar(a); }, 150);
+  };
+  const norm = (x) => String(x || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  const cat = CATALOGO_DCUATES.filter((x) => (grupo < 0 || x.g === grupo) && (!q.trim() || norm(x.t + " " + x.d + " " + x.car.join(" ")).includes(norm(q.trim()))));
   const ofrecer = () => abrirRegistroPrevio("ofrezco");
   const necesitar = () => abrirRegistroPrevio("necesito");
   const meInteresa = (x) => abrirRegistroPrevio("interesa", { valores: { ref: `${x.id} · ${x.t}`.slice(0, 160) } });
@@ -79,10 +94,24 @@ export default function Tablon() {
           <p className="tb-v">Por ahora no hay publicaciones{filtro ? " en esta sección" : ""}. ¡Sé la primera persona en sumarte: usa OFREZCO o NECESITO!</p>
         )}
         {filtro === "Otros" && (
-          <div className="tb-otros">
-            <p className="tb-i">Además de lo que comparte la comunidad, esto es lo que ofrece la página:</p>
-            {DE_LA_PAGINA.map(([e, t, d, a, f]) => (
-              <button key={t} type="button" className="tb-pag" onClick={() => (f ? setFiltro(f) : irPagina(a))}><span aria-hidden="true">{e}</span><span><b>{t}</b><small>{d}</small></span></button>
+          <div className="tb-otros" data-testid="catalogo-dcuates">
+            <p className="tb-i">Todo lo que DCUATES comparte y pone a tu disposición, con sus características y cómo solicitarlo.</p>
+            <input className="tb-q" type="search" placeholder="Buscar: libros, mascotas, ventas…" aria-label="Buscar en el catálogo" value={q} onChange={(e) => setQ(e.target.value)} />
+            <div className="tb-fil" role="tablist" aria-label="Grupos del catálogo">
+              {[["-1", "Todo"], ...GRUPOS_CATALOGO.map((g, i) => [String(i), g])].map(([k, t]) => <button key={k} type="button" role="tab" aria-selected={String(grupo) === k} className={String(grupo) === k ? "on" : ""} onClick={() => setGrupo(Number(k))}>{t}</button>)}
+            </div>
+            {cat.length === 0 && <p className="tb-v">No encontramos nada con esa búsqueda.</p>}
+            {cat.map((it) => (
+              <article key={it.t} className="tb-cat" data-testid="catalogo-item">
+                <h4><span aria-hidden="true">{it.e}</span> {it.t}</h4>
+                <p className="tb-cs"><em>{it.costo}</em></p>
+                <p className="tb-d">{it.d}</p>
+                {ver === it.t && <ul className="tb-car">{it.car.map((c) => <li key={c}>{c}</li>)}</ul>}
+                <div className="tb-cr">
+                  <button type="button" className="tb-vm" aria-expanded={ver === it.t} onClick={() => setVer(ver === it.t ? "" : it.t)}>{ver === it.t ? "Ocultar detalles" : "Ver características"}</button>
+                  <button type="button" className="tb-so" onClick={() => solicitar(it)}>📝 {it.btn}</button>
+                </div>
+              </article>
             ))}
           </div>
         )}
@@ -115,6 +144,13 @@ const CSS = `
 .tb-fil{display:flex;gap:6px;overflow-x:auto;padding:2px 0 8px}
 .tb-fil button{flex:none;min-height:40px;padding:0 12px;border:2px solid #0f2d1e;border-radius:20px;background:#fff;font:inherit;font-weight:800;font-size:13px;color:#0f2d1e;cursor:pointer}
 .tb-fil button.on{background:#0f2d1e;color:#fff}
+.tb-q{width:100%;box-sizing:border-box;min-height:46px;border:2px solid #cfc8b0;border-radius:12px;padding:6px 12px;font:inherit;font-size:15px;font-weight:700;margin:0 0 8px;background:#fff}
+.tb-cat{background:#fff;border:1px solid #d8d2bd;border-left:6px solid #1B6F8A;border-radius:12px;padding:10px;margin:0 0 10px}
+.tb-cat h4{margin:0 0 2px;font-size:16px;font-weight:900}.tb-cs{margin:0 0 4px}.tb-cs em{font-style:normal;font-size:12px;font-weight:900;background:#E6F2F7;color:#0f4c5c;border-radius:10px;padding:2px 8px}
+.tb-car{margin:6px 0;padding-left:20px;font-size:13.5px;font-weight:700;line-height:1.4}
+.tb-cr{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.tb-vm{min-height:44px;border:2px solid #1B6F8A;border-radius:12px;background:#fff;color:#1B6F8A;font:inherit;font-weight:900;font-size:14px;cursor:pointer}
+.tb-so{min-height:48px;border:0;border-radius:12px;background:#1F7A46;color:#fff;font:inherit;font-weight:900;font-size:15px;cursor:pointer}
 .tb-v{text-align:center;font-weight:800;font-size:14px;padding:18px 8px;border:2px dashed #1F7A46;border-radius:14px;background:#eef7f0}
 .tb-tarj{background:#fff;border:1px solid #d8d2bd;border-left:6px solid #1F7A46;border-radius:12px;padding:10px;margin:0 0 10px}
 .tb-tarj img{width:100%;max-height:170px;object-fit:cover;border-radius:8px;margin-bottom:6px}
