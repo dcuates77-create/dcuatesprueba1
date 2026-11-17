@@ -39,8 +39,17 @@ export default function PanelNegocio() {
   const [envio, setEnvio] = useState("");
   const [num, setNum] = useState("");
   const [cj, setCj] = useState(null);
+  const [ped, setPed] = useState(null);
+  const [montos, setMontos] = useState({});
+  const cargarPedidos = async () => { try { const j = await pedir(`a=negocio_pedidos&slug=${encodeURIComponent(slug)}&k=${encodeURIComponent(pin.trim())}`); setPed(j && j.ok ? j : { pedidos: [], pts: 0, tiene: false, error: true }); } catch (x) { setPed({ pedidos: [], pts: 0, tiene: false, error: true }); } };
+  const confirmarVenta = async (id) => {
+    try { await fetch(GOOGLE_SHEETS_URL, { method: "POST", mode: "no-cors", body: new URLSearchParams({ Tipo: "NegocioPedidoConfirma", Rol: "V", Id: id, Slug: slug, K: pin.trim(), Monto: (montos[id] || "").trim() }) }); } catch (x) { /* se confirma abajo */ }
+    registrar("negocio_venta_confirmada", { s: slug });
+    await new Promise((r) => setTimeout(r, 2500)); cargarPedidos();
+  };
+  useEffect(() => { if (paso === "panel" && tab === "pedidos" && !ped) cargarPedidos(); }, [paso, tab]); // eslint-disable-line
   useEffect(() => {
-    const ab = (e) => { const s = String((e && e.detail) || "").toLowerCase().replace(/[^a-z0-9-]/g, ""); if (!s) return; setSlug(s); setPin(""); setPaso("pin"); setError(""); setD(null); setTab("ficha"); setEnvio(""); setNum(""); setCj(null); };
+    const ab = (e) => { const s = String((e && e.detail) || "").toLowerCase().replace(/[^a-z0-9-]/g, ""); if (!s) return; setSlug(s); setPin(""); setPaso("pin"); setError(""); setD(null); setTab("ficha"); setEnvio(""); setNum(""); setCj(null); setPed(null); setMontos({}); };
     window.addEventListener("dcuates:panel-negocio", ab);
     return () => window.removeEventListener("dcuates:panel-negocio", ab);
   }, []);
@@ -108,7 +117,7 @@ export default function PanelNegocio() {
         {paso === "panel" && d && (
           <>
             <div className="pn-tabs" role="tablist" aria-label="Panel del negocio">
-              {[["ficha", "✏️ Mi ficha"], ["canje", "🎟️ Canjear promo"], ["numeros", "📊 Mis números"]].map(([id, t]) => <button type="button" role="tab" key={id} aria-selected={tab === id} className={tab === id ? "on" : ""} onClick={() => setTab(id)}>{t}</button>)}
+              {[["ficha", "✏️ Mi ficha"], ["pedidos", "🛒 Pedidos"], ["canje", "🎟️ Canjear promo"], ["numeros", "📊 Mis números"]].map(([id, t]) => <button type="button" role="tab" key={id} aria-selected={tab === id} className={tab === id ? "on" : ""} onClick={() => setTab(id)}>{t}</button>)}
             </div>
             {tab === "ficha" && (
               <div className="pn-f">
@@ -132,6 +141,28 @@ export default function PanelNegocio() {
                 {envio === "ok" && <p className="pn-ok" role="status" data-testid="pn-enviado">✅ Recibimos tus cambios. Los revisamos y aparecen en tu página en cuanto los aprobemos.</p>}
                 {envio === "falla" && <p className="pn-err" role="alert">No pudimos confirmar el envío. Revisa tu conexión y vuelve a intentarlo.</p>}
                 <button type="button" className="pn-b pn-b1" onClick={enviar} disabled={envio === "enviando"}>{envio === "enviando" ? "Enviando…" : "Enviar para revisión"}</button>
+              </div>
+            )}
+            {tab === "pedidos" && (
+              <div className="pn-f" data-testid="pn-pedidos">
+                <p>Aquí aparecen los pedidos que llegan desde tu catálogo. Cuando uno se concrete, confírmalo: DCUATES lo valida{ped && ped.tiene ? <> y recibes <b>{ped.pts} puntos</b> y sorpresas</> : " y recibes sorpresas"}.</p>
+                {ped && !ped.tiene && <p className="pn-aviso">Para ganar puntos, pide a DCUATES registrar tu número de Pase en tu negocio.</p>}
+                {!ped && <p className="pn-aviso">Cargando…</p>}
+                {ped && ped.error && <p className="pn-err" role="alert">No pudimos cargar tus pedidos. Inténtalo de nuevo.</p>}
+                {ped && !ped.error && !ped.pedidos.length && <p className="pn-aviso">Todavía no hay pedidos. Cuando alguien toque «Pedir» en tu catálogo, aparecerá aquí.</p>}
+                {ped && ped.pedidos.map((x) => (
+                  <div className="pn-mes" key={x.id} data-testid="pn-pedido">
+                    <b>{x.p}{x.pr ? ` · ${x.pr}` : ""}</b>
+                    <p>Pedido {x.id} · {x.f}</p>
+                    {/entregados/i.test(x.e) ? <p className="pn-ok">🎁 Puntos entregados</p> : /rechazado/i.test(x.e) ? <p className="pn-aviso">No validado por DCUATES</p> : x.cv ? <p className="pn-ok">✔ Ya lo confirmaste{x.cc ? " (el comprador también)" : ""}. DCUATES lo está validando.</p> : (
+                      <div className="pn-conf">
+                        <label htmlFor={"pn-m-" + x.id}>Monto cobrado (opcional)</label>
+                        <input id={"pn-m-" + x.id} type="text" inputMode="decimal" maxLength={9} value={montos[x.id] || ""} onChange={(e) => setMontos((o) => ({ ...o, [x.id]: e.target.value }))} />
+                        <button type="button" className="pn-b pn-b1" onClick={() => confirmarVenta(x.id)}>✅ Se concretó{x.cc ? " (el comprador ya confirmó)" : ""}</button>
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
             )}
             {tab === "canje" && (
@@ -186,6 +217,7 @@ const CSS = `
 .pn-b1{background:#7a4a00;color:#fff}.pn-b:disabled{opacity:.6}
 .pn-err{color:#9b1c1c!important;font-weight:900!important}.pn-ok{color:#0b6b32!important;font-weight:900!important}.pn-aviso{background:#FFF4D6;border-radius:10px;padding:8px 10px;color:#8a5a0c!important;font-weight:800!important}
 .pn-nota{font-size:12.5px!important;color:#4a5b52}
+.pn-conf{display:flex;flex-direction:column;gap:6px;margin-top:6px}.pn-mes p{margin:2px 0}
 .pn-mes{background:#fff;border:2px solid #e3dcc6;border-radius:14px;padding:10px 12px}.pn-mes ul{list-style:none;margin:6px 0 0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:4px 12px}
 .pn-mes li{display:flex;justify-content:space-between;font-size:13.5px;font-weight:700}
 `;

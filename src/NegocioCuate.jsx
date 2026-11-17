@@ -11,6 +11,8 @@ import PaginaCuateCTA, { abrirDirectorio } from "./PaginaCuateCTA.jsx";
 import ReelNegocio from "./ReelNegocio.jsx";
 import { abrirPanelNegocio } from "./PanelNegocio.jsx";
 import { eventoNegocio } from "./utilidades/negocioStats.js";
+import { registrarPedido, confirmarPedido, descartarPedido, pedidoPendiente, paseGuardado } from "./utilidades/pedidos.js";
+import { WHATSAPP_NUMERO } from "./datos/config.js";
 import { URL_SITIO } from "./datos/config.js";
 
 export const abrirNegocio = (slug) => { try { window.dispatchEvent(new CustomEvent("dcuates:negocio", { detail: slug })); } catch (e) { /* sin eventos */ } };
@@ -30,8 +32,49 @@ const recordarCodigo = (cod) => {
 };
 const telHref = (t) => { const d = String(t || "").replace(/\D/g, ""); return d ? `tel:+${d.length === 10 ? "52" + d : d}` : ""; };
 
+function AvisoPedido({ slug, negocio, refresco }) {
+  const [, f] = useState(0);
+  const [abierto, setAbierto] = useState(false);
+  const [pase, setPase] = useState(paseGuardado());
+  const [monto, setMonto] = useState("");
+  const [listo, setListo] = useState(null);
+  useEffect(() => { setListo(null); setAbierto(false); setMonto(""); }, [refresco]);
+  const p = pedidoPendiente(slug);
+  if (listo) {
+    return (
+      <div className="ng-av ng-av-ok" data-testid="aviso-pedido-gracias" role="status">
+        <b>🎉 ¡Gracias por confirmar!</b>
+        <p>Para recibir tu sorpresa, manda tu comprobante o una foto de lo que recibiste a DCUATES.</p>
+        <a className="ng-av-b" href={`https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent("Hola DCUATES, confirmo mi compra (pedido " + listo.id + ") en " + negocio + ": " + listo.p + ". Te envío mi comprobante.")}`} target="_blank" rel="noopener noreferrer">📲 Enviar comprobante por WhatsApp</a>
+      </div>
+    );
+  }
+  if (!p || refresco < 0) return null;
+  return (
+    <div className="ng-av" data-testid="aviso-pedido" role="status">
+      <b>🛍️ Registramos tu pedido: {p.p}</b>
+      <p>Cuando se concrete, confírmalo aquí y recibe sorpresas 🎁 (también quien te vende).</p>
+      {!abierto ? (
+        <div className="ng-av-r">
+          <button type="button" className="ng-av-b" onClick={() => { if (!pase) setPase(paseGuardado()); setAbierto(true); }}>✅ Ya se concretó</button>
+          <button type="button" className="ng-av-b2" onClick={() => { descartarPedido(p.id); f((x) => x + 1); }}>No lo compré</button>
+        </div>
+      ) : (
+        <form className="ng-av-f" onSubmit={(e) => { e.preventDefault(); confirmarPedido(p.id, pase.trim(), monto.trim()); setListo(p); }}>
+          <label htmlFor="ng-av-pase">Tu número de Pase (opcional, para tus puntos)</label>
+          <input id="ng-av-pase" type="text" autoCapitalize="characters" maxLength={12} value={pase} onChange={(e) => setPase(e.target.value.toUpperCase())} />
+          <label htmlFor="ng-av-monto">¿Cuánto pagaste? (opcional)</label>
+          <input id="ng-av-monto" type="text" inputMode="decimal" maxLength={9} value={monto} onChange={(e) => setMonto(e.target.value)} />
+          <button type="submit" className="ng-av-b">Confirmar compra</button>
+        </form>
+      )}
+    </div>
+  );
+}
+
 export default function NegocioCuate() {
   const [slug, setSlug] = useState(slugDeHash);
+  const [verPed, setVerPed] = useState(0);
   const [est, setEst] = useState({ cargando: true });
   useEffect(() => {
     // El «#negocio-…» se lee una vez y se quita de la dirección: así «Atrás» y «Cerrar» no vuelven a abrir la página.
@@ -90,6 +133,7 @@ export default function NegocioCuate() {
     if (navigator.share) { navigator.share({ title: n ? n.n : "DCUATES", text: texto, url }).catch(() => {}); return; }
     window.open(`https://wa.me/?text=${encodeURIComponent(texto + " " + url)}`, "_blank", "noopener");
   };
+  const urlPedido = (c, id) => `https://wa.me/${n.wa}?text=${encodeURIComponent("¡Hola! Vi su página en DCUATES y quiero pedir: " + c.n + (c.p ? " (" + c.p + ")" : "") + "." + (id ? " Pedido " + id : ""))}`;
   const clic = (que) => { registrar("negocio_clic", { s: slug, q: que }); eventoNegocio(slug, que); };
   return createPortal(
     <div className="ng-fondo" style={oculta ? { display: "none" } : undefined} role="dialog" aria-modal="true" aria-label={n ? n.n : "Negocio CUATE"} data-testid="negocio">
@@ -141,12 +185,13 @@ export default function NegocioCuate() {
             {n.ct && n.ct.length > 0 && (
               <section className="ng-s" data-testid="negocio-catalogo">
                 <h2>Catálogo</h2>
+                <AvisoPedido slug={slug} negocio={n.n} refresco={verPed} />
                 <ul className="ng-ct">
                   {n.ct.map((c, i) => (
                     <li key={i}>
                       <div><b>{c.n}</b>{c.d && <small>{c.d}</small>}</div>
                       {c.p && <span className="ng-pr">{c.p}</span>}
-                      {n.wa && <a className="ng-pd" href={`https://wa.me/${n.wa}?text=${encodeURIComponent("¡Hola! Vi su página en DCUATES y quiero pedir: " + c.n + (c.p ? " (" + c.p + ")" : "") + ".")}`} target="_blank" rel="noopener noreferrer" onClick={() => clic("pedido")} aria-label={`Pedir ${c.n} por WhatsApp`}>Pedir</a>}
+                      {n.wa && <a className="ng-pd" href={urlPedido(c)} target="_blank" rel="noopener noreferrer" onClick={(e) => { const id = registrarPedido(slug, n.n, c.n, c.p); e.currentTarget.href = urlPedido(c, id); setVerPed((x) => x + 1); clic("pedido"); }} aria-label={`Pedir ${c.n} por WhatsApp`}>Pedir</a>}
                     </li>
                   ))}
                 </ul>
@@ -247,6 +292,13 @@ const CSS = `
 .ng-pase p{margin:8px 14px 0;font-size:14px;font-weight:700;line-height:1.35}.ng-pase i{display:block;font-style:normal;font-size:11px;font-weight:900;opacity:.85;letter-spacing:.05em}
 .ng-club{margin:14px;padding:14px;border-radius:18px;background:#fff;border:2px solid var(--c);display:flex;flex-direction:column;gap:8px}
 .ng-club h2{margin:0;font-size:17px;font-weight:900;color:var(--c)}.ng-club p{margin:0;font-size:14px;font-weight:700;line-height:1.4}
+.ng-av{display:flex;flex-direction:column;gap:8px;margin:0 0 12px;padding:12px;border-radius:14px;background:#E6F6EC;border:2px solid #2E8B57;color:#0f2d1e}
+.ng-av p{margin:0;font-size:13.5px;font-weight:700;line-height:1.4}.ng-av b{font-size:15px;font-weight:900}
+.ng-av-r{display:flex;flex-direction:column;gap:6px}
+.ng-av-f{display:flex;flex-direction:column;gap:6px}.ng-av-f label{font-size:12.5px;font-weight:900}
+.ng-av-f input{min-height:46px;border:2px solid #9fcfb3;border-radius:12px;padding:6px 12px;font:inherit;font-size:15px;font-weight:700;width:100%;box-sizing:border-box}
+.ng-av-b{display:flex;align-items:center;justify-content:center;min-height:50px;border:0;border-radius:14px;background:#08743B;color:#fff;font:inherit;font-size:15px;font-weight:900;text-decoration:none;cursor:pointer}
+.ng-av-b2{min-height:44px;border:2px solid #2E8B57;border-radius:14px;background:#fff;color:#08743B;font:inherit;font-size:14px;font-weight:900;cursor:pointer}
 .ng-soc{display:flex;flex-direction:column;gap:8px;padding:12px 14px 0}
 .ng-soc a{display:flex;align-items:center;justify-content:center;gap:10px;min-height:54px;border-radius:14px;font-size:17px;font-weight:900;text-decoration:none;color:#fff;box-shadow:0 2px 0 rgba(0,0,0,.18)}
 .ng-soc a span{font-size:22px}
