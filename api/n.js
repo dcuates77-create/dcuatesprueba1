@@ -21,8 +21,8 @@ export default async function handler(req, res) {
 
   const host = (req.headers["x-forwarded-host"] || req.headers.host || SITIO).split(",")[0];
   const origen = `https://${host}`;
-  const titulo = n ? `${n.n} | DCUATES` : "Negocio CUATE | DCUATES";
-  const texto = n ? (n.e ? `${n.e}. ` : "") + (n.d || "Negocio de la red CUATE de DCUATES.").slice(0, 150) : "Un negocio de la red CUATE de DCUATES: comunidad de apoyo mutuo.";
+  const titulo = n ? `${n.n} | DCUATES` : "Emprendimiento CUATE | DCUATES";
+  const texto = n ? (n.e ? `${n.e}. ` : "") + (n.d || "Emprendimiento de la red CUATE de DCUATES.").slice(0, 150) : "Un emprendimiento de la red CUATE de DCUATES: comunidad de apoyo mutuo.";
   const imagen = n && /^https:\/\//.test(n.logo || "") ? n.logo : origen + "/images/og/logo.jpg";
   const destino = `/?origen=negocio-${slug}#negocio-${slug}`;
   const canonica = `${origen}/n/${slug}`;
