@@ -16,8 +16,8 @@ export const ACCESOS_BENEFICIOS = [
   { emoji: "🌿", t: "Bienestar y recreación", d: "Actividades para tu salud y convivencia", modal: "bienestar" },
   { emoji: "🐾", t: "Ecatepets", d: "Adopciones y apoyo a mascotas", modal: "ecatepets" },
   { emoji: "🤝", t: "Círculo de Confianza", d: "Apoyos y beneficios mutuos", modal: "circulo-confianza" },
-  { emoji: "📣", t: "Publicidad gratuita", d: "Da a conocer tu negocio", modal: "publicidad-tarjeta" },
-  { emoji: "🏷️", t: "Cupones y promociones", d: "Descuentos en negocios locales", modal: "cupones-promos" },
+  { emoji: "📣", t: "Publicidad gratuita", d: "Da a conocer tu emprendimiento", modal: "publicidad-tarjeta" },
+  { emoji: "🏷️", t: "Cupones y promociones", d: "Descuentos en emprendimientos locales", modal: "cupones-promos" },
   { emoji: "⭐", t: "Recomienda, evalúa y gana", d: "Comparte tu experiencia y suma", modal: "recomienda-evalua-gana" }
 ];
 
@@ -30,8 +30,8 @@ export const ACCESOS_REGISTROS = [
   { emoji: "⭐", t: "Recomienda a alguien", d: "Pública para todos o privada para tu círculo", reg: "recomendar" },
   { grupo: "🎁 OFREZCO · Suma tu parte" },
   { emoji: "🎁", t: "OFREZCO algo", d: "Una cosa, servicio o ayuda para alguien", reg: "ofrezco" },
-  { emoji: "🏪", t: "Registra tu negocio gratis", d: "Publicidad y mapa de negocios", seccion: "publicidad" },
-  { emoji: "🤝", t: "Alianza ganar-ganar", d: "Negocios y organizaciones", reg: "alianza" },
+  { emoji: "🏪", t: "Registra tu emprendimiento gratis", d: "Publicidad y mapa de negocios", seccion: "publicidad" },
+  { emoji: "🤝", t: "Alianza ganar-ganar", d: "Emprendimientos y organizaciones", reg: "alianza" },
   { emoji: "🛍️", t: "Ventas con causa", d: "Ofrece o busca producto o servicio", reg: "ventas" },
   { emoji: "🧺", t: "Bazares y mercados", d: "Participa con lo que ofreces", reg: "bazar" },
   { emoji: "🔒", t: "Círculo de Confianza", d: "Apoyos y beneficios mutuos", reg: "circulo" },

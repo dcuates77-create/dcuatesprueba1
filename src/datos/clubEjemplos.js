@@ -5,11 +5,11 @@ export const PUNTOS_EJEMPLOS = [
   { ic: "💬", t: "Difundir una recomendación", p: 50, d: "Compártela con tu círculo por WhatsApp" },
   { ic: "🤝", t: "Invitar a un vecino que se una", p: 100, d: "Cuando su Pase queda activo" },
   { ic: "🙋", t: "Participar como voluntario", p: 200, d: "Por cada actividad en la que ayudes" },
-  { ic: "🏪", t: "Sumar a tu negocio o aliado", p: 300, d: "Registra una alianza o patrocinio" }
+  { ic: "🏪", t: "Sumar a tu emprendimiento o aliado", p: 300, d: "Registra una alianza o patrocinio" }
 ];
 export const PREMIOS_EJEMPLOS = [
   { ic: "📖", t: "Libro digital", p: 100, d: "A tu elección de la biblioteca DCUATES" },
-  { ic: "📣", t: "Una recomendación", p: 100, d: "Difundimos una recomendación tuya o de tu negocio" },
+  { ic: "📣", t: "Una recomendación", p: 100, d: "Difundimos una recomendación tuya o de tu emprendimiento" },
   { ic: "🎓", t: "Curso o taller", p: 150, d: "Un lugar en un curso o taller de la comunidad" },
   { ic: "🎟️", t: "Cupón de un aliado", p: 80, d: "Descuento en un negocio aliado" },
   { ic: "🎁", t: "Regalo sorpresa", p: 200, d: "Algo especial que preparamos para ti" }

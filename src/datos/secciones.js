@@ -56,7 +56,7 @@ export const CAMINO = {
     ["📣", "COMPARTE", "Casos y causas", { wa: "Te comparto casos y causas que necesitan apoyo en nuestra comunidad DCUATES: dcuates.com 💛" }]
   ],
   negocios: [
-    ["🗺️", "CONOCE", "Mapa de negocios", { scroll: "mapa-negocios" }],
+    ["🗺️", "CONOCE", "Mapa de emprendimientos", { scroll: "mapa-negocios" }],
     ["📣", "ANÚNCIATE", "Publicidad gratuita", { p: "publicidad-tarjeta" }],
     ["🤝", "ALÍATE", "Alianzas ganar-ganar", { p: "alianzas-tarjeta" }],
     ["📈", "CRECE", "Servicios y promos", { serv: 1 }]
@@ -83,7 +83,7 @@ export const CAMINO = {
 
 // ---------------- Listas que rotan cada semana ----------------
 const TIPS_BIENESTAR = ["Toma agua y estírate 2 minutos cada hora.", "Camina 15 minutos hoy: tu ánimo lo agradece.", "Respira profundo 4 veces antes de dormir.", "Llama a alguien querido: una charla corta sana mucho.", "Apaga las pantallas 30 minutos antes de dormir.", "Escribe 3 cosas buenas de tu día.", "Lee 10 páginas de algo que te guste.", "Sonríele a un vecino: cuesta nada y cambia el día."];
-const TIPS_EMPRENDER = ["Pon el nombre y el WhatsApp de tu negocio en todo lo que entregues.", "Pide a tus clientes felices que te recomienden con un vecino.", "Toma buenas fotos con luz natural: venden más.", "Ofrece una promo pequeña y clara, con fecha límite.", "Anota tus gastos: lo que no se mide no crece.", "Alíate con un negocio vecino y promociónense juntos.", "Contesta rápido: la primera respuesta gana la venta.", "Cuenta tu historia: la gente compra a quien conoce."];
+const TIPS_EMPRENDER = ["Pon el nombre y el WhatsApp de tu emprendimiento en todo lo que entregues.", "Pide a tus clientes felices que te recomienden con un vecino.", "Toma buenas fotos con luz natural: venden más.", "Ofrece una promo pequeña y clara, con fecha límite.", "Anota tus gastos: lo que no se mide no crece.", "Alíate con un negocio vecino y promociónense juntos.", "Contesta rápido: la primera respuesta gana la venta.", "Cuenta tu historia: la gente compra a quien conoce."];
 const VALORES = [["💛", "Gratitud", "Dar las gracias hace mejor el día de dos personas."], ["🤝", "Confianza", "Se construye de a poquito, con palabras cumplidas."], ["🌱", "Crecer", "Lo que se cuida con paciencia, florece."], ["🤲", "Solidaridad", "Nadie es tan pobre que no pueda dar, ni tan rico que no necesite recibir."], ["😊", "Alegría", "Una sonrisa compartida vale más que muchas palabras."], ["🌟", "Esperanza", "Cada paso pequeño, repetido con otros, mueve montañas."], ["🕊️", "Respeto", "Escuchar con atención ya es una forma de cuidar."]];
 const PALABRAS = [["Vecindad", "Ser vecino es cuidarnos entre todos."], ["Constancia", "Lo pequeño que se repite se vuelve grande."], ["Compartir", "Lo que se comparte se multiplica."], ["Generosidad", "Dar sin esperar es la mejor inversión."], ["Escucha", "Escuchar abre más puertas que hablar."], ["Palabra", "Una palabra cumplida vale oro."], ["Empatía", "Ponerse en los zapatos del otro lo cambia todo."]];
 const GRACIAS = ["a quien te prestó un libro", "a un vecino que te ayudó sin pedir nada", "a tu maestro o maestra de la vida", "a quien cuida de tus mascotas", "a un negocio que te atendió con cariño", "a alguien que te escuchó cuando lo necesitabas", "a quien comparte su tiempo como voluntario", "a tu familia por estar ahí"];
@@ -108,7 +108,7 @@ export function tarjetasHoy(sec, d = {}) {
   switch (sec) {
     case "beneficios": return [
       { e: bE, et: "BENEFICIO DE LA SEMANA", t: bT, s: bD, c: "#D1530A", a: bA },
-      { e: "🏷️", et: "CUPÓN DE LA SEMANA", t: "Descuentos en negocios locales", s: "Revisa las promos vigentes de tu colonia.", c: "#F07A1A", a: { p: "cupones-promos" } },
+      { e: "🏷️", et: "CUPÓN DE LA SEMANA", t: "Descuentos en emprendimientos locales", s: "Revisa las promos vigentes de tu colonia.", c: "#F07A1A", a: { p: "cupones-promos" } },
       { e: "🧘", et: "TIP DE BIENESTAR DE LA SEMANA", t: rota(TIPS_BIENESTAR), c: "#0F766E", a: { p: "bienestar" } }
     ];
     case "causas": return [

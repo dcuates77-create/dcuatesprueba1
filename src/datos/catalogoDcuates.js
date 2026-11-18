@@ -1,7 +1,7 @@
 // CATÁLOGO «LO QUE COMPARTIMOS EN DCUATES» (e83a): todo lo que DCUATES pone a disposición, con sus características y cómo solicitarlo.
 // Se muestra en «Lo que compartimos» > «🗂️ Catálogo». Solo textos: edítalos aquí sin tocar la lógica.
 // a = qué pasa al tocar «Solicitar»:  { reg: "id" } abre ese registro · { neg: "slug" } abre una Página CUATE · { z: "zona" } abre una zona · { plus: 1 } abre la Agenda · { tablon: "Ofrezco" } abre el tablón filtrado
-export const GRUPOS_CATALOGO = ["Aprende y cuida", "Apoyo y causas", "Negocios y ventas", "Comunidad y Club"];
+export const GRUPOS_CATALOGO = ["Aprende y cuida", "Apoyo y causas", "Emprendimientos y ventas", "Comunidad y Club"];
 
 export const CATALOGO_DCUATES = [
   { g: 0, e: "📚", t: "Bibliobici · préstamo de libros", costo: "Gratis", d: "Libros y materiales prestados sin costo, y recepción de donaciones.",
@@ -30,18 +30,18 @@ export const CATALOGO_DCUATES = [
   { g: 1, e: "🎁", t: "Ofrezco · Necesito", costo: "Gratis", d: "Lo que puedes dar, prestar o hacer por alguien, y lo que te hace falta.",
     car: ["Se publica sin tu nombre ni tu teléfono", "Otros Cuates tocan «Me interesa»", "DCUATES hace la conexión"], btn: "Ver el tablón", a: { tablon: "Ofrezco" } },
 
-  { g: 2, e: "🏪", t: "Tu Página CUATE", costo: "Gratis con promo · si no, aportación voluntaria", d: "Tu negocio con página propia, WhatsApp, promociones y Pase.",
-    car: ["Enlace propio dcuates.com/n/tu-negocio", "Catálogo, galería y Pase del negocio", "Gratis si ofreces promociones a los Cuates; si no, de aportación voluntaria"], btn: "Registrar mi negocio", a: { reg: "pagina" } },
+  { g: 2, e: "🏪", t: "Tu Página CUATE", costo: "Gratis con promo · si no, aportación voluntaria", d: "Tu emprendimiento con página propia, WhatsApp, promociones y Pase.",
+    car: ["Enlace propio dcuates.com/n/tu-negocio", "Catálogo, galería y Pase del emprendimiento", "Gratis si ofreces promociones a los Cuates; si no, de aportación voluntaria"], btn: "Registrar mi emprendimiento", a: { reg: "pagina" } },
   { g: 2, e: "🛒", t: "Ventas DCUATES", costo: "Según producto", d: "Lo que DCUATES ofrece directo y lo que otros Cuates venden por comisión.",
     car: ["Pides por WhatsApp", "El pedido queda registrado", "Beneficios para Cuates"], btn: "Ver qué hay a la venta", a: { neg: "dcuates-ventas" } },
   { g: 2, e: "💼", t: "Vendedores por comisión", costo: "Comisión por producto", d: "Vende productos o servicios de la comunidad y gana comisión.",
     car: ["Te explicamos cómo funciona", "Condiciones por WhatsApp según el producto", "Acompañamiento para empezar"], btn: "Quiero vender", a: { neg: "dcuates-vendedores" } },
-  { g: 2, e: "🤝", t: "Alianzas ganar-ganar", costo: "Gratis", d: "Alianzas con negocios y organizaciones para generar beneficios mutuos.",
+  { g: 2, e: "🤝", t: "Alianzas ganar-ganar", costo: "Gratis", d: "Alianzas con emprendimientos y organizaciones para generar beneficios mutuos.",
     car: ["Platicamos cómo sumar", "Beneficios y apoyos mutuos", "Te contactamos por WhatsApp"], btn: "Quiero una alianza", a: { reg: "alianza" } },
   { g: 2, e: "🧺", t: "Bazares y mercados", costo: "Según evento", d: "Espacio para ofrecer tus productos en los próximos bazares.",
     car: ["Cuentas qué ofreces", "Te incluimos en los próximos bazares"], btn: "Quiero participar", a: { reg: "bazar" } },
-  { g: 2, e: "🔎", t: "Directorio de negocios CUATE", costo: "Gratis", d: "Negocios de la comunidad con promociones para Cuates.",
-    car: ["Busca por categoría o colonia", "Promociones con tu Pase CUATE", "Ordena por destacados, recientes o con oferta"], btn: "Ver negocios", a: { dir: 1 } },
+  { g: 2, e: "🔎", t: "Directorio de emprendimientos CUATE", costo: "Gratis", d: "Emprendimientos de la comunidad con promociones para Cuates.",
+    car: ["Busca por categoría o colonia", "Promociones con tu Pase CUATE", "Ordena por destacados, recientes o con oferta"], btn: "Ver emprendimientos", a: { dir: 1 } },
 
   { g: 3, e: "🧡", t: "Club DCUATES", costo: "Sin cuotas", d: "Sé NUESTRO CUATE: tu Pase, tus puntos y tus premios.",
     car: ["Eliges tu modalidad y con qué te comprometes", "Tu Pase CUATE suma puntos", "No hay cuotas: esta página nunca cobra"], btn: "Unirme al Club", a: { reg: "club" } },
