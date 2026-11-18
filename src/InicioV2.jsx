@@ -20,6 +20,7 @@ import { abrirNegocio } from "./NegocioCuate.jsx";
 import { useMisPuntos } from "./utilidades/tarjetaHoja.js";
 import ComoFunciona from "./ComoFunciona.jsx";
 import { abrirTablon } from "./Tablon.jsx";
+import { RetoVisitas } from "./PiezasEmprendimientos.jsx";
 import { abrirPlus } from "./AgendaPlus.jsx";
 import { abrirRegistroPrevio } from "./RegistroPrevio.jsx";
 import { ejecutar } from "./datos/secciones.js";
@@ -550,6 +551,7 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
 
       <Hoja abierta={ven === "club"} onCerrar={cierra} titulo="Club DCUATES" compartir={{ hash: "club-dcuates", texto: "Tu pase DCUATES te da beneficios especiales" }}>
         <ClubTarjeta ejemplos />
+        <RetoVisitas />
         <PaginaCuateCTA compacto />
       </Hoja>
     </div>

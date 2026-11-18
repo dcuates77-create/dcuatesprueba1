@@ -6,12 +6,14 @@ import { createPortal } from "react-dom";
 import { useAtras } from "./atras.js";
 import { registrar } from "./analitica.js";
 import { abrirRegistroPrevio } from "./RegistroPrevio.jsx";
-import { cargarNegocio, categoriaDe, NIVELES, esOficial } from "./datos/negocios.js";
+import { cargarNegocio, categoriaDe, NIVELES, esOficial, diasHasta, textoCuenta } from "./datos/negocios.js";
 import PaginaCuateCTA from "./PaginaCuateCTA.jsx";
 import ReelNegocio from "./ReelNegocio.jsx";
 import { ListaNegocios, PaginaCategoria, esSlugCategoria, categoriaDeSlug } from "./PaginaCategoria.jsx";
 import { abrirPanelNegocio } from "./PanelNegocio.jsx";
 import { abrirTablon } from "./Tablon.jsx";
+import { BotonFavorito } from "./PiezasEmprendimientos.jsx";
+import { registrarVisita } from "./utilidades/reto.js";
 import { eventoNegocio } from "./utilidades/negocioStats.js";
 import { registrarPedido, confirmarPedido, descartarPedido, pedidoPendiente, paseGuardado } from "./utilidades/pedidos.js";
 import { WHATSAPP_NUMERO } from "./datos/config.js";
@@ -114,7 +116,7 @@ export default function NegocioCuate() {
     cargarNegocio(slug).then((r) => {
       if (!vivo) return;
       setEst({ cargando: false, ...r });
-      if (r.ok) { recordarCodigo(r.negocio.cod); registrar("negocio_abrir", { s: slug }); eventoNegocio(slug, "visita"); }
+      if (r.ok) { recordarCodigo(r.negocio.cod); registrar("negocio_abrir", { s: slug }); eventoNegocio(slug, "visita"); registrarVisita(slug); }
       else registrar("negocio_no_encontrado", { s: slug });
     });
     return () => { vivo = false; };
@@ -147,6 +149,7 @@ export default function NegocioCuate() {
         <div className="ng-bar">
           <button type="button" className="ng-x" onClick={cerrar} aria-label="Cerrar">✕</button>
           <b>{n ? n.n : esCat ? (catPag ? catPag.nombre : "Emprendimientos CUATE") : "Emprendimiento CUATE"}</b>
+          {n && <BotonFavorito slug={slug} nombre={n.n} clase="ng-sh ng-fv" />}
           {n && <button type="button" className="ng-sh" onClick={compartir} aria-label="Compartir">📤</button>}
         </div>
         {esCat && <PaginaCategoria slug={slug} />}
@@ -209,7 +212,7 @@ export default function NegocioCuate() {
             )}
             {n.ofT && (
               <section className="ng-oferta" data-testid="negocio-oferta">
-                <span>🎟️ OFERTA PARA CUATES</span><b>{n.ofT}</b>{n.ofD && <p>{n.ofD}</p>}
+                <span>🎟️ OFERTA PARA CUATES</span><b>{n.ofT}</b>{n.ofD && <p>{n.ofD}</p>}{n.ofV && textoCuenta(diasHasta(n.ofV)) && <p className="ng-cd" data-testid="oferta-cuenta">⏳ {textoCuenta(diasHasta(n.ofV))}</p>}
               </section>
             )}
             {(n.rec || n.nec || n.com) && (
@@ -280,6 +283,7 @@ const CSS = `
 .ng-id h1{margin:8px 0 2px;font-size:22px;font-weight:900;line-height:1.15}
 .ng-esl{margin:0;font-size:14.5px;font-weight:800;color:var(--c)}
 .ng-acc{display:flex;flex-wrap:wrap;gap:8px;margin:14px 14px 4px}
+.ng-fv{font-size:22px}.ng-fv.on{color:#C62828}.ng-cd{font-weight:900;color:#8a1c1c}
 .ng-qt{display:flex;flex-direction:column;gap:6px;margin:10px 0}.ng-qt p{margin:0;font-size:14px;font-weight:900}
 .ng-b{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 16px;border:2px solid var(--c);border-radius:14px;background:#fff;color:var(--c);font:inherit;font-size:14.5px;font-weight:900;text-decoration:none;cursor:pointer;flex:1 1 auto;text-align:center}
 .ng-b1{background:var(--c);color:#fff}

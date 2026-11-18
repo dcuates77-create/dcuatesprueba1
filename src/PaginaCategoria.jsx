@@ -4,6 +4,9 @@ import React, { useEffect, useMemo, useState } from "react";
 import { cargarDirectorio, ordenarDirectorio, categoriaDe, LISTA_CATEGORIAS, NIVELES, esOficial } from "./datos/negocios.js";
 import { abrirNegocio } from "./NegocioCuate.jsx";
 import { registrar } from "./analitica.js";
+import { BotonFavorito, PromoDelMes, RetoVisitas, CSS_PE } from "./PiezasEmprendimientos.jsx";
+import { useFavoritos } from "./utilidades/favoritos.js";
+import { abiertoAhora } from "./utilidades/horario.js";
 
 const sinAc = (s) => String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
 export const slugCategoria = (nombre) => "categoria-" + sinAc(nombre).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -22,11 +25,11 @@ function useDirectorio() {
 const Tarjeta = ({ x, alElegir }) => {
   const c = categoriaDe(x.c);
   return (
-    <button type="button" className="pc-t" style={{ "--c": c.color }} data-testid="pc-negocio" onClick={() => alElegir(x)}>
+    <div className="pc-w"><button type="button" className="pc-t" style={{ "--c": c.color }} data-testid="pc-negocio" onClick={() => alElegir(x)}>
       <span className="pc-l">{x.l ? <img src={x.l} alt="" loading="lazy" /> : c.e}</span>
-      <span className="pc-x"><b>{x.n}</b><small>{c.nombre}{x.col ? " · " + x.col : ""}</small>{x.e && <small className="pc-e">{x.e}</small>}</span>
+      <span className="pc-x"><b>{x.n}</b><small>{c.nombre}{x.col ? " · " + x.col : ""}</small>{x.e && <small className="pc-e">{x.e}</small>}{x.h && abiertoAhora(x.h) === true && <em className="pe-ab" data-testid="abierto-ahora">🟢 Abierto ahora</em>}</span>
       {esOficial(x.s) ? <i>🌟</i> : NIVELES[x.niv] && NIVELES[x.niv].t ? <i>{x.niv === "P" ? "🌟" : "💛"}</i> : null}
-    </button>
+    </button><BotonFavorito slug={x.s} nombre={x.n} clase="pe-fav pc-fv" /></div>
   );
 };
 
@@ -36,8 +39,13 @@ export function ListaNegocios({ actual = "", siempre = false }) {
   const abierta = siempre || abiertaX;
   const [q, setQ] = useState("");
   const [cat, setCat] = useState("");
+  const [soloFav, setSoloFav] = useState(false);
+  const [ahora, setAhora] = useState(false);
+  const favs = useFavoritos();
   const d = useDirectorio();
-  const lista = useMemo(() => d.items.filter((x) => x.s !== actual && (!cat || categoriaDe(x.c).nombre === cat) && (!q.trim() || sinAc(x.n + " " + x.e + " " + x.col + " " + categoriaDe(x.c).nombre).includes(sinAc(q.trim())))), [d.items, actual, cat, q]);
+  const lista = useMemo(() => d.items.filter((x) => x.s !== actual && (!cat || categoriaDe(x.c).nombre === cat) && (!soloFav || favs.includes(x.s)) && (!ahora || abiertoAhora(x.h) === true) && (!q.trim() || sinAc(x.n + " " + x.e + " " + x.col + " " + categoriaDe(x.c).nombre).includes(sinAc(q.trim())))), [d.items, actual, cat, q, soloFav, ahora, favs]);
+  const nAb = useMemo(() => d.items.filter((x) => abiertoAhora(x.h) === true).length, [d.items]);
+  const nombres = useMemo(() => Object.fromEntries(d.items.map((x) => [x.s, x.n])), [d.items]);
   const cats = useMemo(() => { const m = new Set(d.items.map((x) => categoriaDe(x.c).nombre)); return LISTA_CATEGORIAS.filter((c) => m.has(c.nombre)); }, [d.items]);
   return (
     <section className="pc-caja" data-testid="lista-negocios">
@@ -46,9 +54,13 @@ export function ListaNegocios({ actual = "", siempre = false }) {
       </button>}
       {abierta && (
         <div className="pc-cuerpo">
+          {!d.cargando && <PromoDelMes items={d.items} abrir={(x) => abrirNegocio(x)} />}
+          {!d.cargando && <RetoVisitas nombres={nombres} />}
           <input className="pc-q" type="search" placeholder="Buscar emprendimiento, giro o colonia…" aria-label="Buscar emprendimiento" value={q} onChange={(e) => setQ(e.target.value)} />
           <div className="pc-chips" role="tablist" aria-label="Categorías">
             <button type="button" role="tab" aria-selected={!cat} className={!cat ? "on" : ""} onClick={() => setCat("")}>Todas</button>
+            {favs.length > 0 && <button type="button" aria-pressed={soloFav} className={soloFav ? "on" : ""} data-testid="chip-fav" onClick={() => setSoloFav(!soloFav)}>♥ Favoritos ({favs.length})</button>}
+            {nAb > 0 && <button type="button" aria-pressed={ahora} className={ahora ? "on" : ""} data-testid="chip-abierto" onClick={() => setAhora(!ahora)}>🟢 Abierto ahora ({nAb})</button>}
             {cats.map((c) => <button type="button" key={c.k} role="tab" aria-selected={cat === c.nombre} className={cat === c.nombre ? "on" : ""} onClick={() => setCat(c.nombre)}>{c.e} {c.nombre}</button>)}
           </div>
           {d.cargando && <p className="pc-m">Cargando…</p>}
@@ -106,6 +118,8 @@ const CSS = `
 .pc-chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:6px}.pc-chips button,.pc-barra button{flex:0 0 auto;min-height:44px;padding:0 14px;border:2px solid #0f2d1e;border-radius:22px;background:#fff;color:#0f2d1e;font:inherit;font-size:14px;font-weight:900;cursor:pointer}
 .pc-chips button.on,.pc-barra button.on{background:#0f2d1e;color:#fff}
 .pc-cats{flex-wrap:wrap;overflow:visible}
+.pc-w{position:relative}.pc-w .pc-t{padding-right:60px}.pc-fv{position:absolute;top:8px;right:8px}
+${CSS_PE}
 .pc-lista{display:flex;flex-direction:column;gap:6px}.pc-t{display:flex;align-items:center;gap:10px;width:100%;box-sizing:border-box;min-height:56px;padding:8px 10px;border:2px solid var(--c);border-radius:14px;background:#fff;color:#0f2d1e;font:inherit;text-align:left;cursor:pointer}
 .pc-l{flex:none;width:40px;height:40px;border-radius:10px;background:#f2efe3;display:flex;align-items:center;justify-content:center;font-size:22px;overflow:hidden}.pc-l img{width:100%;height:100%;object-fit:cover}
 .pc-x{flex:1;min-width:0;display:flex;flex-direction:column}.pc-x b{font-size:15px;font-weight:900}.pc-x small{font-size:12.5px;font-weight:700;color:#4a5a50;overflow-wrap:anywhere}.pc-t i{font-style:normal;font-size:18px}

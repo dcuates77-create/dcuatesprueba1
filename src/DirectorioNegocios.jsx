@@ -9,6 +9,9 @@ import { abrirNegocio } from "./NegocioCuate.jsx";
 import PaginaCuateCTA from "./PaginaCuateCTA.jsx";
 import { URL_SITIO } from "./datos/config.js";
 import { eventoNegocio } from "./utilidades/negocioStats.js";
+import { BotonFavorito, PromoDelMes, RetoVisitas, CSS_PE } from "./PiezasEmprendimientos.jsx";
+import { useFavoritos } from "./utilidades/favoritos.js";
+import { abiertoAhora } from "./utilidades/horario.js";
 
 const sinAc = (s) => String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
 
@@ -19,6 +22,9 @@ export default function DirectorioNegocios() {
   const [cat, setCat] = useState("");
   const [col, setCol] = useState("");
   const [soloV, setSoloV] = useState(false);
+  const [soloFav, setSoloFav] = useState(false);
+  const [ahora, setAhora] = useState(false);
+  const favs = useFavoritos();
   const [orden, setOrden] = useState("destacados");
   useEffect(() => {
     const quitar = () => { try { history.replaceState(history.state, "", window.location.pathname + window.location.search); } catch (x) { /* sin historial */ } };
@@ -48,9 +54,13 @@ export default function DirectorioNegocios() {
     if (cat && claveCategoria(i.c) !== cat) return false;
     if (col && (i.col || "").trim() !== col) return false;
     if (soloV && !i.v) return false;
+    if (soloFav && !favs.includes(i.s)) return false;
+    if (ahora && abiertoAhora(i.h) !== true) return false;
     if (q.trim()) { const t = sinAc([i.n, i.e, i.c, i.col].join(" ")); if (!sinAc(q).split(/\s+/).filter(Boolean).every((w) => t.includes(w))) return false; }
     return true;
   });
+  const nAbiertos = useMemo(() => est.items.filter((i) => abiertoAhora(i.h) === true).length, [est.items]);
+  const nombres = useMemo(() => Object.fromEntries(est.items.map((i) => [i.s, i.n])), [est.items]);
   if (!abierto) return null;
   const compartir = () => {
     registrar("directorio_compartir");
@@ -59,7 +69,7 @@ export default function DirectorioNegocios() {
     if (navigator.share) { navigator.share({ title: "Emprendimientos CUATE", text: texto, url }).catch(() => {}); return; }
     window.open(`https://wa.me/?text=${encodeURIComponent(texto + " " + url)}`, "_blank", "noopener");
   };
-  const limpiar = () => { setQ(""); setCat(""); setCol(""); setSoloV(false); };
+  const limpiar = () => { setQ(""); setCat(""); setCol(""); setSoloV(false); setSoloFav(false); setAhora(false); };
   return createPortal(
     <div className="dn-fondo" style={oculta ? { display: "none" } : undefined} role="dialog" aria-modal="true" aria-label="Emprendimientos CUATE" data-testid="directorio">
       <style>{CSS}</style>
@@ -71,6 +81,8 @@ export default function DirectorioNegocios() {
         </div>
         <p className="dn-p">Emprendimientos de tu comunidad con beneficios para los Cuates. Muestra tu Pase y aprovecha sus promociones. 💛</p>
         {est.ejemplo && <p className="dn-ej">EJEMPLOS ilustrativos · así se verá el directorio</p>}
+        {!est.cargando && <PromoDelMes items={est.items} abrir={(s) => { eventoNegocio(s, "directorio"); abrirNegocio(s); }} />}
+        {!est.cargando && <RetoVisitas nombres={nombres} />}
         <div className="dn-f">
           <input type="search" className="dn-q" placeholder="🔎 Busca un emprendimiento, giro o colonia" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Buscar" />
           <select className="dn-s" value={col} onChange={(e) => setCol(e.target.value)} aria-label="Colonia o municipio">
@@ -84,22 +96,26 @@ export default function DirectorioNegocios() {
         <div className="dn-chips" role="group" aria-label="Categorías">
           <button type="button" className={"dn-chip" + (cat === "" ? " on" : "")} onClick={() => setCat("")}>Todas ({est.items.length})</button>
           {est.items.some((i) => i.v) && <button type="button" className={"dn-chip" + (soloV ? " on" : "")} aria-pressed={soloV} onClick={() => setSoloV(!soloV)}>✅ Solo verificados</button>}
+          {favs.length > 0 && <button type="button" className={"dn-chip" + (soloFav ? " on" : "")} aria-pressed={soloFav} data-testid="chip-fav" onClick={() => setSoloFav(!soloFav)}>♥ Mis favoritos ({favs.length})</button>}
+          {nAbiertos > 0 && <button type="button" className={"dn-chip" + (ahora ? " on" : "")} aria-pressed={ahora} data-testid="chip-abierto" onClick={() => setAhora(!ahora)}>🟢 Abierto ahora ({nAbiertos})</button>}
           {cats.map((c) => <button type="button" key={c.k} className={"dn-chip" + (cat === c.k ? " on" : "")} onClick={() => setCat(cat === c.k ? "" : c.k)}>{categoriaDe(c.k).e} {c.k} ({c.n})</button>)}
         </div>
         {est.cargando && <p className="dn-m" role="status">Cargando…</p>}
-        {!est.cargando && <p className="dn-m" role="status" data-testid="dir-cuenta">{lista.length} {lista.length === 1 ? "negocio" : "negocios"}{(q || cat || col || soloV) && <> · <button type="button" className="dn-lk" onClick={limpiar}>Quitar filtros</button></>}</p>}
+        {!est.cargando && <p className="dn-m" role="status" data-testid="dir-cuenta">{lista.length} {lista.length === 1 ? "emprendimiento" : "emprendimientos"}{(q || cat || col || soloV || soloFav || ahora) && <> · <button type="button" className="dn-lk" onClick={limpiar}>Quitar filtros</button></>}</p>}
         <div className="dn-lista">
           {lista.map((i) => {
             const c = categoriaDe(i.c); const nv = NIVELES[i.niv];
             return (
-              <button type="button" key={i.s} className="dn-card" style={{ "--c": c.color }} onClick={() => { registrar("directorio_clic", { s: i.s }); eventoNegocio(i.s, "directorio"); abrirNegocio(i.s); }}>
+              <div key={i.s} className="dn-w"><button type="button" className="dn-card" style={{ "--c": c.color }} onClick={() => { registrar("directorio_clic", { s: i.s }); eventoNegocio(i.s, "directorio"); abrirNegocio(i.s); }}>
                 <span className="dn-lg">{i.l ? <img src={i.l} alt="" loading="lazy" /> : c.e}</span>
                 <span className="dn-t">
                   <b>{i.n}</b>
                   {i.e && <small>{i.e}</small>}
-                  <span className="dn-m2"><i>{c.e} {c.nombre}</i>{i.col && <i>📍 {i.col}</i>}{i.v && <i className="dn-vr">✅ Verificado</i>}{i.of && <i className="dn-of">🎟️ Oferta</i>}{esOficial(i.s) ? <i className="dn-nv">🌟 OFICIAL DCUATES</i> : nv && nv.t && <i className="dn-nv">{nv.t}</i>}</span>
+                  <span className="dn-m2"><i>{c.e} {c.nombre}</i>{i.col && <i>📍 {i.col}</i>}{i.v && <i className="dn-vr">✅ Verificado</i>}{i.of && <i className="dn-of">🎟️ Oferta</i>}{i.h && abiertoAhora(i.h) === true && <i className="pe-ab" data-testid="abierto-ahora">🟢 Abierto ahora</i>}{esOficial(i.s) ? <i className="dn-nv">🌟 OFICIAL DCUATES</i> : nv && nv.t && <i className="dn-nv">{nv.t}</i>}</span>
                 </span>
               </button>
+              <BotonFavorito slug={i.s} nombre={i.n} clase="pe-fav dn-fv" />
+              </div>
             );
           })}
         </div>
@@ -130,6 +146,8 @@ const CSS = `
 .dn-card{display:flex;align-items:center;gap:10px;width:100%;padding:10px;border:2px solid var(--c);border-radius:16px;background:#fff;color:inherit;font:inherit;text-align:left;cursor:pointer}
 .dn-lg{flex:none;width:56px;height:56px;border-radius:50%;background:#f1ecdc;display:flex;align-items:center;justify-content:center;font-size:28px;overflow:hidden}
 .dn-lg img{width:100%;height:100%;object-fit:contain;padding:4px;box-sizing:border-box;background:#fff}
+.dn-w{position:relative}.dn-w .dn-card{padding-right:60px}.dn-fv{position:absolute;top:8px;right:8px}
+${CSS_PE}
 .dn-t{display:flex;flex-direction:column;gap:2px;min-width:0}
 .dn-t b{font-size:15.5px;font-weight:900;line-height:1.15}
 .dn-t small{font-size:12.5px;font-weight:700;color:#4a5b52;line-height:1.3}
