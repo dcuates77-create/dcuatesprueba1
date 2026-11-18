@@ -1,4 +1,4 @@
-// PANEL DEL DUEÑO (e81) — se abre desde «Soy el dueño» al pie de cada Página CUATE. Se entra con el PIN del negocio (columna «PIN edición»).
+// PANEL DEL DUEÑO (e81) — se abre desde «Soy el dueño» al pie de cada Página CUATE. Se entra con el PIN del emprendimiento (columna «PIN edición»).
 //  · Mi ficha: el dueño PROPONE cambios (no se publican solos: llegan a la pestaña «CambiosNegocios» y tú los apruebas).
 //  · Canjear promo: confirma el Pase de un Cuate, registra el uso de la promoción y, si corresponde, suma puntos.
 //  · Mis números: visitas, WhatsApp, llamadas, Club, canjes y Cuates referidos por mes.
@@ -12,10 +12,10 @@ export const abrirPanelNegocio = (slug) => window.dispatchEvent(new CustomEvent(
 
 // clave → [rótulo, tipo ("t" texto · "a" párrafo · "l" lista (una por renglón)), ayuda, solo nivel Impulsor/Patrocinador]
 const GRUPOS = [
-  ["Tu negocio", [["e", "Eslogan", "t"], ["d", "Descripción", "a"], ["of", "Qué ofreces (un renglón por cada uno)", "l"], ["h", "Horario", "t"], ["dir", "Dirección", "t"], ["col", "Colonia o municipio", "t"]]],
+  ["Tu emprendimiento", [["e", "Eslogan", "t"], ["d", "Descripción", "a"], ["of", "Qué ofreces (un renglón por cada uno)", "l"], ["h", "Horario", "t"], ["dir", "Dirección", "t"], ["col", "Colonia o municipio", "t"]]],
   ["Contacto", [["wa", "WhatsApp (10 dígitos)", "t"], ["tel", "Teléfono", "t"], ["mapa", "Enlace de Google Maps (https://…)", "t"], ["web", "Sitio web (https://…)", "t"], ["fb", "Facebook (https://…)", "t"], ["ig", "Instagram (https://…)", "t"]]],
   ["Promoción para los Cuates", [["ofT", "Título de la promoción", "t"], ["ofD", "Detalle", "a"], ["ofV", "Vence (dd/mm/aaaa, opcional)", "t"]]],
-  ["Tu Pase del negocio", [["rec", "Ofrezco", "t"], ["nec", "Necesito", "t"], ["com", "Comparto", "t"]]],
+  ["Tu Pase del emprendimiento", [["rec", "Ofrezco", "t"], ["nec", "Necesito", "t"], ["com", "Comparto", "t"]]],
   ["Imágenes, videos y catálogo", [["logo", "Enlace del logo (https://…)", "t"], ["portada", "Enlace de la portada (https://…)", "t"], ["gal", "Imágenes y videos: un enlace por renglón (YouTube o imagen)", "l", true], ["ct", "Catálogo: un renglón por producto → Nombre ~ Precio ~ Descripción", "l", true], ["cc", "Enlace de tu catálogo completo (https://…)", "t", true]]]
 ];
 const aTexto = (k, tipo, v) => (tipo === "l" ? String(v || "").split("|").map((x) => x.trim()).filter(Boolean).join("\n") : String(v || ""));
@@ -92,7 +92,7 @@ export default function PanelNegocio() {
     setCj({ t: "carga" });
     try {
       const j = await pedir(`a=negocio_canje&slug=${encodeURIComponent(slug)}&k=${encodeURIComponent(pin.trim())}&n=${encodeURIComponent(n)}${reg ? "&reg=1" : ""}`);
-      if (!j || !j.ok) { setCj({ t: "err", m: j && j.motivo === "ya" ? "Este Pase ya canjeó hoy en tu negocio." : j && j.motivo === "limite" ? "Llegaste al límite de canjes de hoy. Escríbele a DCUATES." : "No pudimos registrar. Inténtalo de nuevo." }); return; }
+      if (!j || !j.ok) { setCj({ t: "err", m: j && j.motivo === "ya" ? "Este Pase ya canjeó hoy en tu emprendimiento." : j && j.motivo === "limite" ? "Llegaste al límite de canjes de hoy. Escríbele a DCUATES." : "No pudimos registrar. Inténtalo de nuevo." }); return; }
       if (j.registrado) { registrar("negocio_canje", { s: slug }); setCj({ t: "hecho", nombre: j.nombre, puntos: j.puntos }); return; }
       if (!j.valido) { setCj({ t: "err", m: "No encontramos ese Pase o no está activo." }); return; }
       setCj({ t: j.ya ? "ya" : "valido", nombre: j.nombre, perfil: j.perfil });
@@ -107,8 +107,8 @@ export default function PanelNegocio() {
         <div className="pn-bar"><button type="button" className="pn-x" onClick={cerrar} aria-label="Cerrar">✕</button><b>🔑 {d ? d.negocio.n : "Administrar mi página"}</b></div>
         {paso !== "panel" && (
           <form className="pn-f" onSubmit={entrar}>
-            <p>Escribe el <b>PIN de tu negocio</b> (te lo entrega DCUATES). Solo tú puedes proponer cambios y confirmar Pases.</p>
-            <label htmlFor="pn-pin">PIN del negocio</label>
+            <p>Escribe el <b>PIN de tu emprendimiento</b> (te lo entrega DCUATES). Solo tú puedes proponer cambios y confirmar Pases.</p>
+            <label htmlFor="pn-pin">PIN del emprendimiento</label>
             <input id="pn-pin" type="password" autoComplete="off" autoCapitalize="characters" maxLength={12} value={pin} onChange={(e) => setPin(e.target.value)} />
             {error && <p className="pn-err" role="alert">{error}</p>}
             <button type="submit" className="pn-b pn-b1" disabled={paso === "carga"}>{paso === "carga" ? "Entrando…" : "Entrar"}</button>
@@ -116,7 +116,7 @@ export default function PanelNegocio() {
         )}
         {paso === "panel" && d && (
           <>
-            <div className="pn-tabs" role="tablist" aria-label="Panel del negocio">
+            <div className="pn-tabs" role="tablist" aria-label="Panel del emprendimiento">
               {[["ficha", "✏️ Mi ficha"], ["pedidos", "🛒 Pedidos"], ["canje", "🎟️ Canjear promo"], ["numeros", "📊 Mis números"]].map(([id, t]) => <button type="button" role="tab" key={id} aria-selected={tab === id} className={tab === id ? "on" : ""} onClick={() => setTab(id)}>{t}</button>)}
             </div>
             {tab === "ficha" && (
@@ -133,7 +133,7 @@ export default function PanelNegocio() {
                           {tipo === "t" ? <input id={"pn-" + c} type="text" value={v[c] || ""} onChange={(e) => set(c, e.target.value)} /> : <textarea id={"pn-" + c} rows={tipo === "a" ? 3 : 4} value={v[c] || ""} onChange={(e) => set(c, e.target.value)} />}
                         </div>
                       ))}
-                      {bloqueados.length > 0 && <p className="pn-nota">🔒 Galería y catálogo son para negocios Impulsor o Patrocinador.</p>}
+                      {bloqueados.length > 0 && <p className="pn-nota">🔒 Galería y catálogo son para emprendimientos Impulsor o Patrocinador.</p>}
                     </fieldset>
                   );
                 })}
@@ -146,7 +146,7 @@ export default function PanelNegocio() {
             {tab === "pedidos" && (
               <div className="pn-f" data-testid="pn-pedidos">
                 <p>Aquí aparecen los pedidos que llegan desde tu catálogo. Cuando uno se concrete, confírmalo: DCUATES lo valida{ped && ped.tiene ? <> y recibes <b>{ped.pts} puntos</b> y sorpresas</> : " y recibes sorpresas"}.</p>
-                {ped && !ped.tiene && <p className="pn-aviso">Para ganar puntos, pide a DCUATES registrar tu número de Pase en tu negocio.</p>}
+                {ped && !ped.tiene && <p className="pn-aviso">Para ganar puntos, pide a DCUATES registrar tu número de Pase en tu emprendimiento.</p>}
                 {!ped && <p className="pn-aviso">Cargando…</p>}
                 {ped && ped.error && <p className="pn-err" role="alert">No pudimos cargar tus pedidos. Inténtalo de nuevo.</p>}
                 {ped && !ped.error && !ped.pedidos.length && <p className="pn-aviso">Todavía no hay pedidos. Cuando alguien toque «Pedir» en tu catálogo, aparecerá aquí.</p>}
@@ -172,7 +172,7 @@ export default function PanelNegocio() {
                 <input id="pn-num" type="text" autoCapitalize="characters" maxLength={12} placeholder="Ej. VEC100A" value={num} onChange={(e) => { setNum(e.target.value.toUpperCase()); setCj(null); }} />
                 <button type="button" className="pn-b" onClick={() => verificar(false)} disabled={cj && cj.t === "carga"}>Verificar Pase</button>
                 {cj && cj.t === "err" && <p className="pn-err" role="alert">{cj.m}</p>}
-                {cj && cj.t === "ya" && <p className="pn-aviso" role="status">✅ Pase válido: {cj.nombre}. Pero ya canjeó hoy en tu negocio.</p>}
+                {cj && cj.t === "ya" && <p className="pn-aviso" role="status">✅ Pase válido: {cj.nombre}. Pero ya canjeó hoy en tu emprendimiento.</p>}
                 {cj && cj.t === "valido" && (
                   <div role="status" data-testid="pn-valido"><p className="pn-ok">✅ Pase válido: <b>{cj.nombre}</b>{cj.perfil ? ` · ${cj.perfil}` : ""}</p>
                     <button type="button" className="pn-b pn-b1" onClick={() => verificar(true)}>Registrar canje{d.pts > 0 ? ` (+${d.pts} puntos para ${cj.nombre})` : ""}</button></div>

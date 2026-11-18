@@ -14,7 +14,7 @@ export default function PaginaCuateCTA({ compacto = false, directorio = false })
     <section className={"pc-cta" + (compacto ? " pc-c" : "")} data-testid="pagina-cta">
       <style>{CSS}</style>
       <h3>🏪 TU PÁGINA CUATE CON BENEFICIOS PARA TUS CLIENTES</h3>
-      {!compacto && <p>Tu negocio con página propia: tu WhatsApp, tus promociones, tu Pase y el Club DCUATES. Elige cómo quieres empezar:</p>}
+      {!compacto && <p>Tu emprendimiento con página propia: tu WhatsApp, tus promociones, tu Pase y el Club DCUATES. Elige cómo quieres empezar:</p>}
       <button type="button" className="pc-b pc-g" onClick={() => abrirRegistroPagina("Gratuita")}>
         <b>GRATUITO</b>
         <span>si tienes una o más promociones para los CUATES, o eres CUATE aliado, patrocinador o altruista</span>
@@ -23,7 +23,7 @@ export default function PaginaCuateCTA({ compacto = false, directorio = false })
         <b>DE APORTACIÓN VOLUNTARIA</b>
         <span>si no tienes promociones o algún beneficio para los CUATES de la comunidad. Tú decides el valor de lo que podría ayudar a CRECER TU EMPRENDIMIENTO</span>
       </button>
-      {directorio && <button type="button" className="pc-d" onClick={() => { registrar("pagina_directorio"); abrirDirectorio(); }}>🔎 Ver negocios CUATE</button>}
+      {directorio && <button type="button" className="pc-d" onClick={() => { registrar("pagina_directorio"); abrirDirectorio(); }}>🔎 Ver emprendimientos CUATE</button>}
     </section>
   );
 }

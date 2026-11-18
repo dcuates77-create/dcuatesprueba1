@@ -134,6 +134,10 @@ function Actividades({ agenda = [], filasZona = [], anuncios = [] }) {
         ))}
       </div>
       {lista.length === 0 && <p className="v2-p">Pronto verás aquí lo nuevo.</p>}
+      <div className="v2-act-cat" data-testid="act-catalogo">
+        <button type="button" className="v2-ac1" onClick={() => { registrar("v2_actividad", { tab: "catalogo" }); abrirTablon("Otros"); }}>🗂️ Catálogo CUATES</button>
+        <button type="button" className="v2-ac2" onClick={() => { registrar("v2_actividad", { tab: "emprendimientos" }); abrirTablon("Emprendimientos"); }}>🏪 Emprendimientos CUATE</button>
+      </div>
       {lista.map((x, i) => (
         <button key={tab + i} type="button" className="v2-it" onClick={abre}>
           <span className="v2-it-i"><Ico n={tab === "avisos" ? "ayuda" : "agenda"} c="#08743B" s={40} />{x.img && <img src={x.img} alt="" loading="lazy" onError={(e) => { e.currentTarget.style.display = "none"; }} />}</span>
@@ -231,7 +235,7 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
   const tres = [
     ["conocer", "Quiero conocer DCUATES", "Todos ganamos", "azul", "carita"],
     ["causas", "Causas y Beneficios", "Apoya y gana", "naranja", "corazon"],
-    ["negocios", "Negocios, alianzas y patrocinios", "Crecemos juntos", "verde", "tienda"]
+    ["negocios", "Emprendimientos, alianzas y patrocinios", "Crecemos juntos", "verde", "tienda"]
   ];
   const compartir = () => { registrar("v2_tarjeta", { k: "compartimos" }); abrirTablon(""); };
   const reg3 = [
@@ -288,7 +292,7 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
         {banda("c", "carita", "Quiero conocer DCUATES", "Todos ganamos", "linear-gradient(120deg,#5B3FC0,#8B6FE8)", abre("conocer"))}
         {banda("p", "alzada", "¿Cómo puedo participar?", "Empieza aquí: es fácil y gratis", "linear-gradient(120deg,#E8553F,#FF8F6B)", abre("participar"))}
         {banda("a", "corazon", "Causas y Beneficios", "Apoya y gana", "linear-gradient(120deg,#D6246E,#FF6FA3)", abre("causas"))}
-        {banda("n", "tienda", "Ganar-Ganar", "Negocios, alianzas y patrocinios", "linear-gradient(120deg,#0B6E66,#2BB3A3)", abre("negocios"))}
+        {banda("n", "tienda", "Ganar-Ganar", "Emprendimientos, alianzas y patrocinios", "linear-gradient(120deg,#0B6E66,#2BB3A3)", abre("negocios"))}
         {banda("s", "compartir", "COMPARTIMOS", "Lo que hay y se recomienda", "linear-gradient(120deg,#F2A900,#FFD24D)", compartir, true)}
       </section>
       <section className="v3-reg" aria-label="Registra aquí tu información">
@@ -318,7 +322,7 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
           {bt("p", "v5-big", "linear-gradient(160deg,#E8553F,#FF9A6F)", "alzada", "¿CÓMO PUEDO PARTICIPAR?", "Empieza aquí: es fácil y gratis", abre("participar"))}
           {bt("c", "v5-s", "linear-gradient(135deg,#5B3FC0,#8B6FE8)", "carita", "Quiero conocer DCUATES", "", abre("conocer"))}
           {bt("a", "v5-s", "linear-gradient(135deg,#D6246E,#FF6FA3)", "corazon", "Causas y Beneficios", "", abre("causas"))}
-          {bt("n", "v5-m", "linear-gradient(135deg,#0B6E66,#2BB3A3)", "tienda", "Ganar-Ganar", "Negocios, alianzas y patrocinios", abre("negocios"))}
+          {bt("n", "v5-m", "linear-gradient(135deg,#0B6E66,#2BB3A3)", "tienda", "Ganar-Ganar", "Emprendimientos, alianzas y patrocinios", abre("negocios"))}
           {bt("s", "v5-m", "linear-gradient(135deg,#F2A900,#FFD24D)", "compartir", "COMPARTIMOS", "Lo que hay y se recomienda", compartir, true)}
           <button type="button" className="v5-hoy" onClick={() => { registrar("v2_tarjeta", { k: "hoy" }); abrirVentanaEntrada("hoy"); }}>
             <Ico n="sol" c="#FFD24D" s={34} /><span><b>Hoy en DCUATES</b><small>Mira qué pasa hoy en tu comunidad</small></span><Ico n="flecha" c="#FFD24D" s={22} />
@@ -368,7 +372,7 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
       <section className="v6-g">
         {tarjeta6("c", "carita", "Quiero conocer DCUATES", "Todos ganamos", "linear-gradient(135deg,#5B3FC0,#8B6FE8)", abre("conocer"))}
         {tarjeta6("a", "corazon", "Causas y Beneficios", "Apoya y gana", "linear-gradient(135deg,#D6246E,#FF6FA3)", abre("causas"))}
-        {tarjeta6("n", "tienda", "Ganar-Ganar", "Negocios, alianzas y patrocinios", "linear-gradient(135deg,#0B6E66,#2BB3A3)", abre("negocios"))}
+        {tarjeta6("n", "tienda", "Ganar-Ganar", "Emprendimientos, alianzas y patrocinios", "linear-gradient(135deg,#0B6E66,#2BB3A3)", abre("negocios"))}
         {tarjeta6("s", "compartir", "COMPARTIMOS", "Lo que hay y se recomienda", "linear-gradient(135deg,#F2A900,#FFD24D)", compartir, true)}
       </section>
       <button type="button" className="v6-hoy" onClick={() => { registrar("v2_tarjeta", { k: "hoy" }); abrirVentanaEntrada("hoy"); }}>
@@ -393,7 +397,7 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
           ["1", "Conoce", "Quiénes somos y qué hay", "amarillo", "carita", abre("conocer")],
           ["2", "Participa", "Cómo puedes empezar hoy", "azul", "alzada", abre("participar")],
           ["3", "Apoya", "Causas y beneficios", "naranja", "corazon", abre("causas")],
-          ["4", "Ganar-Ganar", "Negocios, alianzas y patrocinios", "verde", "tienda", abre("negocios")]
+          ["4", "Ganar-Ganar", "Emprendimientos, alianzas y patrocinios", "verde", "tienda", abre("negocios")]
         ].map(([n, t, sub, fam, ic, f]) => (
           <button key={n} type="button" className="v4-p" onClick={f}>
             <span className="v4-n" style={{ background: C[fam].i }}>{n}</span>
@@ -421,7 +425,7 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
       <section className="v2-pg" aria-label="Tu página gratis" data-testid="inicio-tu-pagina">
         <button type="button" className="v2-pg-b" onClick={va(() => setVen("pagina"), "tu_pagina")}>
           <span className="v2-pg-e" aria-hidden="true">🏪</span>
-          <span className="v2-pg-t"><b>TU PÁGINA GRATIS</b><small>Tu negocio o emprendimiento con página propia, WhatsApp, promos y Pase</small></span>
+          <span className="v2-pg-t"><b>TU PÁGINA GRATIS</b><small>Tu emprendimiento con página propia, WhatsApp, promos y Pase</small></span>
           <span aria-hidden="true">›</span>
         </button>
       </section>
@@ -496,28 +500,28 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
         <PaginaCuateCTA compacto />
       </Hoja>
 
-      <Hoja abierta={ven === "pagina"} onCerrar={cierra} titulo="Tu página gratis" compartir={{ hash: "tu-pagina", texto: "Tu página CUATE para tu negocio o emprendimiento" }}>
+      <Hoja abierta={ven === "pagina"} onCerrar={cierra} titulo="Tu página gratis" compartir={{ hash: "tu-pagina", texto: "Tu página CUATE para tu emprendimiento" }}>
         <p className="v2-p">Una página con tu enlace propio (dcuates.com/n/tu-negocio), tu WhatsApp, tus promociones y tu Pase para los Cuates.</p>
         <PaginaCuateCTA />
         <p className="v2-p"><b>Mira cómo se ve:</b></p>
         <button type="button" className="v2-ej-b" onClick={va(() => abrirNegocio("ejemplo-salud"), "pg_ej_salud")}>🩺 Ejemplo de Salud</button>
         <button type="button" className="v2-ej-b" onClick={va(() => abrirNegocio("ejemplo-alimentos-panaderia"), "pg_ej_alim")}>🍞 Ejemplo de Alimentos</button>
         <button type="button" className="v2-ej-b" onClick={va(() => abrirNegocio("ejemplo-tecnologia"), "pg_ej_tec")}>💻 Ejemplo de Tecnología</button>
-        <button type="button" className="v2-ej-b v2-ej-b2" onClick={va(() => abrirDirectorio(), "pg_directorio")}>🔎 Ver todos los negocios CUATE</button>
+        <button type="button" className="v2-ej-b v2-ej-b2" onClick={va(() => abrirDirectorio(), "pg_directorio")}>🔎 Ver todos los emprendimientos CUATE</button>
         <p className="v2-p"><b>Más puertas Ganar-Ganar:</b></p>
         <button type="button" className="v2-ej-b" onClick={va(() => abrirNegocio("dcuates-vendedores"), "pg_vendedores")}>💼 Vende por comisión</button>
         <button type="button" className="v2-ej-b" onClick={va(() => abrirNegocio("dcuates-ventas"), "pg_ventas")}>🛒 Ventas DCUATES</button>
         <button type="button" className="v2-ej-b" onClick={va(() => abrirNegocio("dcuates-express"), "pg_express")}>⚡ DCUATES Express</button>
       </Hoja>
 
-      <Hoja abierta={ven === "negocios"} onCerrar={cierra} titulo="Negocios, alianzas y patrocinios" compartir={{ hash: "ganar-ganar", texto: "Ganar-Ganar" }}>
-        <p className="v2-p">Todos ganamos cuando los negocios, aliados y patrocinadores suman.</p>
-        <Fila pal={PAL} n="tienda" t="Negocios CUATE" s="Directorio de Páginas CUATE" fam="negocios" f={va(() => abrirDirectorio(), "directorio")} />
+      <Hoja abierta={ven === "negocios"} onCerrar={cierra} titulo="Emprendimientos, alianzas y patrocinios" compartir={{ hash: "ganar-ganar", texto: "Ganar-Ganar" }}>
+        <p className="v2-p">Todos ganamos cuando los emprendimientos, aliados y patrocinadores suman.</p>
+        <Fila pal={PAL} n="tienda" t="Emprendimientos CUATE" s="Directorio de Páginas CUATE" fam="negocios" f={va(() => abrirDirectorio(), "directorio")} />
         <PaginaCuateCTA />
         <Fila pal={PAL} n="alianza" t="Vende por comisión" s="Página de vendedores DCUATES" fam="negocios" f={va(() => abrirNegocio("dcuates-vendedores"), "vendedores")} />
         <Fila pal={PAL} n="tienda" t="Ventas DCUATES" s="Lo que hay a la venta" fam="negocios" f={va(() => abrirNegocio("dcuates-ventas"), "ventas_dc")} />
         <Fila pal={PAL} n="estrella" t="DCUATES Express" s="Todo DCUATES en una sola página" fam="negocios" f={va(() => abrirNegocio("dcuates-express"), "express")} />
-        <Fila pal={PAL} n="tienda" t="Negocios" s="Emprendimientos que multiplican valor" fam="negocios" f={va(() => onIr("negocios"), "negocios")} />
+        <Fila pal={PAL} n="tienda" t="Emprendimientos" s="Que multiplican valor" fam="negocios" f={va(() => onIr("negocios"), "negocios")} />
         <Fila pal={PAL} n="estrella" t="Gratitud" s="Gracias, reconocimientos y muro" fam="negocios" f={va(() => onIr("gratitud"), "gratitud")} />
         <Fila pal={PAL} n="alianza" t="Alianzas" s="Zona de aliados" fam="negocios" f={va(() => ejecutar({ aliados: 1 }), "alianzas")} />
         <Fila pal={PAL} n="libro" t="Patrocinios" s="Cómo patrocinar" fam="negocios" f={va(() => irASeccion("patrocinadores"), "patrocinios")} />
@@ -721,6 +725,7 @@ const CSS = `
 .v2-ft small{font-size:13px;font-weight:700}
 .v2-fx{flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:64px;border:2px solid;border-radius:16px;font-size:13px;font-weight:900;cursor:pointer}
 .v2-root .vi-logros{margin:0}
+.v2-act-cat{display:flex;gap:8px;margin-top:10px}.v2-act-cat button{flex:1;min-height:52px;border:0;border-radius:14px;color:#fff;font:inherit;font-size:14px;font-weight:900;cursor:pointer}.v2-ac1{background:#5b4bb5}.v2-ac2{background:#0B6E66}
 .v2-sello{margin:10px 0 0;text-align:center;font-size:12px;font-weight:800;color:#0a2a18}
 @media (prefers-reduced-motion:reduce){.v2-hero-i{transition:none}}
 `;

@@ -15,11 +15,12 @@ import { ejecutar } from "./datos/secciones.js";
 import { CATALOGO_DCUATES, GRUPOS_CATALOGO } from "./datos/catalogoDcuates.js";
 import { abrirNegocio } from "./NegocioCuate.jsx";
 import { abrirDirectorio } from "./PaginaCuateCTA.jsx";
+import { ListaNegocios } from "./PaginaCategoria.jsx";
 
 export const abrirTablon = (filtro = "") => window.dispatchEvent(new CustomEvent("dcuates:abrir-tablon", { detail: filtro }));
 
-const FILTROS = [["", "Todo"], ["Ofrezco", "🎁 Ofrezco"], ["Necesito", "🙏 Necesito"], ["Adopciones", "🐾 Adopciones"], ["Libros", "📚 Libros"], ["Recomendaciones", "⭐ Recomendaciones"], ["Otros", "🗂️ Catálogo DCUATES"]];
-const COLOR = { Ofrezco: "#1F7A46", Necesito: "#B7791F", Adopciones: "#8a4fbf", Libros: "#1B6F8A", Recomendaciones: "#B45309", Otros: "#5b4bb5" };
+const FILTROS = [["", "Todo"], ["Ofrezco", "🎁 Ofrezco"], ["Necesito", "🙏 Necesito"], ["Otros", "🗂️ Catálogo CUATES"], ["Emprendimientos", "🏪 Emprendimientos CUATE"], ["Adopciones", "🐾 Adopciones"], ["Libros", "📚 Libros"], ["Recomendaciones", "⭐ Recomendaciones"]];
+const COLOR = { Ofrezco: "#1F7A46", Necesito: "#B7791F", Adopciones: "#8a4fbf", Libros: "#1B6F8A", Emprendimientos: "#0B6E66", Recomendaciones: "#B45309", Otros: "#5b4bb5" };
 // «Otros»: lo que ofrece la página misma (e59). a = acción de src/datos/secciones.js · f = filtro del tablón
 const DE_LA_PAGINA = [
   ["🎮", "Juegos y Semillas", "Juega, aprende y suma Semillas para canjear.", { z: "juegos" }],
@@ -84,17 +85,30 @@ export default function Tablon() {
         <div className="tb-acc">
           <button type="button" onClick={ofrecer}>🎁 OFREZCO algo</button>
           <button type="button" onClick={necesitar}>🙏 NECESITO algo</button>
+          <button type="button" className="tb-cb" data-testid="tb-btn-catalogo" onClick={() => setFiltro("Otros")}>🗂️ CATÁLOGO CUATES<small>Todo lo que DCUATES comparte</small></button>
+          <button type="button" className="tb-eb" data-testid="tb-btn-emprendimientos" onClick={() => setFiltro("Emprendimientos")}>🏪 EMPRENDIMIENTOS CUATE<small>Emprendimientos de la comunidad</small></button>
           <button type="button" className="tb-rec" onClick={() => abrirRegistroPrevio("recomendar")}>⭐ RECOMIENDO a alguien (pública o privada)</button>
         </div>
         <div className="tb-fil" role="tablist">
           {FILTROS.map(([k, t]) => <button key={k} type="button" role="tab" aria-selected={filtro === k} className={filtro === k ? "on" : ""} onClick={() => setFiltro(k)}>{t}</button>)}
         </div>
         {items === null && <p className="tb-v">Cargando…</p>}
-        {items !== null && lista.length === 0 && filtro !== "Otros" && (
+        {items !== null && lista.length === 0 && filtro !== "Otros" && filtro !== "Emprendimientos" && (
           <p className="tb-v">Por ahora no hay publicaciones{filtro ? " en esta sección" : ""}. ¡Sé la primera persona en sumarte: usa OFREZCO o NECESITO!</p>
         )}
-        {filtro === "Otros" && (
+        {lista.map((x) => (
+          <article key={x.id} className="tb-tarj" style={{ borderLeftColor: COLOR[x.sec] || "#1F7A46" }}>
+            {x.img ? <img src={x.img} alt="" loading="lazy" /> : null}
+            <p className="tb-et"><span style={{ background: COLOR[x.sec] || "#1F7A46" }}>{x.sec}</span>{x.cat ? <em>{x.cat}</em> : null}</p>
+            <h4>{x.t}</h4>
+            {x.d ? <p className="tb-d">{x.d}</p> : null}
+            {x.vence ? <p className="tb-vc">Vigente hasta {x.vence}</p> : null}
+            <button type="button" className="tb-mi" onClick={() => meInteresa(x)}>🙋 Me interesa</button>
+          </article>
+        ))}
+        {(filtro === "" || filtro === "Otros") && (
           <div className="tb-otros" data-testid="catalogo-dcuates">
+            {filtro === "" && <h3 className="tb-sec">🗂️ Catálogo CUATES</h3>}
             <p className="tb-i">Todo lo que DCUATES comparte y pone a tu disposición, con sus características y cómo solicitarlo.</p>
             <input className="tb-q" type="search" placeholder="Buscar: libros, mascotas, ventas…" aria-label="Buscar en el catálogo" value={q} onChange={(e) => setQ(e.target.value)} />
             <div className="tb-fil" role="tablist" aria-label="Grupos del catálogo">
@@ -115,16 +129,12 @@ export default function Tablon() {
             ))}
           </div>
         )}
-        {lista.map((x) => (
-          <article key={x.id} className="tb-tarj" style={{ borderLeftColor: COLOR[x.sec] || "#1F7A46" }}>
-            {x.img ? <img src={x.img} alt="" loading="lazy" /> : null}
-            <p className="tb-et"><span style={{ background: COLOR[x.sec] || "#1F7A46" }}>{x.sec}</span>{x.cat ? <em>{x.cat}</em> : null}</p>
-            <h4>{x.t}</h4>
-            {x.d ? <p className="tb-d">{x.d}</p> : null}
-            {x.vence ? <p className="tb-vc">Vigente hasta {x.vence}</p> : null}
-            <button type="button" className="tb-mi" onClick={() => meInteresa(x)}>🙋 Me interesa</button>
-          </article>
-        ))}
+        {(filtro === "" || filtro === "Emprendimientos") && (
+          <div className="tb-otros" data-testid="emprendimientos-tablon">
+            {filtro === "" ? <h3 className="tb-sec">🏪 Emprendimientos CUATE</h3> : <p className="tb-i">Emprendimientos de la comunidad (negocios y también proyectos sociales sin fines de lucro). Elige uno para ver su página.</p>}
+            <ListaNegocios siempre />
+          </div>
+        )}
       </div>
     </div>,
     document.body
@@ -141,6 +151,8 @@ const CSS = `
 .tb-acc{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
 .tb-acc button{min-height:48px;border:0;border-radius:12px;background:#1F7A46;color:#fff;font:inherit;font-weight:900;font-size:14px;cursor:pointer}
 .tb-acc button:nth-child(2){background:#B7791F}.tb-acc .tb-rec{grid-column:1/-1;background:#B45309}
+.tb-acc .tb-cb,.tb-acc .tb-eb{grid-column:1/-1;background:#5b4bb5;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px}.tb-acc .tb-eb{background:#0B6E66}.tb-acc small{font-size:12px;font-weight:700;opacity:.92}
+.tb-sec{margin:14px 0 6px;font-size:16px;font-weight:900;color:#5b4bb5}
 .tb-fil{display:flex;gap:6px;overflow-x:auto;padding:2px 0 8px}
 .tb-fil button{flex:none;min-height:40px;padding:0 12px;border:2px solid #0f2d1e;border-radius:20px;background:#fff;font:inherit;font-weight:800;font-size:13px;color:#0f2d1e;cursor:pointer}
 .tb-fil button.on{background:#0f2d1e;color:#fff}

@@ -1,4 +1,4 @@
-// e83a2 — (1) Lista completa de negocios CUATE DENTRO de cada Página CUATE (botón que despliega, con buscador y categorías).
+// e83a2 — (1) Lista completa de emprendimientos CUATE DENTRO de cada Página CUATE (botón que despliega, con buscador y categorías).
 //          (2) Páginas genéricas por categoría: dcuates.com/n/categoria-<nombre> (p. ej. categoria-alimentos) con una barra para elegir un negocio.
 import React, { useEffect, useMemo, useState } from "react";
 import { cargarDirectorio, ordenarDirectorio, categoriaDe, LISTA_CATEGORIAS, NIVELES, esOficial } from "./datos/negocios.js";
@@ -31,8 +31,9 @@ const Tarjeta = ({ x, alElegir }) => {
 };
 
 // Lista desplegable dentro de una Página CUATE
-export function ListaNegocios({ actual = "" }) {
-  const [abierta, setAbierta] = useState(false);
+export function ListaNegocios({ actual = "", siempre = false }) {
+  const [abiertaX, setAbierta] = useState(false);
+  const abierta = siempre || abiertaX;
   const [q, setQ] = useState("");
   const [cat, setCat] = useState("");
   const d = useDirectorio();
@@ -40,18 +41,18 @@ export function ListaNegocios({ actual = "" }) {
   const cats = useMemo(() => { const m = new Set(d.items.map((x) => categoriaDe(x.c).nombre)); return LISTA_CATEGORIAS.filter((c) => m.has(c.nombre)); }, [d.items]);
   return (
     <section className="pc-caja" data-testid="lista-negocios">
-      <button type="button" className="pc-abrir" aria-expanded={abierta} onClick={() => { setAbierta(!abierta); if (!abierta) registrar("negocio_lista_abrir", { s: actual }); }}>
-        {abierta ? "▲ Ocultar negocios CUATE" : `🔎 Ver todos los negocios CUATE${d.items.length ? " (" + d.items.length + ")" : ""}`}
-      </button>
+      {!siempre && <button type="button" className="pc-abrir" aria-expanded={abierta} onClick={() => { setAbierta(!abierta); if (!abierta) registrar("negocio_lista_abrir", { s: actual }); }}>
+        {abierta ? "▲ Ocultar emprendimientos CUATE" : `🔎 Ver todos los emprendimientos CUATE${d.items.length ? " (" + d.items.length + ")" : ""}`}
+      </button>}
       {abierta && (
         <div className="pc-cuerpo">
-          <input className="pc-q" type="search" placeholder="Buscar negocio, giro o colonia…" aria-label="Buscar negocio" value={q} onChange={(e) => setQ(e.target.value)} />
+          <input className="pc-q" type="search" placeholder="Buscar emprendimiento, giro o colonia…" aria-label="Buscar emprendimiento" value={q} onChange={(e) => setQ(e.target.value)} />
           <div className="pc-chips" role="tablist" aria-label="Categorías">
             <button type="button" role="tab" aria-selected={!cat} className={!cat ? "on" : ""} onClick={() => setCat("")}>Todas</button>
             {cats.map((c) => <button type="button" key={c.k} role="tab" aria-selected={cat === c.nombre} className={cat === c.nombre ? "on" : ""} onClick={() => setCat(c.nombre)}>{c.e} {c.nombre}</button>)}
           </div>
           {d.cargando && <p className="pc-m">Cargando…</p>}
-          {!d.cargando && lista.length === 0 && <p className="pc-m">No hay negocios con ese filtro.</p>}
+          {!d.cargando && lista.length === 0 && <p className="pc-m">No hay emprendimientos con ese filtro.</p>}
           <div className="pc-lista">{lista.map((x) => <Tarjeta key={x.s} x={x} alElegir={(n) => abrirNegocio(n.s)} />)}</div>
         </div>
       )}
@@ -72,16 +73,16 @@ export function PaginaCategoria({ slug }) {
   return (
     <div className="pc-pag" style={{ "--c": c.color }} data-testid="pagina-categoria">
       <style>{CSS}</style>
-      <div className="pc-hero"><span aria-hidden="true">{c.e}</span><h1>{cat ? `Negocios CUATE · ${c.nombre}` : "Negocios CUATE por categoría"}</h1>
-        <p>{cat ? "Elige un negocio de la barra para ver su ficha. Son páginas CUATE de la comunidad (las marcadas como ejemplo muestran cómo se vería la tuya)." : "Elige una categoría para ver sus negocios."}</p></div>
+      <div className="pc-hero"><span aria-hidden="true">{c.e}</span><h1>{cat ? `Emprendimientos CUATE · ${c.nombre}` : "Emprendimientos CUATE por categoría"}</h1>
+        <p>{cat ? "Elige un emprendimiento de la barra para ver su ficha. Son páginas CUATE de la comunidad (las marcadas como ejemplo muestran cómo se vería la tuya)." : "Elige una categoría para ver sus emprendimientos."}</p></div>
       {cat && (
         <>
-          <p className="pc-et">Negocios de esta categoría{d.items.length ? ` (${lista.length})` : ""}</p>
-          <div className="pc-barra" data-testid="pc-barra" role="tablist" aria-label="Negocios de la categoría">
+          <p className="pc-et">Emprendimientos de esta categoría{d.items.length ? ` (${lista.length})` : ""}</p>
+          <div className="pc-barra" data-testid="pc-barra" role="tablist" aria-label="Emprendimientos de la categoría">
             {d.cargando && <span className="pc-m">Cargando…</span>}
             {lista.map((y) => <button type="button" key={y.s} role="tab" aria-selected={sel === y.s} className={sel === y.s ? "on" : ""} onClick={() => setSel(y.s)}>{y.n}</button>)}
           </div>
-          {!d.cargando && lista.length === 0 && <p className="pc-m">Aún no hay negocios en esta categoría. ¡Puede ser el tuyo!</p>}
+          {!d.cargando && lista.length === 0 && <p className="pc-m">Aún no hay emprendimientos en esta categoría. ¡Puede ser el tuyo!</p>}
           {x && (
             <article className="pc-ficha" data-testid="pc-ficha">
               <h2>{x.n}</h2>{x.e && <p className="pc-e">{x.e}</p>}

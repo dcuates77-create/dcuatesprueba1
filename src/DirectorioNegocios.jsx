@@ -1,4 +1,4 @@
-//  DIRECTORIO «NEGOCIOS CUATE» (e80) — lista de todas las Páginas CUATE aprobadas, con buscador y filtros por categoría y colonia.
+// DIRECTORIO «NEGOCIOS CUATE» (e80) — lista de todas las Páginas CUATE aprobadas, con buscador y filtros por categoría y colonia.
 // Se abre con abrirDirectorio() (evento dcuates:directorio) o con el enlace #negocios-cuate. Cada tarjeta abre la Página CUATE del negocio.
 import React, { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
@@ -55,24 +55,24 @@ export default function DirectorioNegocios() {
   const compartir = () => {
     registrar("directorio_compartir");
     const url = `${URL_SITIO}/?origen=directorio#negocios-cuate`;
-    const texto = "Negocios CUATE: negocios de tu comunidad con beneficios para Cuates.";
-    if (navigator.share) { navigator.share({ title: "Negocios CUATE", text: texto, url }).catch(() => {}); return; }
+    const texto = "Emprendimientos CUATE: emprendimientos de tu comunidad con beneficios para Cuates.";
+    if (navigator.share) { navigator.share({ title: "Emprendimientos CUATE", text: texto, url }).catch(() => {}); return; }
     window.open(`https://wa.me/?text=${encodeURIComponent(texto + " " + url)}`, "_blank", "noopener");
   };
   const limpiar = () => { setQ(""); setCat(""); setCol(""); setSoloV(false); };
   return createPortal(
-    <div className="dn-fondo" style={oculta ? { display: "none" } : undefined} role="dialog" aria-modal="true" aria-label="Negocios CUATE" data-testid="directorio">
+    <div className="dn-fondo" style={oculta ? { display: "none" } : undefined} role="dialog" aria-modal="true" aria-label="Emprendimientos CUATE" data-testid="directorio">
       <style>{CSS}</style>
       <div className="dn-caja">
         <div className="dn-bar">
           <button type="button" className="dn-x" onClick={cerrar} aria-label="Cerrar">✕</button>
-          <b>🏪 Negocios CUATE</b>
+          <b>🏪 Emprendimientos CUATE</b>
           <button type="button" className="dn-x" onClick={compartir} aria-label="Compartir">📤</button>
         </div>
-        <p className="dn-p">Negocios de tu comunidad con beneficios para los Cuates. Muestra tu Pase y aprovecha sus promociones. 💛</p>
+        <p className="dn-p">Emprendimientos de tu comunidad con beneficios para los Cuates. Muestra tu Pase y aprovecha sus promociones. 💛</p>
         {est.ejemplo && <p className="dn-ej">EJEMPLOS ilustrativos · así se verá el directorio</p>}
         <div className="dn-f">
-          <input type="search" className="dn-q" placeholder="🔎 Busca un negocio, giro o colonia" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Buscar" />
+          <input type="search" className="dn-q" placeholder="🔎 Busca un emprendimiento, giro o colonia" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Buscar" />
           <select className="dn-s" value={col} onChange={(e) => setCol(e.target.value)} aria-label="Colonia o municipio">
             <option value="">Todas las colonias</option>
             {cols.map((c) => <option key={c} value={c}>{c}</option>)}
@@ -103,7 +103,7 @@ export default function DirectorioNegocios() {
             );
           })}
         </div>
-        {!est.cargando && lista.length === 0 && <p className="dn-m">No encontramos negocios con esos filtros.</p>}
+        {!est.cargando && lista.length === 0 && <p className="dn-m">No encontramos emprendimientos con esos filtros.</p>}
         <PaginaCuateCTA />
       </div>
     </div>,

@@ -1,6 +1,6 @@
 // MINI PÁGINA DE UN NEGOCIO CUATE (e79) — se abre con dcuates.com/n/<slug> (→ #negocio-<slug>) o con abrirNegocio("slug").
 // Una sola plantilla para todos los negocios; el contenido viene de la hoja «NegociosCUATE» (ver src/datos/negocios.js).
-// Bloques: portada · contacto · qué ofrece · Pase del negocio · (Patrocinador: galería · oferta · Club · Red CUATE).
+// Bloques: portada · contacto · qué ofrece · Pase del emprendimiento · (Patrocinador: galería · oferta · Club · Red CUATE).
 import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useAtras } from "./atras.js";
@@ -11,6 +11,7 @@ import PaginaCuateCTA from "./PaginaCuateCTA.jsx";
 import ReelNegocio from "./ReelNegocio.jsx";
 import { ListaNegocios, PaginaCategoria, esSlugCategoria, categoriaDeSlug } from "./PaginaCategoria.jsx";
 import { abrirPanelNegocio } from "./PanelNegocio.jsx";
+import { abrirTablon } from "./Tablon.jsx";
 import { eventoNegocio } from "./utilidades/negocioStats.js";
 import { registrarPedido, confirmarPedido, descartarPedido, pedidoPendiente, paseGuardado } from "./utilidades/pedidos.js";
 import { WHATSAPP_NUMERO } from "./datos/config.js";
@@ -133,19 +134,19 @@ export default function NegocioCuate() {
   const url = `${URL_SITIO}/n/${slug}`;
   const compartir = () => {
     registrar("negocio_compartir", { s: slug }); eventoNegocio(slug, "compartir");
-    const texto = n ? `${n.n}${n.e ? " — " + n.e : ""}. Negocio CUATE en DCUATES:` : "Negocio CUATE en DCUATES:";
+    const texto = n ? `${n.n}${n.e ? " — " + n.e : ""}. Emprendimiento CUATE en DCUATES:` : "Emprendimiento CUATE en DCUATES:";
     if (navigator.share) { navigator.share({ title: n ? n.n : "DCUATES", text: texto, url }).catch(() => {}); return; }
     window.open(`https://wa.me/?text=${encodeURIComponent(texto + " " + url)}`, "_blank", "noopener");
   };
   const urlPedido = (c, id) => `https://wa.me/${n.wa}?text=${encodeURIComponent("¡Hola! Vi su página en DCUATES y quiero pedir: " + c.n + (c.p ? " (" + c.p + ")" : "") + "." + (id ? " Pedido " + id : ""))}`;
   const clic = (que) => { registrar("negocio_clic", { s: slug, q: que }); eventoNegocio(slug, que); };
   return createPortal(
-    <div className="ng-fondo" style={oculta ? { display: "none" } : undefined} role="dialog" aria-modal="true" aria-label={n ? n.n : "Negocio CUATE"} data-testid="negocio">
+    <div className="ng-fondo" style={oculta ? { display: "none" } : undefined} role="dialog" aria-modal="true" aria-label={n ? n.n : "Emprendimiento CUATE"} data-testid="negocio">
       <style>{CSS}</style>
       <div className="ng-caja" style={{ "--c": cat.color }}>
         <div className="ng-bar">
           <button type="button" className="ng-x" onClick={cerrar} aria-label="Cerrar">✕</button>
-          <b>{n ? n.n : esCat ? (catPag ? catPag.nombre : "Negocios CUATE") : "Negocio CUATE"}</b>
+          <b>{n ? n.n : esCat ? (catPag ? catPag.nombre : "Emprendimientos CUATE") : "Emprendimiento CUATE"}</b>
           {n && <button type="button" className="ng-sh" onClick={compartir} aria-label="Compartir">📤</button>}
         </div>
         {esCat && <PaginaCategoria slug={slug} />}
@@ -153,7 +154,7 @@ export default function NegocioCuate() {
         {!est.cargando && !est.ok && !esCat && (
           <div className="ng-msg">
             <p><b>{est.motivo === "no-encontrado" ? "No encontramos esta página." : "No pudimos cargar esta página ahora."}</b></p>
-            <p>{est.motivo === "no-encontrado" ? "Puede que el enlace esté mal escrito o que el negocio aún no esté publicado." : "Revisa tu conexión e inténtalo de nuevo."}</p>
+            <p>{est.motivo === "no-encontrado" ? "Puede que el enlace esté mal escrito o que el emprendimiento aún no esté publicado." : "Revisa tu conexión e inténtalo de nuevo."}</p>
             <button type="button" className="ng-b ng-b1" onClick={cerrar}>Ir a DCUATES</button>
           </div>
         )}
@@ -222,7 +223,7 @@ export default function NegocioCuate() {
             {n.club && (
               <section className="ng-club" data-testid="negocio-club">
                 <h2>🧡 Con {n.n} ganas más</h2>
-                <p>Únete gratis al Club DCUATES: suma puntos, recibe beneficios y apoya a los negocios de tu comunidad.</p>
+                <p>Únete gratis al Club DCUATES: suma puntos, recibe beneficios y apoya a los emprendimientos de tu comunidad.</p>
                 <button type="button" className="ng-b ng-b1" onClick={() => { registrar("negocio_club", { s: slug }); eventoNegocio(slug, "club"); recordarCodigo(n.cod); abrirRegistroPrevio("club", {}); }}>ÚNETE AL CLUB →</button>
                 <button type="button" className="ng-b" onClick={() => { registrar("negocio_pase", { s: slug }); eventoNegocio(slug, "pase"); window.dispatchEvent(new Event("dcuates:tarjeta")); }}>💳 Ya soy Cuate: abrir mi Pase</button>
               </section>
@@ -246,6 +247,10 @@ export default function NegocioCuate() {
             <section className="ng-pie">
               <p>🌐 Esta página es parte de la red <b>CUATE</b> de DCUATES, comunidad de apoyo mutuo.</p>
               <ListaNegocios actual={slug} />
+              <div className="ng-qt" data-testid="negocio-quieres"><p>¿Quieres también…?</p>
+                <button type="button" className="ng-b" onClick={() => { registrar("negocio_quieres", { s: slug, f: "catalogo" }); cerrar(); setTimeout(() => abrirTablon("Otros"), 150); }}>🗂️ Catálogo CUATES</button>
+                <button type="button" className="ng-b" onClick={() => { registrar("negocio_quieres", { s: slug, f: "emp" }); cerrar(); setTimeout(() => abrirTablon("Emprendimientos"), 150); }}>🏪 Emprendimientos CUATE</button>
+              </div>
               <PaginaCuateCTA compacto />
               <button type="button" className="ng-b ng-dueno" onClick={() => abrirPanelNegocio(slug)}>🔑 Soy el dueño: administrar mi página</button>
             </section>
@@ -275,6 +280,7 @@ const CSS = `
 .ng-id h1{margin:8px 0 2px;font-size:22px;font-weight:900;line-height:1.15}
 .ng-esl{margin:0;font-size:14.5px;font-weight:800;color:var(--c)}
 .ng-acc{display:flex;flex-wrap:wrap;gap:8px;margin:14px 14px 4px}
+.ng-qt{display:flex;flex-direction:column;gap:6px;margin:10px 0}.ng-qt p{margin:0;font-size:14px;font-weight:900}
 .ng-b{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 16px;border:2px solid var(--c);border-radius:14px;background:#fff;color:var(--c);font:inherit;font-size:14.5px;font-weight:900;text-decoration:none;cursor:pointer;flex:1 1 auto;text-align:center}
 .ng-b1{background:var(--c);color:#fff}
 .ng-wa{background:#128c4a;border-color:#128c4a;color:#fff}

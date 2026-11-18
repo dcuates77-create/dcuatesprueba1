@@ -57,7 +57,7 @@ export const TABS = [
     texto: "Encuentra comercios aliados en Jardines de Morelos o registra el tuyo gratis.",
     banda: { titulo: "Comunidad que se mueve unida" },
     invitacion: { titulo: "Compra local, crece en comunidad", texto: "Alianzas que mueven la economía de la comunidad. Descubre cómo participar." },
-    wa: "¡Hola DCUATES! Quiero registrar mi negocio."
+    wa: "¡Hola DCUATES! Quiero registrar mi emprendimiento."
   },
   {
     id: "gratitud", label: "Gratitud", emoji: "🙏", color: "#B7791F", pastel: "#FFF4D6", boton: "#92610F",
@@ -145,8 +145,8 @@ function MapaLocal({ url, color }) {
 
   return (
     <div className="bc-map" id="mapa-local">
-      <iframe src={url} title="Mapa de negocios locales DCUATES" loading="lazy" referrerPolicy="strict-origin-when-cross-origin" />
-      <BotonCompartir variante="flotante" className="bc-map-share" hash="mapa-negocios" titulo="Mapa de negocios locales" texto="Descubre los comercios aliados de Jardines de Morelos" />
+      <iframe src={url} title="Mapa de emprendimientos locales DCUATES" loading="lazy" referrerPolicy="strict-origin-when-cross-origin" />
+      <BotonCompartir variante="flotante" className="bc-map-share" hash="mapa-negocios" titulo="Mapa de emprendimientos locales" texto="Descubre los comercios aliados de Jardines de Morelos" />
       {tactil && !activo && (
         <div className="bc-map-lock" onTouchStart={(e) => { if (e.touches.length >= 2) setActivo(true); }}>
           <button type="button" className="bc-pill" onClick={() => setActivo(true)}>✌️ Dos dedos para mover el mapa</button>
@@ -690,7 +690,7 @@ export default function BloqueCentral({
           <div className="bc-mini-w">
             <article className="bc-ficha bc-mini bc-ficha-cta" style={{ borderColor: "#C2410C" }}>
               <span className="bc-ficha-ico" style={{ background: "#C2410C" }} aria-hidden="true">🏪</span>
-              <h3>TENGO UN NEGOCIO</h3>
+              <h3>TENGO UN EMPRENDIMIENTO</h3>
               <p>Publicidad, cupones, alianzas y más para ti.</p>
               <div className="bc-ficha-btns">
                 <button type="button" onClick={() => window.dispatchEvent(new CustomEvent("dcuates:abrir-zona", { detail: "negocio" }))} style={{ background: "#C2410C" }}>Entrar ›</button>
@@ -700,7 +700,7 @@ export default function BloqueCentral({
           <div className="bc-mini-w">
             <article className="bc-ficha bc-mini bc-ficha-cta" style={{ borderColor: tab.color }}>
               <span className="bc-ficha-ico" style={{ background: tab.boton || tab.color }} aria-hidden="true">💼</span>
-              <h3>REGISTRA TU NEGOCIO GRATIS</h3>
+              <h3>REGISTRA TU EMPRENDIMIENTO GRATIS</h3>
               <p>Aparece en el mapa y en la lista.</p>
               <div className="bc-ficha-btns">
                 <button type="button" onClick={() => document.getElementById("publicidad")?.scrollIntoView({ behavior: "smooth", block: "start" })} style={{ background: "#D1530A" }}>Empezar ›</button>
@@ -711,7 +711,7 @@ export default function BloqueCentral({
             <article className="bc-ficha bc-mini" style={{ borderColor: "#E5484D" }}>
               <span className="bc-ficha-ico" style={{ background: "#E5484D" }} aria-hidden="true">🏷️</span>
               <h3>CUPONES, PROMOS Y MÁS</h3>
-              <p>Descuentos en negocios locales.</p>
+              <p>Descuentos en emprendimientos locales.</p>
               <div className="bc-ficha-btns">
                 <button type="button" onClick={() => onAbrirProyecto("cupones-promos")} style={{ background: "#E5484D" }}>Ver ›</button>
               </div>
