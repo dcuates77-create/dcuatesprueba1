@@ -98,6 +98,13 @@ export const REGISTROS = {
       { k: "q", etiqueta: "¿Qué quieres hacer?", tipo: "opciones", opciones: ["Sumar una actividad", "Recibir información"], req: true },
       { k: "d", etiqueta: "Cuéntanos más", tipo: "area", max: 400 },
     ], { wa: "¡Hola DCUATES! Acabo de registrar mi interés en la agenda y noticias de la comunidad." }),
+  // e84b — reclamo del reto del mes «Visita 3 emprendimientos CUATE». Llega a «Registros» con folio RVI-…; tú acreditas los puntos en el Pase.
+  retovisitas: R("retovisitas", "🧭", "Reto del mes: visita emprendimientos CUATE", "RVI", "Reto visitas", "Retos",
+    "¡Gracias por conocer emprendimientos de tu comunidad! Confirma tus datos y revisamos tu reto para darte tus puntos.",
+    [
+      { k: "pase", etiqueta: "Tu número de Pase (si ya lo tienes)", max: 14, ph: "Ej. CTE-1234-ABC" },
+      { k: "vis", etiqueta: "Emprendimientos que visitaste", tipo: "area", max: 300, req: true },
+    ], { wa: "¡Hola DCUATES! Acabo de enviar mi reto del mes: visité emprendimientos CUATE." }),
   reto: R("reto", "⭐", "Propón un reto", "RET", "Propuesta", "Retos",
     "Un reto que nos haga mejores. Cuéntanos tu idea.",
     [{ k: "d", etiqueta: "Tu propuesta de reto", tipo: "area", max: 400, req: true }], { perfil: "Reto", wa: "¡Hola DCUATES! Acabo de enviar una propuesta de reto." }),

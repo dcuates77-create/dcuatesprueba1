@@ -102,3 +102,23 @@ export function ordenarDirectorio(items, modo = "destacados") {
   else lista.sort(dest);
   return lista.map((e) => e.x);
 }
+
+// ---- e84b: promoción del mes y cuenta regresiva -------------------------------------------------------
+// Días que faltan para una fecha ISO (aaaa-mm-dd). 0 = hoy. null si no hay fecha.
+export const diasHasta = (iso) => {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(iso || ""));
+  if (!m) return null;
+  const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+  return Math.round((new Date(+m[1], +m[2] - 1, +m[3]) - hoy) / 86400000);
+};
+export const textoCuenta = (n) => (n == null || n < 0 ? "" : n === 0 ? "Vence hoy" : n === 1 ? "Vence mañana" : `Quedan ${n} días`);
+export const diasFinDeMes = () => { const d = new Date(); return diasHasta(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate()).padStart(2, "0")}`); };
+// Promoción del mes: la que tú marques con «Sí» en la columna «Promoción del mes» de la hoja; si ninguna, una rotación mensual entre los emprendimientos con oferta vigente (trato parejo).
+export function promoDelMes(items) {
+  const c = (items || []).filter((x) => x.of && x.ot).sort((a, b) => String(a.s).localeCompare(String(b.s)));
+  if (!c.length) return null;
+  const f = c.find((x) => x.pm);
+  if (f) return f;
+  const d = new Date(); const k = d.getFullYear() * 12 + d.getMonth();
+  return c[(k * 7919) % c.length];
+}
