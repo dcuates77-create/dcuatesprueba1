@@ -21,6 +21,8 @@ export default function DirectorioNegocios() {
   const [q, setQ] = useState("");
   const [cat, setCat] = useState("");
   const [col, setCol] = useState("");
+  const [pais, setPais] = useState("");
+  const [ent, setEnt] = useState("");
   const [soloV, setSoloV] = useState(false);
   const [soloFav, setSoloFav] = useState(false);
   const [ahora, setAhora] = useState(false);
@@ -48,15 +50,23 @@ export default function DirectorioNegocios() {
     const m = {}; est.items.forEach((i) => { const k = claveCategoria(i.c); m[k] = (m[k] || 0) + 1; });
     return Object.keys(m).sort((a, b) => a.localeCompare(b, "es")).map((k) => ({ k, n: m[k] }));
   }, [est.items]);
-  const cols = useMemo(() => [...new Set(est.items.map((i) => (i.col || "").trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b, "es")), [est.items]);
+  // País → Entidad → Colonia (e85a). Vacío en la hoja = México / Estado de México. Los selectores solo aparecen si hay más de un valor.
+  const paisDe = (i) => (i.pa || "").trim() || "México";
+  const entDe = (i) => (i.en || "").trim() || "Estado de México";
+  const unicos = (arr) => [...new Set(arr.filter(Boolean))].sort((a, b) => a.localeCompare(b, "es"));
+  const paises = useMemo(() => unicos(est.items.map(paisDe)), [est.items]);
+  const entidades = useMemo(() => unicos(est.items.filter((i) => !pais || paisDe(i) === pais).map(entDe)), [est.items, pais]);
+  const cols = useMemo(() => unicos(est.items.filter((i) => (!pais || paisDe(i) === pais) && (!ent || entDe(i) === ent)).map((i) => (i.col || "").trim())), [est.items, pais, ent]);
   const ordenados = useMemo(() => ordenarDirectorio(est.items, orden), [est.items, orden]);
   const lista = ordenados.filter((i) => {
     if (cat && claveCategoria(i.c) !== cat) return false;
+    if (pais && paisDe(i) !== pais) return false;
+    if (ent && entDe(i) !== ent) return false;
     if (col && (i.col || "").trim() !== col) return false;
     if (soloV && !i.v) return false;
     if (soloFav && !favs.includes(i.s)) return false;
     if (ahora && abiertoAhora(i.h) !== true) return false;
-    if (q.trim()) { const t = sinAc([i.n, i.e, i.c, i.col].join(" ")); if (!sinAc(q).split(/\s+/).filter(Boolean).every((w) => t.includes(w))) return false; }
+    if (q.trim()) { const t = sinAc([i.n, i.e, i.c, i.col, i.en, i.pa].join(" ")); if (!sinAc(q).split(/\s+/).filter(Boolean).every((w) => t.includes(w))) return false; }
     return true;
   });
   const nAbiertos = useMemo(() => est.items.filter((i) => abiertoAhora(i.h) === true).length, [est.items]);
@@ -69,7 +79,7 @@ export default function DirectorioNegocios() {
     if (navigator.share) { navigator.share({ title: "Emprendimientos CUATE", text: texto, url }).catch(() => {}); return; }
     window.open(`https://wa.me/?text=${encodeURIComponent(texto + " " + url)}`, "_blank", "noopener");
   };
-  const limpiar = () => { setQ(""); setCat(""); setCol(""); setSoloV(false); setSoloFav(false); setAhora(false); };
+  const limpiar = () => { setQ(""); setCat(""); setCol(""); setPais(""); setEnt(""); setSoloV(false); setSoloFav(false); setAhora(false); };
   return createPortal(
     <div className="dn-fondo" style={oculta ? { display: "none" } : undefined} role="dialog" aria-modal="true" aria-label="Emprendimientos CUATE" data-testid="directorio">
       <style>{CSS}</style>
@@ -85,6 +95,18 @@ export default function DirectorioNegocios() {
         {!est.cargando && <RetoVisitas nombres={nombres} />}
         <div className="dn-f">
           <input type="search" className="dn-q" placeholder="🔎 Busca un emprendimiento, giro o colonia" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Buscar" />
+          {paises.length > 1 && (
+            <select className="dn-s" value={pais} onChange={(e) => { setPais(e.target.value); setEnt(""); setCol(""); }} aria-label="País" data-testid="dir-pais">
+              <option value="">Todos los países</option>
+              {paises.map((p) => <option key={p} value={p}>{p}</option>)}
+            </select>
+          )}
+          {entidades.length > 1 && (
+            <select className="dn-s" value={ent} onChange={(e) => { setEnt(e.target.value); setCol(""); }} aria-label="Entidad o estado" data-testid="dir-entidad">
+              <option value="">Todas las entidades</option>
+              {entidades.map((p) => <option key={p} value={p}>{p}</option>)}
+            </select>
+          )}
           <select className="dn-s" value={col} onChange={(e) => setCol(e.target.value)} aria-label="Colonia o municipio">
             <option value="">Todas las colonias</option>
             {cols.map((c) => <option key={c} value={c}>{c}</option>)}
@@ -101,7 +123,7 @@ export default function DirectorioNegocios() {
           {cats.map((c) => <button type="button" key={c.k} className={"dn-chip" + (cat === c.k ? " on" : "")} onClick={() => setCat(cat === c.k ? "" : c.k)}>{categoriaDe(c.k).e} {c.k} ({c.n})</button>)}
         </div>
         {est.cargando && <p className="dn-m" role="status">Cargando…</p>}
-        {!est.cargando && <p className="dn-m" role="status" data-testid="dir-cuenta">{lista.length} {lista.length === 1 ? "emprendimiento" : "emprendimientos"}{(q || cat || col || soloV || soloFav || ahora) && <> · <button type="button" className="dn-lk" onClick={limpiar}>Quitar filtros</button></>}</p>}
+        {!est.cargando && <p className="dn-m" role="status" data-testid="dir-cuenta">{lista.length} {lista.length === 1 ? "emprendimiento" : "emprendimientos"}{(q || cat || col || pais || ent || soloV || soloFav || ahora) && <> · <button type="button" className="dn-lk" onClick={limpiar}>Quitar filtros</button></>}</p>}
         <div className="dn-lista">
           {lista.map((i) => {
             const c = categoriaDe(i.c); const nv = NIVELES[i.niv];

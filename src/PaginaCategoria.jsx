@@ -43,7 +43,7 @@ export function ListaNegocios({ actual = "", siempre = false }) {
   const [ahora, setAhora] = useState(false);
   const favs = useFavoritos();
   const d = useDirectorio();
-  const lista = useMemo(() => d.items.filter((x) => x.s !== actual && (!cat || categoriaDe(x.c).nombre === cat) && (!soloFav || favs.includes(x.s)) && (!ahora || abiertoAhora(x.h) === true) && (!q.trim() || sinAc(x.n + " " + x.e + " " + x.col + " " + categoriaDe(x.c).nombre).includes(sinAc(q.trim())))), [d.items, actual, cat, q, soloFav, ahora, favs]);
+  const lista = useMemo(() => d.items.filter((x) => x.s !== actual && (!cat || categoriaDe(x.c).nombre === cat) && (!soloFav || favs.includes(x.s)) && (!ahora || abiertoAhora(x.h) === true) && (!q.trim() || sinAc(x.n + " " + x.e + " " + x.col + " " + (x.en || "") + " " + (x.pa || "") + " " + categoriaDe(x.c).nombre).includes(sinAc(q.trim())))), [d.items, actual, cat, q, soloFav, ahora, favs]);
   const nAb = useMemo(() => d.items.filter((x) => abiertoAhora(x.h) === true).length, [d.items]);
   const nombres = useMemo(() => Object.fromEntries(d.items.map((x) => [x.s, x.n])), [d.items]);
   const cats = useMemo(() => { const m = new Set(d.items.map((x) => categoriaDe(x.c).nombre)); return LISTA_CATEGORIAS.filter((c) => m.has(c.nombre)); }, [d.items]);
