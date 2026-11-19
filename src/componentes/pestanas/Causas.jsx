@@ -5,6 +5,7 @@ import { enlaceWhatsApp } from "../../utilidades/baserow.js";
 import { abrirRegistroPrevio } from "../../RegistroPrevio.jsx";
 import { opcionAportacion } from "../../datos/registros.js";
 import BotonCompartir from "../../BotonCompartir";
+import { abrirTablon } from "../../Tablon.jsx";
 
 export function PestanaCausas({ apoyoCausaAnimalLinks, apoyoCosasCasosLinks, apoyoPersonasExtraviadasLinks, extraviadosResumenAbierto, setExtraviadosResumenAbierto }) {
   return (
@@ -142,6 +143,7 @@ export function PestanaCausas({ apoyoCausaAnimalLinks, apoyoCosasCasosLinks, apo
 
             <div className="max-w-3xl mx-auto">
               <PasarelaExtraviados />
+              <button type="button" data-testid="ver-extraviados" onClick={() => abrirTablon("Extraviados")} className="mt-4 w-full rounded-xl border-4 border-[#0f2d1e] bg-[#C2410C] px-4 py-3 text-base font-black uppercase text-white shadow-md">🔎 Ver búsquedas y encontrados (fichas verificadas)</button>
             </div>
             <div id="registro-extraviados" className="max-w-3xl mx-auto mt-4 scroll-mt-48 md:scroll-mt-36">
               <BotonNaranjaDesplegable
