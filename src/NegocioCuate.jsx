@@ -12,7 +12,8 @@ import ReelNegocio from "./ReelNegocio.jsx";
 import { ListaNegocios, PaginaCategoria, esSlugCategoria, categoriaDeSlug } from "./PaginaCategoria.jsx";
 import { abrirPanelNegocio } from "./PanelNegocio.jsx";
 import { abrirTablon } from "./Tablon.jsx";
-import { BotonFavorito } from "./PiezasEmprendimientos.jsx";
+import { BotonFavorito, Estrellas } from "./PiezasEmprendimientos.jsx";
+import Resenas from "./Resenas.jsx";
 import { registrarVisita } from "./utilidades/reto.js";
 import { eventoNegocio } from "./utilidades/negocioStats.js";
 import { registrarPedido, confirmarPedido, descartarPedido, pedidoPendiente, paseGuardado } from "./utilidades/pedidos.js";
@@ -231,6 +232,7 @@ export default function NegocioCuate() {
                 <button type="button" className="ng-b" onClick={() => { registrar("negocio_pase", { s: slug }); eventoNegocio(slug, "pase"); window.dispatchEvent(new Event("dcuates:tarjeta")); }}>💳 Ya soy Cuate: abrir mi Pase</button>
               </section>
             )}
+            <Resenas slug={slug} nombre={n.n} ejemplo={!!est.ejemplo} />
             {n.red && n.red.length > 0 && (
               <section className="ng-s" data-testid="negocio-red">
                 <h2>Más de la red CUATE</h2>

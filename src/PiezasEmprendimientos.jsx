@@ -17,6 +17,8 @@ export function BotonFavorito({ slug, nombre = "", clase = "pe-fav" }) {
   );
 }
 
+export const Estrellas = ({ rp, rn }) => (rn > 0 ? <i className="pe-st" data-testid="estrellas" aria-label={`${rp} de 5 estrellas, ${rn} opiniones`}>★ {Number(rp).toFixed(1)} · {rn}</i> : null);
+
 export function PromoDelMes({ items, abrir }) {
   const p = promoDelMes(items);
   if (!p) return null;
@@ -61,5 +63,6 @@ export const CSS_PE = `
 .pe-reto b{font-size:15px;font-weight:900}.pe-reto p{margin:4px 0;font-size:13.5px;font-weight:700}
 .pe-pasos{display:flex;gap:8px;margin:6px 0}.pe-pasos i{width:34px;height:34px;border-radius:50%;border:2px solid #1B6F8A;background:#fff;color:#1B6F8A;display:flex;align-items:center;justify-content:center;font-style:normal;font-weight:900}.pe-pasos i.on{background:#1B6F8A;color:#fff}
 .pe-reto button{min-height:46px;width:100%;border:0;border-radius:12px;background:#1B6F8A;color:#fff;font:inherit;font-weight:900;font-size:15px;cursor:pointer}
+.pe-st{display:inline-block;font-size:12px;font-weight:900;font-style:normal;border-radius:10px;padding:1px 8px;background:#FFF1C9;color:#7a4b00}
 .pe-ab{display:inline-block;font-size:11.5px;font-weight:900;font-style:normal;border-radius:10px;padding:1px 8px;background:#DDF3E4;color:#14532d}
 `;
