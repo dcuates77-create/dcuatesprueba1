@@ -46,7 +46,7 @@ export const NIVELES = {
 };
 
 const cache = {};
-const pedir = async (qs) => {
+export const pedir = async (qs) => {
   const ctl = new AbortController();
   const t = setTimeout(() => ctl.abort(), 12000);
   try {
