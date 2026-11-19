@@ -16,6 +16,7 @@ import { BASEROW_GALLERY_URL, BIENESTAR_GALERIA_ITEMS, BOTONES_PORTADA, CUPONES_
 import { DEGRADADO_ESCUDO, DEGRADADO_SEGURIDAD } from "../datos/seguridad.js";
 import { enlaceWhatsApp, galeriaDesdeColumna, irASeccion, useFilasEnlaces } from "../utilidades/baserow.js";
 import { registrar, guardarEnHoja } from "../analitica";
+import { abrirTablon } from "../Tablon.jsx";
 import { MENSAJE_ZONA, useZona } from "../utilidades/zonasHoja.js";
 
 export function EnlaceWAOficial() {
@@ -1005,7 +1006,9 @@ export function ContenidoModalProyecto({ id, onCerrar }) {
             </>
           )}
           {proyecto.segundoBoton && (
-            proyecto.segundoBoton.claveZona ? (
+            proyecto.segundoBoton.tablon !== undefined ? (
+              <BotonModal variante="secundario" onClick={() => { onCerrar(); setTimeout(() => abrirTablon(proyecto.segundoBoton.tablon), 200); }}>{proyecto.segundoBoton.titulo}</BotonModal>
+            ) : proyecto.segundoBoton.claveZona ? (
               <BotonModalProtegido zona={proyecto.segundoBoton.claveZona}>
                 {proyecto.segundoBoton.titulo}
               </BotonModalProtegido>
