@@ -19,8 +19,8 @@ import { ListaNegocios } from "./PaginaCategoria.jsx";
 
 export const abrirTablon = (filtro = "") => window.dispatchEvent(new CustomEvent("dcuates:abrir-tablon", { detail: filtro }));
 
-const FILTROS = [["", "Todo"], ["Ofrezco", "🎁 Ofrezco"], ["Necesito", "🙏 Necesito"], ["Otros", "🗂️ Catálogo CUATES"], ["Emprendimientos", "🏪 Emprendimientos CUATE"], ["Adopciones", "🐾 Adopciones"], ["Libros", "📚 Libros"], ["Recomendaciones", "⭐ Recomendaciones"]];
-const COLOR = { Ofrezco: "#1F7A46", Necesito: "#B7791F", Adopciones: "#8a4fbf", Libros: "#1B6F8A", Emprendimientos: "#0B6E66", Recomendaciones: "#B45309", Otros: "#5b4bb5" };
+const FILTROS = [["", "Todo"], ["Ofrezco", "🎁 Ofrezco"], ["Necesito", "🙏 Necesito"], ["Otros", "🗂️ Catálogo CUATES"], ["Emprendimientos", "🏪 Emprendimientos CUATE"], ["Adopciones", "🐾 Adopciones"], ["Extraviados", "🔎 Extraviados"], ["Libros", "📚 Libros"], ["Recomendaciones", "⭐ Recomendaciones"]];
+const COLOR = { Ofrezco: "#1F7A46", Necesito: "#B7791F", Adopciones: "#8a4fbf", Extraviados: "#C2410C", Libros: "#1B6F8A", Emprendimientos: "#0B6E66", Recomendaciones: "#B45309", Otros: "#5b4bb5" };
 // «Otros»: lo que ofrece la página misma (e59). a = acción de src/datos/secciones.js · f = filtro del tablón
 const DE_LA_PAGINA = [
   ["🎮", "Juegos y Semillas", "Juega, aprende y suma Semillas para canjear.", { z: "juegos" }],
@@ -49,6 +49,7 @@ export default function Tablon() {
   const [grupo, setGrupo] = useState(-1);
   const [q, setQ] = useState("");
   const [ver, setVer] = useState("");
+  const [sub, setSub] = useState("");
   const cerrar = () => setAbierto(false);
   const oculta = useAtras(abierto, cerrar, { hub: true }); // hub: se oculta mientras hay otra ventana encima y reaparece al cerrarla
   useEffect(() => {
@@ -58,7 +59,7 @@ export default function Tablon() {
   }, []);
   useEffect(() => { if (abierto && items === null) cargarPublicados().then(setItems); }, [abierto, items]);
   if (!abierto) return null;
-  const lista = (items || []).filter((x) => (filtro ? x.sec === filtro : x.sec !== "Muro de gratitud"));
+  const lista = (items || []).filter((x) => (filtro ? x.sec === filtro : x.sec !== "Muro de gratitud") && (filtro !== "Extraviados" || !sub || x.cat === sub));
   const irPagina = (a) => { cerrar(); setTimeout(() => ejecutar(a), 120); };
   const solicitar = (it) => {
     registrar("catalogo_solicitar", { t: it.t });
@@ -92,6 +93,18 @@ export default function Tablon() {
         <div className="tb-fil" role="tablist">
           {FILTROS.map(([k, t]) => <button key={k} type="button" role="tab" aria-selected={filtro === k} className={filtro === k ? "on" : ""} onClick={() => setFiltro(k)}>{t}</button>)}
         </div>
+        {filtro === "Extraviados" && (
+          <div className="tb-ext" data-testid="extraviados-aviso">
+            <p className="tb-ea">🚨 <b>Si se trata de una persona, llama primero al 911 o a la Fiscalía.</b> DCUATES solo ayuda a difundir fichas verificadas, sin datos de menores si no hay autorización de su familia.</p>
+            <div className="tb-fil" role="group" aria-label="Búsquedas y encontrados">
+              {[["", "Todo"], ["Se busca", "🔎 Se busca"], ["Se encontró", "✅ Se encontró"]].map(([k, t]) => <button key={k} type="button" aria-pressed={sub === k} className={sub === k ? "on" : ""} onClick={() => setSub(k)}>{t}</button>)}
+            </div>
+            <div className="tb-acc">
+              <button type="button" className="tb-eb2" data-testid="ext-reportar" onClick={() => abrirRegistroPrevio("extraviado")}>🔎 Reportar un caso</button>
+              <button type="button" className="tb-rec" onClick={() => irPagina({ chat: "¡Hola DCUATES! Tengo información o una foto sobre un caso de extraviados: ___" })}>💬 Hablar con DCUATES por WhatsApp</button>
+            </div>
+          </div>
+        )}
         {items === null && <p className="tb-v">Cargando…</p>}
         {items !== null && lista.length === 0 && filtro !== "Otros" && filtro !== "Emprendimientos" && (
           <p className="tb-v">Por ahora no hay publicaciones{filtro ? " en esta sección" : ""}. ¡Sé la primera persona en sumarte: usa OFREZCO o NECESITO!</p>
@@ -103,7 +116,7 @@ export default function Tablon() {
             <h4>{x.t}</h4>
             {x.d ? <p className="tb-d">{x.d}</p> : null}
             {x.vence ? <p className="tb-vc">Vigente hasta {x.vence}</p> : null}
-            <button type="button" className="tb-mi" onClick={() => meInteresa(x)}>🙋 Me interesa</button>
+            <button type="button" className="tb-mi" onClick={() => meInteresa(x)}>{x.sec === "Extraviados" ? "📞 Tengo información" : "🙋 Me interesa"}</button>
           </article>
         ))}
         {(filtro === "" || filtro === "Otros") && (
@@ -140,7 +153,7 @@ export default function Tablon() {
     document.body
   );
 }
-const CSS = `
+const CSS = `.tb-ext{margin:8px 0}.tb-ea{margin:0 0 8px;padding:10px 12px;border:2px solid #C2410C;border-radius:12px;background:#FFF1E6;font-size:13.5px;font-weight:700;color:#5a2000;line-height:1.4}.tb-eb2{background:#C2410C!important;color:#fff!important}
 .tb-fondo{position:fixed;inset:0;z-index:94;background:rgba(15,25,20,.65);display:flex;align-items:flex-end;justify-content:center;font-family:Nunito,system-ui,sans-serif}
 .tb-caja{background:#fbf7ec;width:100%;max-width:560px;max-height:92dvh;overflow-y:auto;overscroll-behavior:contain;border-radius:24px 24px 0 0;padding:0 12px 22px;color:#0f2d1e}
 @media(min-width:640px){.tb-fondo{align-items:center}.tb-caja{border-radius:22px;max-height:86dvh}}

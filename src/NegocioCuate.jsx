@@ -178,6 +178,7 @@ export default function NegocioCuate() {
             <div className="ng-acc">
               {n.wa && <a className="ng-b ng-wa" href={`https://wa.me/${n.wa}?text=${encodeURIComponent("¡Hola! Vi su página en DCUATES.")}`} target="_blank" rel="noopener noreferrer" onClick={() => clic("wa")}>💬 WhatsApp</a>}
               {n.tel && <a className="ng-b" href={telHref(n.tel)} onClick={() => clic("tel")}>📞 Llamar</a>}
+              {n.ag && <a className="ng-b" data-testid="negocio-agenda" href={n.ag} target="_blank" rel="noopener noreferrer" onClick={() => registrar("negocio_clic", { s: slug, q: "agenda" })}>📅 Agendar cita</a>}
               {(n.mapa || n.dir) && <a className="ng-b" href={n.mapa || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(n.dir + " " + n.n)}`} target="_blank" rel="noopener noreferrer" onClick={() => clic("mapa")}>📍 Cómo llegar</a>}
             </div>
             {(n.web || n.fb || n.ig) && (
@@ -191,6 +192,14 @@ export default function NegocioCuate() {
             {n.d && <section className="ng-s"><p className="ng-d">{n.d}</p></section>}
             {n.of && n.of.length > 0 && (
               <section className="ng-s"><h2>Qué ofrece</h2><ul className="ng-l">{n.of.map((x) => <li key={x}>{x}</li>)}</ul></section>
+            )}
+            {(n.ga || n.gd || n.gp) && (
+              <section className="ng-s" data-testid="negocio-guia">
+                <h2>🩺 Guía de atención</h2>
+                {[["Antes de tu cita", "🗓️", n.ga], ["Durante la consulta", "🤝", n.gd], ["Después y seguimiento", "💬", n.gp]].filter((g) => g[2]).map(([t, e, x]) => (
+                  <details key={t} className="ng-gd"><summary>{e} {t}</summary><p>{x}</p></details>
+                ))}
+              </section>
             )}
             {n.ct && n.ct.length > 0 && (
               <section className="ng-s" data-testid="negocio-catalogo">
@@ -297,7 +306,7 @@ const CSS = `
 .ng-pr{font-size:14px;font-weight:900;color:var(--c);white-space:nowrap}
 .ng-pd{min-height:44px;min-width:60px;display:inline-flex;align-items:center;justify-content:center;border-radius:12px;background:#128c4a;color:#fff;font-weight:900;font-size:13.5px;text-decoration:none;padding:0 10px}
 .ng-dueno{border-style:dashed;font-size:13.5px}
-.ng-s{margin:14px 14px 0}.ng-s h2{margin:0 0 6px;font-size:16px;font-weight:900;color:var(--c)}
+.ng-gd{margin:0 0 6px;border:2px solid var(--c);border-radius:12px;background:#fff}.ng-gd summary{min-height:46px;display:flex;align-items:center;padding:0 12px;font-weight:900;font-size:15px;cursor:pointer}.ng-gd p{margin:0;padding:0 12px 12px;font-size:14.5px;font-weight:700;line-height:1.5;white-space:pre-line}.ng-s{margin:14px 14px 0}.ng-s h2{margin:0 0 6px;font-size:16px;font-weight:900;color:var(--c)}
 .ng-d{margin:0;font-size:15px;font-weight:700;line-height:1.45}
 .ng-l{margin:0;padding-left:20px;list-style:disc}.ng-l li{font-size:14.5px;font-weight:700;line-height:1.5}
 .ng-dat p{margin:2px 0;font-size:14px;font-weight:800}
