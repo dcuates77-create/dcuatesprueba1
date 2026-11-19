@@ -13,7 +13,7 @@ export default function PaginaCuateCTA({ compacto = false, directorio = false })
   return (
     <section className={"pc-cta" + (compacto ? " pc-c" : "")} data-testid="pagina-cta">
       <style>{CSS}</style>
-      <h3>🏪 TU PÁGINA CUATE CON BENEFICIOS PARA TUS CLIENTES</h3>
+      <h3>🏪 TU PÁGINA CUATE CON BENEFICIOS PARA TI Y TUS CLIENTES</h3>
       {!compacto && <p>Tu emprendimiento con página propia: tu WhatsApp, tus promociones, tu Pase y el Club DCUATES. Elige cómo quieres empezar:</p>}
       <button type="button" className="pc-b pc-g" onClick={() => abrirRegistroPagina("Gratuita")}>
         <b>GRATUITO</b>
