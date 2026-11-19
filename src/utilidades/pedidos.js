@@ -6,7 +6,7 @@ import { GOOGLE_SHEETS_URL, esAdmin } from "../datos/config.js";
 const LLAVE = "dc_pedidos", DIAS = 14;
 export const leerPedidos = () => { try { const a = JSON.parse(localStorage.getItem(LLAVE) || "[]"); return (Array.isArray(a) ? a : []).filter((x) => x && x.id && Date.now() - x.t < DIAS * 864e5); } catch (e) { return []; } };
 const guardar = (a) => { try { localStorage.setItem(LLAVE, JSON.stringify(a.slice(-20))); } catch (e) { /* sin almacenamiento */ } };
-const enviar = (obj) => {
+export const enviar = (obj) => {
   try {
     if (typeof window === "undefined" || /^(localhost|127\.|\[::1\])/.test(window.location.hostname) || esAdmin()) return;
     fetch(GOOGLE_SHEETS_URL, { method: "POST", mode: "no-cors", keepalive: true, body: new URLSearchParams(obj) }).catch(() => {});
