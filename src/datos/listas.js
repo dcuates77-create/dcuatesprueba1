@@ -34,6 +34,16 @@ export const INICIATIVAS_PRINCIPALES = [
     }
   },
   {
+    id: "extraviados",
+    registro: "extraviado", textoRegistro: "Reportar un caso (se busca o se encontró)",
+    categoria: "BÚSQUEDAS Y ENCONTRADOS",
+    titulo: "EXTRAVIADOS: PERSONAS, MASCOTAS Y COSAS",
+    descripcion: "Difundimos búsquedas y encontrados de la comunidad. Si es una persona, llama primero al 911 o a la Fiscalía; publicamos solo fichas verificadas, sin tu nombre ni tu teléfono y sin datos de menores si no hay autorización de su familia.",
+    puntos: ["Fichas verificadas por DCUATES", "Fotos por WhatsApp", "Contacto a través de DCUATES"],
+    textoBoton: "Reportar un caso",
+    segundoBoton: { titulo: "Ver búsquedas y encontrados", tablon: "Extraviados" }
+  },
+  {
     id: "alianzas-tarjeta",
     registro: "alianza",
     categoria: "CRECIMIENTO CONJUNTO",

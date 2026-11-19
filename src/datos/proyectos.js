@@ -153,6 +153,7 @@ export const RESUMEN_PROYECTO = {
   bienestar: "Talleres, cursos y recreación",
   asesorias: "Orientación gratuita",
   ecatepets: "Adopción y ayuda a peluditos",
+  extraviados: "Búsquedas y encontrados",
   "circulo-confianza": "Red de confianza vecinal",
   "publicidad-tarjeta": "Promociona tu negocio gratis",
   "recomienda-evalua-gana": "Recomienda, evalúa y gana",
@@ -191,7 +192,7 @@ export const CATEGORIAS_PROYECTOS = [
     emoji: "🎁",
     img: null,
     descripcion: "Recursos pensados para tu bienestar y el de tu familia, sin costo: préstamo de libros, actividades de bienestar, asesorías, apoyo para tus mascotas y una red de confianza vecinal.",
-    proyectos: ["libros", "bienestar", "asesorias", "ecatepets", "circulo-confianza"]
+    proyectos: ["libros", "bienestar", "asesorias", "ecatepets", "extraviados", "circulo-confianza"]
   },
   {
     id: "alianzas-y-negocios",
@@ -209,7 +210,7 @@ export const CATEGORIAS_PROYECTOS = [
     emoji: "💚",
     img: null,
     descripcion: "Formas de aportar tu tiempo, dinero o talento para causas que transforman: apoyo voluntario, asesoría a quien la necesita, bienestar comunitario, préstamo de libros y apoyo a mascotas.",
-    proyectos: ["donaciones", "asesorias", "bienestar", "libros", "ecatepets"]
+    proyectos: ["donaciones", "asesorias", "bienestar", "libros", "ecatepets", "extraviados"]
   },
   {
     id: "sumando-valores",

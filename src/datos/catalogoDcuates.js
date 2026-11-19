@@ -14,8 +14,8 @@ export const CATALOGO_DCUATES = [
     car: ["Eliges qué te interesa", "Te avisamos de talleres y actividades", "Por WhatsApp"], btn: "Quiero que me avisen", a: { reg: "bienestar" } },
   { g: 0, e: "🐾", t: "Ecatepets · bienestar animal", costo: "Gratis", d: "Apoyo y adopciones de mascotas y peluditos de la comunidad.",
     car: ["Cuentas cómo quieres sumarte o qué necesita un peludito", "Adopciones y apoyo animal", "Te contactamos por WhatsApp"], btn: "Quiero participar", a: { reg: "ecatepets" } },
-  { g: 0, e: "🔎", t: "Mascotas o cosas extraviadas", costo: "Gratis", d: "Reporta o ayuda a encontrar mascotas y objetos perdidos.",
-    car: ["Reportas el caso", "Se difunde en la comunidad", "Si es una persona en peligro, llama primero al 911"], btn: "Reportar un caso", a: { reg: "extraviado" } },
+  { g: 0, e: "🔎", t: "Personas, mascotas y cosas extraviadas", costo: "Gratis", d: "Búsquedas y encontrados: reporta o consulta fichas verificadas de personas, mascotas y objetos.",
+    car: ["Si es una persona, llama primero al 911 o a la Fiscalía", "Solo publicamos fichas verificadas por DCUATES, sin tu nombre ni tu teléfono", "Sin datos de menores si no hay autorización de su familia", "Fotos por WhatsApp"], btn: "Ver búsquedas y encontrados", a: { tablon: "Extraviados" } },
 
   { g: 1, e: "🆘", t: "Solicitud de apoyo", costo: "Gratis", d: "Cuéntanos qué apoyo necesitas y te respondemos.",
     car: ["Registras tu solicitud", "Te respondemos por WhatsApp", "Para urgencias usa el botón rosa «¿Necesitas apoyo o tienes una urgencia?»"], btn: "Pedir apoyo", a: { reg: "solicitud" } },
