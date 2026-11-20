@@ -49,6 +49,7 @@ import MicroAcciones from "./MicroAcciones.jsx";
 import RegistroPrevio from "./RegistroPrevio.jsx";
 import NegocioCuate from "./NegocioCuate.jsx";
 import DirectorioNegocios from "./DirectorioNegocios.jsx";
+import AsistentePagina from "./AsistentePagina.jsx";
 import PanelNegocio from "./PanelNegocio.jsx";
 import { cargarSinonimosHoja } from "./utilidades/sinonimosHoja.js";
 import { cargarPerfilesHoja } from "./utilidades/perfilesHoja.js";
@@ -744,6 +745,7 @@ export default function App() {
       <RegistroPrevio />
       <NegocioCuate />
       <DirectorioNegocios />
+      <AsistentePagina />
       <PanelNegocio />
       <Tablon />
       <GratitudVentanas filas={filasEnlaces} />
