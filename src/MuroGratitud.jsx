@@ -103,7 +103,7 @@ const CSS = `
 .mg-g{border-radius:14px;padding:10px 12px;box-shadow:0 1px 4px rgba(0,0,0,.1)}
 .mg-gt2{margin:0 0 3px;font-size:15.5px;font-weight:900;line-height:1.25;color:#0f2d1e}
 .mg-gd{margin:0 0 8px;font-size:14.5px;font-weight:700;line-height:1.4;color:#2f4d3f}
-.mg-gb{min-height:44px;padding:0 16px;border-radius:999px;border:2px solid #B7791F;background:#fff;color:#8a5a0c;font:inherit;font-weight:900;font-size:14px;cursor:pointer}
+.mg-gb{min-height:44px;padding:0 16px;border-radius:999px;border:2px solid var(--dc-dorado,#B7791F);background:#fff;color:#8a5a0c;font:inherit;font-weight:900;font-size:14px;cursor:pointer}
 .mg-ej{margin:8px 0 0}
 .mg-ejc{margin-top:6px;padding:8px 12px;background:#FFF4D6;border-radius:12px}
 .mg-ejc p{margin:4px 0;font-size:14px;color:#0f2d1e}.mg-ejc ul{margin:0 0 4px;padding-left:18px}.mg-ejc li{font-size:13.5px;font-weight:700;line-height:1.35;margin:2px 0;color:#2f4d3f}
@@ -113,7 +113,7 @@ const CSS = `
 .mg-n p{margin:0 0 4px;font-size:15.5px;font-weight:800;line-height:1.35;color:#0f2d1e}
 .mg-n small{font-size:13px;font-weight:800;color:#5a4a16}
 .mg-tipo{display:block;margin-bottom:2px}
-.mg-b{display:block;width:100%;border:0;text-align:center;min-height:48px;padding:8px 12px;line-height:1.2;border-radius:999px;background:#B7791F;color:#fff;font:inherit;font-weight:900;font-size:15px;cursor:pointer}
+.mg-b{display:block;width:100%;border:0;text-align:center;min-height:48px;padding:8px 12px;line-height:1.2;border-radius:999px;background:var(--dc-dorado,#B7791F);color:#fff;font:inherit;font-weight:900;font-size:15px;cursor:pointer}
 .mg-nota{display:block;text-align:center;margin-top:6px;font-weight:700;color:#5b6b62}
 .mg-nota a{color:#128c7e;font-weight:900}
 `;

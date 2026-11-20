@@ -501,7 +501,7 @@ const CSS = `
 .tj-acc form > button:disabled{opacity:.6}
 .tj-err{margin:8px 0 0!important;color:#b42318;font-weight:800!important;font-size:14px!important}
 .tj-cfg-f{position:fixed;inset:0;z-index:98;background:rgba(15,25,20,.6);display:flex;align-items:flex-end;justify-content:center}
-.tj-cfg{background:#fbf7ec;width:100%;max-width:460px;max-height:92dvh;overflow-y:auto;border-radius:24px 24px 0 0;padding:0 14px 22px}
+.tj-cfg{background:var(--dc-fondo,#FBF7EC);width:100%;max-width:460px;max-height:92dvh;overflow-y:auto;border-radius:24px 24px 0 0;padding:0 14px 22px}
 @media(min-width:640px){.tj-cfg-f{align-items:center}.tj-cfg{border-radius:22px}}
 .tj-cfg-h{position:sticky;top:0;z-index:1;display:flex;align-items:center;background:var(--c1);color:#fff;margin:0 -14px 10px;padding:10px 12px 10px 16px;border-radius:24px 24px 0 0}
 .tj-cfg-h b{flex:1;font-size:17px;font-weight:900}.tj-cfg-h button{width:44px;height:44px;border-radius:50%;border:0;background:#fff;color:var(--c1);font-size:20px;font-weight:900;cursor:pointer}

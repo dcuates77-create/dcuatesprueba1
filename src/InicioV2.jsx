@@ -651,7 +651,7 @@ const CSS = `
 .v2-rb{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;min-height:116px;padding:10px 6px;border:2px solid;border-radius:16px;cursor:pointer;color:#0f3b22;min-width:0}
 .v2-rb b{font-size:14px;font-weight:900;letter-spacing:.3px}
 .v2-rb small{font-size:11.5px;font-weight:700;line-height:1.15}
-.v2-pg{margin:10px 0 0}.v2-pg-b{display:flex;align-items:center;gap:10px;width:100%;min-height:64px;padding:10px 14px;border:0;border-radius:20px;background:linear-gradient(135deg,#B7791F,#E3A92C);color:#fff;font:inherit;text-align:left;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.18)}
+.v2-pg{margin:10px 0 0}.v2-pg-b{display:flex;align-items:center;gap:10px;width:100%;min-height:64px;padding:10px 14px;border:0;border-radius:20px;background:linear-gradient(135deg,var(--dc-dorado,#B7791F),#E3A92C);color:#fff;font:inherit;text-align:left;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.18)}
 .v2-pg-e{font-size:30px}.v2-pg-t{flex:1;display:flex;flex-direction:column;gap:2px}.v2-pg-t b{font-size:18px;font-weight:900;letter-spacing:.02em}.v2-pg-t small{font-size:12.5px;font-weight:700;line-height:1.3}
 .v2-club{position:relative;display:block;width:100%;padding:12px;border-radius:22px;background:linear-gradient(135deg,#FFD24D 0%,#F7B500 55%,#E89B00 100%);border:2px solid #C98200;text-align:left;flex:none;color:#0B3D2E;box-shadow:0 5px 0 #B87400}
 .v2-club-g{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:8px;align-items:center}

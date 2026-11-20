@@ -57,7 +57,7 @@ export function RetoVisitas({ nombres = {} }) {
 export const CSS_PE = `
 .pe-fav{flex:none;width:44px;height:44px;border:2px solid #d8d2bd;border-radius:50%;background:#fff;color:#8a5a5a;font-size:22px;line-height:1;cursor:pointer}
 .pe-fav.on{color:#C62828;border-color:#C62828;background:#FDECEC}
-.pe-promo{display:flex;flex-direction:column;gap:2px;width:100%;box-sizing:border-box;margin:0 0 10px;padding:10px 12px;border:2px solid #B7791F;border-radius:14px;background:linear-gradient(135deg,#FFF4D6,#FFE9B0);color:#4a2f00;font:inherit;text-align:left;cursor:pointer}
+.pe-promo{display:flex;flex-direction:column;gap:2px;width:100%;box-sizing:border-box;margin:0 0 10px;padding:10px 12px;border:2px solid var(--dc-dorado,#B7791F);border-radius:14px;background:linear-gradient(135deg,#FFF4D6,#FFE9B0);color:#4a2f00;font:inherit;text-align:left;cursor:pointer}
 .pe-pm-k{font-size:12px;font-weight:900;letter-spacing:.04em;color:#8a5a00}.pe-promo b{font-size:17px;font-weight:900}.pe-pm-t{font-size:14.5px;font-weight:800}.pe-promo small{font-size:12.5px;font-weight:800}
 .pe-reto{margin:0 0 10px;padding:10px 12px;border:2px solid #1B6F8A;border-radius:14px;background:#E6F2F7;color:#0f2d3a}
 .pe-reto b{font-size:15px;font-weight:900}.pe-reto p{margin:4px 0;font-size:13.5px;font-weight:700}

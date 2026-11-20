@@ -232,7 +232,7 @@ const CSS = `
 .ma-ec{display:flex;flex-direction:column;gap:3px;padding:10px;border:2px solid #cbd5e1;border-radius:14px;background:#fff}.ma-ec b{font-size:14.5px;font-weight:900;color:#0f2d1e}.ma-ec small{font-size:13px;font-weight:700;color:#4a5564;line-height:1.3}
 .ma-ec button{align-self:flex-start;min-height:44px;padding:0 16px;margin-top:4px;border:0;border-radius:999px;background:#25a244;color:#fff;font:inherit;font-weight:900;font-size:14px;cursor:pointer}.ma-resp{font-size:12.5px;font-weight:700;color:#5b6b62}
 .ma-fondo{position:fixed;inset:0;z-index:76;background:rgba(15,25,20,.65);display:flex;align-items:flex-end;justify-content:center;font-family:Nunito,system-ui,sans-serif}
-.ma-caja{background:#fbf7ec;width:100%;max-width:560px;max-height:92dvh;overflow-y:auto;overscroll-behavior:contain;border-radius:24px 24px 0 0;padding:0 12px 22px;color:#0f2d1e}
+.ma-caja{background:var(--dc-fondo,#FBF7EC);width:100%;max-width:560px;max-height:92dvh;overflow-y:auto;overscroll-behavior:contain;border-radius:24px 24px 0 0;padding:0 12px 22px;color:#0f2d1e}
 @media(min-width:640px){.ma-fondo{align-items:center}.ma-caja{border-radius:22px;max-height:86dvh}}
 .ma-cab{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:8px;background:#E65100;color:#fff;margin:0 -12px 10px;padding:12px 12px;border-radius:24px 24px 0 0}
 .ma-cab b{flex:1;font-size:17px;font-weight:900}

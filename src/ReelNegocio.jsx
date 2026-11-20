@@ -74,5 +74,5 @@ const CSS = `
 .rl-pts{display:flex;justify-content:center;gap:2px;margin-top:2px}
 .rl-pts button{width:28px;height:28px;border:0;background:none;cursor:pointer;position:relative}
 .rl-pts button::after{content:"";position:absolute;inset:0;margin:auto;width:9px;height:9px;border-radius:50%;background:#c9c2a8}
-.rl-pts button.on::after{background:var(--c,#1F7A46);width:12px;height:12px}
+.rl-pts button.on::after{background:var(--c,var(--dc-verde,#1F7A46));width:12px;height:12px}
 `;

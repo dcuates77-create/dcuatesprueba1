@@ -91,16 +91,16 @@ export default function ComoFunciona({ onCerrar }) {
 .cf-h{margin:14px 0 8px;font-size:17px;font-weight:900;color:#0f2d1e}
 .cf-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 8px}
 .cf-tabs button{min-height:46px;border:2px solid #0f2d1e;border-radius:12px;background:#fff;font:inherit;font-weight:900;font-size:15px;color:#0f2d1e;cursor:pointer}
-.cf-tabs .on.o{background:#1F7A46;color:#fff;border-color:#1F7A46}.cf-tabs .on.n{background:#B7791F;color:#fff;border-color:#B7791F}
+.cf-tabs .on.o{background:var(--dc-verde,#1F7A46);color:#fff;border-color:var(--dc-verde,#1F7A46)}.cf-tabs .on.n{background:var(--dc-dorado,#B7791F);color:#fff;border-color:var(--dc-dorado,#B7791F)}
 .cf-casos{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px}
 .cf-casos button{flex:none;min-height:40px;padding:0 12px;border:2px solid #cfc7aa;border-radius:20px;background:#fff;font:inherit;font-weight:800;font-size:13px;color:#0f2d1e;cursor:pointer}
 .cf-casos button.on{background:#0f2d1e;color:#fff;border-color:#0f2d1e}
-.cf-hist{margin:6px 0 8px;padding:8px 10px;background:#fff4d6;border-left:5px solid #B7791F;border-radius:10px;font-size:14.5px;font-weight:800;line-height:1.35}
+.cf-hist{margin:6px 0 8px;padding:8px 10px;background:#fff4d6;border-left:5px solid var(--dc-dorado,#B7791F);border-radius:10px;font-size:14.5px;font-weight:800;line-height:1.35}
 .cf-ciclo{list-style:none;margin:0;padding:0}
 .cf-ciclo li{display:flex;gap:10px;margin:0 0 8px;align-items:flex-start}
 .cf-ciclo li span{flex:none;width:28px;height:28px;border-radius:50%;color:#fff;font-weight:900;font-size:15px;display:flex;align-items:center;justify-content:center;margin-top:2px}
 .cf-ciclo b{display:block;font-size:14.5px;font-weight:900}.cf-ciclo small{display:block;font-size:14px;line-height:1.35;font-weight:600;color:#1d2b24}
-.cf-ej{margin:12px 0 0;padding:10px 12px;background:#fff4d6;border-left:5px solid #B7791F;border-radius:12px;font-size:14.5px;line-height:1.45;font-weight:700}
+.cf-ej{margin:12px 0 0;padding:10px 12px;background:#fff4d6;border-left:5px solid var(--dc-dorado,#B7791F);border-radius:12px;font-size:14.5px;line-height:1.45;font-weight:700}
 .cf-r{display:flex;gap:10px;margin:0 0 8px;align-items:flex-start}.cf-r em{flex:none;font-style:normal;font-size:24px;width:32px;text-align:center}
 .cf-r b{display:block;font-size:14.5px;font-weight:900}.cf-r .cf-d{display:block;font-size:14px;line-height:1.35;font-weight:600}
 .cf-b{display:flex;flex-direction:column;gap:8px;margin-top:14px}

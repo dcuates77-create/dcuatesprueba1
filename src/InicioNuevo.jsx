@@ -231,7 +231,7 @@ export default function InicioNuevo({ onIr, logros = [], cargando = false, entra
 }
 
 export const CSS = `
-.vi-root{background:#fbf7ec;color:#0f2d1e;font-family:"Nunito",ui-rounded,system-ui,sans-serif;padding:12px 12px 20px;border-radius:0 0 24px 24px}
+.vi-root{background:var(--dc-fondo,#FBF7EC);color:#0f2d1e;font-family:"Nunito",ui-rounded,system-ui,sans-serif;padding:12px 12px 20px;border-radius:0 0 24px 24px}
 .vi-root *{font-family:inherit}
 .vi-hero{position:relative;overflow:hidden;border-radius:26px;background:#14532d;box-shadow:0 8px 22px rgba(15,45,30,.22)}
 .vi-foto{display:block;width:100%;height:auto}
@@ -256,7 +256,7 @@ export const CSS = `
 .vi-sigue b{font-size:17px;font-weight:900}
 .vi-sigue>span:first-child,.vi-sigue>span:last-child{font-size:20px;font-weight:900;color:#0e7c4f}
 .vi-llama{margin:16px 0 6px;border:2px solid #0e7c4f;border-radius:22px;background:#fff;overflow:hidden;box-shadow:0 4px 0 rgba(15,45,30,.08),0 8px 16px rgba(15,45,30,.1)}
-.vi-llama-img{display:block;width:46%;max-height:300px;object-fit:contain;border-radius:14px;align-self:flex-start;background:#fbf7ec}
+.vi-llama-img{display:block;width:46%;max-height:300px;object-fit:contain;border-radius:14px;align-self:flex-start;background:var(--dc-fondo,#FBF7EC)}
 .vi-lado{display:flex;gap:10px;align-items:center;padding:0 12px 14px}
 .vi-lado-b{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
 .vi-sinb{border:0;box-shadow:none;margin:6px 0 0}
@@ -279,7 +279,7 @@ export const CSS = `
 .vi-part .pu-grid .en-d:nth-child(3) b,.vi-part .pu-grid .en-d:nth-child(3) small{color:#0f2d1e !important}
 .vi-part .pu-dif[style*="15, 76, 92"],.vi-part .pu-dif[style*="0f4c5c"]{background:#F8B4D0 !important}
 .vi-part .pu-dif[style*="15, 76, 92"] b,.vi-part .pu-dif[style*="15, 76, 92"] small,.vi-part .pu-dif[style*="0f4c5c"] b,.vi-part .pu-dif[style*="0f4c5c"] small{color:#4a0f2a !important}
-.vi-part .ap-btn{background:#B7791F !important}
+.vi-part .ap-btn{background:var(--dc-dorado,#B7791F) !important}
 .vi-part .en-tit{display:none}
 .vi-part .pu-q2{margin:4px 46px 12px;min-height:34px;display:flex;align-items:center;justify-content:center;font-size:15px;line-height:1.25}
 .vi-h2fila{display:flex;flex-direction:column;align-items:center;gap:8px;margin:0 0 6px}
@@ -293,7 +293,7 @@ export const CSS = `
 .vi-lista a{color:#0e7c4f}
 .vi-lg-b{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .vi-lg-b button{min-height:48px;border:0;border-radius:14px;background:#0e7c4f;color:#fff;font:inherit;font-weight:900;cursor:pointer}
-.vi-hoja{width:100%;max-width:640px;max-height:90dvh;display:flex;flex-direction:column;background:#fbf7ec;border-radius:26px 26px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.35);animation:vi-sube .28s ease-out}
+.vi-hoja{width:100%;max-width:640px;max-height:90dvh;display:flex;flex-direction:column;background:var(--dc-fondo,#FBF7EC);border-radius:26px 26px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.35);animation:vi-sube .28s ease-out}
 .vi-hoja-cab{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;font-weight:900;font-size:15px;letter-spacing:.02em;color:#0f2d1e;border-bottom:1px solid rgba(15,45,30,.12)}
 .vi-hoja-acc{display:flex;align-items:center;gap:8px}.vi-hoja-cab button{border:0;border-radius:50%;width:40px;height:40px;background:#0f2d1e;color:#fff;font-size:18px;font-weight:900;cursor:pointer}
 .vi-hoja-cuerpo{overflow-y:auto;padding:10px 12px 22px;overscroll-behavior:contain}

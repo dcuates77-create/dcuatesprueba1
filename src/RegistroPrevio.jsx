@@ -93,17 +93,17 @@ export default function RegistroPrevio() {
 }
 const CSS = `
 .rp-fondo{position:fixed;inset:0;z-index:95;background:rgba(15,25,20,.65);display:flex;align-items:flex-end;justify-content:center;font-family:Nunito,system-ui,sans-serif}
-.rp-caja{background:#fbf7ec;width:100%;max-width:560px;max-height:92dvh;overflow-y:auto;overscroll-behavior:contain;border-radius:24px 24px 0 0;padding:0 12px 22px;color:#0f2d1e}
+.rp-caja{background:var(--dc-fondo,#FBF7EC);width:100%;max-width:560px;max-height:92dvh;overflow-y:auto;overscroll-behavior:contain;border-radius:24px 24px 0 0;padding:0 12px 22px;color:#0f2d1e}
 @media(min-width:640px){.rp-fondo{align-items:center}.rp-caja{border-radius:22px;max-height:86dvh}}
-.rp-cab{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:8px;background:#1F7A46;color:#fff;margin:0 -12px 10px;padding:12px;border-radius:24px 24px 0 0}
+.rp-cab{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:8px;background:var(--dc-verde,#1F7A46);color:#fff;margin:0 -12px 10px;padding:12px;border-radius:24px 24px 0 0}
 .rp-cab b{flex:1;font-size:17px;font-weight:900;line-height:1.15}
-.rp-x{width:44px;height:44px;border-radius:50%;border:0;background:#fff;color:#1F7A46;font-size:20px;font-weight:900;cursor:pointer}
+.rp-x{width:44px;height:44px;border-radius:50%;border:0;background:#fff;color:var(--dc-verde,#1F7A46);font-size:20px;font-weight:900;cursor:pointer}
 .rp-v{font-size:26px;line-height:1}
 .rp-rel{margin:14px 0 0;padding:10px;background:#fff;border:2px solid #d8d2bd;border-radius:14px}.rp-rel p{margin:0 0 6px;font-size:14px;font-weight:900}.rp-rel div{display:flex;flex-wrap:wrap;gap:6px}
-.rp-rel button{min-height:44px;padding:0 12px;border:2px solid #1F7A46;border-radius:22px;background:#fff;color:#1F7A46;font:inherit;font-weight:800;font-size:13px;cursor:pointer;text-align:left}
+.rp-rel button{min-height:44px;padding:0 12px;border:2px solid var(--dc-verde,#1F7A46);border-radius:22px;background:#fff;color:var(--dc-verde,#1F7A46);font:inherit;font-weight:800;font-size:13px;cursor:pointer;text-align:left}
 .rp-rel .rp-rel-c{border-color:#5b4bb5;color:#5b4bb5}.rp-rel .rp-rel-c:last-child{border-color:#0B6E66;color:#0B6E66}
 .rp-at{display:block;width:100%;min-height:52px;margin:6px 0 4px;padding:8px 12px;border:0;border-radius:14px;background:#E65100;color:#fff;font:inherit;font-weight:900;font-size:14.5px;text-align:left;cursor:pointer;box-shadow:0 3px 0 #a33a00}
-.rp-ej{margin:6px 0 4px}.rp-ejb{min-height:44px;padding:0 14px;border:2px solid #B7791F;border-radius:999px;background:#fff;color:#8a5a0c;font:inherit;font-weight:900;font-size:14px;cursor:pointer}
+.rp-ej{margin:6px 0 4px}.rp-ejb{min-height:44px;padding:0 14px;border:2px solid var(--dc-dorado,#B7791F);border-radius:999px;background:#fff;color:#8a5a0c;font:inherit;font-weight:900;font-size:14px;cursor:pointer}
 .rp-ej div{margin-top:6px;padding:8px 12px;background:#FFF4D6;border-radius:12px}.rp-ej p{margin:4px 0;font-size:14px}.rp-ej ul{margin:0 0 4px;padding-left:18px}.rp-ej li{font-size:13.5px;font-weight:700;line-height:1.35;margin:2px 0}
 .rp-i{margin:0 0 4px;font-size:14.5px;font-weight:700;line-height:1.35}
 .rp-s{margin:12px 0 0;font-size:13px;font-weight:700;color:#4a5b52}

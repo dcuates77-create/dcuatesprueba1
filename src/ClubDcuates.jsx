@@ -179,7 +179,7 @@ const CSS = `
 .clb-tj2{margin:0 0 8px}
 .clb-p{display:block;width:100%;min-height:50px;margin:0 0 8px;padding:8px 12px;border:0;border-radius:14px;background:${NARANJA_CLUB};color:#fff;font:inherit;font-weight:900;font-size:15px;cursor:pointer;box-shadow:0 3px 0 #a33a00}
 .clb-fondo{position:fixed;inset:0;z-index:95;background:rgba(15,25,20,.65);display:flex;align-items:flex-end;justify-content:center;font-family:Nunito,system-ui,sans-serif}
-.clb-caja{background:#fbf7ec;width:100%;max-width:560px;max-height:92dvh;overflow-y:auto;border-radius:24px 24px 0 0;padding:0 12px 22px;color:#0f2d1e}
+.clb-caja{background:var(--dc-fondo,#FBF7EC);width:100%;max-width:560px;max-height:92dvh;overflow-y:auto;border-radius:24px 24px 0 0;padding:0 12px 22px;color:#0f2d1e}
 @media(min-width:640px){.clb-fondo{align-items:center}.clb-caja{border-radius:22px}}
 .clb-cab{position:sticky;top:0;display:flex;align-items:center;gap:8px;background:${NARANJA_CLUB};color:#fff;margin:0 -12px 10px;padding:12px;border-radius:24px 24px 0 0}
 .clb-cab b{flex:1;font-size:17px;font-weight:900}.clb-cab button{width:44px;height:44px;border-radius:50%;border:0;background:#fff;color:${NARANJA_CLUB};font-size:20px;font-weight:900;cursor:pointer}

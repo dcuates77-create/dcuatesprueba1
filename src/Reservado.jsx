@@ -151,7 +151,7 @@ export function IndiceReservado() {
 
 const CSS_RV = `
 .rv-fondo{position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;justify-content:center;font-family:Nunito,system-ui,sans-serif}
-.rv-hoja{background:#fbf7ec;width:100%;max-width:640px;max-height:92vh;overflow:auto;border-radius:24px 24px 0 0;padding:0 14px 18px;color:#0f2d1e}
+.rv-hoja{background:var(--dc-fondo,#FBF7EC);width:100%;max-width:640px;max-height:92vh;overflow:auto;border-radius:24px 24px 0 0;padding:0 14px 18px;color:#0f2d1e}
 .rv-cab{position:sticky;top:0;background:#3b2a6b;color:#fff;margin:0 -14px 12px;padding:12px 14px;display:flex;align-items:center;gap:8px;border-radius:24px 24px 0 0}
 .rv-cab b{flex:1;font-size:16px;font-weight:900}.rv-cab button{width:44px;height:44px;border-radius:50%;border:0;background:#fff;color:#3b2a6b;font-size:20px;font-weight:900;cursor:pointer}
 .rv-nota{font-size:13.5px;font-weight:700;line-height:1.4;background:#fff4d6;border-radius:12px;padding:8px 10px;margin:0 0 12px;color:#0f2d1e}

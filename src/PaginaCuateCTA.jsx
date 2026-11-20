@@ -6,16 +6,18 @@ import React from "react";
 import { registrar } from "./analitica.js";
 import { abrirRegistroPrevio } from "./RegistroPrevio.jsx";
 import { abrirAsistente } from "./AsistentePagina.jsx";
+import { texto, useTextos } from "./utilidades/tema.js";
 
 export const abrirDirectorio = () => window.dispatchEvent(new CustomEvent("dcuates:directorio"));
 export const abrirRegistroPagina = (mod) => { registrar("pagina_registro", { mod }); abrirRegistroPrevio("pagina", { valores: { mod } }); };
 
 export default function PaginaCuateCTA({ compacto = false, directorio = false }) {
+  useTextos();
   return (
     <section className={"pc-cta" + (compacto ? " pc-c" : "")} data-testid="pagina-cta">
       <style>{CSS}</style>
-      <h3>🏪 TU PÁGINA CUATE CON BENEFICIOS PARA TI Y TUS CLIENTES</h3>
-      {!compacto && <p>Tu emprendimiento con página propia: tu WhatsApp, tus promociones, tu Pase y el Club DCUATES. Elige cómo quieres empezar:</p>}
+      <h3>{texto("cta_titulo", "🏪 TU PÁGINA CUATE CON BENEFICIOS PARA TI Y TUS CLIENTES")}</h3>
+      {!compacto && <p>{texto("cta_intro", "Tu emprendimiento con página propia: tu WhatsApp, tus promociones, tu Pase y el Club DCUATES. Elige cómo quieres empezar:")}</p>}
       <button type="button" className="pc-b pc-a" data-testid="cta-asistente" onClick={() => { registrar("pagina_asistente"); abrirAsistente(); }}>
         <b>🧩 ARMA TU PÁGINA PASO A PASO</b>
         <span>elige tu giro, usa textos de ejemplo, mira cómo se verá y envíala para revisión</span>
@@ -40,7 +42,7 @@ const CSS = `
 .pc-b{display:flex;flex-direction:column;gap:3px;min-height:56px;padding:10px 12px;border:0;border-radius:14px;color:#fff;font:inherit;text-align:left;cursor:pointer}
 .pc-b b{font-size:15px;font-weight:900;letter-spacing:.01em}
 .pc-b span{font-size:12.5px;font-weight:700;line-height:1.35;opacity:.97}
-.pc-a{background:#0E7490}.pc-g{background:#1F7A46}.pc-v{background:#B7791F}
+.pc-a{background:#0E7490}.pc-g{background:var(--dc-verde,#1F7A46)}.pc-v{background:var(--dc-dorado,#B7791F)}
 .pc-d{min-height:46px;border:2px solid #7a4a00;border-radius:14px;background:#fff;color:#7a4a00;font:inherit;font-size:14px;font-weight:900;cursor:pointer}
 .pc-c{margin:0;background:#fff}
 `;

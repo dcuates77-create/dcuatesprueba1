@@ -105,7 +105,7 @@ export default function ConsultaFolio() {
 }
 const CSS = `
 .cfo-fondo{position:fixed;inset:0;z-index:96;background:rgba(15,25,20,.65);display:flex;align-items:flex-end;justify-content:center;font-family:Nunito,system-ui,sans-serif}
-.cfo-caja{background:#fbf7ec;width:100%;max-width:520px;max-height:90dvh;overflow-y:auto;border-radius:24px 24px 0 0;padding:0 14px 20px;color:#0f2d1e}
+.cfo-caja{background:var(--dc-fondo,#FBF7EC);width:100%;max-width:520px;max-height:90dvh;overflow-y:auto;border-radius:24px 24px 0 0;padding:0 14px 20px;color:#0f2d1e}
 @media(min-width:640px){.cfo-fondo{align-items:center}.cfo-caja{border-radius:22px}}
 .cfo-cab{display:flex;align-items:center;gap:8px;background:#0f4c5c;color:#fff;margin:0 -14px 10px;padding:12px 14px;border-radius:24px 24px 0 0}
 .cfo-cab b{flex:1;font-size:18px;font-weight:900}.cfo-cab button{width:44px;height:44px;border-radius:50%;border:0;background:#fff;color:#0f4c5c;font-size:20px;font-weight:900;cursor:pointer}

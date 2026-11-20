@@ -374,7 +374,7 @@ const CSS = `
 .zj-res{position:absolute;inset:0;z-index:5;background:rgba(255,255,255,.96);border-radius:13px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:14px;text-align:center}
 .zj-res p{margin:0;font-size:15px;font-weight:700}
 .zj-res-t{font-size:19px!important;font-weight:900!important}
-.zj-res-s{color:#B7791F;font-weight:900!important}
+.zj-res-s{color:var(--dc-dorado,#B7791F);font-weight:900!important}
 .zj-res-b{display:flex;flex-direction:column;gap:8px;margin-top:6px;width:100%}
 .zj-res-b button{min-height:46px;border:0;border-radius:12px;color:#fff;font-family:inherit;font-weight:900;font-size:15px;cursor:pointer}
 .zj-res-b .zj-sig{background:#1f2a37}
@@ -466,7 +466,7 @@ const CSS = `
 .ag-ev a{display:inline-block;margin-top:8px;font-weight:900;font-size:14px;color:#1B6F8A}
 .gn-area{margin-top:6px}
 .gn-reels{display:flex;justify-content:center;gap:8px;margin:8px 0}
-.gn-reels span{width:80px;height:80px;display:grid;place-items:center;font-size:46px;background:#fff;border:3px solid #B7791F;border-radius:16px;box-shadow:inset 0 3px 8px rgba(0,0,0,.15)}
+.gn-reels span{width:80px;height:80px;display:grid;place-items:center;font-size:46px;background:#fff;border:3px solid var(--dc-dorado,#B7791F);border-radius:16px;box-shadow:inset 0 3px 8px rgba(0,0,0,.15)}
 .gn-premio{background:#fff4d6!important;text-align:center}
 .gn-t{font-size:18px!important;font-weight:900!important}
 .gn-nota{font-size:12.5px!important;font-weight:700!important;color:#6b7785}

@@ -127,7 +127,7 @@ export function BotonRegistrate() {
       <style>{`
 .rp-wrap{position:relative}
 .rp-comp{position:absolute;top:50%;right:10px;margin-top:-18px;z-index:3}
-.rp-btn{width:100%;display:flex;align-items:center;gap:12px;min-height:76px;margin:10px 0 0;padding:8px 56px 8px 14px;border:2px solid #fff;border-bottom-width:6px;border-radius:18px;background:#1F7A46;color:#fff;font-family:inherit;text-align:left;cursor:pointer;box-shadow:0 5px 12px rgba(0,0,0,.25)}
+.rp-btn{width:100%;display:flex;align-items:center;gap:12px;min-height:76px;margin:10px 0 0;padding:8px 56px 8px 14px;border:2px solid #fff;border-bottom-width:6px;border-radius:18px;background:var(--dc-verde,#1F7A46);color:#fff;font-family:inherit;text-align:left;cursor:pointer;box-shadow:0 5px 12px rgba(0,0,0,.25)}
 .rp-e{width:44px;height:44px;flex:none;display:grid;place-items:center;border-radius:14px;background:#fff;font-size:24px}
 .rp-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.rp-t b{display:block;white-space:normal;overflow:visible;text-overflow:clip;font-size:16px;font-weight:900}.rp-t small{display:block;white-space:normal;overflow:visible;text-overflow:clip;font-size:12.5px;font-weight:700;line-height:1.2;color:#e3f6ea}
 `}</style>

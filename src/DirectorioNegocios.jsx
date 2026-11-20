@@ -150,20 +150,20 @@ export default function DirectorioNegocios() {
 }
 
 const CSS = `
-.dn-fondo{position:fixed;inset:0;z-index:79;background:#fbf7ec;font-family:Nunito,system-ui,sans-serif;color:#0f2d1e;display:flex;justify-content:center}
-.dn-caja{width:100%;max-width:560px;height:100%;overflow-y:auto;overscroll-behavior:contain;padding:0 12px 40px;background:#fbf7ec}
-.dn-bar{position:sticky;top:0;z-index:3;display:flex;align-items:center;gap:8px;margin:0 -12px;background:#1F7A46;color:#fff;padding:8px 10px}
+.dn-fondo{position:fixed;inset:0;z-index:79;background:var(--dc-fondo,#FBF7EC);font-family:Nunito,system-ui,sans-serif;color:#0f2d1e;display:flex;justify-content:center}
+.dn-caja{width:100%;max-width:560px;height:100%;overflow-y:auto;overscroll-behavior:contain;padding:0 12px 40px;background:var(--dc-fondo,#FBF7EC)}
+.dn-bar{position:sticky;top:0;z-index:3;display:flex;align-items:center;gap:8px;margin:0 -12px;background:var(--dc-verde,#1F7A46);color:#fff;padding:8px 10px}
 .dn-bar b{flex:1;font-size:17px;font-weight:900}
-.dn-x{width:44px;height:44px;border-radius:50%;border:0;background:#fff;color:#1F7A46;font-size:19px;font-weight:900;cursor:pointer}
+.dn-x{width:44px;height:44px;border-radius:50%;border:0;background:#fff;color:var(--dc-verde,#1F7A46);font-size:19px;font-weight:900;cursor:pointer}
 .dn-p{margin:12px 0 6px;font-size:14px;font-weight:700;line-height:1.4}
 .dn-ej{margin:0 -12px 8px;padding:6px 12px;background:#FFF4D6;color:#8a5a0c;font-size:12.5px;font-weight:900;text-align:center}
 .dn-f{display:flex;flex-direction:column;gap:8px;margin:8px 0}
 .dn-q,.dn-s{min-height:46px;border:2px solid #cfc8b0;border-radius:12px;background:#fff;padding:0 12px;font:inherit;font-size:15px;font-weight:700;color:#0f2d1e;width:100%;box-sizing:border-box}
 .dn-chips{display:flex;gap:6px;overflow-x:auto;padding:2px 0 8px}
-.dn-chip{flex:none;min-height:38px;padding:0 12px;border:2px solid #1F7A46;border-radius:999px;background:#fff;color:#1F7A46;font:inherit;font-size:12.5px;font-weight:900;cursor:pointer;white-space:nowrap}
-.dn-chip.on{background:#1F7A46;color:#fff}
+.dn-chip{flex:none;min-height:38px;padding:0 12px;border:2px solid var(--dc-verde,#1F7A46);border-radius:999px;background:#fff;color:var(--dc-verde,#1F7A46);font:inherit;font-size:12.5px;font-weight:900;cursor:pointer;white-space:nowrap}
+.dn-chip.on{background:var(--dc-verde,#1F7A46);color:#fff}
 .dn-m{margin:4px 0 8px;font-size:13px;font-weight:800;color:#4a5b52}
-.dn-lk{border:0;background:none;color:#1F7A46;font:inherit;font-weight:900;text-decoration:underline;cursor:pointer;min-height:32px}
+.dn-lk{border:0;background:none;color:var(--dc-verde,#1F7A46);font:inherit;font-weight:900;text-decoration:underline;cursor:pointer;min-height:32px}
 .dn-lista{display:flex;flex-direction:column;gap:8px}
 .dn-card{display:flex;align-items:center;gap:10px;width:100%;padding:10px;border:2px solid var(--c);border-radius:16px;background:#fff;color:inherit;font:inherit;text-align:left;cursor:pointer}
 .dn-lg{flex:none;width:56px;height:56px;border-radius:50%;background:#f1ecdc;display:flex;align-items:center;justify-content:center;font-size:28px;overflow:hidden}

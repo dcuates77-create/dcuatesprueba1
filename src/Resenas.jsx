@@ -41,7 +41,7 @@ export default function Resenas({ slug, nombre, ejemplo }) {
         </div>
       )}
       <style>{`.rs-caja h2{font-size:17px}.rs-v,.rs-n{margin:4px 0;font-size:13.5px;font-weight:700;color:#4a5a50}.rs-l{list-style:none;margin:6px 0;padding:0;display:flex;flex-direction:column;gap:8px}.rs-l li{padding:8px 10px;border:1px solid #d8d2bd;border-radius:12px;background:#fff;font-size:14px}.rs-l p{margin:2px 0 0;font-weight:700}.rs-e{color:#C77700;letter-spacing:1px}
-.rs-b{width:100%;min-height:48px;border:2px solid #C2185B;border-radius:12px;background:#fff;color:#C2185B;font:inherit;font-weight:900;font-size:15px;cursor:pointer}.rs-ok{margin:6px 0;font-weight:900;color:#1F7A46}
+.rs-b{width:100%;min-height:48px;border:2px solid #C2185B;border-radius:12px;background:#fff;color:#C2185B;font:inherit;font-weight:900;font-size:15px;cursor:pointer}.rs-ok{margin:6px 0;font-weight:900;color:var(--dc-verde,#1F7A46)}
 .rs-f{margin-top:8px;padding:10px;border:2px solid #C2185B;border-radius:14px;background:#FFF5F9}.rs-f label{display:block;margin:6px 0;font-size:13.5px;font-weight:800}.rs-f textarea,.rs-f input{display:block;width:100%;box-sizing:border-box;margin-top:3px;padding:8px 10px;border:2px solid #cfc8b0;border-radius:10px;font:inherit;font-size:15px;background:#fff}
 .rs-st{display:flex;gap:6px}.rs-st button{width:48px;height:48px;border:2px solid #d8d2bd;border-radius:12px;background:#fff;color:#bbb;font-size:26px;cursor:pointer}.rs-st button.on{color:#C77700;border-color:#C77700;background:#FFF1C9}.rs-er{margin:4px 0;font-weight:900;color:#B3261E}`}</style>
     </section>

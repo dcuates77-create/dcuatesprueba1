@@ -50,6 +50,7 @@ import RegistroPrevio from "./RegistroPrevio.jsx";
 import NegocioCuate from "./NegocioCuate.jsx";
 import DirectorioNegocios from "./DirectorioNegocios.jsx";
 import AsistentePagina from "./AsistentePagina.jsx";
+import { cargarTema } from "./utilidades/tema.js";
 import PanelNegocio from "./PanelNegocio.jsx";
 import { cargarSinonimosHoja } from "./utilidades/sinonimosHoja.js";
 import { cargarPerfilesHoja } from "./utilidades/perfilesHoja.js";
@@ -103,6 +104,7 @@ function leerV2() {
 
 export default function App() {
   const [usarV2] = useState(leerV2);
+  useEffect(() => { cargarTema(); }, []);
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [showTerminos, setShowTerminos] = useState(false);
   const [showSeguridad, setShowSeguridad] = useState(false);

@@ -113,7 +113,7 @@ export function PaginaCategoria({ slug }) {
 }
 
 const CSS = `
-.pc-caja{margin:0 0 10px}.pc-abrir{display:flex;align-items:center;justify-content:center;width:100%;box-sizing:border-box;min-height:50px;padding:0 14px;border:2px solid var(--c,#1F7A46);border-radius:14px;background:#fff;color:var(--c,#1F7A46);font:inherit;font-size:15px;font-weight:900;cursor:pointer}
+.pc-caja{margin:0 0 10px}.pc-abrir{display:flex;align-items:center;justify-content:center;width:100%;box-sizing:border-box;min-height:50px;padding:0 14px;border:2px solid var(--c,var(--dc-verde,#1F7A46));border-radius:14px;background:#fff;color:var(--c,var(--dc-verde,#1F7A46));font:inherit;font-size:15px;font-weight:900;cursor:pointer}
 .pc-cuerpo{margin-top:8px}.pc-q{width:100%;box-sizing:border-box;min-height:46px;border:2px solid #cfc8b0;border-radius:12px;padding:6px 12px;font:inherit;font-size:15px;font-weight:700;background:#fff;margin-bottom:8px}
 .pc-chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:6px}.pc-chips button,.pc-barra button{flex:0 0 auto;min-height:44px;padding:0 14px;border:2px solid #0f2d1e;border-radius:22px;background:#fff;color:#0f2d1e;font:inherit;font-size:14px;font-weight:900;cursor:pointer}
 .pc-chips button.on,.pc-barra button.on{background:#0f2d1e;color:#fff}

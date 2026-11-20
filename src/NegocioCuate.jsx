@@ -277,8 +277,8 @@ export default function NegocioCuate() {
 }
 
 const CSS = `
-.ng-fondo{position:fixed;inset:0;z-index:80;background:#fbf7ec;font-family:Nunito,system-ui,sans-serif;color:#0f2d1e;display:flex;justify-content:center}
-.ng-caja{width:100%;max-width:560px;height:100%;overflow-y:auto;overscroll-behavior:contain;padding-bottom:40px;background:#fbf7ec}
+.ng-fondo{position:fixed;inset:0;z-index:80;background:var(--dc-fondo,#FBF7EC);font-family:Nunito,system-ui,sans-serif;color:#0f2d1e;display:flex;justify-content:center}
+.ng-caja{width:100%;max-width:560px;height:100%;overflow-y:auto;overscroll-behavior:contain;padding-bottom:40px;background:var(--dc-fondo,#FBF7EC)}
 .ng-bar{position:sticky;top:0;z-index:3;display:flex;align-items:center;gap:8px;background:var(--c);color:#fff;padding:8px 10px}
 .ng-bar b{flex:1;font-size:16px;font-weight:900;line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ng-x,.ng-sh{width:44px;height:44px;border-radius:50%;border:0;background:#fff;color:var(--c);font-size:19px;font-weight:900;cursor:pointer}
@@ -311,7 +311,7 @@ const CSS = `
 .ng-l{margin:0;padding-left:20px;list-style:disc}.ng-l li{font-size:14.5px;font-weight:700;line-height:1.5}
 .ng-dat p{margin:2px 0;font-size:14px;font-weight:800}
 .ng-gal{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;scroll-snap-type:x mandatory}.ng-gal img{height:150px;width:auto;border-radius:12px;scroll-snap-align:start}
-.ng-oferta{margin:14px;padding:12px 14px;border:3px dashed #B7791F;border-radius:16px;background:#FFF4D6}
+.ng-oferta{margin:14px;padding:12px 14px;border:3px dashed var(--dc-dorado,#B7791F);border-radius:16px;background:#FFF4D6}
 .ng-oferta span{display:block;font-size:11.5px;font-weight:900;color:#8a5a0c}.ng-oferta b{display:block;font-size:18px;font-weight:900;margin:2px 0}.ng-oferta p{margin:2px 0 0;font-size:14px;font-weight:700}
 .ng-pase{margin:14px;border-radius:18px;overflow:hidden;background:linear-gradient(160deg,var(--c),#0f2d1e);color:#fff;padding:0 0 8px;box-shadow:0 4px 14px rgba(0,0,0,.22)}
 .ng-pase header{padding:10px 14px;background:rgba(0,0,0,.18)}.ng-pase header span{display:block;font-size:11px;font-weight:900;letter-spacing:.06em;opacity:.9}.ng-pase header b{font-size:17px;font-weight:900}

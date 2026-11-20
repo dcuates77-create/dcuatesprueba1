@@ -9,6 +9,7 @@ import { GIROS, giroPorId } from "./datos/giros.js";
 import { categoriaDe } from "./datos/negocios.js";
 import { GOOGLE_SHEETS_URL, WHATSAPP_NUMERO } from "./datos/config.js";
 import { nuevoId } from "./utilidades/pedidos.js";
+import { texto, useTextos, estadoAlta } from "./utilidades/tema.js";
 
 export const abrirAsistente = () => window.dispatchEvent(new CustomEvent("dcuates:asistente"));
 const LLAVE = "dc_asistente";
@@ -20,6 +21,10 @@ const waValido = (t) => { const d = soloDigitos(t); return d.length === 10 || (d
 const slugDe = (n) => String(n || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40);
 
 export default function AsistentePagina() {
+  useTextos();
+  const [folioC, setFolioC] = useState("");
+  const [resC, setResC] = useState(null);
+  const [buscando, setBuscando] = useState(false);
   const [abierto, setAbierto] = useState(() => typeof window !== "undefined" && window.location.hash === "#arma-tu-pagina");
   const [f, setF] = useState(leer);
   const [tocado, setTocado] = useState({});
@@ -81,8 +86,20 @@ export default function AsistentePagina() {
     try { localStorage.removeItem(LLAVE); } catch (e) { /* sin almacenamiento */ }
     setHecho({ folio, nombre: f.nombre.trim(), slug: slugDe(f.nombre) });
   };
-  const msgWa = hecho ? `¡Hola DCUATES! Armé mi Página CUATE «${hecho.nombre}» con el asistente (folio ${hecho.folio}). Te mando por aquí mi logo, mi portada y mis fotos.` : "";
+  const msgWa = hecho ? texto("wa_asistente", "¡Hola DCUATES! Armé mi Página CUATE «{nombre}» con el asistente (folio {folio}). Te mando por aquí mi logo, mi portada y mis fotos.", { nombre: hecho.nombre, folio: hecho.folio }) : "";
   const abrirWa = () => window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(msgWa)}`, "_blank", "noopener,noreferrer");
+  const consultar = async () => {
+    const f = folioC.trim().toUpperCase();
+    if (!/^ALT-\d{4}-[A-Z0-9]{3}$/.test(f)) { setResC({ t: "Escribe tu folio completo, con este formato: ALT-2026-K7M." }); return; }
+    setBuscando(true);
+    const r = await estadoAlta(f);
+    setBuscando(false);
+    if (r.ok && r.estado === "aprobado") setResC({ t: "✅ ¡Tu página ya está publicada!", slug: r.slug });
+    else if (r.ok && r.estado === "pausa") setResC({ t: "⏸️ Tu página está en pausa. Escríbenos por WhatsApp para saber qué falta." });
+    else if (r.ok) setResC({ t: "🕒 Tu página está en revisión. Si aún no mandas tu logo y fotos por WhatsApp, mándalos con tu folio para agilizarla." });
+    else if (r.motivo === "espera") setResC({ t: "Hay muchas consultas en este momento. Intenta de nuevo en un minuto." });
+    else setResC({ t: "No encontramos ese folio. Revisa que esté bien escrito o escríbenos por WhatsApp." });
+  };
   const empezarOtra = () => { setHecho(null); setF(VACIO); setTocado({}); enviando.current = false; };
 
   return createPortal(
@@ -105,7 +122,15 @@ export default function AsistentePagina() {
           </div>
         ) : (
           <div className="as-cuerpo">
-            <p className="as-intro">Elige tu giro, ajusta los textos de ejemplo a tu estilo y envíalo. <b>Tu página nunca se publica sola:</b> la revisa DCUATES. Después mandas tu logo y fotos por WhatsApp.</p>
+            <p className="as-intro">{texto("asistente_intro", "Elige tu giro, ajusta los textos de ejemplo a tu estilo y envíalo. Tu página nunca se publica sola: la revisa DCUATES. Después mandas tu logo y fotos por WhatsApp.")}</p>
+            <details className="as-seg" data-testid="asistente-seguimiento">
+              <summary>🔎 ¿Ya enviaste tu página? Consulta tu folio</summary>
+              <div className="as-segc">
+                <input className="as-i" value={folioC} maxLength={16} onChange={(e) => { setFolioC(e.target.value.toUpperCase()); setResC(null); }} placeholder="Ej. ALT-2026-K7M" data-testid="asistente-folio-input" />
+                <button type="button" className="as-b" data-testid="asistente-consultar" disabled={buscando} onClick={consultar}>{buscando ? "Buscando…" : "Consultar estado"}</button>
+                {resC && <p className="as-res" role="status" data-testid="asistente-estado">{resC.t}{resC.slug && <> <a href={"/n/" + resC.slug} data-testid="asistente-ver">Abrir mi página</a></>}</p>}
+              </div>
+            </details>
 
             <h3>1 · ¿Cuál es tu giro?</h3>
             <select className="as-i" value={f.giro} onChange={(e) => aplicarGiro(e.target.value, false)} aria-label="Giro" data-testid="asistente-giro">
@@ -167,19 +192,19 @@ export default function AsistentePagina() {
 }
 
 const CSS = `
-.as-fondo{position:fixed;inset:0;z-index:96;background:#fbf7ec;font-family:Nunito,system-ui,sans-serif;color:#0f2d1e;display:flex;justify-content:center;overflow-y:auto}
+.as-fondo{position:fixed;inset:0;z-index:96;background:var(--dc-fondo,#FBF7EC);font-family:Nunito,system-ui,sans-serif;color:#0f2d1e;display:flex;justify-content:center;overflow-y:auto}
 .as-caja{width:100%;max-width:560px;padding:0 12px 40px;box-sizing:border-box}
-.as-bar{position:sticky;top:0;z-index:3;display:flex;align-items:center;gap:8px;margin:0 -12px;background:#1F7A46;color:#fff;padding:8px 10px}
+.as-bar{position:sticky;top:0;z-index:3;display:flex;align-items:center;gap:8px;margin:0 -12px;background:var(--dc-verde,#1F7A46);color:#fff;padding:8px 10px}
 .as-bar b{flex:1;font-size:17px;font-weight:900}
-.as-x{width:44px;height:44px;border-radius:50%;border:0;background:#fff;color:#1F7A46;font-size:19px;font-weight:900;cursor:pointer}
+.as-x{width:44px;height:44px;border-radius:50%;border:0;background:#fff;color:var(--dc-verde,#1F7A46);font-size:19px;font-weight:900;cursor:pointer}
 .as-intro{font-size:15px;font-weight:700;line-height:1.45}
-.as-cuerpo h3{margin:18px 0 6px;font-size:17px;font-weight:900;color:#1F7A46}
+.as-cuerpo h3{margin:18px 0 6px;font-size:17px;font-weight:900;color:var(--dc-verde,#1F7A46)}
 .as-e{display:block;margin:10px 0 3px;font-size:14px;font-weight:900}
 .as-i{width:100%;box-sizing:border-box;min-height:46px;padding:8px 10px;border:3px solid #0f2d1e;border-radius:12px;background:#fff;font:inherit;font-size:16px;font-weight:700;color:#0f2d1e}
 .as-2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .as-n{font-size:13.5px;font-weight:700;line-height:1.4;margin:4px 0 8px}
-.as-l{background:none;border:0;color:#1F7A46;font-weight:900;font-size:14px;text-decoration:underline;padding:10px 0;min-height:44px;cursor:pointer}
-.as-prev{border:4px solid #1F7A46;border-radius:16px;background:#fff;overflow:hidden;padding-bottom:6px}
+.as-l{background:none;border:0;color:var(--dc-verde,#1F7A46);font-weight:900;font-size:14px;text-decoration:underline;padding:10px 0;min-height:44px;cursor:pointer}
+.as-prev{border:4px solid var(--dc-verde,#1F7A46);border-radius:16px;background:#fff;overflow:hidden;padding-bottom:6px}
 .as-ph{color:#fff;font-weight:900;font-size:14px;padding:6px 12px}
 .as-prev h4{margin:10px 12px 2px;font-size:20px;font-weight:900}
 .as-prev p,.as-prev ul{margin:4px 12px;font-size:14.5px;font-weight:700;line-height:1.4}
@@ -189,8 +214,9 @@ const CSS = `
 .as-ck{display:flex;gap:8px;align-items:flex-start;margin:14px 0 6px;font-size:14px;font-weight:700;line-height:1.4}
 .as-ck input{width:22px;height:22px;flex:none;margin-top:1px}
 .as-err{margin:8px 0;padding:10px 12px;border:3px solid #b42318;border-radius:12px;background:#fff0ee;color:#7a1a10;font-weight:900;font-size:14px}
-.as-b{display:block;width:100%;min-height:52px;margin:10px 0;border:4px solid #0f2d1e;border-radius:14px;background:#1F7A46;color:#fff;font:inherit;font-size:17px;font-weight:900;cursor:pointer}
+.as-b{display:block;width:100%;min-height:52px;margin:10px 0;border:4px solid #0f2d1e;border-radius:14px;background:var(--dc-verde,#1F7A46);color:#fff;font:inherit;font-size:17px;font-weight:900;cursor:pointer}
 .as-wa{background:#25D366;color:#0f2d1e}
 .as-ok{padding-top:14px}.as-ok h2{font-size:22px;font-weight:900;margin:0 0 8px}.as-ok p{font-size:15px;font-weight:700;line-height:1.45}
+.as-seg{margin:8px 0;border:3px solid var(--dc-verde,#1F7A46);border-radius:12px;background:#fff}.as-seg summary{min-height:48px;display:flex;align-items:center;padding:0 12px;font-weight:900;font-size:15px;cursor:pointer}.as-segc{padding:0 12px 10px}.as-res{margin:6px 0 0;font-weight:900;font-size:15px;line-height:1.4}.as-res a{color:var(--dc-verde,#1F7A46)}
 .as-folio{background:#FFF7D6;border:2px dashed #b8860b;border-radius:8px;padding:1px 8px;white-space:nowrap}
 `;

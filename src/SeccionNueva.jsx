@@ -190,7 +190,7 @@ export const CSS_SN = `.sn-micro{margin:6px 0 10px}.sn-micro-l{display:flex;flex
 .sn-tx b{font-size:17px;line-height:1.15;font-weight:900;color:#0f4a2f}
 .sn-tx small{font-size:14.5px;line-height:1.3;font-weight:700;color:#3d5a4a}
 .sn-fl{flex:0 0 auto;font-size:22px;font-weight:900;color:#0f4a2f;width:26px;text-align:center}
-.sn-cont{padding:6px 10px 14px;border-top:1px dashed rgba(15,45,30,.18);background:#fbf7ec}
+.sn-cont{padding:6px 10px 14px;border-top:1px dashed rgba(15,45,30,.18);background:var(--dc-fondo,#FBF7EC)}
 .sn-banda{display:flex;align-items:center;gap:12px;width:100%;margin:14px 0 6px;text-align:left;border:2px solid;border-radius:20px;padding:12px 14px;min-height:70px;cursor:pointer;color:#0f2d1e}
 .sn-banda-e{font-size:30px}
 .sn-banda-go{flex:0 0 auto;display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:#0f4a2f;color:#fff;font-size:18px;font-weight:900}

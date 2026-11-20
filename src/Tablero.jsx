@@ -57,10 +57,10 @@ export default function Tablero({ paso, emoji, titulo, intro, color = "#1B6F8A",
 .tb-lista .tb-e{width:44px;height:44px;border-radius:50%;flex:none}
 .tb-lista .tb-t{flex:1}
 .tb-go{font-size:26px;font-weight:900;color:#64748b;line-height:1}
-.tb-lista .tb-reg{flex-direction:row;align-items:center;border-bottom-width:6px;background:#1F7A46;color:#fff}
+.tb-lista .tb-reg{flex-direction:row;align-items:center;border-bottom-width:6px;background:var(--dc-verde,#1F7A46);color:#fff}
 .tb-lista .tb-reg small{color:#e3f6ea}
 .tb-lista .tb-reg .tb-e{background:#fff}
-.tb-lleno .tb-card{background:var(--c);color:#fff;border-color:rgba(255,255,255,.75);border-left-color:rgba(0,0,0,.28)}.tb-lleno .tb-card:active{background:var(--c);filter:brightness(.92)}.tb-lleno .tb-card small,.tb-lleno .tb-go{color:#fff}.tb-lleno .tb-card .tb-e{background:#fff}.tb-lleno .tb-reg{background:#1F7A46}
+.tb-lleno .tb-card{background:var(--c);color:#fff;border-color:rgba(255,255,255,.75);border-left-color:rgba(0,0,0,.28)}.tb-lleno .tb-card:active{background:var(--c);filter:brightness(.92)}.tb-lleno .tb-card small,.tb-lleno .tb-go{color:#fff}.tb-lleno .tb-card .tb-e{background:#fff}.tb-lleno .tb-reg{background:var(--dc-verde,#1F7A46)}
 .tb-bloq{opacity:.85}
 .tb-reg{grid-column:1/-1;min-height:84px;background:#eafaf0}
 `}</style>

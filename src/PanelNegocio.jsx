@@ -199,7 +199,7 @@ export default function PanelNegocio() {
 }
 
 const CSS = `
-.pn-fondo{position:fixed;inset:0;z-index:85;background:#fbf7ec;font-family:Nunito,system-ui,sans-serif;color:#0f2d1e;display:flex;justify-content:center}
+.pn-fondo{position:fixed;inset:0;z-index:85;background:var(--dc-fondo,#FBF7EC);font-family:Nunito,system-ui,sans-serif;color:#0f2d1e;display:flex;justify-content:center}
 .pn-caja{width:100%;max-width:560px;height:100%;overflow-y:auto;overscroll-behavior:contain;padding-bottom:40px}
 .pn-bar{position:sticky;top:0;z-index:3;display:flex;align-items:center;gap:8px;background:#7a4a00;color:#fff;padding:8px 10px}
 .pn-bar b{flex:1;font-size:16px;font-weight:900;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
