@@ -1,6 +1,7 @@
 // INICIO v2 (e71) — portada rediseñada: se activa con ?v=2 (y se recuerda en este celular; ?v=1 regresa a la anterior).
 // Conserva el cintillo, el encabezado y la barra inferior (viven fuera de aquí). Todos los botones llevan a lo mismo que antes.
 import React, { useEffect, useState } from "react";
+import { abrirQueEs } from "./QueEsDcuates.jsx";
 import EntradaDcuates, { elegirPuerta, abrirVentanaEntrada, abrirTour } from "./PuertasDcuates.jsx";
 import { BandaImpacto, TABS } from "./BloqueCentral.jsx";
 import { Hoja, Atajos, BloqueLado, CSS as CSS_VI } from "./InicioNuevo.jsx";
@@ -233,6 +234,7 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
     negocios: { f: "#D6F1EC", b: "#82CFC2", t: "#0B5A53", i: "#0B6E66", tt: "#07504A" }
   };
   const PAL = variante === "3" || variante === "5" || variante === "6" ? { ...C, ...P3 } : { ...C, conocer: C.azul, participar: C.azul, causas: C.naranja, negocios: C.verde };
+  const queEs = () => { registrar("v2_tarjeta", { k: "que_es" }); abrirQueEs(); };
   const tres = [
     ["conocer", "Quiero conocer DCUATES", "Todos ganamos", "azul", "carita"],
     ["causas", "Causas y Beneficios", "Apoya y gana", "naranja", "corazon"],
@@ -266,6 +268,7 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
   const base = (
     <>
       <Ancho n="alzada" fam="azul" t="¿CÓMO PUEDO PARTICIPAR?" sub="Empieza aquí: es fácil y gratis" f={abre("participar")} />
+      <Ancho n="ayuda" fam="naranja" t="¿QUÉ ES DCUATES?" sub="Descubre quiénes somos" f={queEs} />
       <div className="v2-tres">
         {tres.map(([k, t, s, fam, ic]) => (
           <button key={k} type="button" className="v2-card" style={{ background: C[fam].f, borderColor: C[fam].b, boxShadow: "0 4px 0 " + C[fam].b }} onClick={abre(k)}>
@@ -290,6 +293,7 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
   const solido = (
     <>
       <section className="v3-sol" aria-label="Explora DCUATES">
+        {banda("q", "ayuda", "¿QUÉ ES DCUATES?", "Descubre quiénes somos", "linear-gradient(120deg,#E07410,#F2A900)", queEs)}
         {banda("c", "carita", "Quiero conocer DCUATES", "Todos ganamos", "linear-gradient(120deg,#5B3FC0,#8B6FE8)", abre("conocer"))}
         {banda("p", "alzada", "¿Cómo puedo participar?", "Empieza aquí: es fácil y gratis", "linear-gradient(120deg,#E8553F,#FF8F6B)", abre("participar"))}
         {banda("a", "corazon", "Causas y Beneficios", "Apoya y gana", "linear-gradient(120deg,#D6246E,#FF6FA3)", abre("causas"))}
@@ -321,6 +325,7 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
         <h2>Elige tu camino</h2>
         <div className="v5-grid">
           {bt("p", "v5-big", "linear-gradient(160deg,#E8553F,#FF9A6F)", "alzada", "¿CÓMO PUEDO PARTICIPAR?", "Empieza aquí: es fácil y gratis", abre("participar"))}
+          {bt("q", "v5-s", "linear-gradient(135deg,#E07410,#F2A900)", "ayuda", "¿QUÉ ES DCUATES?", "", queEs)}
           {bt("c", "v5-s", "linear-gradient(135deg,#5B3FC0,#8B6FE8)", "carita", "Quiero conocer DCUATES", "", abre("conocer"))}
           {bt("a", "v5-s", "linear-gradient(135deg,#D6246E,#FF6FA3)", "corazon", "Causas y Beneficios", "", abre("causas"))}
           {bt("n", "v5-m", "linear-gradient(135deg,#0B6E66,#2BB3A3)", "tienda", "Ganar-Ganar", "Emprendimientos, alianzas y patrocinios", abre("negocios"))}
@@ -343,6 +348,7 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
   // v6 «Vitrina»: accesos redondos arriba, gran tarjeta de bienvenida con 3 pasos y tarjetas "de cristal".
   const hist = [
     ["alzada", "Participa", "linear-gradient(135deg,#E8553F,#FF9A6F)", abre("participar")],
+    ["ayuda", "¿Qué es?", "linear-gradient(135deg,#E07410,#F2A900)", queEs],
     ["carita", "Conoce", "linear-gradient(135deg,#5B3FC0,#8B6FE8)", abre("conocer")],
     ["corazon", "Causas", "linear-gradient(135deg,#D6246E,#FF6FA3)", abre("causas")],
     ["tienda", "Ganar-Ganar", "linear-gradient(135deg,#0B6E66,#2BB3A3)", abre("negocios")],
@@ -371,6 +377,7 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
         <span className="v6-feat-b">Empezar ›</span>
       </button>
       <section className="v6-g">
+        {tarjeta6("q", "ayuda", "¿QUÉ ES DCUATES?", "Descubre quiénes somos", "linear-gradient(135deg,#E07410,#F2A900)", queEs)}
         {tarjeta6("c", "carita", "Quiero conocer DCUATES", "Todos ganamos", "linear-gradient(135deg,#5B3FC0,#8B6FE8)", abre("conocer"))}
         {tarjeta6("a", "corazon", "Causas y Beneficios", "Apoya y gana", "linear-gradient(135deg,#D6246E,#FF6FA3)", abre("causas"))}
         {tarjeta6("n", "tienda", "Ganar-Ganar", "Emprendimientos, alianzas y patrocinios", "linear-gradient(135deg,#0B6E66,#2BB3A3)", abre("negocios"))}
@@ -395,6 +402,7 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
       <section className="v4-ruta" aria-label="Tu ruta en DCUATES">
         <h2>Tu ruta en DCUATES</h2>
         {[
+          ["?", "¿Qué es DCUATES?", "Descubre quiénes somos", "naranja", "ayuda", queEs],
           ["1", "Conoce", "Quiénes somos y qué hay", "amarillo", "carita", abre("conocer")],
           ["2", "Participa", "Cómo puedes empezar hoy", "azul", "alzada", abre("participar")],
           ["3", "Apoya", "Causas y beneficios", "naranja", "corazon", abre("causas")],
@@ -693,9 +701,9 @@ const CSS = `
 @keyframes v2nudge{0%,100%{translate:0 0}50%{translate:5px 0}}
 .v2-frase{position:relative;z-index:1;margin:9px 4px 2px;text-align:center;font-size:15px;font-weight:900;line-height:1.25;color:#12355B;animation:v2fr .6s ease-out}
 @keyframes v2fr{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-.v3-b-i,.v3-rt svg{animation:v3p 9.6s ease-in-out infinite}
-.v3-sol .v3-b:nth-child(1) .v3-b-i{animation-delay:0s}.v3-sol .v3-b:nth-child(2) .v3-b-i{animation-delay:1.2s}.v3-sol .v3-b:nth-child(3) .v3-b-i{animation-delay:2.4s}.v3-sol .v3-b:nth-child(4) .v3-b-i{animation-delay:3.6s}.v3-sol .v3-b:nth-child(5) .v3-b-i{animation-delay:4.8s}
-.v2-reg-g .v3-rt:nth-child(1) svg{animation-delay:6s}.v2-reg-g .v3-rt:nth-child(2) svg{animation-delay:7.2s}.v2-reg-g .v3-rt:nth-child(3) svg{animation-delay:8.4s}
+.v3-b-i,.v3-rt svg{animation:v3p 10.8s ease-in-out infinite}
+.v3-sol .v3-b:nth-child(1) .v3-b-i{animation-delay:0s}.v3-sol .v3-b:nth-child(2) .v3-b-i{animation-delay:1.2s}.v3-sol .v3-b:nth-child(3) .v3-b-i{animation-delay:2.4s}.v3-sol .v3-b:nth-child(4) .v3-b-i{animation-delay:3.6s}.v3-sol .v3-b:nth-child(5) .v3-b-i{animation-delay:4.8s}.v3-sol .v3-b:nth-child(6) .v3-b-i{animation-delay:6s}
+.v2-reg-g .v3-rt:nth-child(1) svg{animation-delay:7.2s}.v2-reg-g .v3-rt:nth-child(2) svg{animation-delay:8.4s}.v2-reg-g .v3-rt:nth-child(3) svg{animation-delay:9.6s}
 @keyframes v3p{0%{scale:1}5%{scale:1.18}10%{scale:1}100%{scale:1}}
 @media (prefers-reduced-motion:reduce){.v2-sp,.v2-club-r .pc,.v2-mp-e,.v2-unete i,.v2-unete::after,.v3-b-i,.v3-rt svg{animation:none!important}.v2-sp{display:none}.v2-frase{animation:none}}
 .v2-club-b{align-self:flex-start}

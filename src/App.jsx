@@ -50,6 +50,7 @@ import RegistroPrevio from "./RegistroPrevio.jsx";
 import NegocioCuate from "./NegocioCuate.jsx";
 import DirectorioNegocios from "./DirectorioNegocios.jsx";
 import AsistentePagina from "./AsistentePagina.jsx";
+import QueEsDcuates from "./QueEsDcuates.jsx";
 import { cargarTema } from "./utilidades/tema.js";
 import PanelNegocio from "./PanelNegocio.jsx";
 import { cargarSinonimosHoja } from "./utilidades/sinonimosHoja.js";
@@ -748,6 +749,7 @@ export default function App() {
       <NegocioCuate />
       <DirectorioNegocios />
       <AsistentePagina />
+      <QueEsDcuates />
       <PanelNegocio />
       <Tablon />
       <GratitudVentanas filas={filasEnlaces} />
