@@ -4,6 +4,11 @@
 // Textos marcados «BORRADOR» no venían en el documento original y están propuestos para revisión.
 
 export const FRASES = {
+  bienvenida: "¡TODOS TENEMOS ALGO QUE BUSCAR, OFRECER Y COMPARTIR!",
+  bienvenidaTxt: "DCUATES conecta personas, necesidades, capacidades, iniciativas y oportunidades para facilitar soluciones, generar beneficios y construir nuevas posibilidades de desarrollo personal y comunitario.",
+  bienvenidaTxt2: "No todas las personas llegan buscando lo mismo. Algunas necesitan encontrar algo, pedir información o apoyo; otras desean compartir lo que saben, ofrecen, tienen o pueden aportar. Ambas motivaciones valen lo mismo y se complementan.",
+  cultivamos: "CULTIVAMOS PERSONAS, TEJEMOS COMUNIDAD Y MULTIPLICAMOS POSIBILIDADES.",
+  desarrollo: "DESARROLLO INTEGRAL Y COMPARTIDO",
   compartir: "¡TODOS TENEMOS ALGO QUE COMPARTIR!",
   mejor: "¡JUNTOS HACEMOS UNA MEJOR COMUNIDAD!",
   conectando: "CONECTANDO PERSONAS, IDEAS, PROYECTOS, CAUSAS Y OPORTUNIDADES",
@@ -107,3 +112,77 @@ export const FORMAS = [
 
 // Conexiones futuras con el resto del sitio (solo conceptual en esta etapa: NO son enlaces).
 export const FUTURO = ["Negocios", "Beneficios", "Causas", "Bibliobici", "Causa Animal", "Alianzas Solidarias", "Voluntariado", "Club DCUATES", "Círculo de Confianza", "Proyectos e iniciativas"];
+
+// ===== e86b: DOS PUERTAS (texto tomado del documento «Mejoras a ¿Qué es DCUATES?») =====
+export const PERSONAS = ["👵", "🧑‍🔧", "👩‍🍳", "🧒", "🧑‍🏫", "👨‍🌾", "👩‍💻", "🧓"];
+
+export const PUERTA1 = {
+  n: "01", t: "QUIERO BUSCAR / SOLICITAR", e: "🔎", c: "#0E7C86", f: "#E3F4F5",
+  lema: "Tengo una necesidad, busco algo o quiero encontrar nuevas posibilidades.",
+  ejemplos: ["Productos, servicios y negocios", "Promociones, descuentos y beneficios", "Información y orientación", "Apoyo y acompañamiento", "Personas, organizaciones e iniciativas que puedan ayudar", "Oportunidades de aprendizaje, colaboración o desarrollo"],
+  cta: "ENCUENTRA LO QUE BUSCAS",
+  nota: "Pedir o recibir apoyo no depende de que ofrezcas algo a cambio, participes en actividades o demuestres antes alguna capacidad."
+};
+// Atajos REALES (solo lo que ya existe). acc = acción que ejecuta el componente.
+export const ATAJOS1 = [
+  { t: "Directorio de negocios CUATE", e: "🏪", acc: "directorio" },
+  { t: "Lo que hay en el Tablón", e: "📋", acc: "tablon" },
+  { t: "Causas y Beneficios", e: "💛", acc: "causas" },
+  { t: "Necesito algo", e: "🙋", acc: "necesito" }
+];
+
+export const PUENTE = {
+  t: "¿Y SI PODEMOS IR MÁS ALLÁ DE ENCONTRAR LO QUE BUSCAMOS?",
+  p: [
+    "Buscar o solicitar algo puede ser el comienzo de una gran conexión.",
+    "Tal vez, además de encontrar lo que necesitas, descubras que tienes conocimientos, experiencias, capacidades o recursos que pueden ser valiosos para otras personas.",
+    "Cuando compartimos, colaboramos y nos apoyamos, las oportunidades se multiplican: lo que alguien necesita puede encontrar respuesta en lo que otro ofrece, y quienes ayudan también pueden encontrar respaldo, beneficios y nuevas posibilidades para desarrollarse.",
+    "No se trata de dar algo a cambio de lo que recibes, sino de descubrir todo lo que podemos generar cuando decidimos sumar juntos."
+  ],
+  inv: "¿TE GUSTARÍA DESCUBRIR ESA OTRA POSIBILIDAD?",
+  cta: "CONOCE LA PUERTA 02: QUIERO SUMAR / MULTIPLICAR"
+};
+
+export const PUERTA2 = {
+  n: "02", t: "QUIERO SUMAR / MULTIPLICAR", e: "🌱", c: "#B85400", f: "#FFF0DC",
+  lema: "Tengo algo que ofrecer, quiero apoyar, participar o impulsar nuevas posibilidades.",
+  ejemplos: ["Compartir conocimientos, experiencias, talentos y capacidades", "Dar visibilidad a negocios, productos, servicios y emprendimientos", "Impulsar proyectos e iniciativas", "Participar en causas y acciones comunitarias", "Construir alianzas y relaciones de colaboración", "Apoyar y recibir apoyo", "Conocer el Club DCUATES y las posibilidades de integración"],
+  cta: "DESCUBRE CÓMO PODEMOS MULTIPLICAR",
+  nota: "Sumar no es solo hacer voluntariado o dar dinero: también se aporta con conocimientos, contactos, servicios, productos, ideas, experiencias, tiempo y capacidades.",
+  beneficios: ["Visibilidad", "Relaciones de confianza", "Aprendizaje", "Oportunidades", "Colaboración", "Acceso a apoyos", "Proyectos más fuertes"],
+  apoyo: "Quienes contribuyen también pueden necesitar respaldo, orientación, recursos o acompañamiento. DCUATES es un espacio donde quienes apoyan encuentran también apoyo para su propio desarrollo."
+};
+export const ATAJOS2 = [
+  { t: "Quiero ofrecer algo", e: "🎁", acc: "ofrezco" },
+  { t: "Arma tu página CUATE", e: "🏪", acc: "asistente" },
+  { t: "Club DCUATES", e: "🏅", acc: "club" },
+  { t: "Causas y Beneficios", e: "💛", acc: "causas" }
+];
+
+export const AMBAS = {
+  t: "¡Y PUEDES HACER AMBAS COSAS!",
+  p: "Todos podemos necesitar, recibir, ofrecer y apoyar. Nuestras circunstancias y posibilidades cambian, y todos tenemos algo que compartir."
+};
+
+export const CULTIVAR = {
+  t: "CULTIVAR", e: "🌱", c: "#2F7D3A", f: "#E8F5E9",
+  d: "Alimentar y fortalecer lo interno",
+  p: "Desarrollar personas, capacidades, conocimientos, talentos, experiencias, valores, emociones, confianza, bienestar y potencialidades."
+};
+export const TEJER = {
+  t: "TEJER", e: "🧵", c: "#8E3A9F", f: "#F5E8F8",
+  d: "Construir y fortalecer lo externo",
+  p: "Generar relaciones, vínculos, redes, alianzas, oportunidades y estructuras de apoyo que dan unión, abrigo, protección y respaldo."
+};
+export const CULTIVAR_TEJER_NOTA = "Se complementan y se retroalimentan: cuando las personas crecen, la comunidad se fortalece; y cuando la comunidad se teje, cada persona encuentra dónde crecer.";
+
+export const CADENA = {
+  t: "CADENA DE VALORES Y APOYOS MUTUOS",
+  p: ["Ayudamos a quien pide ayuda, sin condicionar el apoyo a que pueda dar algo a cambio.", "Y apoyamos especialmente a quienes apoyan: quienes ayudan a los demás también tienen necesidades y merecen respaldo."],
+  nota: "La reciprocidad no es una deuda ni se devuelve a la misma persona: el valor sigue circulando y genera nuevas oportunidades para otras."
+};
+
+export const CIERRE = {
+  p: "Puedes llegar por lo que necesitas, por lo que tienes para compartir o por lo que deseas construir. Lo importante es descubrir las posibilidades que podemos generar juntos.",
+  fin: "Una comunidad donde todos podemos necesitar, recibir, aportar, apoyar y desarrollarnos."
+};
