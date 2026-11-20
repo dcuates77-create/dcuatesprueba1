@@ -1,13 +1,16 @@
 // «¿QUÉ ES DCUATES?» (e86a) — MAQUETA visual móvil para revisión. Complemento de «Quiero conocer DCUATES».
 // 7 apartados navegables; las tarjetas tienen «Conoce más» (hoja con la explicación ampliada). No registra, no envía, no enlaza a otras secciones.
 // Todo el texto está en src/datos/queEsDcuates.js. Fotos opcionales: /images/que-es/<clave>.webp (si no existe, se ve una ilustración).
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useAtras } from "./atras.js";
 import { registrar } from "./analitica.js";
-import { FRASES, APARTADOS, VISION, ACCIONES, FUNDAMENTOS, RELACION, IDENTIDAD, MOTIVOS, DIMENSIONES, FORMAS, FUTURO } from "./datos/queEsDcuates.js";
+import { abrirTablon } from "./Tablon.jsx";
+import { abrirRegistroPrevio } from "./RegistroPrevio.jsx";
+import { abrirAsistente } from "./AsistentePagina.jsx";
+import { FRASES, APARTADOS, VISION, ACCIONES, FUNDAMENTOS, RELACION, IDENTIDAD, MOTIVOS, DIMENSIONES, FORMAS, FUTURO, PERSONAS, PUERTA1, ATAJOS1, PUENTE, PUERTA2, ATAJOS2, AMBAS, CULTIVAR, TEJER, CULTIVAR_TEJER_NOTA, CADENA, CIERRE } from "./datos/queEsDcuates.js";
 
-export const abrirQueEs = (n) => window.dispatchEvent(new CustomEvent("dcuates:que-es", { detail: n || 0 }));
+export const abrirQueEs = (n) => window.dispatchEvent(new CustomEvent("dcuates:que-es", { detail: typeof n === "number" ? n : -1 }));
 const HASH = "#que-es-dcuates";
 
 function Foto({ k, e, c }) {
@@ -35,39 +38,99 @@ function Tarjeta({ it, onMas, letra }) {
 
 export default function QueEsDcuates() {
   const [abierto, setAbierto] = useState(() => typeof window !== "undefined" && window.location.hash === HASH);
-  const [ap, setAp] = useState(0); // 0 = vista central; 1..7 = apartado
+  const [ap, setAp] = useState(-1); // -1 = inicio (bienvenida y dos puertas); 0 = «Profundiza» (mapa de 7 pasos); 1..7 = apartado
   const [mas, setMas] = useState(null);
+  const p2 = useRef(null);
   useEffect(() => {
     const quitar = () => { try { history.replaceState(history.state, "", window.location.pathname + window.location.search); } catch (x) { /* sin historial */ } };
     if (window.location.hash === HASH) quitar();
-    const al = () => { if (window.location.hash === HASH) { setAp(0); setAbierto(true); quitar(); } };
-    const ev = (e) => { setAp(Number(e.detail) || 0); setAbierto(true); };
+    const al = () => { if (window.location.hash === HASH) { setAp(-1); setAbierto(true); quitar(); } };
+    const ev = (e) => { setAp(Number.isFinite(Number(e.detail)) ? Number(e.detail) : -1); setAbierto(true); };
     window.addEventListener("hashchange", al);
     window.addEventListener("dcuates:que-es", ev);
     return () => { window.removeEventListener("hashchange", al); window.removeEventListener("dcuates:que-es", ev); };
   }, []);
   const cerrar = () => { setAbierto(false); setMas(null); };
-  const oculta = useAtras(abierto, cerrar);
+  const oculta = useAtras(abierto, cerrar, { hub: true });
   const ocultaMas = useAtras(!!mas, () => setMas(null));
   useEffect(() => { if (abierto) registrar("que_es_abrir"); }, [abierto]);
   useEffect(() => { if (abierto && ap) registrar("que_es_apartado", { n: ap }); }, [abierto, ap]);
   useEffect(() => { if (abierto) { const el = document.querySelector(".qe-cuerpo"); if (el) el.scrollTop = 0; } }, [ap, abierto]);
   if (!abierto) return null;
 
-  const A = APARTADOS[ap - 1];
-  const ir = (n) => setAp(Math.max(0, Math.min(7, n)));
+  const A = ap > 0 ? APARTADOS[ap - 1] : null;
+  const ir = (n) => setAp(Math.max(-1, Math.min(7, n)));
+  const ev = (n, d) => window.dispatchEvent(new CustomEvent(n, { detail: d }));
+  // Atajos a lugares REALES. El overlay se queda debajo y reaparece con «Atrás».
+  const ejecutar = (acc) => {
+    registrar("que_es_atajo", { acc });
+    if (acc === "directorio") ev("dcuates:directorio");
+    else if (acc === "tablon") abrirTablon("");
+    else if (acc === "necesito") abrirRegistroPrevio("necesito", {});
+    else if (acc === "ofrezco") abrirRegistroPrevio("ofrezco", {});
+    else if (acc === "asistente") abrirAsistente();
+    else if (acc === "causas" || acc === "club" || acc === "participar") ev("dcuates:que-es-ir", acc);
+  };
+  const irPuerta2 = () => { registrar("que_es_puente"); const el = p2.current; if (el) el.scrollIntoView({ behavior: "smooth", block: "start" }); };
+  const Puerta = ({ d, atajos, cta, accCta, id, refP }) => (
+    <section className="qe-puerta" style={{ borderColor: d.c, background: d.f }} ref={refP} data-testid={id} aria-label={d.t}>
+      <div className="qe-p-h"><i style={{ background: d.c }}>{d.n}</i><b style={{ color: d.c }}>{d.e} {d.t}</b></div>
+      <p className="qe-p-lema">{d.lema}</p>
+      <ul className="qe-p-ej">{d.ejemplos.map((x) => <li key={x}>{x}</li>)}</ul>
+      {d.beneficios && <div className="qe-chips qe-chips-s">{d.beneficios.map((m) => <span key={m}>{m}</span>)}</div>}
+      <p className="qe-p-nota">{d.nota}</p>
+      {d.apoyo && <p className="qe-p-nota">{d.apoyo}</p>}
+      <button type="button" className="qe-p-cta" style={{ background: d.c }} onClick={() => ejecutar(accCta)} data-testid={id + "-cta"}>{cta} ›</button>
+      <div className="qe-atajos">{atajos.map((a) => <button key={a.t} type="button" style={{ borderColor: d.c, color: d.c }} onClick={() => ejecutar(a.acc)} data-testid={"qe-atajo-" + a.acc}><span aria-hidden="true">{a.e}</span> {a.t}</button>)}</div>
+    </section>
+  );
   const abrirMas = (it) => { registrar("que_es_mas", { k: it.k || it.l }); setMas(it); };
   const Lista = ({ items, letra }) => <div className="qe-lista">{items.map((it) => <Tarjeta key={it.k || it.l} it={it} onMas={abrirMas} letra={letra} />)}</div>;
   const Pie = () => (
     <div className="qe-pie">
       {ap > 1 && <button type="button" className="qe-nav" onClick={() => ir(ap - 1)} data-testid="qe-ant">‹ {APARTADOS[ap - 2].t}</button>}
       {ap < 7 && <button type="button" className="qe-nav qe-nav-s" onClick={() => ir(ap + 1)} data-testid="qe-sig">{APARTADOS[ap].t} ›</button>}
-      <button type="button" className="qe-nav qe-nav-c" onClick={() => ir(0)} data-testid="qe-central">Volver a la vista central</button>
+      <button type="button" className="qe-nav qe-nav-c" onClick={() => ir(0)} data-testid="qe-central">Volver al mapa de pasos</button>
     </div>
   );
 
   let cuerpo;
-  if (ap === 0) {
+  if (ap === -1) {
+    cuerpo = (
+      <>
+        <div className="qe-hero" data-testid="qe-bienvenida">
+          <div className="qe-personas" aria-hidden="true">{PERSONAS.map((p, i) => <span key={i}>{p}</span>)}</div>
+          <h2>{FRASES.bienvenida}</h2>
+          <p>{FRASES.bienvenidaTxt}</p>
+          <p className="qe-p2">{FRASES.bienvenidaTxt2}</p>
+        </div>
+        <div className="qe-sub">Elige por dónde empezar</div>
+        <Puerta d={PUERTA1} atajos={ATAJOS1} cta={PUERTA1.cta} accCta="tablon" id="qe-puerta1" />
+        <div className="qe-puente" data-testid="qe-puente">
+          <div className="qe-puente-l" aria-hidden="true">⌄</div>
+          <h3>{PUENTE.t}</h3>
+          {PUENTE.p.map((x, i) => <p key={i}>{x}</p>)}
+          <b className="qe-puente-i">{PUENTE.inv}</b>
+          <button type="button" className="qe-p-cta qe-puente-b" onClick={irPuerta2} data-testid="qe-puente-cta">{PUENTE.cta} ›</button>
+        </div>
+        <Puerta d={PUERTA2} atajos={ATAJOS2} cta={PUERTA2.cta} accCta="participar" id="qe-puerta2" refP={p2} />
+        <div className="qe-ambas" data-testid="qe-ambas"><b>{AMBAS.t}</b><span>{AMBAS.p}</span></div>
+        <div className="qe-sub">Nuestra visión</div>
+        <div className="qe-ct">
+          {[CULTIVAR, TEJER].map((x) => (
+            <div key={x.t} style={{ background: x.f, borderColor: x.c }} data-testid={"qe-" + x.t.toLowerCase()}>
+              <span aria-hidden="true">{x.e}</span><b style={{ color: x.c }}>{x.t}</b><em>{x.d}</em><p>{x.p}</p>
+            </div>
+          ))}
+        </div>
+        <p className="qe-ct-n">{CULTIVAR_TEJER_NOTA}</p>
+        <div className="qe-frase qe-frase-g" data-testid="qe-rectora">{FRASES.cultivamos}<small>{FRASES.desarrollo}</small></div>
+        <div className="qe-cadena-t" data-testid="qe-cadena-t"><b>⛓️ {CADENA.t}</b>{CADENA.p.map((x, i) => <p key={i}>{x}</p>)}<small>{CADENA.nota}</small></div>
+        <div className="qe-cierre" data-testid="qe-cierre"><p>{CIERRE.p}</p><div className="qe-frase qe-frase-g">{FRASES.cultivamos}<small>{FRASES.desarrollo}</small></div><span>{CIERRE.fin}</span></div>
+        <button type="button" className="qe-prof" onClick={() => ir(0)} data-testid="qe-profundiza">Profundiza: recorre los 7 pasos ›</button>
+      </>
+    );
+  } else if (ap === 0) {
     cuerpo = (
       <>
         <div className="qe-hero">
@@ -86,6 +149,7 @@ export default function QueEsDcuates() {
           ))}
         </div>
         <div className="qe-frase">{FRASES.conectando}</div>
+        <button type="button" className="qe-nav qe-nav-c" style={{ width: "100%", marginTop: 14 }} onClick={() => ir(-1)} data-testid="qe-inicio-sec">Volver al inicio de la sección</button>
       </>
     );
   } else if (ap === 1) {
@@ -147,11 +211,11 @@ export default function QueEsDcuates() {
   }
 
   return createPortal(
-    <div className="qe-ov" role="dialog" aria-modal="true" aria-label="¿Qué es DCUATES?" style={oculta ? { display: "none" } : undefined} data-testid="qe-overlay">
+    <div className="qe-ov" role="dialog" aria-modal="true" aria-label="¿Qué es DCUATES?" style={oculta && !mas ? { display: "none" } : undefined} data-testid="qe-overlay">
       <style>{CSS}</style>
       <header className="qe-h">
-        <button type="button" className="qe-x" onClick={ap ? () => ir(0) : cerrar} aria-label={ap ? "Volver a la vista central" : "Cerrar"} data-testid="qe-atras">‹</button>
-        <div className="qe-h-t"><b>{ap ? A.t : "¿QUÉ ES DCUATES?"}</b><small>{ap ? A.s : "COMUNIDAD · Maqueta para revisión"}</small></div>
+        <button type="button" className="qe-x" onClick={ap >= 0 ? () => ir(ap > 0 ? 0 : -1) : cerrar} aria-label={ap >= 0 ? "Volver" : "Cerrar"} data-testid="qe-atras">‹</button>
+        <div className="qe-h-t"><b>{ap > 0 ? A.t : ap === 0 ? "PROFUNDIZA" : "¿QUÉ ES DCUATES?"}</b><small>{ap > 0 ? A.s : ap === 0 ? "Los 7 pasos para conocer DCUATES a fondo" : "COMUNIDAD · Maqueta para revisión"}</small></div>
         <button type="button" className="qe-x" onClick={cerrar} aria-label="Cerrar" data-testid="qe-cerrar">✕</button>
       </header>
       {ap > 0 && <div className="qe-prog" aria-label={"Apartado " + ap + " de 7"}>{APARTADOS.map((a) => <button key={a.k} type="button" onClick={() => ir(a.n)} aria-label={a.t} className={a.n === ap ? "on" : ""} style={a.n === ap ? { background: a.c } : undefined} />)}</div>}
@@ -216,5 +280,26 @@ const CSS = `
 .qe-ej{background:#F1F8E9;border-radius:12px;padding:8px 12px;margin-top:10px}
 .qe-hoja-x{position:absolute;top:10px;right:10px;width:36px;height:36px;border-radius:50%;border:0;background:#eee;font-size:16px;cursor:pointer}
 .qe-hoja-b{display:block;width:100%;margin-top:14px;border:0;border-radius:12px;padding:12px;color:#fff;font-weight:700;font-size:15px;cursor:pointer}
+.qe-personas{display:flex;justify-content:center;gap:2px;font-size:30px;margin-bottom:4px;flex-wrap:wrap}
+.qe-p2{margin-top:8px!important;font-size:14px!important;color:#444}
+.qe-puerta{border:3px solid;border-radius:18px;padding:14px;margin-bottom:6px}
+.qe-p-h{display:flex;align-items:center;gap:10px}.qe-p-h i{width:34px;height:34px;border-radius:50%;color:#fff;font-style:normal;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none;font-size:14px}.qe-p-h b{font-size:16px;line-height:1.2}
+.qe-p-lema{font-style:italic;font-size:15px;line-height:1.4;margin:10px 0 6px}
+.qe-p-ej{margin:6px 0;padding-left:20px;list-style:disc}.qe-p-ej li{font-size:14px;line-height:1.45}
+.qe-p-nota{font-size:13px;line-height:1.4;color:#37474f;background:rgba(255,255,255,.7);border-radius:10px;padding:8px 10px;margin:8px 0}
+.qe-p-cta{display:block;width:100%;border:0;border-radius:14px;padding:14px;color:#fff;font-weight:800;font-size:15px;cursor:pointer;min-height:48px}
+.qe-atajos{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.qe-atajos button{background:#fff;border:2px solid;border-radius:999px;padding:8px 12px;font-weight:700;font-size:13px;cursor:pointer;min-height:40px}
+.qe-chips-s{justify-content:flex-start;margin:8px 0}.qe-chips-s span{border-style:solid;font-size:12px;padding:4px 10px}
+.qe-puente{margin:10px 0;border-radius:18px;padding:16px 14px;background:linear-gradient(180deg,#E3F4F5,#FFF0DC);border:2px dashed #B8860B;text-align:center}
+.qe-puente-l{font-size:26px;color:#B85400;line-height:1}.qe-puente h3{margin:4px 0 8px;font-size:17px;color:#8a4b00;line-height:1.25}.qe-puente p{font-size:14px;line-height:1.5;margin:7px 0;text-align:left}
+.qe-puente-i{display:block;margin:12px 0 8px;font-size:15px;color:#0E7C86}.qe-puente-b{background:#B85400}
+.qe-ambas{margin:12px 0;background:#fff;border:3px solid #8E3A9F;border-radius:18px;padding:14px;text-align:center;display:flex;flex-direction:column;gap:6px}.qe-ambas b{font-size:19px;color:#8E3A9F}.qe-ambas span{font-size:14px;line-height:1.45}
+.qe-ct{display:grid;grid-template-columns:1fr;gap:10px}.qe-ct div{border:2px solid;border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:2px}.qe-ct span{font-size:28px}.qe-ct b{font-size:18px}.qe-ct em{font-size:13px;font-style:normal;font-weight:700;color:#555}.qe-ct p{font-size:14px;line-height:1.45;margin:4px 0 0}
+.qe-ct-n{font-size:13px;line-height:1.45;text-align:center;color:#444;margin:10px 4px}
+.qe-frase-g{background:linear-gradient(120deg,#E8F5E9,#F5E8F8);color:#2b2b2b;font-size:15px}.qe-frase-g small{display:block;margin-top:4px;font-size:12px;color:#555;letter-spacing:.5px}
+.qe-cadena-t{background:#fff;border:2px solid #0E7C86;border-radius:16px;padding:12px;margin:10px 0}.qe-cadena-t b{color:#0E7C86;font-size:14px}.qe-cadena-t p{font-size:14px;line-height:1.45;margin:6px 0}.qe-cadena-t small{display:block;font-size:12.5px;line-height:1.4;color:#555;margin-top:4px}
+.qe-cierre{text-align:center;margin:14px 0}.qe-cierre p{font-size:15px;line-height:1.5}.qe-cierre span{font-size:13px;color:#555}
+.qe-prof{display:block;width:100%;margin-top:14px;background:#fff;border:2px solid var(--dc-verde,#08743B);color:var(--dc-verde,#08743B);border-radius:14px;padding:13px;font-weight:800;font-size:15px;cursor:pointer;min-height:48px}
+@media(min-width:520px){.qe-ct{grid-template-columns:1fr 1fr}}
 @media(min-width:520px){.qe-duo{grid-template-columns:1fr 1fr}.qe-pie{flex-direction:row;flex-wrap:wrap}.qe-nav{flex:1}}
 `;

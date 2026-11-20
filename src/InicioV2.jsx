@@ -221,6 +221,11 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
     return () => { window.removeEventListener("dcuates:inicio-directo", directo); window.removeEventListener("hashchange", leer); };
   }, []);
   useEffect(() => {
+    const ir = (e) => { const k = e.detail; if (k === "causas" || k === "club" || k === "participar") setVen(k); };
+    window.addEventListener("dcuates:que-es-ir", ir);
+    return () => window.removeEventListener("dcuates:que-es-ir", ir);
+  }, []);
+  useEffect(() => {
     const abrir = () => setVen("participar");
     window.addEventListener("dcuates:abrir-entrada", abrir);
     return () => window.removeEventListener("dcuates:abrir-entrada", abrir);
