@@ -9,7 +9,7 @@
 export const GOOGLE_SHEETS_URL = "https://script.google.com/macros/s/AKfycbxngMxuH03w0rI7AyJHRap9QCVf_Xs5roypGXnnkSGr_22SyfxWAVAiH614r1eGC2DW2g/exec";
 
 // Número de WhatsApp centralizado — cámbialo aquí una sola vez si cambia el teléfono
-export const WHATSAPP_NUMERO = "525520696627";
+export const WHATSAPP_NUMERO = "525540476247";
 
 // ID del video de portada en YouTube — reemplaza esto por el ID real de "Chuy el Sapo Soñador"
 // (el ID es lo que va después de "v=" en la URL normal de YouTube)
@@ -22,7 +22,34 @@ export const YOUTUBE_VIDEO_ID = "SUnE27QnnyI";
 // iframe); no hace falta tocar nada más en el código.
 // Sello de versión: se ve en pequeño al final de los accesos rápidos y en la
 // consola del navegador. Sirve para comprobar que el celular ya cargó lo último.
-export const VERSION_BUILD = "CLON10 · e3";
+export const VERSION_BUILD = "CLON15 · e88";
+// e59 — versión del Aviso de Privacidad que acepta la persona al registrarse (se anota en la hoja, columna «Aceptó aviso»). Súbela cuando cambies el aviso.
+export const VERSION_AVISO = "oct-2026 (borrador)";
+
+// Interruptor de contenido DE EJEMPLO (testimonios, cupones, casos extraviados,
+// anuncios del ticker, eventos de muestra). En true (como está ahora) se dejan visibles.
+// Al lanzar, ponlo en false y la página solo muestra
+// contenido real (hoja / Baserow / Calendar) y, si no hay, un mensaje amable.
+// Ponlo en true solo para ver cómo se vería con datos de muestra.
+export const MOSTRAR_EJEMPLOS = true;
+
+// Modo administrador (e48): el sello de versión y el estado de Baserow solo se ven aquí.
+// Para activarlo en un teléfono: abre dcuates.com/?admin=1 (queda guardado en ese teléfono).
+// Para apagarlo: dcuates.com/?admin=0. En tu computadora (localhost) siempre se ve.
+export function esAdmin() {
+  try {
+    const q = new URLSearchParams(window.location.search).get("admin");
+    if (q === "1") window.localStorage.setItem("dcuates_admin", "1");
+    if (q === "0") window.localStorage.removeItem("dcuates_admin");
+    return window.localStorage.getItem("dcuates_admin") === "1" || /^(localhost|127\.)/.test(window.location.hostname);
+  } catch {
+    return false;
+  }
+}
+
+// Botón «Invita a un vecino» (e48): texto que se manda por WhatsApp. Edítalo aquí.
+export const URL_SITIO = "https://dcuates.com";
+export const MENSAJE_INVITACION = "Hola, te invito a conocer DCUATES, la comunidad de Jardines de Morelos: libros, asesorías, mascotas y apoyos gratis. Entra aquí:";
 
 export const MAPA_NEGOCIOS_EMBED_URL = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15034.541076557625!2d-99.00223799999999!3d19.600120500000003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1ee234c038987%3A0x4b578513910d8103!2sJardines%20de%20Morelos%2C%20Ecatepec%20de%20Morelos%2C%20M%C3%A9x.!5e0!3m2!1ses!2smx!4v1790129394750!5m2!1ses!2smx";
 
@@ -53,6 +80,8 @@ export const REDES_SOCIALES = {
 // - { label, modal }  -> abre la ventana emergente de ese proyecto (mismo
 //   id que en TODOS_LOS_PROYECTOS)
 export const NAV_LINKS_MAS = [
+  { label: "Únete al Club DCUATES", emoji: "🧡", action: "club" },
+  { label: "Mi Pase Cuate", emoji: "💳", action: "tarjeta" },
   { label: "Publicidad Gratuita", emoji: "📣", href: "#publicidad" },
   { label: "Ventas con Causa", emoji: "🛍️", href: "#ventas-con-causa" },
   { label: "Alianzas Solidarias", emoji: "🤝", modal: "alianzas-tarjeta" },
@@ -66,7 +95,7 @@ export const NAV_LINKS_MAS = [
   { label: "Recomienda, Evalúa y Gana", emoji: "⭐", modal: "recomienda-evalua-gana" },
   { label: "Asesorías Gratuitas", emoji: "🎓", modal: "asesorias" },
   { label: "Bazar y Comercio", emoji: "🏪", modal: "bazares" },
-  { label: "Noticias de Barrio", emoji: "📰", modal: "noticias" },
+  { label: "Noticias de la Comunidad", emoji: "📰", modal: "noticias" },
   { label: "Bienestar y Recreación", emoji: "🧘", modal: "bienestar" },
   { label: "Sugerencias y Quejas", emoji: "💬", action: "sugerencias" },
   { label: "Preguntas Frecuentes", emoji: "❓", action: "faq" }
@@ -92,3 +121,9 @@ export const SECCIONES_BUSCABLES = [
   { t: "Aviso de Seguridad de la Comunidad", kw: "aviso seguridad fraude estafa suplantacion cuenta clabe pagos reglas encuentros baneo", id: "seguridad" },
   { t: "Escudo de Seguridad (cómo identificar el espacio seguro)", kw: "escudo seguridad fraude estafa seguro oficial whatsapp identificar proteccion", id: "escudo" }
 ];
+
+// ---- AGENDA Y UTILERÍAS (e32) ----
+export const CALENDARIO_ID_PUBLICO = "c0f9d9a89b586e52697e11c67f9d70a460f2c43ae5d10e02f8b47e12aac715a0@group.calendar.google.com";
+export const CALENDARIO_AGREGAR = "https://calendar.google.com/calendar/u/0?cid=YzBmOWQ5YTg5YjU4NmU1MjY5N2UxMWM2N2Y5ZDcwYTQ2MGYyYzQzYWU1ZDEwZTAyZjhiNDdlMTJhYWM3MTVhMEBncm91cC5jYWxlbmRhci5nb29nbGUuY29t";
+// Lugar del clima (coordenadas aproximadas de Jardines de Morelos, Ecatepec; para el clima basta la zona).
+export const CLIMA_LUGAR = { nombre: "Jardines de Morelos, Ecatepec", lat: 19.6, lon: -99.03 };
