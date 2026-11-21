@@ -128,8 +128,10 @@ export const PUERTA1 = {
 };
 // Atajos REALES (solo lo que ya existe). acc = acción que ejecuta el componente.
 export const ATAJOS1 = [
+  { t: "¿Necesitas apoyo o tienes una urgencia?", e: "🤍", acc: "urgencia" },
   { t: "Directorio de negocios CUATE", e: "🏪", acc: "directorio" },
   { t: "Lo que hay en el Tablón", e: "📋", acc: "tablon" },
+  { t: "Extraviados", e: "🔎", acc: "extraviados" },
   { t: "Causas y Beneficios", e: "💛", acc: "causas" },
   { t: "Necesito algo", e: "🙋", acc: "necesito" }
 ];
@@ -160,8 +162,19 @@ export const ATAJOS2 = [
   { t: "Quiero ofrecer algo", e: "🎁", acc: "ofrezco" },
   { t: "Arma tu página CUATE", e: "🏪", acc: "asistente" },
   { t: "Club DCUATES", e: "🏅", acc: "club" },
-  { t: "Causas y Beneficios", e: "💛", acc: "causas" }
+  { t: "Recomienda y propón", e: "💡", acc: "propon" },
+  { t: "Zona de aliados", e: "🌟", acc: "aliados" },
+  { t: "Compra, vende y dona con causa", e: "🛍️", acc: "causa" }
 ];
+
+// Acciones al final de algunos pasos (máx. 2): llevan a lo concreto de ese paso. acc = mismo vocabulario que los atajos.
+export const ACCIONES_PASO = {
+  4: [{ t: "Zona de aliados", e: "🌟", acc: "aliados" }],
+  5: [{ t: "Elige tu puerta", e: "🚪", acc: "puertas" }],
+  6: [{ t: "Proyectos y mapa del sitio", e: "🧭", acc: "mapa" }],
+  7: [{ t: "Quiero ofrecer algo", e: "🎁", acc: "ofrezco" }, { t: "Club DCUATES", e: "🏅", acc: "club" }],
+  8: [{ t: "Arma tu página CUATE", e: "🏪", acc: "asistente" }, { t: "Quiero ofrecer algo", e: "🎁", acc: "ofrezco" }]
+};
 
 export const AMBAS = {
   t: "¡Y PUEDES HACER AMBAS COSAS!",
