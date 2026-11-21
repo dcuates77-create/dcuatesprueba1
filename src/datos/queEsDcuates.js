@@ -16,15 +16,16 @@ export const FRASES = {
   rectora: "DESARROLLAR es nuestra visión y lo que nos mueve; CUATES es el camino que construimos para hacerla realidad."
 };
 
-// Los 7 apartados de navegación (no confundir con las letras D + CUATES).
+// Los 8 apartados (siguen la maqueta): menú → pantalla. «l» = leyenda breve del menú; «h» = foto en /images/que-es/<h>.webp
 export const APARTADOS = [
-  { n: 1, k: "descubre", t: "DESCUBRE", s: "Razón de ser", c: "#3E7D1E", e: "🌱" },
-  { n: 2, k: "comprende", t: "COMPRENDE", s: "Visión y camino", c: "#0E7C86", e: "🧭" },
-  { n: 3, k: "conecta", t: "CONECTA", s: "Cultura, cadena y ecosistema", c: "#B85400", e: "🔗" },
-  { n: 4, k: "identificate", t: "IDENTIFÍCATE", s: "Intereses, capacidades y circunstancias", c: "#8E3A9F", e: "🪞" },
-  { n: 5, k: "explora", t: "EXPLORA", s: "Dimensiones del desarrollo integral", c: "#2F7D3A", e: "📚" },
-  { n: 6, k: "participa", t: "PARTICIPA", s: "Aportar, recibir, compartir, colaborar", c: "#1F65A8", e: "🤝" },
-  { n: 7, k: "crece", t: "CRECE Y MULTIPLICA", s: "Desarrollo compartido", c: "#A84A00", e: "🌳" }
+  { n: 1, k: "descubre", t: "DESCUBRE", s: "Razón de ser", l: "Qué es DCUATES y por qué existimos", c: "#0E7C86", e: "🌱", h: "descubre" },
+  { n: 2, k: "comprende", t: "COMPRENDE", s: "Nuestra visión", l: "La D de DESARROLLAR: crecer desde dentro y tejer hacia fuera", c: "#D9730D", e: "🧭", h: "comprende" },
+  { n: 3, k: "cuates", t: "CUATES", s: "El camino en 6 acciones", l: "Conocer, Ubicar, Aportar, Tejer, Encontrar y Sumar", c: "#2A74B0", e: "🔤", h: "" },
+  { n: 4, k: "conecta", t: "CONECTA", s: "Cultura, cadena y ecosistema", l: "Lo que hace posibles nuestras conexiones", c: "#B85400", e: "🔗", h: "conecta" },
+  { n: 5, k: "identificate", t: "IDENTIFÍCATE", s: "Intereses, capacidades y circunstancias", l: "Tú también construyes la comunidad", c: "#8E3A9F", e: "🪞", h: "identificate" },
+  { n: 6, k: "explora", t: "EXPLORA", s: "Dimensiones del desarrollo integral", l: "Salud, educación, trabajo, cultura, entorno y convivencia", c: "#2F7D3A", e: "📚", h: "explora" },
+  { n: 7, k: "participa", t: "PARTICIPA", s: "Aportar, recibir, compartir, colaborar", l: "Formas de compartir, colaborar y ser voluntario", c: "#1F65A8", e: "🤝", h: "participa" },
+  { n: 8, k: "crece", t: "CRECE Y MULTIPLICA", s: "Desarrollo compartido", l: "Seguimos construyendo juntos una mejor comunidad", c: "#A84A00", e: "🌳", h: "crece" }
 ];
 
 // D = visión; CUATES = camino (seis acciones).
@@ -114,9 +115,11 @@ export const FORMAS = [
 export const FUTURO = ["Negocios", "Beneficios", "Causas", "Bibliobici", "Causa Animal", "Alianzas Solidarias", "Voluntariado", "Club DCUATES", "Círculo de Confianza", "Proyectos e iniciativas"];
 
 // ===== e86b: DOS PUERTAS (texto tomado del documento «Mejoras a ¿Qué es DCUATES?») =====
+export const POR_QUE = "Porque creemos que todos tenemos algo valioso que aportar.";
 export const PERSONAS = ["👵", "🧑‍🔧", "👩‍🍳", "🧒", "🧑‍🏫", "👨‍🌾", "👩‍💻", "🧓"];
 
 export const PUERTA1 = {
+  l: "Encuentra lo que necesitas: productos, servicios, apoyo, información y oportunidades.", h: "explora",
   n: "01", t: "QUIERO BUSCAR / SOLICITAR", e: "🔎", c: "#0E7C86", f: "#E3F4F5",
   lema: "Tengo una necesidad, busco algo o quiero encontrar nuevas posibilidades.",
   ejemplos: ["Productos, servicios y negocios", "Promociones, descuentos y beneficios", "Información y orientación", "Apoyo y acompañamiento", "Personas, organizaciones e iniciativas que puedan ayudar", "Oportunidades de aprendizaje, colaboración o desarrollo"],
@@ -144,6 +147,7 @@ export const PUENTE = {
 };
 
 export const PUERTA2 = {
+  l: "Comparte lo que sabes, tienes o haces, y descubre cómo se multiplica.", h: "participa",
   n: "02", t: "QUIERO SUMAR / MULTIPLICAR", e: "🌱", c: "#B85400", f: "#FFF0DC",
   lema: "Tengo algo que ofrecer, quiero apoyar, participar o impulsar nuevas posibilidades.",
   ejemplos: ["Compartir conocimientos, experiencias, talentos y capacidades", "Dar visibilidad a negocios, productos, servicios y emprendimientos", "Impulsar proyectos e iniciativas", "Participar en causas y acciones comunitarias", "Construir alianzas y relaciones de colaboración", "Apoyar y recibir apoyo", "Conocer el Club DCUATES y las posibilidades de integración"],
