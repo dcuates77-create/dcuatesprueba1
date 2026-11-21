@@ -8,7 +8,10 @@ import { registrar } from "./analitica.js";
 import { abrirTablon } from "./Tablon.jsx";
 import { abrirRegistroPrevio } from "./RegistroPrevio.jsx";
 import { abrirAsistente } from "./AsistentePagina.jsx";
-import { FRASES, APARTADOS, VISION, ACCIONES, FUNDAMENTOS, RELACION, IDENTIDAD, MOTIVOS, DIMENSIONES, FORMAS, FUTURO, PUERTA1, ATAJOS1, PUENTE, PUERTA2, ATAJOS2, AMBAS, CULTIVAR, TEJER, CULTIVAR_TEJER_NOTA, CADENA, CIERRE, POR_QUE } from "./datos/queEsDcuates.js";
+import { abrirPuerta } from "./PuertasDcuates.jsx";
+import BotonCompartir from "./BotonCompartir.jsx";
+import { ejecutar as ejecutarAccion } from "./datos/secciones.js";
+import { FRASES, APARTADOS, VISION, ACCIONES, FUNDAMENTOS, RELACION, IDENTIDAD, MOTIVOS, DIMENSIONES, FORMAS, FUTURO, PUERTA1, ATAJOS1, PUENTE, PUERTA2, ATAJOS2, AMBAS, CULTIVAR, TEJER, CULTIVAR_TEJER_NOTA, CADENA, CIERRE, POR_QUE, ACCIONES_PASO } from "./datos/queEsDcuates.js";
 
 export const abrirQueEs = (v) => window.dispatchEvent(new CustomEvent("dcuates:que-es", { detail: typeof v === "string" ? v : "menu" }));
 const HASH = "#que-es-dcuates";
@@ -97,10 +100,18 @@ export default function QueEsDcuates() {
     else if (acc === "ofrezco") abrirRegistroPrevio("ofrezco", {});
     else if (acc === "asistente") abrirAsistente();
     else if (acc === "causas" || acc === "club" || acc === "participar") ev("dcuates:que-es-ir", acc);
+    else if (acc === "urgencia") abrirPuerta("dificil");
+    else if (acc === "extraviados") abrirTablon("Extraviados");
+    else if (acc === "puertas") ejecutarAccion({ elegir: 1 });
+    else if (acc === "mapa") ejecutarAccion({ acc: "mapa" });
+    else if (acc === "propon") ejecutarAccion({ z: "propon" });
+    else if (acc === "aliados") ejecutarAccion({ aliados: 1 });
+    else if (acc === "causa") ejecutarAccion({ z: "causa" });
   };
   const Lista = ({ items, letra }) => <div className="qe-lista">{items.map((it) => <Tarjeta key={it.k || it.l} it={it} onMas={abrirMas} letra={letra} />)}</div>;
   const Sig = ({ txt }) => (
     <div className="qe-pie">
+      {(ACCIONES_PASO[nAp] || []).map((a) => <button key={a.acc} type="button" className="qe-nav qe-nav-a" style={{ borderColor: A.c, color: A.c }} onClick={() => ejecutar(a.acc)} data-testid={"qe-paso-" + a.acc}><span aria-hidden="true">{a.e}</span> {a.t}</button>)}
       <button type="button" className="qe-p-cta" style={{ background: A.c }} onClick={() => ir(nAp < 8 ? "a" + (nAp + 1) : "menu")} data-testid="qe-sig">{txt || (nAp < 8 ? APARTADOS[nAp].t + " ›" : "Volver al inicio ↑")}</button>
       {nAp > 1 && <button type="button" className="qe-nav" onClick={() => ir("a" + (nAp - 1))} data-testid="qe-ant">‹ {APARTADOS[nAp - 2].t}</button>}
       <button type="button" className="qe-nav qe-nav-c" onClick={() => ir("menu")} data-testid="qe-central">Volver al menú</button>
@@ -258,7 +269,7 @@ export default function QueEsDcuates() {
       <style>{CSS}</style>
       {vista === "menu" ? (
         <div className="qe-caja" data-testid="qe-menu">
-          <div className="qe-cab"><LogoDcuates alto={36} /><span className="qe-cab-s" /><button type="button" className="qe-x" onClick={cerrar} aria-label="Cerrar" data-testid="qe-cerrar">✕</button></div>
+          <div className="qe-cab"><LogoDcuates alto={36} /><span className="qe-cab-s" /><BotonCompartir hash="que-es-dcuates" titulo="¿Qué es DCUATES?" texto="Conoce DCUATES: una comunidad donde todos tenemos algo que buscar, ofrecer y compartir" variante="circulo" /><button type="button" className="qe-x" onClick={cerrar} aria-label="Cerrar" data-testid="qe-cerrar">✕</button></div>
           <h2 className="qe-m-t">¿QUÉ ES <i>D</i>CUATES?</h2>
           <p className="qe-m-s">Desarrollo integral y compartido · <b>Juntos construimos una mejor comunidad</b></p>
           <p className="qe-m-p">{FRASES.bienvenida}</p>
@@ -375,7 +386,7 @@ const CSS = `
 .qe-ambas{margin-top:12px;margin-bottom:12px;background:#fff;border:3px solid #8E3A9F;border-radius:18px;padding:14px;text-align:center;display:flex;flex-direction:column;gap:8px}.qe-ambas b{font-size:19px;color:#8E3A9F}.qe-ambas span{font-size:14px;line-height:1.45}
 .qe-cierre{text-align:center;margin-top:14px;margin-bottom:14px}.qe-cierre p{font-size:15px;line-height:1.5}.qe-cierre span{font-size:13px;color:#555}
 .qe-pie{display:flex;flex-direction:column;gap:8px;margin-top:22px;margin-bottom:0}
-.qe-nav{border:2px solid #0E7C86;background:#fff;color:#0E7C86;border-radius:12px;padding:12px;font-weight:800;font-size:14px;cursor:pointer;min-height:44px;font-family:inherit}.qe-nav-c{border-color:#bbb;color:#555}
+.qe-nav{border:2px solid #0E7C86;background:#fff;color:#0E7C86;border-radius:12px;padding:12px;font-weight:800;font-size:14px;cursor:pointer;min-height:44px;font-family:inherit}.qe-nav-c{border-color:#bbb;color:#555}.qe-nav-a{background:#fff}
 .qe-fin{display:block;width:100%;background:#F2A900;border:0;border-radius:14px;padding:14px;font-weight:900;font-size:16px;cursor:pointer;color:#3b2a00;font-family:inherit}
 .qe-hoja-f{position:absolute;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;z-index:2}
 .qe-hoja{position:relative;background:#fff;border-top:6px solid;border-radius:20px 20px 0 0;padding:18px 16px 20px;width:100%;max-width:520px;max-height:82vh;overflow-y:auto;box-sizing:border-box}

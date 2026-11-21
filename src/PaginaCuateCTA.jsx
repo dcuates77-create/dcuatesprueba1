@@ -1,7 +1,7 @@
 // BOTONES «TU PÁGINA CUATE» (e80) — se reutilizan en Ganar-Ganar, Tengo un negocio, Servicios especiales, Club y al pie de cada Página CUATE.
 // Dos modalidades de alta (las dos llegan a «Registros» como Borrador de Página CUATE y las apruebas tú):
-//   GRATUITO: con promociones para los Cuates, o aliado / patrocinador / altruista.
-//   DE APORTACIÓN VOLUNTARIA: sin promociones por ahora; el acuerdo se platica por WhatsApp.
+//   TU PÁGINA GRATUITA: con apoyo a causas (aportación voluntaria sobre lo que ayudemos a vender y conectar), o aliado / patrocinador / multiplicador; antes decía GRATUITO. Antes: con promociones para los Cuates, o aliado / patrocinador / altruista.
+//   TU PÁGINA DE APORTACIÓN VOLUNTARIA: sin promociones por ahora; el acuerdo se platica por WhatsApp.
 import React from "react";
 import { registrar } from "./analitica.js";
 import { abrirRegistroPrevio } from "./RegistroPrevio.jsx";
@@ -20,15 +20,15 @@ export default function PaginaCuateCTA({ compacto = false, directorio = false })
       {!compacto && <p>{texto("cta_intro", "Tu emprendimiento con página propia: tu WhatsApp, tus promociones, tu Pase y el Club DCUATES. Elige cómo quieres empezar:")}</p>}
       <button type="button" className="pc-b pc-a" data-testid="cta-asistente" onClick={() => { registrar("pagina_asistente"); abrirAsistente(); }}>
         <b>🧩 ARMA TU PÁGINA PASO A PASO</b>
-        <span>elige tu giro, usa textos de ejemplo, mira cómo se verá y envíala para revisión</span>
+        <span>{texto("cta_asist_d", "SI YA TIENES TU FOLIO APROBADO, INGRESA LOS DATOS DE TU PÁGINA: elige tu giro, usa textos de ejemplo, mira cómo se verá y envíala para revisión")}</span>
       </button>
       <button type="button" className="pc-b pc-g" onClick={() => abrirRegistroPagina("Gratuita")}>
-        <b>GRATUITO</b>
-        <span>si tienes una o más promociones para los CUATES, o eres CUATE aliado, patrocinador o altruista</span>
+        <b>{texto("cta_gratis_t", "TU PÁGINA GRATUITA")}</b>
+        <span>{texto("cta_gratis_d", "Es gratuita si APOYAS o deseas APOYAR CAUSAS con una aportación voluntaria de lo que te podamos AYUDAR A VENDER Y CONECTAR a través de la página y nuestros distintos espacios publicitarios; o si eres ALIADO, PATROCINADOR o un VALIOSO ELEMENTO MULTIPLICADOR PARA NUESTRAS COMUNIDADES. REGÍSTRATE Y CONTÁCTANOS PARA LOGRAR LOS MEJORES ACUERDOS GANAR-GANAR PARA TODOS. ¡¡¡REGÍSTRATE AQUÍ!!!")}</span>
       </button>
       <button type="button" className="pc-b pc-v" onClick={() => abrirRegistroPagina("Aportación voluntaria")}>
-        <b>DE APORTACIÓN VOLUNTARIA</b>
-        <span>si no tienes promociones o algún beneficio para los CUATES de la comunidad. Tú decides el valor de lo que podría ayudar a CRECER TU EMPRENDIMIENTO</span>
+        <b>{texto("cta_vol_t", "TU PÁGINA DE APORTACIÓN VOLUNTARIA")}</b>
+        <span>{texto("cta_vol_d", "si no tienes promociones o algún beneficio para los CUATES de la comunidad. Tú decides el valor de lo que podría ayudar a CRECER TU EMPRENDIMIENTO. ¡¡¡REGÍSTRATE AQUÍ!!!")}</span>
       </button>
       {directorio && <button type="button" className="pc-d" onClick={() => { registrar("pagina_directorio"); abrirDirectorio(); }}>🔎 Ver emprendimientos CUATE</button>}
     </section>
