@@ -1,6 +1,6 @@
-// «¿QUÉ ES DCUATES?» (e86a) — MAQUETA visual móvil para revisión. Complemento de «Quiero conocer DCUATES».
-// 7 apartados navegables; las tarjetas tienen «Conoce más» (hoja con la explicación ampliada). No registra, no envía, no enlaza a otras secciones.
-// Todo el texto está en src/datos/queEsDcuates.js. Fotos opcionales: /images/que-es/<clave>.webp (si no existe, se ve una ilustración).
+// «¿QUÉ ES DCUATES?» (e87) — MAQUETA para revisión. Complemento de «Quiero conocer DCUATES» (que no se toca).
+// Nivel 1: ventana de menú (botones con leyenda, estilo EXPLORA). Nivel 2: pantallas con vista (logo con D naranja, foto, tarjetas).
+// Todo el texto vive en src/datos/queEsDcuates.js. Fotos: public/images/que-es/<clave>.webp (reemplazables).
 import React, { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useAtras } from "./atras.js";
@@ -8,12 +8,38 @@ import { registrar } from "./analitica.js";
 import { abrirTablon } from "./Tablon.jsx";
 import { abrirRegistroPrevio } from "./RegistroPrevio.jsx";
 import { abrirAsistente } from "./AsistentePagina.jsx";
-import { FRASES, APARTADOS, VISION, ACCIONES, FUNDAMENTOS, RELACION, IDENTIDAD, MOTIVOS, DIMENSIONES, FORMAS, FUTURO, PERSONAS, PUERTA1, ATAJOS1, PUENTE, PUERTA2, ATAJOS2, AMBAS, CULTIVAR, TEJER, CULTIVAR_TEJER_NOTA, CADENA, CIERRE } from "./datos/queEsDcuates.js";
+import { FRASES, APARTADOS, VISION, ACCIONES, FUNDAMENTOS, RELACION, IDENTIDAD, MOTIVOS, DIMENSIONES, FORMAS, FUTURO, PUERTA1, ATAJOS1, PUENTE, PUERTA2, ATAJOS2, AMBAS, CULTIVAR, TEJER, CULTIVAR_TEJER_NOTA, CADENA, CIERRE, POR_QUE } from "./datos/queEsDcuates.js";
 
-export const abrirQueEs = (n) => window.dispatchEvent(new CustomEvent("dcuates:que-es", { detail: typeof n === "number" ? n : -1 }));
+export const abrirQueEs = (v) => window.dispatchEvent(new CustomEvent("dcuates:que-es", { detail: typeof v === "string" ? v : "menu" }));
 const HASH = "#que-es-dcuates";
+const VISTAS = ["menu", "p1", "p2", "a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8"];
 
-function Foto({ k, e, c }) {
+// LOGO: tres personas + DCUATES con la D en naranja + COMUNIDAD.
+export function LogoDcuates({ alto = 34 }) {
+  return (
+    <span className="qe-logo" style={{ height: alto }} aria-label="DCUATES Comunidad" role="img">
+      <svg viewBox="0 0 64 44" height={alto} aria-hidden="true">
+        {[[10, "#2E9E5B"], [22, "#1B8A8F"], [34, "#E8731A"], [46, "#2A74B0"], [57, "#7A4FBF"]].map(([x, c], i) => (
+          <g key={i} fill={c}><circle cx={x} cy={i % 2 ? 11 : 13} r="5.2" /><path d={`M${x - 7} 40 C${x - 7} ${i % 2 ? 20 : 22} ${x + 7} ${i % 2 ? 20 : 22} ${x + 7} 40 Z`} /></g>
+        ))}
+      </svg>
+      <span className="qe-logo-t"><b><i>D</i>CUATES</b><small>COMUNIDAD</small></span>
+    </span>
+  );
+}
+
+function Hero({ h, c, e, t, sub, children }) {
+  const [ok, setOk] = useState(!!h);
+  return (
+    <div className="qe-hero-f" style={{ background: "linear-gradient(135deg," + c + "," + c + "99)" }}>
+      {ok && <img src={"/images/que-es/" + h + ".webp"} alt="" onError={() => setOk(false)} />}
+      {!ok && <span className="qe-hero-e" aria-hidden="true">{e}</span>}
+      <div className="qe-hero-o">{children}</div>
+    </div>
+  );
+}
+
+function Mini({ k, e, c }) {
   const [ok, setOk] = useState(true);
   return (
     <span className="qe-foto" style={{ background: c + "22" }}>
@@ -26,9 +52,9 @@ function Foto({ k, e, c }) {
 function Tarjeta({ it, onMas, letra }) {
   return (
     <div className="qe-card" style={{ borderColor: it.c }} data-testid={"qe-card-" + (it.k || it.l)}>
-      <Foto k={it.k || it.v.toLowerCase()} e={it.e} c={it.c} />
+      {letra ? <i className="qe-letra-g" style={{ background: it.c }}>{it.l}</i> : <Mini k={it.k} e={it.e} c={it.c} />}
       <div className="qe-card-t">
-        <b style={{ color: it.c }}>{letra ? <i className="qe-letra" style={{ background: it.c }}>{it.l}</i> : null}{it.v || it.t}</b>
+        <b style={{ color: it.c }}>{it.v || it.t}</b>
         <span>{it.corto}</span>
         <button type="button" className="qe-mas" style={{ color: it.c, borderColor: it.c }} onClick={() => onMas(it)}>Conoce más ›</button>
       </div>
@@ -38,14 +64,14 @@ function Tarjeta({ it, onMas, letra }) {
 
 export default function QueEsDcuates() {
   const [abierto, setAbierto] = useState(() => typeof window !== "undefined" && window.location.hash === HASH);
-  const [ap, setAp] = useState(-1); // -1 = inicio (bienvenida y dos puertas); 0 = «Profundiza» (mapa de 7 pasos); 1..7 = apartado
+  const [vista, setVista] = useState("menu");
   const [mas, setMas] = useState(null);
   const p2 = useRef(null);
   useEffect(() => {
     const quitar = () => { try { history.replaceState(history.state, "", window.location.pathname + window.location.search); } catch (x) { /* sin historial */ } };
     if (window.location.hash === HASH) quitar();
-    const al = () => { if (window.location.hash === HASH) { setAp(-1); setAbierto(true); quitar(); } };
-    const ev = (e) => { setAp(Number.isFinite(Number(e.detail)) ? Number(e.detail) : -1); setAbierto(true); };
+    const al = () => { if (window.location.hash === HASH) { setVista("menu"); setAbierto(true); quitar(); } };
+    const ev = (e) => { setVista(VISTAS.includes(e.detail) ? e.detail : "menu"); setAbierto(true); };
     window.addEventListener("hashchange", al);
     window.addEventListener("dcuates:que-es", ev);
     return () => { window.removeEventListener("hashchange", al); window.removeEventListener("dcuates:que-es", ev); };
@@ -54,14 +80,15 @@ export default function QueEsDcuates() {
   const oculta = useAtras(abierto, cerrar, { hub: true });
   const ocultaMas = useAtras(!!mas, () => setMas(null));
   useEffect(() => { if (abierto) registrar("que_es_abrir"); }, [abierto]);
-  useEffect(() => { if (abierto && ap) registrar("que_es_apartado", { n: ap }); }, [abierto, ap]);
-  useEffect(() => { if (abierto) { const el = document.querySelector(".qe-cuerpo"); if (el) el.scrollTop = 0; } }, [ap, abierto]);
+  useEffect(() => { if (abierto) registrar("que_es_vista", { v: vista }); }, [abierto, vista]);
+  useEffect(() => { if (abierto) { const el = document.querySelector(".qe-cuerpo"); if (el) el.scrollTop = 0; } }, [vista, abierto]);
   if (!abierto) return null;
 
-  const A = ap > 0 ? APARTADOS[ap - 1] : null;
-  const ir = (n) => setAp(Math.max(-1, Math.min(7, n)));
+  const ir = (v) => { setMas(null); setVista(v); };
+  const nAp = vista[0] === "a" ? Number(vista.slice(1)) : 0;
+  const A = nAp ? APARTADOS[nAp - 1] : null;
+  const abrirMas = (it) => { registrar("que_es_mas", { k: it.k || it.l }); setMas(it); };
   const ev = (n, d) => window.dispatchEvent(new CustomEvent(n, { detail: d }));
-  // Atajos a lugares REALES. El overlay se queda debajo y reaparece con «Atrás».
   const ejecutar = (acc) => {
     registrar("que_es_atajo", { acc });
     if (acc === "directorio") ev("dcuates:directorio");
@@ -71,51 +98,73 @@ export default function QueEsDcuates() {
     else if (acc === "asistente") abrirAsistente();
     else if (acc === "causas" || acc === "club" || acc === "participar") ev("dcuates:que-es-ir", acc);
   };
-  const irPuerta2 = () => { registrar("que_es_puente"); const el = p2.current; if (el) el.scrollIntoView({ behavior: "smooth", block: "start" }); };
-  const Puerta = ({ d, atajos, cta, accCta, id, refP }) => (
-    <section className="qe-puerta" style={{ borderColor: d.c, background: d.f }} ref={refP} data-testid={id} aria-label={d.t}>
-      <div className="qe-p-h"><i style={{ background: d.c }}>{d.n}</i><b style={{ color: d.c }}>{d.e} {d.t}</b></div>
-      <p className="qe-p-lema">{d.lema}</p>
-      <ul className="qe-p-ej">{d.ejemplos.map((x) => <li key={x}>{x}</li>)}</ul>
-      {d.beneficios && <div className="qe-chips qe-chips-s">{d.beneficios.map((m) => <span key={m}>{m}</span>)}</div>}
-      <p className="qe-p-nota">{d.nota}</p>
-      {d.apoyo && <p className="qe-p-nota">{d.apoyo}</p>}
-      <button type="button" className="qe-p-cta" style={{ background: d.c }} onClick={() => ejecutar(accCta)} data-testid={id + "-cta"}>{cta} ›</button>
-      <div className="qe-atajos">{atajos.map((a) => <button key={a.t} type="button" style={{ borderColor: d.c, color: d.c }} onClick={() => ejecutar(a.acc)} data-testid={"qe-atajo-" + a.acc}><span aria-hidden="true">{a.e}</span> {a.t}</button>)}</div>
-    </section>
-  );
-  const abrirMas = (it) => { registrar("que_es_mas", { k: it.k || it.l }); setMas(it); };
   const Lista = ({ items, letra }) => <div className="qe-lista">{items.map((it) => <Tarjeta key={it.k || it.l} it={it} onMas={abrirMas} letra={letra} />)}</div>;
-  const Pie = () => (
+  const Sig = ({ txt }) => (
     <div className="qe-pie">
-      {ap > 1 && <button type="button" className="qe-nav" onClick={() => ir(ap - 1)} data-testid="qe-ant">‹ {APARTADOS[ap - 2].t}</button>}
-      {ap < 7 && <button type="button" className="qe-nav qe-nav-s" onClick={() => ir(ap + 1)} data-testid="qe-sig">{APARTADOS[ap].t} ›</button>}
-      <button type="button" className="qe-nav qe-nav-c" onClick={() => ir(0)} data-testid="qe-central">Volver al mapa de pasos</button>
+      <button type="button" className="qe-p-cta" style={{ background: A.c }} onClick={() => ir(nAp < 8 ? "a" + (nAp + 1) : "menu")} data-testid="qe-sig">{txt || (nAp < 8 ? APARTADOS[nAp].t + " ›" : "Volver al inicio ↑")}</button>
+      {nAp > 1 && <button type="button" className="qe-nav" onClick={() => ir("a" + (nAp - 1))} data-testid="qe-ant">‹ {APARTADOS[nAp - 2].t}</button>}
+      <button type="button" className="qe-nav qe-nav-c" onClick={() => ir("menu")} data-testid="qe-central">Volver al menú</button>
     </div>
   );
+  const Puerta = ({ d, atajos, id, accCta, children }) => (
+    <>
+      <Hero h={d.h} c={d.c} e={d.e}><span className="qe-hero-n" style={{ background: d.c }}>PUERTA {d.n}</span><h2>{d.t}</h2></Hero>
+      <section className="qe-puerta" style={{ borderColor: d.c, background: d.f }} data-testid={id}>
+        <p className="qe-p-lema">{d.lema}</p>
+        <ul className="qe-p-ej">{d.ejemplos.map((x) => <li key={x}>{x}</li>)}</ul>
+        {d.beneficios && <div className="qe-chips qe-chips-s">{d.beneficios.map((m) => <span key={m}>{m}</span>)}</div>}
+        <p className="qe-p-nota">{d.nota}</p>
+        {d.apoyo && <p className="qe-p-nota">{d.apoyo}</p>}
+        <button type="button" className="qe-p-cta" style={{ background: d.c }} onClick={() => ejecutar(accCta)} data-testid={id + "-cta"}>{d.cta} ›</button>
+        <div className="qe-atajos">{atajos.map((a) => <button key={a.t} type="button" style={{ borderColor: d.c, color: d.c }} onClick={() => ejecutar(a.acc)} data-testid={"qe-atajo-" + a.acc}><span aria-hidden="true">{a.e}</span> {a.t}</button>)}</div>
+      </section>
+      {children}
+    </>
+  );
 
-  let cuerpo;
-  if (ap === -1) {
+  let cuerpo = null;
+  if (vista === "p1") {
     cuerpo = (
-      <>
-        <div className="qe-hero" data-testid="qe-bienvenida">
-          <div className="qe-personas" aria-hidden="true">{PERSONAS.map((p, i) => <span key={i}>{p}</span>)}</div>
-          <h2>{FRASES.bienvenida}</h2>
-          <p>{FRASES.bienvenidaTxt}</p>
-          <p className="qe-p2">{FRASES.bienvenidaTxt2}</p>
-        </div>
-        <div className="qe-sub">Elige por dónde empezar</div>
-        <Puerta d={PUERTA1} atajos={ATAJOS1} cta={PUERTA1.cta} accCta="tablon" id="qe-puerta1" />
+      <Puerta d={PUERTA1} atajos={ATAJOS1} id="qe-puerta1" accCta="tablon">
         <div className="qe-puente" data-testid="qe-puente">
           <div className="qe-puente-l" aria-hidden="true">⌄</div>
           <h3>{PUENTE.t}</h3>
           {PUENTE.p.map((x, i) => <p key={i}>{x}</p>)}
           <b className="qe-puente-i">{PUENTE.inv}</b>
-          <button type="button" className="qe-p-cta qe-puente-b" onClick={irPuerta2} data-testid="qe-puente-cta">{PUENTE.cta} ›</button>
+          <button type="button" className="qe-p-cta qe-puente-b" onClick={() => ir("p2")} data-testid="qe-puente-cta">{PUENTE.cta} ›</button>
         </div>
-        <Puerta d={PUERTA2} atajos={ATAJOS2} cta={PUERTA2.cta} accCta="participar" id="qe-puerta2" refP={p2} />
-        <div className="qe-ambas" data-testid="qe-ambas"><b>{AMBAS.t}</b><span>{AMBAS.p}</span></div>
-        <div className="qe-sub">Nuestra visión</div>
+        <button type="button" className="qe-nav qe-nav-c" style={{ width: "100%" }} onClick={() => ir("menu")} data-testid="qe-central">Volver al menú</button>
+      </Puerta>
+    );
+  } else if (vista === "p2") {
+    cuerpo = (
+      <Puerta d={PUERTA2} atajos={ATAJOS2} id="qe-puerta2" accCta="participar">
+        <div className="qe-ambas" data-testid="qe-ambas"><b>{AMBAS.t}</b><span>{AMBAS.p}</span>
+          <button type="button" className="qe-nav" onClick={() => ir("p1")} data-testid="qe-a-p1">‹ Ver la Puerta 01: Quiero buscar / solicitar</button></div>
+        <div className="qe-frase qe-frase-g" data-testid="qe-rectora">{FRASES.cultivamos}<small>{FRASES.desarrollo}</small></div>
+        <button type="button" className="qe-nav qe-nav-c" style={{ width: "100%" }} onClick={() => ir("menu")} data-testid="qe-central">Volver al menú</button>
+      </Puerta>
+    );
+  } else if (nAp === 1) {
+    cuerpo = (
+      <>
+        <Hero h="descubre" c={A.c} e={A.e}><h2>¿QUÉ ES DCUATES?</h2><small>DESARROLLO INTEGRAL Y COMPARTIDO</small></Hero>
+        <p className="qe-lead">{FRASES.bienvenidaTxt}</p>
+        <div className="qe-por" data-testid="qe-bienvenida"><i>?</i><div><b>¿Por qué existimos?</b><span>{POR_QUE}</span></div></div>
+        <p className="qe-lead qe-lead-s">{FRASES.bienvenidaTxt2}</p>
+        <div className="qe-frase">{FRASES.bienvenida}</div>
+        <Sig txt="DESCUBRE EL CAMINO ↓" />
+      </>
+    );
+  } else if (nAp === 2) {
+    cuerpo = (
+      <>
+        <div className="qe-vis"><span className="qe-badge">NUESTRA VISIÓN</span>
+          <h2 className="qe-d-t"><i>D</i> — DESARROLLAR</h2><b>Desarrollo Integral y Compartido</b></div>
+        <Hero h="comprende" c={A.c} e={A.e} />
+        <p className="qe-lead">Desarrollarnos es crecer desde nuestras capacidades y compartir ese crecimiento con los demás.</p>
+        <div className="qe-tres">{VISION.tres.map((t) => <span key={t}>{t}</span>)}</div>
+        <button type="button" className="qe-mas qe-mas-solo" style={{ color: VISION.c, borderColor: VISION.c }} onClick={() => abrirMas({ k: "d", mas: VISION.mas, c: VISION.c })}>Conoce más sobre la D ›</button>
         <div className="qe-ct">
           {[CULTIVAR, TEJER].map((x) => (
             <div key={x.t} style={{ background: x.f, borderColor: x.c }} data-testid={"qe-" + x.t.toLowerCase()}>
@@ -125,101 +174,131 @@ export default function QueEsDcuates() {
         </div>
         <p className="qe-ct-n">{CULTIVAR_TEJER_NOTA}</p>
         <div className="qe-frase qe-frase-g" data-testid="qe-rectora">{FRASES.cultivamos}<small>{FRASES.desarrollo}</small></div>
-        <div className="qe-cadena-t" data-testid="qe-cadena-t"><b>⛓️ {CADENA.t}</b>{CADENA.p.map((x, i) => <p key={i}>{x}</p>)}<small>{CADENA.nota}</small></div>
-        <div className="qe-cierre" data-testid="qe-cierre"><p>{CIERRE.p}</p><div className="qe-frase qe-frase-g">{FRASES.cultivamos}<small>{FRASES.desarrollo}</small></div><span>{CIERRE.fin}</span></div>
-        <button type="button" className="qe-prof" onClick={() => ir(0)} data-testid="qe-profundiza">Profundiza: recorre los 7 pasos ›</button>
+        <div className="qe-sub">Nuestro camino: CUATES</div>
+        <div className="qe-mini">{ACCIONES.map((a) => <button key={a.l} type="button" onClick={() => ir("a3")} style={{ borderColor: a.c }}><i style={{ background: a.c }}>{a.l}</i>{a.v}<em>›</em></button>)}</div>
+        <Sig />
       </>
     );
-  } else if (ap === 0) {
+  } else if (nAp === 3) {
     cuerpo = (
       <>
-        <div className="qe-hero">
-          <div className="qe-hero-e" aria-hidden="true">🌱🤝🌳</div>
-          <h2>{FRASES.compartir}</h2>
-          <p>{FRASES.central}</p>
-        </div>
-        <div className="qe-sub">Recorre DCUATES en 7 pasos</div>
-        <div className="qe-mapa">
-          {APARTADOS.map((a) => (
-            <button key={a.k} type="button" className="qe-ap" style={{ borderColor: a.c }} onClick={() => ir(a.n)} data-testid={"qe-ap-" + a.n}>
-              <i style={{ background: a.c }}>{a.n}</i>
-              <span><b style={{ color: a.c }}>{a.e} {a.t}</b><small>{a.s}</small></span>
-              <em>›</em>
-            </button>
-          ))}
-        </div>
-        <div className="qe-frase">{FRASES.conectando}</div>
-        <button type="button" className="qe-nav qe-nav-c" style={{ width: "100%", marginTop: 14 }} onClick={() => ir(-1)} data-testid="qe-inicio-sec">Volver al inicio de la sección</button>
-      </>
-    );
-  } else if (ap === 1) {
-    cuerpo = (
-      <>
-        <div className="qe-hero qe-hero-2"><div className="qe-hero-e" aria-hidden="true">🌱</div><h2>{FRASES.compartir}</h2><p>{FRASES.central}</p></div>
-        <div className="qe-duo">
-          <div style={{ background: "#FFF3E0" }}><b>¡Juntos!</b><span>{FRASES.mejor}</span></div>
-          <div style={{ background: "#E3F2FD" }}><b>Conectando</b><span>{FRASES.conectando}</span></div>
-        </div>
-      </>
-    );
-  } else if (ap === 2) {
-    cuerpo = (
-      <>
-        <div className="qe-d" style={{ borderColor: VISION.c }}>
-          <i style={{ background: VISION.c }}>{VISION.l}</i>
-          <div><b style={{ color: VISION.c }}>{VISION.v}</b><span>{VISION.corto}</span></div>
-        </div>
-        <div className="qe-tres">{VISION.tres.map((t) => <span key={t}>{t}</span>)}</div>
-        <button type="button" className="qe-mas qe-mas-solo" style={{ color: VISION.c, borderColor: VISION.c }} onClick={() => abrirMas({ k: "d", mas: VISION.mas, c: VISION.c })}>Conoce más ›</button>
-        <div className="qe-sub">CUATES: el camino en 6 acciones</div>
+        <div className="qe-vis"><h2 className="qe-d-t qe-cuates-t">EL CAMINO DE LOS <span>CUATES</span></h2><b>Cada acción abre una posibilidad para desarrollarnos juntos.</b></div>
         <Lista items={ACCIONES} letra />
         <div className="qe-frase">{FRASES.rectora}</div>
+        <Sig />
       </>
     );
-  } else if (ap === 3) {
+  } else if (nAp === 4) {
     cuerpo = (
       <>
+        <Hero h="conecta" c={A.c} e={A.e}><h2>CONECTA</h2></Hero>
+        <div className="qe-sub qe-sub-c">¿Qué hace posible nuestras conexiones?</div>
+        <p className="qe-lead qe-lead-s">Tres elementos que se complementan y dan vida a nuestra comunidad.</p>
         <Lista items={FUNDAMENTOS} />
+        <div className="qe-cadena-t" data-testid="qe-cadena-t"><b>⛓️ {CADENA.t}</b>{CADENA.p.map((x, i) => <p key={i}>{x}</p>)}<small>{CADENA.nota}</small></div>
         <div className="qe-sub">Cómo se relacionan</div>
         <div className="qe-cadena">{RELACION.map((r, i) => (<React.Fragment key={r.t}><div><b>{r.t}</b><small>{r.d}</small></div>{i < RELACION.length - 1 && <span aria-hidden="true">→</span>}</React.Fragment>))}</div>
+        <Sig />
       </>
     );
-  } else if (ap === 4) {
+  } else if (nAp === 5) {
     cuerpo = (
       <>
-        <div className="qe-frase qe-frase-t">Cada persona llega con algo distinto</div>
+        <Hero h="identificate" c={A.c} e={A.e}><h2>IDENTIFÍCATE</h2></Hero>
+        <p className="qe-lead">Tus intereses, capacidades y circunstancias también construyen nuestra comunidad.</p>
         <Lista items={IDENTIDAD} />
         <div className="qe-sub">Llegamos por diferentes razones…</div>
         <div className="qe-chips" aria-label="Ejemplos de motivos (ilustrativos)">{MOTIVOS.map((m) => <span key={m}>{m}</span>)}</div>
         <div className="qe-frase">{FRASES.central}</div>
+        <Sig />
       </>
     );
-  } else if (ap === 5) {
-    cuerpo = (<><div className="qe-frase qe-frase-t">Desarrollo integral: todas las dimensiones de la vida</div><Lista items={DIMENSIONES} /></>);
-  } else if (ap === 6) {
-    cuerpo = (<><div className="qe-frase qe-frase-t">Aportar, recibir, compartir y colaborar</div><Lista items={FORMAS} /><div className="qe-frase">{FRASES.compartir}</div></>);
-  } else {
+  } else if (nAp === 6) {
     cuerpo = (
       <>
-        <div className="qe-hero qe-hero-2"><div className="qe-hero-e" aria-hidden="true">🌳</div><h2>{FRASES.mejor}</h2><p>El desarrollo compartido crece y se multiplica.</p></div>
+        <Hero h="explora" c={A.c} e={A.e}><h2>EXPLORA</h2></Hero>
+        <p className="qe-lead">Las dimensiones del desarrollo integral:</p>
+        <Lista items={DIMENSIONES} />
+        <Sig />
+      </>
+    );
+  } else if (nAp === 7) {
+    cuerpo = (
+      <>
+        <Hero h="participa" c={A.c} e={A.e}><h2>PARTICIPA</h2></Hero>
+        <p className="qe-lead">Descubre diversas formas de aportar, recibir, compartir y colaborar.</p>
+        <Lista items={FORMAS} />
+        <div className="qe-frase">{FRASES.compartir}</div>
+        <Sig />
+      </>
+    );
+  } else if (nAp === 8) {
+    cuerpo = (
+      <>
+        <Hero h="crece" c={A.c} e={A.e}><h2>CRECE Y MULTIPLICA</h2></Hero>
+        <p className="qe-lead">Seguimos construyendo juntos una mejor comunidad.</p>
+        <div className="qe-frase qe-frase-g">{FRASES.mejor}</div>
         <div className="qe-sub">Lo que viene a conectarse</div>
         <div className="qe-chips" aria-label="Conexiones futuras (aún no son enlaces)">{FUTURO.map((m) => <span key={m}>{m}</span>)}</div>
-        <div className="qe-frase">{FRASES.conectando}</div>
-        <button type="button" className="qe-fin" onClick={cerrar} data-testid="qe-inicio">Volver al inicio</button>
+        <div className="qe-cierre" data-testid="qe-cierre"><p>{CIERRE.p}</p><span>{CIERRE.fin}</span></div>
+        <div className="qe-pie">
+          <button type="button" className="qe-fin" onClick={() => ir("menu")} data-testid="qe-inicio">⌂ Volver al inicio ↑</button>
+          <button type="button" className="qe-nav" onClick={() => ir("a7")} data-testid="qe-ant">‹ PARTICIPA</button>
+        </div>
       </>
     );
   }
 
+  const MENU1 = [
+    { v: "p1", t: PUERTA1.t, l: PUERTA1.l, e: PUERTA1.e, c: PUERTA1.c, n: "01" },
+    { v: "p2", t: PUERTA2.t, l: PUERTA2.l, e: PUERTA2.e, c: PUERTA2.c, n: "02" }
+  ];
   return createPortal(
-    <div className="qe-ov" role="dialog" aria-modal="true" aria-label="¿Qué es DCUATES?" style={oculta && !mas ? { display: "none" } : undefined} data-testid="qe-overlay">
+    <div className={"qe-ov" + (vista === "menu" ? " qe-ov-m" : "")} role="dialog" aria-modal="true" aria-label="¿Qué es DCUATES?" style={oculta && !mas ? { display: "none" } : undefined} data-testid="qe-overlay" onClick={(e) => { if (vista === "menu" && e.target === e.currentTarget) cerrar(); }}>
       <style>{CSS}</style>
-      <header className="qe-h">
-        <button type="button" className="qe-x" onClick={ap >= 0 ? () => ir(ap > 0 ? 0 : -1) : cerrar} aria-label={ap >= 0 ? "Volver" : "Cerrar"} data-testid="qe-atras">‹</button>
-        <div className="qe-h-t"><b>{ap > 0 ? A.t : ap === 0 ? "PROFUNDIZA" : "¿QUÉ ES DCUATES?"}</b><small>{ap > 0 ? A.s : ap === 0 ? "Los 7 pasos para conocer DCUATES a fondo" : "COMUNIDAD · Maqueta para revisión"}</small></div>
-        <button type="button" className="qe-x" onClick={cerrar} aria-label="Cerrar" data-testid="qe-cerrar">✕</button>
-      </header>
-      {ap > 0 && <div className="qe-prog" aria-label={"Apartado " + ap + " de 7"}>{APARTADOS.map((a) => <button key={a.k} type="button" onClick={() => ir(a.n)} aria-label={a.t} className={a.n === ap ? "on" : ""} style={a.n === ap ? { background: a.c } : undefined} />)}</div>}
-      <main className="qe-cuerpo">{cuerpo}{ap > 0 && <Pie />}</main>
+      {vista === "menu" ? (
+        <div className="qe-caja" data-testid="qe-menu">
+          <div className="qe-cab"><LogoDcuates alto={36} /><span className="qe-cab-s" /><button type="button" className="qe-x" onClick={cerrar} aria-label="Cerrar" data-testid="qe-cerrar">✕</button></div>
+          <h2 className="qe-m-t">¿QUÉ ES <i>D</i>CUATES?</h2>
+          <p className="qe-m-s">Desarrollo integral y compartido · <b>Juntos construimos una mejor comunidad</b></p>
+          <p className="qe-m-p">{FRASES.bienvenida}</p>
+          <div className="qe-g">Elige por dónde empezar</div>
+          <div className="qe-col">
+            {MENU1.map((m) => (
+              <button key={m.v} type="button" style={{ background: m.c }} onClick={() => ir(m.v)} data-testid={"qe-m-" + m.v}>
+                <span className="qe-m-n">{m.n}</span><span className="qe-m-e" aria-hidden="true">{m.e}</span>
+                <span className="qe-m-x"><b>{m.t}</b><small>{m.l}</small></span><em>›</em>
+              </button>
+            ))}
+          </div>
+          <div className="qe-g">Conoce DCUATES paso a paso</div>
+          <div className="qe-col">
+            {APARTADOS.map((a) => (
+              <button key={a.k} type="button" style={{ background: a.c }} onClick={() => ir("a" + a.n)} data-testid={"qe-ap-" + a.n}>
+                <span className="qe-m-n">{a.n}</span><span className="qe-m-e" aria-hidden="true">{a.e}</span>
+                <span className="qe-m-x"><b>{a.t}</b><small>{a.l}</small></span><em>›</em>
+              </button>
+            ))}
+          </div>
+          <div className="qe-frase qe-frase-g">{FRASES.cultivamos}<small>{FRASES.desarrollo}</small></div>
+        </div>
+      ) : (
+        <>
+          <header className="qe-h">
+            <button type="button" className="qe-x qe-x-l" onClick={() => ir("menu")} aria-label="Volver al menú" data-testid="qe-atras">‹</button>
+            <LogoDcuates alto={32} />
+            <span className="qe-cab-s" />
+            <button type="button" className="qe-x qe-x-l" onClick={cerrar} aria-label="Cerrar" data-testid="qe-cerrar">✕</button>
+          </header>
+          {nAp > 0 && (
+            <nav className="qe-tabs" aria-label="Pasos">
+              {APARTADOS.map((a) => <button key={a.k} type="button" onClick={() => ir("a" + a.n)} className={a.n === nAp ? "on" : ""} style={{ background: a.c, opacity: a.n === nAp ? 1 : 0.35 }} aria-label={a.t} aria-current={a.n === nAp ? "step" : undefined} />)}
+              <small>{nAp} de 8 · {A.t}</small>
+            </nav>
+          )}
+          <main className="qe-cuerpo">{cuerpo}</main>
+        </>
+      )}
       {mas && !ocultaMas && (
         <div className="qe-hoja-f" onClick={() => setMas(null)} data-testid="qe-hoja">
           <div className="qe-hoja" onClick={(e) => e.stopPropagation()} style={{ borderTopColor: mas.c }}>
@@ -238,68 +317,71 @@ export default function QueEsDcuates() {
 }
 
 const CSS = `
-.qe-ov{position:fixed;inset:0;z-index:97;background:var(--dc-fondo,#FFF8EC);display:flex;flex-direction:column;font-family:inherit;color:#2b2b2b}
-.qe-h{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--dc-verde,#08743B);color:#fff}
-.qe-h-t{flex:1;min-width:0;display:flex;flex-direction:column}.qe-h-t b{font-size:17px;letter-spacing:.3px}.qe-h-t small{font-size:11px;opacity:.9}
-.qe-x{width:40px;height:40px;border-radius:50%;border:0;background:rgba(255,255,255,.2);color:#fff;font-size:20px;cursor:pointer}
-.qe-prog{display:flex;gap:6px;padding:8px 14px;background:#fff;border-bottom:1px solid #eee}
-.qe-prog button{flex:1;height:8px;border-radius:4px;border:0;background:#ddd;cursor:pointer;padding:0}
-.qe-cuerpo{flex:1;overflow-y:auto;padding:14px 14px 40px;max-width:640px;width:100%;margin:0 auto;box-sizing:border-box}
-.qe-hero{text-align:center;background:linear-gradient(160deg,#FFE9C2,#FFF);border-radius:18px;padding:18px 14px;border:2px solid #F2C46D}
-.qe-hero-e{font-size:40px}.qe-hero h2{margin:8px 0 6px;font-size:21px;line-height:1.2;color:#B85400}.qe-hero p{margin:0;font-size:15px;line-height:1.4}
-.qe-hero-2{margin-bottom:12px}
-.qe-sub{margin:18px 2px 8px;font-weight:700;font-size:15px;color:var(--dc-verde,#08743B)}
-.qe-mapa{display:flex;flex-direction:column;gap:8px}
-.qe-ap{display:flex;align-items:center;gap:10px;text-align:left;background:#fff;border:2px solid;border-radius:14px;padding:10px 12px;cursor:pointer;min-height:56px}
-.qe-ap i{width:30px;height:30px;border-radius:50%;color:#fff;font-style:normal;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none}
-.qe-ap span{flex:1;display:flex;flex-direction:column}.qe-ap b{font-size:15px}.qe-ap small{font-size:12px;color:#555}.qe-ap em{font-style:normal;font-size:22px;color:#999}
-.qe-frase{margin:16px 0 4px;text-align:center;font-weight:700;font-size:14px;line-height:1.35;color:#8a4b00;background:#FFF1D6;border-radius:12px;padding:10px 12px}
-.qe-frase-t{margin-top:0;margin-bottom:12px;background:#E8F5E9;color:#1B5E20}
-.qe-duo{display:grid;grid-template-columns:1fr;gap:8px}.qe-duo div{border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:4px}.qe-duo b{font-size:15px}.qe-duo span{font-size:14px;line-height:1.35}
-.qe-d{display:flex;align-items:center;gap:12px;background:#fff;border:3px solid;border-radius:16px;padding:12px}
-.qe-d i{width:54px;height:54px;border-radius:14px;color:#fff;font-style:normal;font-weight:800;font-size:32px;display:flex;align-items:center;justify-content:center;flex:none}
-.qe-d div{display:flex;flex-direction:column}.qe-d b{font-size:20px}.qe-d span{font-size:14px;line-height:1.3}
-.qe-tres{display:flex;flex-direction:column;gap:4px;margin:10px 0;text-align:center;font-weight:700;font-size:13px;color:#555;letter-spacing:.4px}
-.qe-lista{display:flex;flex-direction:column;gap:10px}
-.qe-card{display:flex;gap:10px;background:#fff;border:2px solid;border-radius:14px;padding:10px;align-items:stretch}
-.qe-foto{position:relative;width:84px;min-height:84px;border-radius:12px;overflow:hidden;flex:none;display:flex;align-items:center;justify-content:center}
-.qe-foto-e{font-size:34px}.qe-foto img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.qe-card-t{display:flex;flex-direction:column;gap:4px;flex:1;min-width:0}.qe-card-t b{font-size:15px;display:flex;align-items:center;gap:6px;line-height:1.2}.qe-card-t span{font-size:13px;line-height:1.3;color:#444}
-.qe-letra{width:24px;height:24px;border-radius:50%;color:#fff;font-style:normal;display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex:none}
-.qe-mas{align-self:flex-start;margin-top:2px;background:#fff;border:2px solid;border-radius:999px;padding:6px 12px;font-weight:700;font-size:13px;cursor:pointer;min-height:36px}
-.qe-mas-solo{display:block;margin:0 auto}
+.qe-ov{position:fixed;inset:0;z-index:97;background:#FBF6EC;display:flex;flex-direction:column;font-family:inherit;color:#2b2b2b}
+.qe-ov-m{background:rgba(15,25,20,.65);align-items:center;justify-content:flex-end}
+.qe-logo{display:inline-flex;align-items:center;gap:7px}.qe-logo svg{width:auto}
+.qe-logo-t{display:flex;flex-direction:column;line-height:1}.qe-logo-t b{font-size:21px;font-weight:900;color:#0B6E78;letter-spacing:.2px}.qe-logo-t b i{color:#E8731A;font-style:normal}.qe-logo-t small{font-size:8.5px;letter-spacing:3.2px;color:#0B6E78;margin-top:2px;font-weight:700}
+.qe-caja{width:100%;max-width:460px;max-height:95vh;overflow-y:auto;background:#fff;border-radius:22px 22px 0 0;padding:12px 12px 22px;box-sizing:border-box}
+@media(min-width:640px){.qe-ov-m{justify-content:center}.qe-caja{border-radius:22px}}
+.qe-cab{display:flex;align-items:center;gap:8px}.qe-cab-s{flex:1}
+.qe-x{width:40px;height:40px;border-radius:50%;border:0;background:#eceff1;color:#333;font-size:18px;cursor:pointer}
+.qe-m-t{margin:10px 0 2px;text-align:center;font-size:26px;font-weight:900;color:#0B6E78}.qe-m-t i{color:#E8731A;font-style:normal}
+.qe-m-s{margin:0;text-align:center;font-size:13px;color:#555}.qe-m-s b{color:#0B6E78}
+.qe-m-p{margin:8px 0 2px;text-align:center;font-size:14px;font-weight:800;color:#B85400;line-height:1.3}
+.qe-g{margin:14px 2px 2px;font-weight:900;font-size:15px;color:#0B6E78;text-align:center}
+.qe-col button{width:100%;margin-top:7px;border:0;border-radius:14px;padding:9px 10px;color:#fff;font-family:inherit;display:flex;align-items:center;gap:9px;text-align:left;cursor:pointer;min-height:56px;box-shadow:0 2px 6px rgba(0,0,0,.18)}
+.qe-m-n{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.28);font-weight:900;font-size:12px;display:flex;align-items:center;justify-content:center;flex:none}
+.qe-m-e{font-size:24px;flex:none}.qe-m-x{flex:1;display:flex;flex-direction:column;min-width:0}.qe-m-x b{font-size:15px;font-weight:900;line-height:1.15}.qe-m-x small{font-size:12px;line-height:1.3;opacity:.95;margin-top:2px}.qe-col em{font-style:normal;font-size:24px;opacity:.8}
+.qe-h{display:flex;align-items:center;gap:8px;padding:8px 10px;background:#fff;border-bottom:1px solid #e7e0d0}
+.qe-x-l{background:#eef3f2}
+.qe-tabs{display:flex;align-items:center;gap:4px;padding:7px 12px;background:#fff;flex-wrap:wrap}.qe-tabs button{flex:1;height:9px;min-width:0;border:0;border-radius:5px;padding:0;cursor:pointer}.qe-tabs small{flex-basis:100%;font-size:11px;font-weight:800;color:#0B6E78;text-align:center;margin-top:2px}
+.qe-cuerpo{flex:1;overflow-y:auto;padding:0 0 40px;max-width:520px;width:100%;margin:0 auto;box-sizing:border-box}
+.qe-cuerpo>*:not(.qe-hero-f){margin-left:14px;margin-right:14px}
+.qe-hero-f{position:relative;height:190px;overflow:hidden;border-radius:0 0 28px 28px;margin-bottom:12px;display:flex;align-items:flex-end}
+.qe-hero-f img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.qe-hero-e{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:70px;opacity:.85}
+.qe-hero-o{position:relative;width:100%;padding:34px 14px 14px;background:linear-gradient(0deg,rgba(0,0,0,.62),rgba(0,0,0,0));color:#fff;display:flex;flex-direction:column;gap:3px;box-sizing:border-box}
+.qe-hero-o:empty{display:none}.qe-hero-o h2{margin:0;font-size:25px;font-weight:900;line-height:1.1;text-shadow:0 1px 4px rgba(0,0,0,.5)}.qe-hero-o small{font-weight:800;letter-spacing:.5px;color:#FFD9A8;font-size:13px}
+.qe-hero-n{align-self:flex-start;color:#fff;font-weight:900;font-size:12px;padding:3px 10px;border-radius:999px;letter-spacing:.5px}
+.qe-lead{font-size:16px;line-height:1.5;text-align:center;margin-top:10px;margin-bottom:6px}.qe-lead-s{font-size:14px;color:#444}
+.qe-por{display:flex;gap:10px;align-items:center;border-top:2px solid #eadfca;border-bottom:2px solid #eadfca;padding:12px 2px;margin-top:8px;margin-bottom:8px}.qe-por i{width:34px;height:34px;border-radius:50%;background:#F2A33A;color:#fff;font-style:normal;font-weight:900;display:flex;align-items:center;justify-content:center;flex:none;font-size:20px}.qe-por div{display:flex;flex-direction:column}.qe-por b{font-size:15px;color:#B85400}.qe-por span{font-size:14px;line-height:1.35}
+.qe-vis{text-align:center;padding-top:14px}.qe-badge{display:inline-block;background:#D6EFEF;color:#0B6E78;font-weight:900;font-size:11px;letter-spacing:1px;padding:4px 12px;border-radius:999px}
+.qe-d-t{margin:8px 0 2px;font-size:30px;font-weight:900;color:#0B6E78;letter-spacing:.3px}.qe-d-t i{font-style:normal;color:#E8731A;font-size:42px}.qe-vis>b{font-size:15px;line-height:1.3;color:#333;display:block;margin-bottom:10px}
+.qe-cuates-t{font-size:19px;color:#2b2b2b}.qe-cuates-t span{display:block;font-size:34px;color:#E8731A;letter-spacing:2px}
+.qe-tres{display:flex;flex-direction:column;gap:2px;margin:10px 0;text-align:center;font-weight:900;font-size:13px;color:#2F7D3A;letter-spacing:.4px;background:#E8F5E9;border-radius:14px;padding:10px}
+.qe-sub{margin:18px 2px 8px;font-weight:900;font-size:15px;color:#0B6E78;text-align:center}.qe-sub-c{font-size:18px;margin-top:4px}
+.qe-mini{display:flex;flex-direction:column;gap:6px}.qe-mini button{display:flex;align-items:center;gap:10px;background:#fff;border:2px solid;border-radius:12px;padding:8px 12px;font-weight:800;font-size:15px;cursor:pointer;min-height:46px;text-align:left;font-family:inherit}.qe-mini i{width:28px;height:28px;border-radius:50%;color:#fff;font-style:normal;display:flex;align-items:center;justify-content:center;font-size:14px}.qe-mini em{margin-left:auto;font-style:normal;color:#999;font-size:20px}
+.qe-frase{margin:16px 14px 4px;text-align:center;font-weight:800;font-size:14px;line-height:1.35;color:#8a4b00;background:#FFF1D6;border-radius:14px;padding:10px 12px}
+.qe-frase-g{background:linear-gradient(120deg,#E8F5E9,#F5E8F8);color:#2b2b2b;font-size:15px}.qe-frase-g small{display:block;margin-top:4px;font-size:12px;color:#555;letter-spacing:.5px}
+.qe-lista{display:flex;flex-direction:column;gap:10px;margin-top:8px}
+.qe-card{display:flex;gap:10px;background:#fff;border:2px solid;border-radius:16px;padding:10px;align-items:center;box-shadow:0 2px 6px rgba(0,0,0,.06)}
+.qe-letra-g{width:56px;height:56px;border-radius:50%;color:#fff;font-style:normal;font-weight:900;font-size:28px;display:flex;align-items:center;justify-content:center;flex:none}
+.qe-foto{position:relative;width:64px;height:64px;border-radius:14px;overflow:hidden;flex:none;display:flex;align-items:center;justify-content:center}.qe-foto-e{font-size:30px}.qe-foto img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.qe-card-t{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}.qe-card-t b{font-size:15px;line-height:1.2}.qe-card-t span{font-size:13px;line-height:1.3;color:#444}
+.qe-mas{align-self:flex-start;background:#fff;border:2px solid;border-radius:999px;padding:5px 12px;font-weight:800;font-size:13px;cursor:pointer;min-height:34px;font-family:inherit}.qe-mas-solo{display:block;margin:6px auto}
 .qe-cadena{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px}.qe-cadena div{background:#fff;border:2px solid #cfd8dc;border-radius:12px;padding:6px 10px;text-align:center;display:flex;flex-direction:column}.qe-cadena b{font-size:13px}.qe-cadena small{font-size:11px;color:#555}.qe-cadena span{color:#999}
-.qe-chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}.qe-chips span{background:#fff;border:2px dashed #b0bec5;border-radius:999px;padding:6px 12px;font-size:13px;color:#37474f}
-.qe-pie{display:flex;flex-direction:column;gap:8px;margin-top:22px}
-.qe-nav{border:2px solid var(--dc-verde,#08743B);background:#fff;color:var(--dc-verde,#08743B);border-radius:12px;padding:12px;font-weight:700;font-size:14px;cursor:pointer;min-height:44px}
-.qe-nav-s{background:var(--dc-verde,#08743B);color:#fff}.qe-nav-c{border-color:#bbb;color:#555}
-.qe-fin{display:block;width:100%;margin-top:16px;background:var(--dc-dorado,#F2A900);border:0;border-radius:14px;padding:14px;font-weight:800;font-size:16px;cursor:pointer;color:#3b2a00}
+.qe-cadena-t{background:#fff;border:2px solid #0E7C86;border-radius:16px;padding:12px;margin-top:12px}.qe-cadena-t b{color:#0E7C86;font-size:14px}.qe-cadena-t p{font-size:14px;line-height:1.45;margin:6px 0}.qe-cadena-t small{display:block;font-size:12.5px;line-height:1.4;color:#555;margin-top:4px}
+.qe-chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}.qe-chips span{background:#fff;border:2px dashed #b0bec5;border-radius:999px;padding:6px 12px;font-size:13px;color:#37474f}.qe-chips-s{justify-content:flex-start;margin:8px 0}.qe-chips-s span{border-style:solid;font-size:12px;padding:4px 10px}
+.qe-ct{display:grid;grid-template-columns:1fr;gap:10px;margin-top:10px}.qe-ct div{border:2px solid;border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:2px}.qe-ct span{font-size:28px}.qe-ct b{font-size:18px}.qe-ct em{font-size:13px;font-style:normal;font-weight:800;color:#555}.qe-ct p{font-size:14px;line-height:1.45;margin:4px 0 0}
+.qe-ct-n{font-size:13px;line-height:1.45;text-align:center;color:#444;margin-top:10px;margin-bottom:0}
+.qe-puerta{border:3px solid;border-radius:18px;padding:14px;margin-bottom:6px}
+.qe-p-lema{font-style:italic;font-size:15px;line-height:1.4;margin:0 0 6px}
+.qe-p-ej{margin:6px 0;padding-left:20px;list-style:disc}.qe-p-ej li{font-size:14px;line-height:1.45}
+.qe-p-nota{font-size:13px;line-height:1.4;color:#37474f;background:rgba(255,255,255,.7);border-radius:10px;padding:8px 10px;margin:8px 0}
+.qe-p-cta{display:block;width:100%;border:0;border-radius:14px;padding:14px;color:#fff;font-weight:900;font-size:15px;cursor:pointer;min-height:48px;font-family:inherit}
+.qe-atajos{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.qe-atajos button{background:#fff;border:2px solid;border-radius:999px;padding:8px 12px;font-weight:800;font-size:13px;cursor:pointer;min-height:40px;font-family:inherit}
+.qe-puente{margin-top:10px;margin-bottom:10px;border-radius:18px;padding:16px 14px;background:linear-gradient(180deg,#E3F4F5,#FFF0DC);border:2px dashed #B8860B;text-align:center}
+.qe-puente-l{font-size:26px;color:#B85400;line-height:1}.qe-puente h3{margin:4px 0 8px;font-size:17px;color:#8a4b00;line-height:1.25}.qe-puente p{font-size:14px;line-height:1.5;margin:7px 0;text-align:left}.qe-puente-i{display:block;margin:12px 0 8px;font-size:15px;color:#0E7C86}.qe-puente-b{background:#B85400}
+.qe-ambas{margin-top:12px;margin-bottom:12px;background:#fff;border:3px solid #8E3A9F;border-radius:18px;padding:14px;text-align:center;display:flex;flex-direction:column;gap:8px}.qe-ambas b{font-size:19px;color:#8E3A9F}.qe-ambas span{font-size:14px;line-height:1.45}
+.qe-cierre{text-align:center;margin-top:14px;margin-bottom:14px}.qe-cierre p{font-size:15px;line-height:1.5}.qe-cierre span{font-size:13px;color:#555}
+.qe-pie{display:flex;flex-direction:column;gap:8px;margin-top:22px;margin-bottom:0}
+.qe-nav{border:2px solid #0E7C86;background:#fff;color:#0E7C86;border-radius:12px;padding:12px;font-weight:800;font-size:14px;cursor:pointer;min-height:44px;font-family:inherit}.qe-nav-c{border-color:#bbb;color:#555}
+.qe-fin{display:block;width:100%;background:#F2A900;border:0;border-radius:14px;padding:14px;font-weight:900;font-size:16px;cursor:pointer;color:#3b2a00;font-family:inherit}
 .qe-hoja-f{position:absolute;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;z-index:2}
-.qe-hoja{position:relative;background:#fff;border-top:6px solid;border-radius:20px 20px 0 0;padding:18px 16px 20px;width:100%;max-width:640px;max-height:82vh;overflow-y:auto;box-sizing:border-box}
+.qe-hoja{position:relative;background:#fff;border-top:6px solid;border-radius:20px 20px 0 0;padding:18px 16px 20px;width:100%;max-width:520px;max-height:82vh;overflow-y:auto;box-sizing:border-box}
 .qe-hoja h3{margin:0 34px 8px 0;font-size:19px}.qe-hoja p{font-size:15px;line-height:1.5;margin:8px 0}.qe-hoja ul{margin:8px 0;padding-left:20px;list-style:disc}.qe-hoja li{font-size:15px;line-height:1.5}
 .qe-ej{background:#F1F8E9;border-radius:12px;padding:8px 12px;margin-top:10px}
 .qe-hoja-x{position:absolute;top:10px;right:10px;width:36px;height:36px;border-radius:50%;border:0;background:#eee;font-size:16px;cursor:pointer}
-.qe-hoja-b{display:block;width:100%;margin-top:14px;border:0;border-radius:12px;padding:12px;color:#fff;font-weight:700;font-size:15px;cursor:pointer}
-.qe-personas{display:flex;justify-content:center;gap:2px;font-size:30px;margin-bottom:4px;flex-wrap:wrap}
-.qe-p2{margin-top:8px!important;font-size:14px!important;color:#444}
-.qe-puerta{border:3px solid;border-radius:18px;padding:14px;margin-bottom:6px}
-.qe-p-h{display:flex;align-items:center;gap:10px}.qe-p-h i{width:34px;height:34px;border-radius:50%;color:#fff;font-style:normal;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none;font-size:14px}.qe-p-h b{font-size:16px;line-height:1.2}
-.qe-p-lema{font-style:italic;font-size:15px;line-height:1.4;margin:10px 0 6px}
-.qe-p-ej{margin:6px 0;padding-left:20px;list-style:disc}.qe-p-ej li{font-size:14px;line-height:1.45}
-.qe-p-nota{font-size:13px;line-height:1.4;color:#37474f;background:rgba(255,255,255,.7);border-radius:10px;padding:8px 10px;margin:8px 0}
-.qe-p-cta{display:block;width:100%;border:0;border-radius:14px;padding:14px;color:#fff;font-weight:800;font-size:15px;cursor:pointer;min-height:48px}
-.qe-atajos{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.qe-atajos button{background:#fff;border:2px solid;border-radius:999px;padding:8px 12px;font-weight:700;font-size:13px;cursor:pointer;min-height:40px}
-.qe-chips-s{justify-content:flex-start;margin:8px 0}.qe-chips-s span{border-style:solid;font-size:12px;padding:4px 10px}
-.qe-puente{margin:10px 0;border-radius:18px;padding:16px 14px;background:linear-gradient(180deg,#E3F4F5,#FFF0DC);border:2px dashed #B8860B;text-align:center}
-.qe-puente-l{font-size:26px;color:#B85400;line-height:1}.qe-puente h3{margin:4px 0 8px;font-size:17px;color:#8a4b00;line-height:1.25}.qe-puente p{font-size:14px;line-height:1.5;margin:7px 0;text-align:left}
-.qe-puente-i{display:block;margin:12px 0 8px;font-size:15px;color:#0E7C86}.qe-puente-b{background:#B85400}
-.qe-ambas{margin:12px 0;background:#fff;border:3px solid #8E3A9F;border-radius:18px;padding:14px;text-align:center;display:flex;flex-direction:column;gap:6px}.qe-ambas b{font-size:19px;color:#8E3A9F}.qe-ambas span{font-size:14px;line-height:1.45}
-.qe-ct{display:grid;grid-template-columns:1fr;gap:10px}.qe-ct div{border:2px solid;border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:2px}.qe-ct span{font-size:28px}.qe-ct b{font-size:18px}.qe-ct em{font-size:13px;font-style:normal;font-weight:700;color:#555}.qe-ct p{font-size:14px;line-height:1.45;margin:4px 0 0}
-.qe-ct-n{font-size:13px;line-height:1.45;text-align:center;color:#444;margin:10px 4px}
-.qe-frase-g{background:linear-gradient(120deg,#E8F5E9,#F5E8F8);color:#2b2b2b;font-size:15px}.qe-frase-g small{display:block;margin-top:4px;font-size:12px;color:#555;letter-spacing:.5px}
-.qe-cadena-t{background:#fff;border:2px solid #0E7C86;border-radius:16px;padding:12px;margin:10px 0}.qe-cadena-t b{color:#0E7C86;font-size:14px}.qe-cadena-t p{font-size:14px;line-height:1.45;margin:6px 0}.qe-cadena-t small{display:block;font-size:12.5px;line-height:1.4;color:#555;margin-top:4px}
-.qe-cierre{text-align:center;margin:14px 0}.qe-cierre p{font-size:15px;line-height:1.5}.qe-cierre span{font-size:13px;color:#555}
-.qe-prof{display:block;width:100%;margin-top:14px;background:#fff;border:2px solid var(--dc-verde,#08743B);color:var(--dc-verde,#08743B);border-radius:14px;padding:13px;font-weight:800;font-size:15px;cursor:pointer;min-height:48px}
+.qe-hoja-b{display:block;width:100%;margin-top:14px;border:0;border-radius:12px;padding:12px;color:#fff;font-weight:800;font-size:15px;cursor:pointer;font-family:inherit}
 @media(min-width:520px){.qe-ct{grid-template-columns:1fr 1fr}}
-@media(min-width:520px){.qe-duo{grid-template-columns:1fr 1fr}.qe-pie{flex-direction:row;flex-wrap:wrap}.qe-nav{flex:1}}
 `;
