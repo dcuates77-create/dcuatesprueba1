@@ -255,7 +255,7 @@ export function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirTerminos, onA
             />
           </span>
           <div className="flex flex-col leading-none">
-            <span className="text-xl min-[360px]:text-2xl min-[400px]:text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-tight text-[#0f2d1e]">DCUATES</span>
+            <span className="text-xl min-[360px]:text-2xl min-[400px]:text-3xl sm:text-4xl md:text-5xl font-black uppercase tracking-tight text-[#0f2d1e]"><span className="text-[#e65100]">D</span>CUATES</span>
             <span className="text-[10px] min-[360px]:text-xs sm:text-sm md:text-base font-black uppercase tracking-wide text-[#e65100] -mt-0.5 whitespace-nowrap">¡Comparte y Gana!</span>
           </div>
         </a>
