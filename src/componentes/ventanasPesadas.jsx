@@ -989,7 +989,9 @@ export function ContenidoModalProyecto({ id, onCerrar }) {
               variante={proyecto.registro ? "secundario" : "principal"}
               onClick={() => {
                 onCerrar();
-                irASeccion(proyecto.scrollDestino);
+                // e90: si el proyecto se abrió desde una ventana de zona («Tengo un negocio», «Empieza aquí»…), se cierra para que se vea el formulario.
+                window.dispatchEvent(new Event("dcuates:cerrar-zonas"));
+                setTimeout(() => irASeccion(proyecto.scrollDestino), 200);
               }}
             >
               {proyecto.textoBoton}
