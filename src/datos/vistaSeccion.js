@@ -62,7 +62,7 @@ export const VISTA = {
       img: "/images/sumar-causas.webp",
       titulo: "Tu ayuda cambia vidas",
       texto: "Un poco de tu tiempo, talento o recursos puede cambiar la historia de alguien. Elige cómo ayudar y hazlo visible: tu ejemplo invita a otros.",
-      botones: [{ t: "Quiero ser voluntario", a: { reg: "voluntario" } }, { t: "Reporta un caso", a: { reg: "extraviado" } }]
+      botones: [{ t: "Quiero ser voluntario", a: { reg: "voluntario" } }, { t: "Reporta un caso (de extravío o localización de MASCOTAS, PERSONAS, COSAS)", a: { reg: "extraviado" } }]
     }
   },
   negocios: {
