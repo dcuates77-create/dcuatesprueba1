@@ -306,10 +306,12 @@ export default function ZonaJuegos({ onAbrirProyecto: abrirProy = () => {}, fila
   useEffect(() => {
     const oir = (e) => { let id = e.detail; if (id === "info:agenda") { window.dispatchEvent(new CustomEvent("dcuates:abrir-agenda")); return; } if (typeof id === "string" && id.startsWith("info:")) { setInfoSec(id.slice(5)); id = "info"; } else if (id === "info") setInfoSec("emergencias"); if (["empieza", "juegos", "aprende", "gana", "propon", "causa", "info", "negocio"].includes(id)) setAbierto(id); };
     const oirT = (e) => { if (e.detail === "participa") setTablero(true); };
+    const alCerrarZonas = () => setAbierto(null); // e90: lo usan los botones que bajan a un formulario de la página
+    window.addEventListener("dcuates:cerrar-zonas", alCerrarZonas);
     window.addEventListener("dcuates:abrir-zona", oir);
     window.addEventListener("dcuates:abrir-tablero", oirT);
     try { if (window.location.hash === "#zona-publica") setTablero(true); } catch (e) {}
-    return () => { window.removeEventListener("dcuates:abrir-zona", oir); window.removeEventListener("dcuates:abrir-tablero", oirT); };
+    return () => { window.removeEventListener("dcuates:cerrar-zonas", alCerrarZonas); window.removeEventListener("dcuates:abrir-zona", oir); window.removeEventListener("dcuates:abrir-tablero", oirT); };
   }, []);
   useEffect(() => { setSemillas(leerSemillas()); }, []);
   const sus = <Suspense fallback={<div className="zj-fondo"><div className="zj-caja"><p className="jg-info">Cargando…</p></div></div>}>
