@@ -167,8 +167,46 @@ export const ATAJOS2 = [
   { t: "Compra, vende y dona con causa", e: "🛍️", acc: "causa" }
 ];
 
+// «Ver más atajos» (e89): más botones para cada puerta. Mismo vocabulario de acciones que los atajos.
+export const ATAJOS1_MAS = [
+  { t: "Mapa y proyectos de la comunidad", e: "🧭", acc: "mapa" },
+  { t: "Consulta el estado de tu folio", e: "🔢", acc: "folio" },
+  { t: "Elige tu puerta (lo que más te describe)", e: "🚪", acc: "puertas" },
+  { t: "Recomienda y propón", e: "💡", acc: "propon" },
+  { t: "Zona de aliados", e: "🌟", acc: "aliados" },
+  { t: "Quiero ofrecer algo", e: "🎁", acc: "ofrezco" }
+];
+export const ATAJOS2_MAS = [
+  { t: "Directorio de negocios CUATE", e: "🏪", acc: "directorio" },
+  { t: "Lo que hay en el Tablón", e: "📋", acc: "tablon" },
+  { t: "Consulta el estado de tu folio", e: "🔢", acc: "folio" },
+  { t: "Mapa y proyectos de la comunidad", e: "🧭", acc: "mapa" },
+  { t: "Elige tu puerta", e: "🚪", acc: "puertas" },
+  { t: "Necesito algo", e: "🙋", acc: "necesito" }
+];
+
+// Qué puerta de «Elige tu puerta» sugiere cada una de las dos entradas de «¿Qué es?».
+export const PUERTA_A_ENTRADA = { negocio: "p2", organizacion: "p2", patrocinador: "p2", voluntario: "p2" };
+
+// Palabras que la persona puede escribir en el buscador de «¿Qué es?» (además de los textos de cada tarjeta).
+export const CLAVES_BUSCADOR = {
+  p1: "buscar solicitar necesito necesidad apoyo ayuda urgencia pedir encontrar extraviado perdido tablon directorio",
+  p2: "sumar multiplicar ofrecer ofrezco aportar donar voluntario apoyar negocio vender club aliado causa participar",
+  a1: "que es dcuates comunidad bienvenida existimos mision",
+  a2: "desarrollar vision cultivar tejer desarrollo integral",
+  a3: "cuates camino conocer ubicar acciones",
+  a4: "conecta cultura cadena valores apoyos mutuos confianza",
+  a5: "identificate intereses capacidades circunstancias quien soy",
+  a6: "explora dimensiones salud educacion economia cultura medio ambiente",
+  a7: "participa formas compartir colaborar recibir aportar",
+  a8: "crece multiplica futuro gratis gratuita pagina cuate"
+};
+
 // Acciones al final de algunos pasos (máx. 2): llevan a lo concreto de ese paso. acc = mismo vocabulario que los atajos.
 export const ACCIONES_PASO = {
+  1: [{ t: "Elige tu puerta", e: "🚪", acc: "puertas" }],
+  2: [{ t: "Elige tu puerta", e: "🚪", acc: "puertas" }],
+  3: [{ t: "Directorio de negocios CUATE", e: "🏪", acc: "directorio" }, { t: "Lo que hay en el Tablón", e: "📋", acc: "tablon" }],
   4: [{ t: "Zona de aliados", e: "🌟", acc: "aliados" }],
   5: [{ t: "Elige tu puerta", e: "🚪", acc: "puertas" }],
   6: [{ t: "Proyectos y mapa del sitio", e: "🧭", acc: "mapa" }],
