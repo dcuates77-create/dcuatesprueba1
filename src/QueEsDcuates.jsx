@@ -11,10 +11,19 @@ import { abrirAsistente } from "./AsistentePagina.jsx";
 import { abrirPuerta } from "./PuertasDcuates.jsx";
 import BotonCompartir from "./BotonCompartir.jsx";
 import { ejecutar as ejecutarAccion } from "./datos/secciones.js";
-import { FRASES, APARTADOS, VISION, ACCIONES, FUNDAMENTOS, RELACION, IDENTIDAD, MOTIVOS, DIMENSIONES, FORMAS, FUTURO, PUERTA1, ATAJOS1, PUENTE, PUERTA2, ATAJOS2, AMBAS, CULTIVAR, TEJER, CULTIVAR_TEJER_NOTA, CADENA, CIERRE, POR_QUE, ACCIONES_PASO } from "./datos/queEsDcuates.js";
+import { expandirBusqueda } from "./datos/sinonimos.js";
+import { puertaPorId } from "./datos/puertas.js";
+import { FRASES, APARTADOS, VISION, ACCIONES, FUNDAMENTOS, RELACION, IDENTIDAD, MOTIVOS, DIMENSIONES, FORMAS, FUTURO, PUERTA1, ATAJOS1, PUENTE, PUERTA2, ATAJOS2, ATAJOS1_MAS, ATAJOS2_MAS, PUERTA_A_ENTRADA, CLAVES_BUSCADOR, AMBAS, CULTIVAR, TEJER, CULTIVAR_TEJER_NOTA, CADENA, CIERRE, POR_QUE, ACCIONES_PASO } from "./datos/queEsDcuates.js";
 
 export const abrirQueEs = (v) => window.dispatchEvent(new CustomEvent("dcuates:que-es", { detail: typeof v === "string" ? v : "menu" }));
 const HASH = "#que-es-dcuates";
+// e89: cada pantalla tiene su enlace: #que-es-dcuates (menú) · #que-es-p1 · #que-es-a3 …
+const vistaDeHash = () => {
+  if (typeof window === "undefined") return null;
+  const m = window.location.hash.match(/^#que-es-(dcuates|p1|p2|a[1-8])$/);
+  return m ? (m[1] === "dcuates" ? "menu" : m[1]) : null;
+};
+const sinAc = (x) => String(x || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 const VISTAS = ["menu", "p1", "p2", "a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8"];
 
 // LOGO: tres personas + DCUATES con la D en naranja + COMUNIDAD.
@@ -66,14 +75,16 @@ function Tarjeta({ it, onMas, letra }) {
 }
 
 export default function QueEsDcuates() {
-  const [abierto, setAbierto] = useState(() => typeof window !== "undefined" && window.location.hash === HASH);
-  const [vista, setVista] = useState("menu");
+  const [abierto, setAbierto] = useState(() => !!vistaDeHash());
+  const [vista, setVista] = useState(() => vistaDeHash() || "menu");
+  const [busca, setBusca] = useState("");
+  const [masAt, setMasAt] = useState({});
   const [mas, setMas] = useState(null);
   const p2 = useRef(null);
   useEffect(() => {
     const quitar = () => { try { history.replaceState(history.state, "", window.location.pathname + window.location.search); } catch (x) { /* sin historial */ } };
-    if (window.location.hash === HASH) quitar();
-    const al = () => { if (window.location.hash === HASH) { setVista("menu"); setAbierto(true); quitar(); } };
+    if (vistaDeHash()) quitar();
+    const al = () => { const v = vistaDeHash(); if (v) { setVista(v); setAbierto(true); quitar(); } };
     const ev = (e) => { setVista(VISTAS.includes(e.detail) ? e.detail : "menu"); setAbierto(true); };
     window.addEventListener("hashchange", al);
     window.addEventListener("dcuates:que-es", ev);
@@ -107,6 +118,7 @@ export default function QueEsDcuates() {
     else if (acc === "propon") ejecutarAccion({ z: "propon" });
     else if (acc === "aliados") ejecutarAccion({ aliados: 1 });
     else if (acc === "causa") ejecutarAccion({ z: "causa" });
+    else if (acc === "folio") ev("dcuates:consulta-folio");
   };
   const Lista = ({ items, letra }) => <div className="qe-lista">{items.map((it) => <Tarjeta key={it.k || it.l} it={it} onMas={abrirMas} letra={letra} />)}</div>;
   const Sig = ({ txt }) => (
@@ -117,7 +129,7 @@ export default function QueEsDcuates() {
       <button type="button" className="qe-nav qe-nav-c" onClick={() => ir("menu")} data-testid="qe-central">Volver al menú</button>
     </div>
   );
-  const Puerta = ({ d, atajos, id, accCta, children }) => (
+  const Puerta = ({ d, atajos, extra, id, accCta, children }) => (
     <>
       <Hero h={d.h} c={d.c} e={d.e}><span className="qe-hero-n" style={{ background: d.c }}>PUERTA {d.n}</span><h2>{d.t}</h2></Hero>
       <section className="qe-puerta" style={{ borderColor: d.c, background: d.f }} data-testid={id}>
@@ -128,15 +140,39 @@ export default function QueEsDcuates() {
         {d.apoyo && <p className="qe-p-nota">{d.apoyo}</p>}
         <button type="button" className="qe-p-cta" style={{ background: d.c }} onClick={() => ejecutar(accCta)} data-testid={id + "-cta"}>{d.cta} ›</button>
         <div className="qe-atajos">{atajos.map((a) => <button key={a.t} type="button" style={{ borderColor: d.c, color: d.c }} onClick={() => ejecutar(a.acc)} data-testid={"qe-atajo-" + a.acc}><span aria-hidden="true">{a.e}</span> {a.t}</button>)}</div>
+        {extra && (
+          <>
+            {masAt[id] && <div className="qe-atajos" data-testid={id + "-mas"}>{extra.map((a) => <button key={a.t} type="button" style={{ borderColor: d.c, color: d.c }} onClick={() => ejecutar(a.acc)} data-testid={"qe-atajo-" + a.acc + "-x"}><span aria-hidden="true">{a.e}</span> {a.t}</button>)}</div>}
+            <button type="button" className="qe-vmas" style={{ color: d.c }} onClick={() => setMasAt((m) => ({ ...m, [id]: !m[id] }))} aria-expanded={!!masAt[id]} data-testid={id + "-vermas"}>{masAt[id] ? "Ver menos atajos ▴" : "Ver más atajos ▾"}</button>
+          </>
+        )}
       </section>
       {children}
     </>
   );
 
+  // Buscador (e89): palabras escritas + sinónimos del sitio; busca en los títulos, textos cortos y palabras clave de cada pantalla.
+  const indice = [
+    ...[PUERTA1, PUERTA2].map((d, i) => ({ v: "p" + (i + 1), t: d.t, e: d.e, d: d.l, x: [d.t, d.l, d.lema, (d.ejemplos || []).join(" "), CLAVES_BUSCADOR["p" + (i + 1)]].join(" ") })),
+    ...APARTADOS.map((a) => ({ v: "a" + a.n, t: a.t, e: a.e, d: "Paso " + a.n + " de 8", x: [a.t, a.l, CLAVES_BUSCADOR["a" + a.n]].join(" ") })),
+    ...[[ACCIONES, "a3"], [FUNDAMENTOS, "a4"], [IDENTIDAD, "a5"], [DIMENSIONES, "a6"], [FORMAS, "a7"]].flatMap(([lista, v]) => lista.map((it) => ({ v, t: it.t || it.v, e: it.e, d: it.corto, x: [it.t, it.v, it.corto].join(" ") })))
+  ];
+  const palabras = sinAc(busca).split(/[^a-z0-9ñ]+/).filter((w) => w.length > 1);
+  const resultados = palabras.length ? (() => {
+    const alts = expandirBusqueda(palabras);
+    return indice.filter((it) => { const t = sinAc(it.x); return alts.every((lista) => lista.some((w) => t.includes(sinAc(w)))); }).slice(0, 8);
+  })() : [];
+  // Puerta elegida antes en «Elige tu puerta» (se guarda en el teléfono) → sugerir por dónde empezar.
+  let sugerida = null;
+  try {
+    const id = window.localStorage.getItem("dc_puerta");
+    const pu = id ? puertaPorId(id) : null;
+    if (pu) { const v = PUERTA_A_ENTRADA[id] || "p1"; const d = v === "p2" ? PUERTA2 : PUERTA1; sugerida = { v, t: d.t, e: pu.e, p: pu.t }; }
+  } catch (x) { /* sin almacenamiento */ }
   let cuerpo = null;
   if (vista === "p1") {
     cuerpo = (
-      <Puerta d={PUERTA1} atajos={ATAJOS1} id="qe-puerta1" accCta="tablon">
+      <Puerta d={PUERTA1} atajos={ATAJOS1} extra={ATAJOS1_MAS} id="qe-puerta1" accCta="tablon">
         <div className="qe-puente" data-testid="qe-puente">
           <div className="qe-puente-l" aria-hidden="true">⌄</div>
           <h3>{PUENTE.t}</h3>
@@ -144,16 +180,16 @@ export default function QueEsDcuates() {
           <b className="qe-puente-i">{PUENTE.inv}</b>
           <button type="button" className="qe-p-cta qe-puente-b" onClick={() => ir("p2")} data-testid="qe-puente-cta">{PUENTE.cta} ›</button>
         </div>
-        <button type="button" className="qe-nav qe-nav-c" style={{ width: "100%" }} onClick={() => ir("menu")} data-testid="qe-central">Volver al menú</button>
+        <button type="button" className="qe-nav qe-nav-c" style={{ width: "calc(100% - 28px)" }} onClick={() => ir("menu")} data-testid="qe-central">Volver al menú</button>
       </Puerta>
     );
   } else if (vista === "p2") {
     cuerpo = (
-      <Puerta d={PUERTA2} atajos={ATAJOS2} id="qe-puerta2" accCta="participar">
+      <Puerta d={PUERTA2} atajos={ATAJOS2} extra={ATAJOS2_MAS} id="qe-puerta2" accCta="participar">
         <div className="qe-ambas" data-testid="qe-ambas"><b>{AMBAS.t}</b><span>{AMBAS.p}</span>
           <button type="button" className="qe-nav" onClick={() => ir("p1")} data-testid="qe-a-p1">‹ Ver la Puerta 01: Quiero buscar / solicitar</button></div>
         <div className="qe-frase qe-frase-g" data-testid="qe-rectora">{FRASES.cultivamos}<small>{FRASES.desarrollo}</small></div>
-        <button type="button" className="qe-nav qe-nav-c" style={{ width: "100%" }} onClick={() => ir("menu")} data-testid="qe-central">Volver al menú</button>
+        <button type="button" className="qe-nav qe-nav-c" style={{ width: "calc(100% - 28px)" }} onClick={() => ir("menu")} data-testid="qe-central">Volver al menú</button>
       </Puerta>
     );
   } else if (nAp === 1) {
@@ -273,6 +309,21 @@ export default function QueEsDcuates() {
           <h2 className="qe-m-t">¿QUÉ ES <i>D</i>CUATES?</h2>
           <p className="qe-m-s">Desarrollo integral y compartido · <b>Juntos construimos una mejor comunidad</b></p>
           <p className="qe-m-p">{FRASES.bienvenida}</p>
+          <div className="qe-bus" data-testid="qe-buscador">
+            <input type="search" value={busca} onChange={(e) => setBusca(e.target.value)} placeholder="🔍 Busca: mascota, ofrecer, urgencia, negocio…" aria-label="Buscar en ¿Qué es DCUATES?" data-testid="qe-bus-in" />
+            {busca.trim() && (
+              <div className="qe-bus-r" data-testid="qe-bus-res">
+                {resultados.length ? resultados.map((r) => (
+                  <button key={r.v + r.t} type="button" onClick={() => { registrar("que_es_buscar", { q: busca.trim().slice(0, 30) }); setBusca(""); ir(r.v); }} data-testid="qe-bus-item"><span aria-hidden="true">{r.e}</span><b>{r.t}</b><small>{r.d}</small></button>
+                )) : <p>No encontramos «{busca.trim()}». Prueba con otra palabra o elige abajo.</p>}
+              </div>
+            )}
+          </div>
+          {sugerida && !busca.trim() && (
+            <button type="button" className="qe-sug" onClick={() => ir(sugerida.v)} data-testid="qe-sugerida">
+              <span aria-hidden="true">{sugerida.e}</span><span>Elegiste «{sugerida.p}». Te sugerimos empezar por <b>{sugerida.t}</b></span><em>›</em>
+            </button>
+          )}
           <div className="qe-g">Elige por dónde empezar</div>
           <div className="qe-col">
             {MENU1.map((m) => (
@@ -299,6 +350,7 @@ export default function QueEsDcuates() {
             <button type="button" className="qe-x qe-x-l" onClick={() => ir("menu")} aria-label="Volver al menú" data-testid="qe-atras">‹</button>
             <LogoDcuates alto={32} />
             <span className="qe-cab-s" />
+            <BotonCompartir key={vista} hash={"que-es-" + vista} variante="circulo" titulo={`${A ? A.t : vista === "p1" ? PUERTA1.t : PUERTA2.t} — ¿Qué es DCUATES?`} texto="Conoce DCUATES: una comunidad donde todos tenemos algo que buscar, ofrecer y compartir" />
             <button type="button" className="qe-x qe-x-l" onClick={cerrar} aria-label="Cerrar" data-testid="qe-cerrar">✕</button>
           </header>
           {nAp > 0 && (
@@ -339,6 +391,13 @@ const CSS = `
 .qe-m-t{margin:10px 0 2px;text-align:center;font-size:26px;font-weight:900;color:#0B6E78}.qe-m-t i{color:#E8731A;font-style:normal}
 .qe-m-s{margin:0;text-align:center;font-size:13px;color:#555}.qe-m-s b{color:#0B6E78}
 .qe-m-p{margin:8px 0 2px;text-align:center;font-size:14px;font-weight:800;color:#B85400;line-height:1.3}
+.qe-bus{margin:10px 0 2px}.qe-bus input{width:100%;box-sizing:border-box;border:2px solid #0B6E78;border-radius:999px;padding:11px 16px;font-size:16px;font-family:inherit;background:#fff;min-height:46px}
+.qe-bus-r{display:flex;flex-direction:column;gap:6px;margin-top:8px}.qe-bus-r p{margin:6px;text-align:center;font-size:14px}
+.qe-bus-r button{display:grid;grid-template-columns:28px 1fr;column-gap:8px;text-align:left;background:#fff;border:2px solid #e0d8c4;border-radius:12px;padding:8px 10px;cursor:pointer;font-family:inherit;min-height:44px}
+.qe-bus-r button span{grid-row:1/3;font-size:20px;align-self:center}.qe-bus-r button b{font-size:14px}.qe-bus-r button small{font-size:12px;opacity:.8}
+.qe-sug{display:flex;align-items:center;gap:8px;width:100%;margin-top:8px;background:#FFF7E0;border:2px dashed #E8731A;border-radius:12px;padding:8px 10px;text-align:left;font-family:inherit;font-size:13px;cursor:pointer;min-height:46px}.qe-sug>span:first-child{font-size:22px}.qe-sug em{margin-left:auto;font-style:normal;font-size:20px}
+.qe-nav{box-sizing:border-box;max-width:100%}
+.qe-vmas{all:unset;cursor:pointer;display:block;margin:8px auto 0;font-weight:800;font-size:13px;padding:8px 12px;min-height:30px}.qe-vmas:focus-visible{outline:3px solid #FFD54F}
 .qe-g{margin:14px 2px 2px;font-weight:900;font-size:15px;color:#0B6E78;text-align:center}
 .qe-col button{width:100%;margin-top:7px;border:0;border-radius:14px;padding:9px 10px;color:#fff;font-family:inherit;display:flex;align-items:center;gap:9px;text-align:left;cursor:pointer;min-height:56px;box-shadow:0 2px 6px rgba(0,0,0,.18)}
 .qe-m-n{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.28);font-weight:900;font-size:12px;display:flex;align-items:center;justify-content:center;flex:none}

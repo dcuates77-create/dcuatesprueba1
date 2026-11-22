@@ -201,6 +201,8 @@ export default function App() {
   const [vista, setVista] = useState("inicio");
   const irVista = (v) => { setVista(v); window.scrollTo({ top: 0, behavior: "auto" }); if (v === "inicio") window.dispatchEvent(new Event("dcuates:inicio-directo")); };
   useAtras(vista !== "inicio", () => setVista("inicio"));
+  // e89: el botón de compartir del encabezado comparte la sección donde estás (lo lee de aquí).
+  useEffect(() => { window.__dcuatesVista = vista; window.dispatchEvent(new Event("dcuates:vista-cambio")); }, [vista]);
   useEffect(() => {
     // Si un enlace/evento apunta a algo que vive en otra vista, se cambia a esa vista.
     const vistaDeId = (id) => {

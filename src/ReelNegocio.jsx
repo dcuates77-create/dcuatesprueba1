@@ -2,8 +2,10 @@
 // Los videos de YouTube se cargan solo cuando la persona toca el cuadro (no gastan datos antes). El carrusel avanza solo cada 5 s
 // si no hay un video en marcha, se detiene al tocarlo y no se mueve si la persona prefiere menos movimiento.
 import React, { useEffect, useRef, useState } from "react";
+import MediaInteligente, { CSS_MEDIA } from "./componentes/MediaInteligente.jsx";
+import { aMedio } from "./utilidades/medios.js";
 
-const norm = (x) => (typeof x === "string" ? { t: "img", u: x } : x);
+const norm = aMedio;
 
 export default function ReelNegocio({ items, nombre = "", alAbrirVideo }) {
   const lista = (items || []).map(norm).filter((m) => m && (m.u || m.id));
@@ -44,10 +46,9 @@ export default function ReelNegocio({ items, nombre = "", alAbrirVideo }) {
                   <img src={`https://i.ytimg.com/vi/${m.id}/hqdefault.jpg`} alt="" loading="lazy" /><span aria-hidden="true">▶</span>
                 </button>
               )
-            ) : m.t === "mp4" ? (
-              <video controls playsInline preload="metadata" src={m.u} onPlay={() => { setActivo(i); alAbrirVideo && alAbrirVideo(); }} onPause={() => setActivo(-1)} aria-label={`Video de ${nombre}`} />
             ) : (
-              <img src={m.u} alt="" loading="lazy" />
+              <MediaInteligente medio={m} nombre={nombre} activo={activo === i}
+                onActivar={() => { setActivo(i); alAbrirVideo && alAbrirVideo(); }} onPausa={() => setActivo(-1)} />
             )}
           </div>
         ))}
@@ -61,7 +62,7 @@ export default function ReelNegocio({ items, nombre = "", alAbrirVideo }) {
   );
 }
 
-const CSS = `
+const CSS = CSS_MEDIA + `
 .rl{margin:14px 0 0}
 .rl-pista{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;padding:0 14px 4px;scrollbar-width:none}
 .rl-pista::-webkit-scrollbar{display:none}

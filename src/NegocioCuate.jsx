@@ -9,6 +9,7 @@ import { abrirRegistroPrevio } from "./RegistroPrevio.jsx";
 import { cargarNegocio, categoriaDe, NIVELES, esOficial, diasHasta, textoCuenta } from "./datos/negocios.js";
 import PaginaCuateCTA from "./PaginaCuateCTA.jsx";
 import ReelNegocio from "./ReelNegocio.jsx";
+import { ImagenSegura, useImagenSegura } from "./componentes/MediaInteligente.jsx";
 import { ListaNegocios, PaginaCategoria, esSlugCategoria, categoriaDeSlug } from "./PaginaCategoria.jsx";
 import { abrirPanelNegocio } from "./PanelNegocio.jsx";
 import { abrirTablon } from "./Tablon.jsx";
@@ -129,6 +130,7 @@ export default function NegocioCuate() {
     const caja = document.querySelector(".ng-caja"); if (caja) caja.scrollTop = 0;
     return () => { document.title = ant; };
   }, [slug, est]);
+  const portadaOk = useImagenSegura(est.ok && est.negocio ? est.negocio.portada : ""); // e89: sin «imagen rota»
   if (!slug) return null;
   const esCat = esSlugCategoria(slug);
   const catPag = esCat ? categoriaDeSlug(slug) : null;
@@ -165,12 +167,12 @@ export default function NegocioCuate() {
         {n && (
           <>
             {est.ejemplo && <p className="ng-ej">EJEMPLO ilustrativo · así se vería tu página</p>}
-            <div className="ng-portada" style={n.portada ? { backgroundImage: `url("${n.portada}")` } : undefined}>
+            <div className="ng-portada" style={portadaOk ? { backgroundImage: `url("${portadaOk}")` } : undefined}>
               <span className="ng-cat">{cat.e} {cat.nombre.toUpperCase()}</span>
               {esOficial(n.s) ? <span className="ng-pat">🌟 OFICIAL DCUATES</span> : NIVELES[n.niv] && NIVELES[n.niv].t && <span className="ng-pat">{NIVELES[n.niv].t}</span>}
             </div>
             <div className="ng-id">
-              <div className="ng-logo">{n.logo ? <img src={n.logo} alt="" loading="lazy" /> : <span aria-hidden="true">{cat.e}</span>}</div>
+              <div className="ng-logo">{n.logo ? <ImagenSegura src={n.logo} alt="" icono={cat.e} /> : <span aria-hidden="true">{cat.e}</span>}</div>
               <h1>{n.n}</h1>
               {n.e && <p className="ng-esl">{n.e}</p>}
               {n.v && <p className="ng-ver" data-testid="negocio-verificado">✅ CUATE VERIFICADO <small>Lo revisó DCUATES</small></p>}

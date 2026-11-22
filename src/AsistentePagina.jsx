@@ -5,6 +5,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useAtras } from "./atras.js";
 import { registrar } from "./analitica.js";
+import BotonCompartir from "./BotonCompartir.jsx";
 import { GIROS, giroPorId } from "./datos/giros.js";
 import { categoriaDe } from "./datos/negocios.js";
 import { GOOGLE_SHEETS_URL, WHATSAPP_NUMERO } from "./datos/config.js";
@@ -109,6 +110,7 @@ export default function AsistentePagina() {
         <div className="as-bar">
           <button type="button" className="as-x" onClick={cerrar} aria-label="Cerrar">✕</button>
           <b>🧩 Arma tu Página CUATE</b>
+          <BotonCompartir variante="claro" hash="arma-tu-pagina" titulo="Arma tu Página CUATE — DCUATES" texto="Crea gratis la página de tu emprendimiento" />
         </div>
         {hecho ? (
           <div className="as-ok" data-testid="asistente-listo">
