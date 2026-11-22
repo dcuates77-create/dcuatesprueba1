@@ -21,6 +21,25 @@ const FUERA = [
   ["Claude", "✨", (q) => "https://claude.ai/new?q=" + q],
   ["Gemini", "♊", () => "https://gemini.google.com/app", true]
 ];
+// e89: en Inicio comparte la página; en una sección comparte ESA sección (pestaña o contacto).
+const NOMBRE_TAB = { nosotros: "Nosotros", beneficios: "Beneficios", causas: "Causas", negocios: "Negocios CUATE" };
+function CompartirContextual() {
+  const [c, setC] = useState({ v: "inicio", t: "nosotros" });
+  useEffect(() => {
+    const leer = () => setC({ v: window.__dcuatesVista || "inicio", t: window.__dcuatesTab || "nosotros" });
+    leer();
+    window.addEventListener("dcuates:vista-cambio", leer);
+    window.addEventListener("dcuates:tab-activa", leer);
+    return () => { window.removeEventListener("dcuates:vista-cambio", leer); window.removeEventListener("dcuates:tab-activa", leer); };
+  }, []);
+  if (c.v === "seccion") {
+    const nom = NOMBRE_TAB[c.t] || "DCUATES";
+    return <BotonCompartir key={c.t} variante="circulo" hash={c.t} titulo={`${nom} — DCUATES`} texto={`Mira la sección «${nom}» de DCUATES, una comunidad que suma`} />;
+  }
+  if (c.v === "contacto") return <BotonCompartir key="contacto" variante="circulo" hash="contacto" titulo="Contacto y registro — DCUATES" texto="Regístrate y participa en DCUATES" />;
+  return <BotonCompartir key="inicio" variante="circulo" hash="" titulo="DCUATES — ¡Comparte y Gana!" texto="Conoce DCUATES: una comunidad que suma. Entra y participa" />;
+}
+
 export function BuscarFuera({ texto }) {
   const q = String(texto || "").trim();
   const [aviso, setAviso] = useState("");
@@ -272,7 +291,7 @@ export function SiteHeader({ onAbrirFAQ, onAbrirPrivacidad, onAbrirTerminos, onA
 
           <div className="flex items-center gap-1.5 sm:gap-3">
             {/* Búsqueda: ícono de lupa; abre una ventana de búsqueda al tocarlo. */}
-            <span className="shrink-0 flex items-center"><BotonCompartir variante="circulo" hash="" titulo="DCUATES — ¡Comparte y Gana!" texto="Conoce DCUATES: una comunidad que suma. Entra y participa" /></span>
+            <span className="shrink-0 flex items-center"><CompartirContextual /></span>
             <BarraBusqueda onAbrirProyecto={onAbrirProyecto} onAbrirCategoria={onAbrirCategoria} onAbrirFAQ={onAbrirFAQ} abierta={busquedaAbierta} setAbierta={setBusquedaAbierta} />
 
             {/* Menú de tres rayas — antes botón "Más". */}
