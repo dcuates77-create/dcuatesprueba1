@@ -1,6 +1,7 @@
 // JUEGA Y GANA — ruleta y tragamonedas con premios de aliados, Semillas y retos.
 // 3 giros al día (guardados en el celular). Los cupones ganados se guardan en "Mis premios".
 import BotonCompartir from "./BotonCompartir.jsx";
+import { MarcaVentana } from "./componentes/LogoDcuates.jsx";
 import { SiguientePaso } from "./ZonaPaso.jsx";
 import React, { useEffect, useRef, useState } from "react";
 import { GIROS_POR_DIA } from "./datos/zona.js";
@@ -73,7 +74,7 @@ export default function ZonaGana({ premios, onCerrar, alSumar }) {
   return (
     <div className="zj-fondo" role="dialog" aria-modal="true" aria-label="Juega y gana" onClick={(e) => { if (e.target === e.currentTarget) onCerrar(); }}>
       <div className="zj-caja">
-        <div className="zj-cab"><b>🏆 Juega y gana</b><span className="zj-sem">🎟️ {quedan}/{GIROS_POR_DIA}</span><button type="button" className="zj-x" onClick={onCerrar} aria-label="Cerrar">✕</button></div>
+        <MarcaVentana /><div className="zj-cab"><b>🏆 Juega y gana</b><span className="zj-sem">🎟️ {quedan}/{GIROS_POR_DIA}</span><button type="button" className="zj-x" onClick={onCerrar} aria-label="Cerrar">✕</button></div>
         <p className="zj-p">Tienes <b>{GIROS_POR_DIA} giros al día</b>. Gana cupones de negocios aliados, Semillas 🌱, mensajes y retos amables.</p>
 
         {modo !== "mis" && (

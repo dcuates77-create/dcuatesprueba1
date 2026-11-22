@@ -51,6 +51,7 @@ import NegocioCuate from "./NegocioCuate.jsx";
 import DirectorioNegocios from "./DirectorioNegocios.jsx";
 import AsistentePagina from "./AsistentePagina.jsx";
 import QueEsDcuates from "./QueEsDcuates.jsx";
+import VentanasCausas from "./VentanasCausas.jsx";
 import { cargarTema } from "./utilidades/tema.js";
 import PanelNegocio from "./PanelNegocio.jsx";
 import { cargarSinonimosHoja } from "./utilidades/sinonimosHoja.js";
@@ -472,7 +473,7 @@ export default function App() {
         <div className="flex items-center justify-center gap-3">
           <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#0f2d1e] font-black text-white text-lg shrink-0">DC</span>
           <div className="flex flex-col items-start leading-none">
-            <span className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#0f2d1e]">DCUATES</span>
+            <span className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#0f2d1e]"><span className="text-[#e65100]">D</span>CUATES</span>
             <span className="text-[10px] sm:text-xs font-black uppercase tracking-wide text-[#e65100] -mt-0.5">¡Comparte y Gana!</span>
           </div>
         </div>
@@ -752,6 +753,7 @@ export default function App() {
       <DirectorioNegocios />
       <AsistentePagina />
       <QueEsDcuates />
+      <VentanasCausas reelItems={portadasItems.causas || []} cargando={!baserowListo} animalProps={{ apoyoCausaAnimalLinks, apoyoCosasCasosLinks, apoyoPersonasExtraviadasLinks, extraviadosResumenAbierto, setExtraviadosResumenAbierto }} />
       <PanelNegocio />
       <Tablon />
       <GratitudVentanas filas={filasEnlaces} />

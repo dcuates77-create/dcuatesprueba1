@@ -1,5 +1,6 @@
 // APOYO GRATUITO: ventana con teléfonos y enlaces de ayuda (psicológica, ciberdelitos, local). Se abre con el evento dcuates:abrir-apoyo.
 import React, { useEffect, useState } from "react";
+import { MarcaVentana } from "./componentes/LogoDcuates.jsx";
 import { createPortal } from "react-dom";
 import { useAtras } from "./atras.js";
 import { APOYO, CIBERNETICA, AYUDA_LOCAL, FECHA_REVISION, ANIMAL_SUGERENCIAS, ANIMAL_TELEFONOS } from "./datos/apoyo.js";
@@ -32,7 +33,7 @@ export default function ApoyoHost({ onAbrirProyecto = () => {} }) {
   if (vista === "animal") return createPortal(
     <div className="zj-fondo" role="dialog" aria-modal="true" aria-label="Ayuda causa animal" onClick={(e) => { if (e.target === e.currentTarget) cerrar(); }}>
       <div className="zj-caja">
-        <div className="zj-cab"><b>🐾 Ayuda causa animal</b><button type="button" className="zj-x" onClick={cerrar} aria-label="Cerrar">✕</button></div>
+        <MarcaVentana /><div className="zj-cab"><b>🐾 Ayuda causa animal</b><button type="button" className="zj-x" onClick={cerrar} aria-label="Cerrar">✕</button></div>
         <p className="zj-p">Extravío, adopción, rescate o maltrato: qué hacer y a quién llamar. Los animalitos cuentan con nosotros. 💛</p>
         <p className="ap-av">🚨 Si hay peligro inmediato para personas, llama al <b>911</b>.</p>
         {ANIMAL_SUGERENCIAS.map(([e, t, c, items]) => (
@@ -53,7 +54,7 @@ export default function ApoyoHost({ onAbrirProyecto = () => {} }) {
   return createPortal(
     <div className="zj-fondo" role="dialog" aria-modal="true" aria-label="Apoyo gratuito" onClick={(e) => { if (e.target === e.currentTarget) cerrar(); }}>
       <div className="zj-caja">
-        <div className="zj-cab"><b>💚 Apoyo gratuito</b><button type="button" className="zj-x" onClick={cerrar} aria-label="Cerrar">✕</button></div>
+        <MarcaVentana /><div className="zj-cab"><b>💚 Apoyo gratuito</b><button type="button" className="zj-x" onClick={cerrar} aria-label="Cerrar">✕</button></div>
         <p className="zj-p">Teléfonos y enlaces de atención gratuita: apoyo emocional, universidades, gobierno, ciberdelitos y ayuda en tu zona. Toca un número para llamar. 🤍</p>
         <p className="ap-av">🚨 Si hay peligro inmediato, llama al <b>911</b>. DCUATES no sustituye atención médica, psicológica ni legal.</p>
         {APOYO.map(([t, filas]) => <div key={t}><p className="zj-et">{t}</p>{filas.map((f, i) => <Fila key={f[1] + i} f={f} i={i} />)}</div>)}

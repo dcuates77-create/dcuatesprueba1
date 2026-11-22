@@ -83,7 +83,7 @@ export function PaseCompleto({ id = "vecino", quien = "mujer", foto, nombre = "A
   const [falla, setFalla] = React.useState(false);
   return (
     <span className="pc" aria-hidden="true" style={{ background: "linear-gradient(160deg," + t.f1 + "," + t.f2 + ")", borderColor: t.c2, transform: "rotate(" + inclinar + "deg)" }}>
-      <span className="pc-top"><img src="/images/logo-circular.webp" alt="" width="16" height="16" /><b>DCUATES</b><i>¡COMPARTE Y GANA!</i></span>
+      <span className="pc-top"><img src="/images/logo-circular.webp" alt="" width="16" height="16" /><b><span style={{ color: "#E65100" }}>D</span>CUATES</b><i>¡COMPARTE Y GANA!</i></span>
       <span className="pc-per">
         <span className="pc-f" style={{ boxShadow: "0 0 0 2px " + t.c2 }}>
           {foto && !falla ? <img src={foto} alt="" onError={() => setFalla(true)} /> : <Avatar quien={quien} t={t} />}

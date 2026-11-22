@@ -1,5 +1,6 @@
 // TENGO UN NEGOCIO — ventana con el mismo formato que "Empieza aquí" (Soy vecino), pero con lo que le sirve a un emprendedor.
 import React from "react";
+import { MarcaVentana } from "./componentes/LogoDcuates.jsx";
 import { WHATSAPP_NUMERO } from "./datos/config.js";
 import BotonCompartir from "./BotonCompartir.jsx";
 import { abrirRegistroPrevio } from "./RegistroPrevio.jsx";
@@ -40,7 +41,7 @@ export default function Negocio({ onCerrar, onAbrirProyecto }) {
   return (
     <div className="zj-fondo" role="dialog" aria-modal="true" aria-label="Tengo un negocio" onClick={(e) => { if (e.target === e.currentTarget) onCerrar(); }}>
       <div className="zj-caja">
-        <div className="zj-cab"><b>🏪 Tengo un negocio</b>
+        <MarcaVentana /><div className="zj-cab"><b>🏪 Tengo un negocio</b>
           <BotonCompartir hash="negocio" titulo="Tengo un negocio — DCUATES" texto="Publicidad gratuita, cupones, alianzas y más para negocios locales" variante="circulo" />
           <button type="button" className="zj-x" onClick={onCerrar} aria-label="Cerrar">✕</button></div>
         <p className="zj-p">Tu negocio crece más cuando la comunidad lo conoce y confía en él. Elige por dónde quieres empezar: todo es de apoyo mutuo y sin costo de inicio. 💛</p>

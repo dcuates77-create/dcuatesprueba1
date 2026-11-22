@@ -2,6 +2,7 @@
 // (abre ENTRADA DCUATES en una hoja), cuadrícula de 6 secciones y el carrusel de logros.
 import BotonCompartir from "./BotonCompartir.jsx";
 import React, { useEffect, useRef, useState } from "react";
+import { MarcaVentana } from "./componentes/LogoDcuates.jsx";
 import { createPortal } from "react-dom";
 import EntradaDcuates from "./PuertasDcuates.jsx";
 import { BandaImpacto, TABS } from "./BloqueCentral.jsx";
@@ -36,6 +37,7 @@ export function Hoja({ abierta, onCerrar, titulo, children, compartir }) {
   return createPortal(
     <div className="vi-fondo" onClick={onCerrar} style={oculta ? { display: "none" } : undefined}>
       <div className="vi-hoja" role="dialog" aria-modal="true" aria-label={titulo} onClick={(e) => e.stopPropagation()}>
+        <div style={{ padding: "10px 16px 0" }}><MarcaVentana /></div>
         <div className="vi-hoja-cab">
           <b>{titulo}</b>
           <span className="vi-hoja-acc">

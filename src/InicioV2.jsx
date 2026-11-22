@@ -27,6 +27,7 @@ import { abrirRegistroPrevio } from "./RegistroPrevio.jsx";
 import { ejecutar } from "./datos/secciones.js";
 import { irASeccion } from "./utilidades/baserow.js";
 import { registrar } from "./analitica.js";
+import { texto } from "./utilidades/tema.js";
 
 const FOTOS = ["/images/portada-inicio.webp", "/images/bibliobici-movil.webp"];
 const FOTO_CLUB = "/images/cuate/dcuates.webp";
@@ -290,9 +291,9 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
   // v3 «Impacto»: bandas de color sólido (índigo · coral · dorado · verde azulado), letras blancas y ícono grande.
   const banda = (k, ic, t, sub, g, f, oscuro) => (
     <button key={k} type="button" className={"v3-b" + (oscuro ? " v3-osc" : "")} style={{ background: g }} onClick={f}>
-      <span className="v3-b-i"><Ico n={ic} c="#fff" s={52} /></span>
+      <span className="v3-b-i"><Ico n={ic} c="#fff" s={34} /></span>
       <span className="v3-b-t"><b>{t}</b><small>{sub}</small></span>
-      <span className="v3-b-f"><Ico n="flecha" c={oscuro ? "#3b2a00" : "#fff"} s={22} /></span>
+      <span className="v3-b-f"><Ico n="flecha" c={oscuro ? "#3b2a00" : "#fff"} s={17} /></span>
     </button>
   );
   const solido = (
@@ -431,7 +432,17 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
     <div className="vi-root v2-root">
       <style>{CSS_VI}</style>
       <style>{CSS}</style>
+      {/* e91: menú de secciones (el mismo de las demás pantallas, en pequeño) + portada reducida + lema */}
+      <nav className="v2-menu" aria-label="Secciones de DCUATES" data-testid="inicio-menu">
+        <span className="v2-mn v2-mn-on" aria-current="page"><i style={{ background: "#17472d" }} aria-hidden="true">🏠</i><b>Inicio</b></span>
+        {TABS.map((t) => (
+          <button key={t.id} type="button" className="v2-mn" onClick={() => { registrar("menu_inicio", { id: t.id }); onIr(t.id); }} data-testid={"inicio-menu-" + t.id}>
+            <i style={{ background: t.color }} aria-hidden="true">{t.emoji}</i><b>{t.label}</b>
+          </button>
+        ))}
+      </nav>
       <HeroFade fotos={fotosHero} />
+      <p className="v2-lema" data-testid="inicio-lema">{texto("inicio_lema", "Apoyos y Beneficios Mutuos y Comunitarios que nos hacen MEJORES !!!")}</p>
       {variante === "3" ? solido : variante === "4" ? ruta : variante === "5" ? bento : variante === "6" ? vitrina : base}
       <Atajos />
       <div id="vi-resultados" />
@@ -575,8 +586,16 @@ const CSS = `
 .v2-root{background:#FFFBEA;padding:8px 10px 10px;display:flex;flex-direction:column;gap:12px;border-radius:0}
 .v2-root button{font-family:inherit}
 .v2-i{flex:none;display:block}
-.v2-hero{position:relative;height:190px;border-radius:20px;overflow:hidden;background:#14532d;flex:none}
-.v2-hero-i{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity 1.4s ease}
+.v2-menu{display:flex;gap:6px;overflow-x:auto;padding:2px 2px 6px;margin:0 0 6px;scrollbar-width:none;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+.v2-menu::-webkit-scrollbar{display:none}
+.v2-mn{all:unset;box-sizing:border-box;flex:0 0 auto;display:flex;align-items:center;gap:5px;min-height:40px;padding:3px 10px 3px 4px;border-radius:999px;background:#f1f4f2;border:1.5px solid rgba(15,45,30,.1);cursor:pointer;font-family:inherit}
+.v2-mn i{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:15px;color:#fff}
+.v2-mn b{font-size:13px;font-weight:800;color:#14352a;white-space:nowrap}
+.v2-mn-on{background:#17472d;border-color:#17472d}.v2-mn-on b{color:#fff}.v2-mn-on i{background:#fff!important}
+.v2-mn:focus-visible{outline:3px solid #FFD54F;outline-offset:1px}
+.v2-lema{margin:7px 4px 8px;text-align:center;font-size:15.5px;line-height:1.25;font-weight:900;color:#0f3d24;letter-spacing:.1px}
+.v2-hero{position:relative;height:124px;border-radius:20px;overflow:hidden;background:#14532d;flex:none}
+.v2-hero-i{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 30%;transition:opacity 1.4s ease}
 .v2-bigb{display:flex;align-items:center;gap:10px;width:100%;min-height:84px;padding:8px 10px;background:#fff;border:2px solid #d7e8bd;border-radius:18px;text-align:left;cursor:pointer;color:#0f3b22}
 .v2-bigb:active,.v2-card:active,.v2-rb:active,.v2-club:active{transform:scale(.97)}
 .v2-bi{flex:none;width:66px;height:66px;border-radius:50%;display:flex;align-items:center;justify-content:center}
@@ -599,15 +618,15 @@ const CSS = `
 .v2-aviso{display:flex;align-items:center;gap:10px;background:#fff;border:2px solid #cfe5b0;border-radius:18px;padding:10px}
 .v2-aviso-i{flex:none;width:52px;height:52px;border-radius:50%;background:#E9F6D5;display:flex;align-items:center;justify-content:center}
 .v2-aviso-t{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.2}.v2-aviso-t b{font-size:16px;font-weight:900}.v2-aviso-t small{font-size:12px;font-weight:700;color:#2f4d3f}
-.v3-sol{display:flex;flex-direction:column;gap:10px}
-.v3-b{position:relative;display:flex;align-items:center;gap:12px;width:100%;min-height:96px;padding:10px 12px;border:0;border-radius:22px;color:#fff;text-align:left;cursor:pointer;box-shadow:0 6px 14px rgba(18,53,91,.22);overflow:hidden}
-.v3-b::after{content:"";position:absolute;right:-30px;top:-30px;width:110px;height:110px;border-radius:50%;background:rgba(255,255,255,.14)}
+.v3-sol{display:flex;flex-direction:column;gap:7px}
+.v3-b{position:relative;display:flex;align-items:center;gap:9px;width:100%;min-height:66px;padding:6px 10px;border:0;border-radius:18px;color:#fff;text-align:left;cursor:pointer;box-shadow:0 6px 14px rgba(18,53,91,.22);overflow:hidden}
+.v3-b::after{content:"";position:absolute;right:-24px;top:-24px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.14)}
 .v3-b:active{transform:scale(.98)}
-.v3-b-i{flex:none;width:68px;height:68px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center}
+.v3-b-i{flex:none;width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center}
 .v3-b-t{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.1;z-index:1}
-.v3-b-t b{font-size:19px;font-weight:900;letter-spacing:.2px;text-shadow:0 1px 2px rgba(0,0,0,.25)}
-.v3-b-t small{font-size:13px;font-weight:700;margin-top:3px;opacity:.95}
-.v3-b-f{flex:none;z-index:1;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center}
+.v3-b-t b{font-size:15.5px;font-weight:900;letter-spacing:.2px;text-shadow:0 1px 2px rgba(0,0,0,.25)}
+.v3-b-t small{font-size:11.5px;font-weight:700;margin-top:2px;opacity:.95}
+.v3-b-f{flex:none;z-index:1;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center}
 .v3-osc{color:#3b2a00}.v3-osc .v3-b-t b{text-shadow:none}.v3-osc .v3-b-i{background:rgba(255,255,255,.55)}.v3-osc .v3-b-i svg{stroke:#8a5a00}
 .v3-reg{background:#fff;border:2px solid #dfe3ee;border-radius:20px;padding:10px 8px 12px}
 .v3-rt{display:flex;flex-direction:column;align-items:center;gap:6px;min-height:104px;justify-content:center;border:0;border-radius:18px;color:#fff;font-size:13.5px;font-weight:900;cursor:pointer;box-shadow:0 5px 10px rgba(0,0,0,.18)}

@@ -1,5 +1,6 @@
 // DONA, COMPRA Y VENDE CON CAUSA — necesidades para donar, catálogo de Ventas con Causa y formulario para ofrecer.
 import { SiguientePaso } from "./ZonaPaso.jsx";
+import { MarcaVentana } from "./componentes/LogoDcuates.jsx";
 import React, { useState } from "react";
 import { GOOGLE_SHEETS_URL, WHATSAPP_NUMERO } from "./datos/config.js";
 import { BASEROW_TABLE_ID_VENTAS_CON_CAUSA, VENTAS_CON_CAUSA_ITEMS } from "./datos/proyectos.js";
@@ -39,7 +40,7 @@ export default function ZonaCausa({ onCerrar, necesidades, onAbrirProyecto = () 
   return (
     <div className="zj-fondo" role="dialog" aria-modal="true" aria-label="Dona, compra y vende con causa" onClick={(e) => { if (e.target === e.currentTarget) onCerrar(); }}>
       <div className="zj-caja">
-        <div className="zj-cab"><b>🛍️ Dona, compra y vende con causa</b><button type="button" className="zj-x" onClick={onCerrar} aria-label="Cerrar">✕</button></div>
+        <MarcaVentana /><div className="zj-cab"><b>🛍️ Dona, compra y vende con causa</b><button type="button" className="zj-x" onClick={onCerrar} aria-label="Cerrar">✕</button></div>
         <p className="zj-p">Cada compra, donativo o servicio con causa mueve algo bueno en la comunidad.</p>
         <div className="zj-chips">
           {pestanas.map(([id, t]) => <button type="button" key={id} className={"zj-chip" + (pest === id ? " zj-on" : "")} onClick={() => setPest(id)} aria-pressed={pest === id}>{t}</button>)}

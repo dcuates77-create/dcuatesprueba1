@@ -1,6 +1,7 @@
 // AGENDA Y UTILERÍAS: próximos eventos (Google Calendar), cuenta regresiva, clima, horarios de atención 24 h y recordatorios.
 // Se abre con el evento dcuates:abrir-agenda (la agenda de HOY, EXPLORA e Info clave lo usan).
 import React, { useEffect, useMemo, useState } from "react";
+import { MarcaVentana } from "./componentes/LogoDcuates.jsx";
 import { createPortal } from "react-dom";
 import { useAtras } from "./atras.js";
 import BotonCompartir from "./BotonCompartir.jsx";
@@ -194,7 +195,7 @@ function Ventana({ onCerrar, agenda, negocios }) {
   return createPortal(
     <div className="zj-fondo" role="dialog" aria-modal="true" aria-label="Agenda y utilerías" onClick={(e) => { if (e.target === e.currentTarget) onCerrar(); }}>
       <div className="zj-caja">
-        <div className="zj-cab"><b>📅 Agenda y utilerías</b>
+        <MarcaVentana /><div className="zj-cab"><b>📅 Agenda y utilerías</b>
           <BotonCompartir hash="agenda" titulo="Agenda DCUATES" texto="Mira los próximos eventos de DCUATES" variante="circulo" />
           <button type="button" className="zj-x" onClick={onCerrar} aria-label="Cerrar">✕</button></div>
         <p className="zj-p">Eventos, cuenta regresiva, clima, horarios de atención y recordatorios, en un solo lugar.</p>

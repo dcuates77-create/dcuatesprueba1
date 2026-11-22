@@ -79,9 +79,6 @@ const TABS_TODAS = esAdmin() ? [...TABS, TAB_RESERVADO] : TABS;
 // ids de secciones que ahora viven dentro de una pestaña: los enlaces
 // (#donaciones, irASeccion("chuy-video")…) abren la pestaña correcta.
 export const ID_A_TAB = {
-  donaciones: "causas",
-  "chuy-video": "causas",
-  "extraviados-registro": "causas",
   "quienes-somos": "nosotros",
   solicitudes: "beneficios",
   recursos: "causas",
@@ -92,7 +89,6 @@ export const ID_A_TAB = {
   "mapa-negocios": "negocios",
   "ventas-con-causa": "negocios",
   "registro-ventas": "negocios",
-  "registro-extraviados": "causas",
   publicidad: "negocios",
   "retos-regalos": "gratitud",
   manifiesto: "nosotros",
@@ -666,6 +662,7 @@ export default function BloqueCentral({
     else if (a.acceso) onAcceso(a.acceso);
     else if (a.proy) onAbrirProyecto(a.proy);
     else if (a.zona) ev("dcuates:abrir-zona", a.zona);
+    else if (a.causaVent) window.dispatchEvent(new CustomEvent("dcuates:causa-vent", { detail: a.causaVent }));
     else if (a.ir) irASeccion(a.ir);
     else if (a.wa) window.open(wa(a.wa), "_blank", "noopener");
     else if (a.tab) { const i = TABS_TODAS.findIndex((t) => t.id === a.tab); if (i >= 0) cambiar(i); }

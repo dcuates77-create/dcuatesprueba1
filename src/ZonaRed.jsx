@@ -1,5 +1,6 @@
 // RED DE CONFIANZA (3er nivel) — actividades INDIVIDUALES por invitación. Todo se guarda en el celular de cada persona.
 import React, { useEffect, useState } from "react";
+import { MarcaVentana } from "./componentes/LogoDcuates.jsx";
 import { createPortal } from "react-dom";
 import { useAtras } from "./atras.js";
 import Tablero, { abrirAcceso } from "./Tablero.jsx";
@@ -31,7 +32,7 @@ function Acceso({ onCerrar, onEntrar }) {
   return (
     <div className="zj-fondo" role="dialog" aria-modal="true" aria-label="Acceso a la Red de confianza" onClick={(e) => { if (e.target === e.currentTarget) onCerrar(); }}>
       <div className="zj-caja">
-        <div className="zj-cab"><b>🌳 Red de confianza</b><button type="button" className="zj-x" onClick={onCerrar} aria-label="Cerrar">✕</button></div>
+        <MarcaVentana /><div className="zj-cab"><b>🌳 Red de confianza</b><button type="button" className="zj-x" onClick={onCerrar} aria-label="Cerrar">✕</button></div>
         <p className="zj-p">Este espacio es por invitación para quienes ya participan de forma constante. Escribe la clave que te compartimos.</p>
         <form className="pr-form" onSubmit={entrar}>
           <label>Tu clave<input value={clave} onChange={(e) => { setClave(e.target.value); setError(""); }} autoComplete="off" autoCapitalize="none" /></label>
@@ -204,7 +205,7 @@ function Ventana({ t, contenido, onCerrar, onAbrirProyecto }) {
   return (
     <div className="zj-fondo" role="dialog" aria-modal="true" aria-label={t.titulo} onClick={(e) => { if (e.target === e.currentTarget) onCerrar(); }}>
       <div className="zj-caja">
-        <div className="zj-cab"><b>{t.emoji} {t.titulo}</b><button type="button" className="zj-x" onClick={onCerrar} aria-label="Cerrar">✕</button></div>
+        <MarcaVentana /><div className="zj-cab"><b>{t.emoji} {t.titulo}</b><button type="button" className="zj-x" onClick={onCerrar} aria-label="Cerrar">✕</button></div>
         {t.id === "pasaporte" && <Pasaporte onAbrirProyecto={onAbrirProyecto} cerrar={onCerrar} />}
         {t.id === "lectura" && <Lectura libro={contenido.libro && contenido.libro[0]} pregunta={contenido["libro-pregunta"] && contenido["libro-pregunta"][0] && contenido["libro-pregunta"][0].x} />}
         {t.id === "diario" && <Diario />}

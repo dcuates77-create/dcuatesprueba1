@@ -1,5 +1,6 @@
 // PUERTAS DCUATES — entrada de NOSOTROS: ¿Cómo quieres participar hoy? Cada puerta abre su guía con su propio camino.
 import React, { useEffect, useState } from "react";
+import { MarcaVentana } from "./componentes/LogoDcuates.jsx";
 import { createPortal } from "react-dom";
 import BotonCompartir from "./BotonCompartir.jsx";
 import { abrirRegistroPrevio } from "./RegistroPrevio.jsx";
@@ -42,7 +43,7 @@ function Guia({ p, onCerrar, onAbrirProyecto, modo, setModo }) {
   return (
     <div className="zj-fondo" style={oculta ? { display: "none" } : undefined} role="dialog" aria-modal="true" aria-label={p.titulo} onClick={(e) => { if (e.target === e.currentTarget) onCerrar(); }}>
       <div className="zj-caja" style={{ "--pc": p.c }}>
-        <div className="zj-cab"><b>{p.e} {p.titulo}</b>
+        <MarcaVentana /><div className="zj-cab"><b>{p.e} {p.titulo}</b>
           {(!p.sensible || p.id === "dificil") && <BotonCompartir hash={"puerta-" + p.id} titulo={p.titulo + " — DCUATES"} texto={"Entra a DCUATES por tu puerta: " + p.titulo} variante="circulo" />}
           <button type="button" className="zj-x" onClick={onCerrar} aria-label="Cerrar">✕</button></div>
         <p className="zj-p">{p.intro}</p>
@@ -105,7 +106,7 @@ function VentanaEntrada({ titulo, onCerrar, hash, texto, children }) {
   return (
     <div className="zj-fondo" style={oculta ? { display: "none" } : undefined} role="dialog" aria-modal="true" aria-label={titulo} onClick={(e) => { if (e.target === e.currentTarget) onCerrar(); }}>
       <div className="zj-caja">
-        <div className="zj-cab"><b>{titulo}</b>
+        <MarcaVentana /><div className="zj-cab"><b>{titulo}</b>
           <BotonCompartir hash={hash} titulo={titulo + " — DCUATES"} texto={texto} variante="circulo" />
           <button type="button" className="zj-x" onClick={onCerrar} aria-label="Cerrar">✕</button></div>
         {children}
@@ -121,7 +122,7 @@ function Selector({ onCerrar, onAbrirProyecto }) {
   return (
     <div className="zj-fondo" style={oculta ? { display: "none" } : undefined} role="dialog" aria-modal="true" aria-label="Puertas" onClick={(e) => { if (e.target === e.currentTarget) onCerrar(); }}>
       <div className="zj-caja">
-        <div className="zj-cab"><b>🚪 Puertas</b><BotonCompartir hash="puertas" titulo="PUERTAS — DCUATES" texto="Elige tu puerta y entra a DCUATES por donde te toque" variante="circulo" /><button type="button" className="zj-x" onClick={onCerrar} aria-label="Cerrar">✕</button></div>
+        <MarcaVentana /><div className="zj-cab"><b>🚪 Puertas</b><BotonCompartir hash="puertas" titulo="PUERTAS — DCUATES" texto="Elige tu puerta y entra a DCUATES por donde te toque" variante="circulo" /><button type="button" className="zj-x" onClick={onCerrar} aria-label="Cerrar">✕</button></div>
         <p className="zj-p">Elige cómo quieres participar y te guiamos paso a paso. Puedes cambiarla cuando quieras.</p>
         <div className="pu-chips pu-chips2">
           <button type="button" onClick={() => lanza({ z: "empieza" }, onCerrar, onAbrirProyecto)}>👀 Solo vengo a conocer</button>

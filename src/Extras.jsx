@@ -1,6 +1,7 @@
 // VENTANAS EXTRA (se montan una sola vez en App): SERVICIOS Y PROMOCIONES ESPECIALES y SÉ PARTE DE NUESTROS LOGROS.
 // Se abren con eventos: dcuates:abrir-servicios y dcuates:abrir-logros (desde cualquier botón, tablero o lista).
 import PaginaCuateCTA from "./PaginaCuateCTA.jsx";
+import { MarcaVentana } from "./componentes/LogoDcuates.jsx";
 import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { WHATSAPP_NUMERO } from "./datos/config.js";
@@ -47,7 +48,7 @@ export default function Extras({ logros = [] }) {
       {serv && createPortal(
         <div className="zj-fondo" role="dialog" aria-modal="true" aria-label="Servicios y promociones especiales" onClick={(e) => { if (e.target === e.currentTarget) setServ(false); }}>
           <div className="zj-caja">
-            <div className="zj-cab"><b>💼 Servicios y promociones especiales</b>
+            <MarcaVentana /><div className="zj-cab"><b>💼 Servicios y promociones especiales</b>
               <BotonCompartir hash="servicios" titulo="Servicios y promociones especiales" texto="Coaching, consultoría, asesoría y promociones especiales de DCUATES" variante="circulo" />
               <button type="button" className="zj-x" onClick={() => setServ(false)} aria-label="Cerrar">✕</button></div>
             <p className="zj-p">Además de los apoyos comunitarios, DCUATES y Conexiones con Causa ofrecen servicios y promociones especiales para personas, negocios y organizaciones. La lista se irá completando; mientras tanto, pide informes y te orientamos.</p>
@@ -60,7 +61,7 @@ export default function Extras({ logros = [] }) {
       {log && createPortal(
         <div className="zj-fondo" role="dialog" aria-modal="true" aria-label="Sé parte de nuestros logros" onClick={(e) => { if (e.target === e.currentTarget) setLog(false); }}>
           <div className="zj-caja">
-            <div className="zj-cab"><b>🏆 Sé parte de nuestros logros</b>
+            <MarcaVentana /><div className="zj-cab"><b>🏆 Sé parte de nuestros logros</b>
               <BotonCompartir hash="logros" titulo="Sé parte de nuestros logros" texto="Mira lo que hemos logrado juntos en DCUATES y súmate" variante="circulo" />
               <button type="button" className="zj-x" onClick={() => setLog(false)} aria-label="Cerrar">✕</button></div>
             <p className="zj-p ex-intro">Cada logro de esta lista lo construyó una persona que dijo «yo me sumo»: un vecino que prestó un libro, un negocio que se alió, un voluntario que dio su tiempo. 💛 <b>El siguiente logro puede llevar tu nombre.</b> Mira lo que hemos hecho juntos y toma tu lugar.</p>

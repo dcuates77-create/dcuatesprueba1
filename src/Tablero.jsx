@@ -1,6 +1,7 @@
 // TABLERO — ventana con introducción y botones grandes (toca en cualquier parte del botón para abrir su contenido).
 // Lo abre cada botón de CAMINO DCUATES. Incluye siempre el botón REGÍSTRATE Y PARTICIPA.
 import React from "react";
+import { MarcaVentana } from "./componentes/LogoDcuates.jsx";
 import { createPortal } from "react-dom";
 import BotonCompartir from "./BotonCompartir.jsx";
 import { abrirServicios } from "./Extras.jsx";
@@ -13,7 +14,7 @@ export default function Tablero({ paso, emoji, titulo, intro, color = "#1B6F8A",
   return createPortal(
     <div className="zj-fondo" role="dialog" aria-modal="true" aria-label={titulo} onClick={(e) => { if (e.target === e.currentTarget) onCerrar(); }}>
       <div className="zj-caja tb-caja">
-        <div className="zj-cab" style={{ borderBottom: `4px solid ${color}`, paddingBottom: 6 }}>
+        <MarcaVentana /><div className="zj-cab" style={{ borderBottom: `4px solid ${color}`, paddingBottom: 6 }}>
           <b>{emoji} {titulo}</b>
           {hash && <BotonCompartir hash={hash} titulo={titulo} texto={intro} variante="circulo" />}
           <button type="button" className="zj-x" onClick={onCerrar} aria-label="Cerrar">✕</button>

@@ -1,5 +1,6 @@
 // Ícono 📲 "Instalar DCUATES como app" (esquina izquierda de TU ENTRADA, opuesto al A+): Android/PC usan el aviso del navegador; iPhone y otros ven los pasos.
 import React, { useEffect, useState } from "react";
+import { MarcaVentana } from "./componentes/LogoDcuates.jsx";
 import { createPortal } from "react-dom";
 import { esIOS, instalarApp, puedeInstalar, suscribirPWA, yaInstalada } from "./pwa.js";
 import { useAtras } from "./atras.js";
@@ -18,7 +19,7 @@ export default function InstalarApp() {
       {guia && createPortal(
         <div className="zj-fondo" role="dialog" aria-modal="true" aria-label="Instalar DCUATES" onClick={(e) => { if (e.target === e.currentTarget) setGuia(false); }}>
           <div className="zj-caja">
-            <div className="zj-cab"><b>📲 Instalar DCUATES</b><button type="button" className="zj-x" onClick={() => setGuia(false)} aria-label="Cerrar">✕</button></div>
+            <MarcaVentana /><div className="zj-cab"><b>📲 Instalar DCUATES</b><button type="button" className="zj-x" onClick={() => setGuia(false)} aria-label="Cerrar">✕</button></div>
             <p className="zj-p">Tendrás el ícono en tu pantalla de inicio y se abrirá como una app, sin barra del navegador.</p>
             {ios ? (
               <ol className="ia-pasos"><li>Abre esta página en <b>Safari</b>.</li><li>Toca el botón <b>Compartir</b> (cuadro con flecha hacia arriba).</li><li>Elige <b>«Agregar a inicio»</b> y confirma.</li></ol>

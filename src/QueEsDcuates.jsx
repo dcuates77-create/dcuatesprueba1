@@ -13,6 +13,7 @@ import BotonCompartir from "./BotonCompartir.jsx";
 import { ejecutar as ejecutarAccion } from "./datos/secciones.js";
 import { expandirBusqueda } from "./datos/sinonimos.js";
 import { puertaPorId } from "./datos/puertas.js";
+import { LogoDcuates } from "./componentes/LogoDcuates.jsx";
 import { FRASES, APARTADOS, VISION, ACCIONES, FUNDAMENTOS, RELACION, IDENTIDAD, MOTIVOS, DIMENSIONES, FORMAS, FUTURO, PUERTA1, ATAJOS1, PUENTE, PUERTA2, ATAJOS2, ATAJOS1_MAS, ATAJOS2_MAS, PUERTA_A_ENTRADA, CLAVES_BUSCADOR, AMBAS, CULTIVAR, TEJER, CULTIVAR_TEJER_NOTA, CADENA, CIERRE, POR_QUE, ACCIONES_PASO } from "./datos/queEsDcuates.js";
 
 export const abrirQueEs = (v) => window.dispatchEvent(new CustomEvent("dcuates:que-es", { detail: typeof v === "string" ? v : "menu" }));
@@ -25,20 +26,6 @@ const vistaDeHash = () => {
 };
 const sinAc = (x) => String(x || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 const VISTAS = ["menu", "p1", "p2", "a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8"];
-
-// LOGO: tres personas + DCUATES con la D en naranja + COMUNIDAD.
-export function LogoDcuates({ alto = 34 }) {
-  return (
-    <span className="qe-logo" style={{ height: alto }} aria-label="DCUATES Comunidad" role="img">
-      <svg viewBox="0 0 64 44" height={alto} aria-hidden="true">
-        {[[10, "#2E9E5B"], [22, "#1B8A8F"], [34, "#E8731A"], [46, "#2A74B0"], [57, "#7A4FBF"]].map(([x, c], i) => (
-          <g key={i} fill={c}><circle cx={x} cy={i % 2 ? 11 : 13} r="5.2" /><path d={`M${x - 7} 40 C${x - 7} ${i % 2 ? 20 : 22} ${x + 7} ${i % 2 ? 20 : 22} ${x + 7} 40 Z`} /></g>
-        ))}
-      </svg>
-      <span className="qe-logo-t"><b><i>D</i>CUATES</b><small>COMUNIDAD</small></span>
-    </span>
-  );
-}
 
 function Hero({ h, c, e, t, sub, children }) {
   const [ok, setOk] = useState(!!h);

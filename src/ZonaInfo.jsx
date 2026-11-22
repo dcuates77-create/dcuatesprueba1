@@ -1,5 +1,6 @@
 // INFO CLAVE — teléfonos de emergencia, agenda, canal oficial, redes y tips de seguridad.
 import { SiguientePaso } from "./ZonaPaso.jsx";
+import { MarcaVentana } from "./componentes/LogoDcuates.jsx";
 import React from "react";
 import { REDES_SOCIALES, WHATSAPP_NUMERO } from "./datos/config.js";
 import { TELEFONOS_EMERGENCIA, TELEFONOS_LOCALES, TIPS_SEGURIDAD } from "./datos/zona.js";
@@ -20,7 +21,7 @@ export default function ZonaInfo({ abrir = "emergencias", onCerrar, agenda = [],
   return (
     <div className="zj-fondo" role="dialog" aria-modal="true" aria-label="Información clave" onClick={(e) => { if (e.target === e.currentTarget) onCerrar(); }}>
       <div className="zj-caja">
-        <div className="zj-cab"><b>📌 Info clave</b><button type="button" className="zj-x" onClick={onCerrar} aria-label="Cerrar">✕</button></div>
+        <MarcaVentana /><div className="zj-cab"><b>📌 Info clave</b><button type="button" className="zj-x" onClick={onCerrar} aria-label="Cerrar">✕</button></div>
         <p className="zj-p">Lo importante, a la mano. Guarda esta página en tu celular.</p>
         <details className="in-sec" open={abrir === "emergencias"}>
           <summary>🚨 Teléfonos de emergencia</summary>

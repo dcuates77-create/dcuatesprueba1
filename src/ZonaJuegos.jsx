@@ -2,6 +2,7 @@
 //  👋 EMPIEZA AQUÍ · 🎉 JUEGA Y DIVIÉRTETE · 🧠 JUEGA Y APRENDE · 🏆 JUEGA Y GANA
 //  💡 RECOMIENDA Y GANA · 🛍️ DONA, COMPRA Y VENDE CON CAUSA · 📌 INFO CLAVE   (Semillas y nivel en el chip del encabezado)
 import React, { Suspense, lazy, useEffect, useMemo, useRef, useState } from "react";
+import { MarcaVentana } from "./componentes/LogoDcuates.jsx";
 import { createPortal } from "react-dom";
 import TiraAuto from "./TiraAuto.jsx";
 import BotonCompartir from "./BotonCompartir.jsx";
@@ -69,7 +70,7 @@ function Marco({ juegos, onCerrar, onAbrirProyecto, alSumar }) {
   return (
     <div className="zj-fondo" role="dialog" aria-modal="true" aria-label="Juega y diviértete" onClick={(e) => { if (e.target === e.currentTarget) onCerrar(); }}>
       <div className="zj-caja">
-        <div className="zj-cab">
+        <MarcaVentana /><div className="zj-cab">
           <b>🎉 Juega y diviértete</b>
           <span className="zj-sem" title="Tus Semillas">{niv.emoji} {semillas}</span>
           <button type="button" className="zj-x" onClick={onCerrar} aria-label="Cerrar">✕</button>
@@ -168,7 +169,7 @@ function Empieza({ onCerrar, onAbrirProyecto, alSumar, palabras, retos }) {
   return (
     <div className="zj-fondo" role="dialog" aria-modal="true" aria-label="Empieza aquí" onClick={(e) => { if (e.target === e.currentTarget) onCerrar(); }}>
       <div className="zj-caja">
-        <div className="zj-cab"><b>👋 Empieza aquí</b><button type="button" className="zj-x" onClick={onCerrar} aria-label="Cerrar">✕</button></div>
+        <MarcaVentana /><div className="zj-cab"><b>👋 Empieza aquí</b><button type="button" className="zj-x" onClick={onCerrar} aria-label="Cerrar">✕</button></div>
         {vista === "menu" && (
           <div className="zj-menu">
             <p className="zj-p">Pasos de un solo clic para conocernos. ¡Varios suman una Semilla! 🌱</p>

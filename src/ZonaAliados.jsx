@@ -1,6 +1,7 @@
 // ZONA DE ALIADOS, PATROCINADORES, VOLUNTARIOS Y AMIGOS — barra con candado general y candado por tarjeta/perfil.
 // (e63) Las claves y el contenido por perfil viven en tu hoja (pestañas «Claves» y «Zonas»); se piden al Apps Script con utilidades/zonasHoja.js.
 import React, { useEffect, useState } from "react";
+import { MarcaVentana } from "./componentes/LogoDcuates.jsx";
 import { createPortal } from "react-dom";
 import TiraAuto from "./TiraAuto.jsx";
 import { useAtras } from "./atras.js";
@@ -33,7 +34,7 @@ function Acceso({ onCerrar, onEntrar }) {
   return (
     <div className="zj-fondo" role="dialog" aria-modal="true" aria-label="Acceso a la zona" onClick={(e) => { if (e.target === e.currentTarget) onCerrar(); }}>
       <div className="zj-caja">
-        <div className="zj-cab"><b>🔐 Entrar a la zona</b><button type="button" className="zj-x" onClick={onCerrar} aria-label="Cerrar">✕</button></div>
+        <MarcaVentana /><div className="zj-cab"><b>🔐 Entrar a la zona</b><button type="button" className="zj-x" onClick={onCerrar} aria-label="Cerrar">✕</button></div>
         <p className="zj-p">Esta zona es para quienes ya forman parte de la red de DCUATES. Escribe la clave que te compartimos.</p>
         <form className="pr-form" onSubmit={entrar}>
           <label>Tu clave<input value={clave} onChange={(e) => { setClave(e.target.value); setError(""); }} placeholder="Tu clave" autoComplete="off" autoCapitalize="none" /></label>
@@ -89,7 +90,7 @@ function Ventana({ tarjeta, perfil, contenido, agenda, onCerrar }) {
   return (
     <div className="zj-fondo" role="dialog" aria-modal="true" aria-label={tarjeta.titulo} onClick={(e) => { if (e.target === e.currentTarget) onCerrar(); }}>
       <div className="zj-caja">
-        <div className="zj-cab"><b>{tarjeta.emoji} {tarjeta.titulo}</b><button type="button" className="zj-x" onClick={onCerrar} aria-label="Cerrar">✕</button></div>
+        <MarcaVentana /><div className="zj-cab"><b>{tarjeta.emoji} {tarjeta.titulo}</b><button type="button" className="zj-x" onClick={onCerrar} aria-label="Cerrar">✕</button></div>
         <p className="zl-perfil" style={{ background: P.color }}>{P.emoji} Perfil: {P.nombre}</p>
         {tarjeta.id === "beneficios" && (
           <div className="zl-lista">{(contenido.beneficios || []).map((b, i) => <div className="ag-ev" key={i}><p>✔️ {b.x}</p></div>)}

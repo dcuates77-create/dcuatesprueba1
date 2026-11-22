@@ -1,5 +1,6 @@
 // RECOMIENDA Y GANA — buzón de alertas, recomendaciones y propuestas + atajos al menú principal.
 import { SiguientePaso } from "./ZonaPaso.jsx";
+import { MarcaVentana } from "./componentes/LogoDcuates.jsx";
 import React, { useState } from "react";
 import { GOOGLE_SHEETS_URL, WHATSAPP_NUMERO } from "./datos/config.js";
 import { CasillaAcepto, abrirLegal, useAceptacion } from "./componentes/legal.jsx";
@@ -42,7 +43,7 @@ export default function ZonaPropon({ onCerrar, menu = {}, onAbrirProyecto = () =
   return (
     <div className="zj-fondo" role="dialog" aria-modal="true" aria-label="Recomienda y gana" onClick={(e) => { if (e.target === e.currentTarget) onCerrar(); }}>
       <div className="zj-caja">
-        <div className="zj-cab"><b>💡 Recomienda y gana</b><button type="button" className="zj-x" onClick={onCerrar} aria-label="Cerrar">✕</button></div>
+        <MarcaVentana /><div className="zj-cab"><b>💡 Recomienda y gana</b><button type="button" className="zj-x" onClick={onCerrar} aria-label="Cerrar">✕</button></div>
         <p className="zj-p">Esta comunidad se construye entre todos. Recomienda, propón o avisa y suma 2 Semillas 🌱 por cada aporte.</p>
         <div className="zj-chips">
           {Object.entries(TIPOS).map(([k, v]) => <button type="button" key={k} className={"zj-chip" + (t === k ? " zj-on" : "")} onClick={() => { setT(k); setEnviado(false); setError(""); }} aria-pressed={t === k}><span>{v.emoji}</span>{v.nombre}</button>)}

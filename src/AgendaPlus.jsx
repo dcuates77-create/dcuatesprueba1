@@ -1,6 +1,7 @@
 // AGENDA (antes «Agenda Plus»): ventana con 4 botones — Agenda-Calendario, Mapas de la zona, Tablero de anuncios y Directorio PLUS.
 // Se abre con el evento dcuates:abrir-plus (detail opcional: "mapas" | "tablero" | "directorio") o con el hash #plus.
 import React, { useEffect, useMemo, useState } from "react";
+import { MarcaVentana } from "./componentes/LogoDcuates.jsx";
 import { createPortal } from "react-dom";
 import { useAtras } from "./atras.js";
 import BotonCompartir from "./BotonCompartir.jsx";
@@ -37,7 +38,7 @@ function Caja({ titulo, hash, onCerrar, children, hub }) {
   return createPortal(
     <div className="zj-fondo" role="dialog" aria-modal="true" aria-label={titulo} onClick={(e) => { if (e.target === e.currentTarget) onCerrar(); }}>
       <div className="zj-caja">
-        <div className="zj-cab"><b>{titulo}</b>
+        <MarcaVentana /><div className="zj-cab"><b>{titulo}</b>
           {hash && <BotonCompartir hash={hash} titulo={titulo} texto="Mira esto en DCUATES" variante="circulo" />}
           <button type="button" className="zj-x" onClick={onCerrar} aria-label="Cerrar">✕</button></div>
         {children}

@@ -1,6 +1,7 @@
 // JUEGA Y APRENDE / DESCUBRE — 4 temas (Música, Pelis, Páginas, Libros) x 4 juegos
 // (Tablero luminoso, Ruleta, Lotería, Galleta de la suerte). Mismo contenido, distinto juego.
 import { SiguientePaso } from "./ZonaPaso.jsx";
+import { MarcaVentana } from "./componentes/LogoDcuates.jsx";
 import React, { useEffect, useRef, useState } from "react";
 import { FRASE_REGALOS } from "./datos/regalos.js";
 import { guardarPref, leerPref, sumarSemillas } from "./datos/juegos.js";
@@ -165,7 +166,7 @@ export default function ZonaAprende({ temas, onCerrar }) {
   return (
     <div className="zj-fondo" role="dialog" aria-modal="true" aria-label="Juega y aprende" onClick={(e) => { if (e.target === e.currentTarget) onCerrar(); }}>
       <div className="zj-caja rg-oscura">
-        <div className="zj-cab">
+        <MarcaVentana /><div className="zj-cab">
           <b style={{ color: tema.color }}>🧠 Juega y aprende</b>
           <button type="button" className="zj-x" onClick={onCerrar} aria-label="Cerrar">✕</button>
         </div>
