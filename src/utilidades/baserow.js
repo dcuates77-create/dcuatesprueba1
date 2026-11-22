@@ -10,7 +10,10 @@ export function enlaceWhatsApp(mensaje) {
 // Función helper para hacer scroll suave hacia una sección/registro de la
 // misma página (usada por los botones que en vez de abrir WhatsApp llevan
 // directo a un formulario, ej. "Publicar mi negocio" o "Extraviados y Adopciones").
+// e91: estos tres contenidos de CAUSAS ahora viven en ventanas propias (VentanasCausas.jsx).
+const VENT_CAUSA = { donaciones: "apoyo", "chuy-video": "exito", "extraviados-registro": "animal", "registro-extraviados": "animal" };
 export function irASeccion(id) {
+  if (VENT_CAUSA[id]) { window.dispatchEvent(new CustomEvent("dcuates:causa-vent", { detail: VENT_CAUSA[id] })); return; }
   // El mapa vive dentro de la pestaña NEGOCIOS: aunque el contenedor exista
   // siempre, hay que abrir esa pestaña primero y luego bajar hasta el mapa.
   if (id === "mapa-negocios") {
