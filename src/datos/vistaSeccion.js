@@ -53,11 +53,13 @@ export const VISTA = {
     pregunta: "¿Por qué van juntas las causas y los valores?",
     intro: "Una causa sin valores se queda en buena intención, y los valores sin causa se quedan en palabras. En nuestra comunidad van de la mano: la confianza, la honestidad y la solidaridad que practicamos son las que permiten que cada ayuda llegue a quien la necesita, y cada causa nos hace vivir mejor esos valores.",
     extras: [
-      { ico: "🙏", t: "Apoyo voluntario, donativos y casos", d: "Tu ayuda cambia vidas; reporta o consulta casos.", anidada: "slot" },
+      { ico: "🙏", t: "Apoyo voluntario y donativos", d: "Tu tiempo, tu talento o tus recursos cambian vidas.", a: { causaVent: "apoyo" } },
+      { ico: "🌟", t: "Casos de éxito", d: "Chuy, el Sapo Soñador: una causa que sí se logró.", a: { causaVent: "exito" } },
+      { ico: "🐾", t: "Ecatepets · Bienestar animal", d: "Mascotas, personas y cosas extraviadas; reporta o consulta casos.", a: { causaVent: "animal" } },
       { ico: "📚", t: "Recursos y recomendaciones", d: "Música, libros, películas, recomendaciones y preguntas.", anidada: "valores" }
     ],
-    reel: true, // e69: los videos y la galería van como reel justo después de la portada (ya no como botón)
-    cta: { t: "¿Quieres ayudar hoy?", d: "Regístrate como voluntario o donante.", a: { ir: "donaciones" } },
+    reel: false, // e91: el reel vive ahora en la ventana de Ecatepets (era e69: : los videos y la galería van como reel justo después de la portada (ya no como botón)
+    cta: { t: "¿Quieres ayudar hoy?", d: "Regístrate como voluntario o donante.", a: { causaVent: "apoyo" } },
     sumar: {
       img: "/images/sumar-causas.webp",
       titulo: "Tu ayuda cambia vidas",
@@ -73,6 +75,10 @@ export const VISTA = {
     pregunta: "¿Qué ofrecemos?",
     intro: "Apoyamos emprendimientos y negocios locales que comparten nuestros valores y generan un impacto positivo.",
     extras: [
+      { ico: "🗂️", t: "Catálogo CUATES", d: "Todo lo que DCUATES comparte: productos, libros y apoyos.", a: { tabl: "Otros" } },
+      { ico: "🏪", t: "Emprendimientos CUATE", d: "Negocios y proyectos de la comunidad en el Tablón.", a: { tabl: "Emprendimientos" } },
+      { ico: "📇", t: "Directorio de Páginas CUATE", d: "Busca por categoría, colonia o «abierto ahora».", a: { dir: 1 } },
+      { ico: "✨", t: "Arma tu Página CUATE gratis", d: "Paso a paso, con vista previa en vivo.", a: { asist: 1 } },
       { ico: "🗺️", t: "Comercios y mapa de la zona", d: "Fichas, cupones, aliados, agenda y mapa.", anidada: "fichas" },
       { ico: "🛍️", t: "Ventas con causa y publicidad", d: "Compra, vende y registra tu negocio gratis.", anidada: "slot" }
     ],
