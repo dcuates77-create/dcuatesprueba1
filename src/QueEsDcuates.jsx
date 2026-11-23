@@ -78,16 +78,15 @@ export default function QueEsDcuates() {
     return () => { window.removeEventListener("hashchange", al); window.removeEventListener("dcuates:que-es", ev); };
   }, []);
   const cerrar = () => { setAbierto(false); setMas(null); };
-  const oculta = useAtras(abierto, cerrar, { hub: true });
-  // e93: dentro de una opción (Quiero buscar, Descubre…) «Atrás» y ✕ regresan al MENÚ de «¿Qué es DCUATES?», no a la página principal.
-  useAtras(abierto && vista !== "menu", () => { setMas(null); setVista("menu"); });
-  const ocultaMas = useAtras(!!mas, () => setMas(null));
-  const salirVista = () => {
-    if (vista === "menu") { cerrar(); return; }
-    const v0 = vista;
-    try { history.back(); } catch (x) { setVista("menu"); }
-    setTimeout(() => setVista((v) => (v === v0 ? "menu" : v)), 250); // por si el historial no respondió
+  // e93: dentro de una opción (Quiero buscar, Descubre…) «Atrás» regresa al MENÚ de «¿Qué es DCUATES?» (se vuelve a armar la entrada del historial); en el menú, cierra.
+  const vistaRef = useRef(vista); vistaRef.current = vista;
+  const alAtras = () => {
+    if (vistaRef.current === "menu") { cerrar(); return; }
+    setMas(null); setVista("menu"); setAbierto(false); setTimeout(() => setAbierto(true), 0);
   };
+  const oculta = useAtras(abierto, alAtras, { hub: true });
+  const ocultaMas = useAtras(!!mas, () => setMas(null));
+  const salirVista = () => { if (vista === "menu") cerrar(); else { setMas(null); setVista("menu"); } };
   useEffect(() => { if (abierto) registrar("que_es_abrir"); }, [abierto]);
   useEffect(() => { if (abierto) registrar("que_es_vista", { v: vista }); }, [abierto, vista]);
   useEffect(() => { if (abierto) { const el = document.querySelector(".qe-cuerpo"); if (el) el.scrollTop = 0; } }, [vista, abierto]);
