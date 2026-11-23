@@ -773,6 +773,7 @@ export default function BloqueCentral({
   return (
     <section id="mapa-negocios" ref={rootRef} className="bc-root" aria-label="Explora DCUATES">
       <style>{CSS}</style>
+      <style>{CSS_MENU}</style>
       <div className="bc-shell">
         <div
           className={`bc-fija${pegado ? " bc-pegado" : ""}`}
@@ -797,10 +798,6 @@ export default function BloqueCentral({
             ))}
           </div>
 
-          <div className="bc-prog" role="progressbar" aria-valuemin={1} aria-valuemax={TABS_TODAS.length + 1} aria-valuenow={idx + 2} aria-label="Sección actual">
-            <div className="bc-track"><div className="bc-fill" style={{ width: `${pct}%`, background: tab.color }} /></div>
-            <div className="bc-prog-txt"><span>{pct}%</span><b>{idx + 2} / {TABS_TODAS.length + 1}</b></div>
-          </div>
         </div>
 
         <div className="bc-panel bc-nuevo" id="bc-panel" role="tabpanel" aria-labelledby={`bc-tab-${tab.id}`} key={tab.id} style={{ background: "#fbf7ec", "--tc": tab.boton || tab.color }}>
@@ -920,6 +917,17 @@ export default function BloqueCentral({
   );
 }
 
+// e93: el menú de secciones tiene el MISMO tamaño que el de Inicio (botones compactos, siempre con nombre) y sin barra de porcentaje.
+const CSS_MENU = `
+.bc-root .bc-prog{display:none}
+.bc-root .bc-tabs,.bc-root .bc-pegado .bc-tabs{gap:6px;padding:4px 6px 6px;justify-content:flex-start;overflow-x:auto}
+.bc-root .bc-fija .bc-tab,.bc-root .bc-fija .bc-tab-inicio{flex:0 0 auto;flex-direction:row;align-items:center;justify-content:flex-start;gap:5px;min-height:40px;padding:3px 10px 3px 4px;border-radius:999px;border:1.5px solid rgba(15,45,30,.1);background:#f1f4f2;font-size:13px;font-weight:800;scroll-snap-align:start}
+.bc-root .bc-fija .bc-tab[aria-selected="false"] .bc-tab-t,.bc-root .bc-fija.bc-pegado .bc-tab-inicio .bc-tab-t{display:inline}
+.bc-root .bc-fija .bc-tab[aria-selected="true"]{border-color:transparent}
+.bc-root .bc-fija .bc-ico{width:28px;height:28px;font-size:15px}
+.bc-root .bc-fija .bc-tab-t{white-space:nowrap}
+@media (min-width:768px){.bc-root .bc-tabs,.bc-root .bc-pegado .bc-tabs{overflow-x:auto;padding:6px 12px 8px}.bc-root .bc-fija .bc-tab{flex:0 0 auto;min-height:44px;font-size:14px}}
+`;
 const CSS = `
 .bc-root{--ink:#1f2a37;--pad:16px;font-family:"Nunito","Varela Round",ui-rounded,system-ui,sans-serif;color:var(--ink);width:100%;margin:0 auto;box-sizing:border-box;scroll-margin-top:192px}
 .bc-root *{font-family:inherit}

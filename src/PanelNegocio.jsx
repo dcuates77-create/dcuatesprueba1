@@ -140,7 +140,7 @@ export default function PanelNegocio() {
                 {envio === "sin" && <p className="pn-aviso">No cambiaste nada todavía.</p>}
                 {envio === "ok" && <p className="pn-ok" role="status" data-testid="pn-enviado">✅ Recibimos tus cambios. Los revisamos y aparecen en tu página en cuanto los aprobemos.</p>}
                 {envio === "falla" && <p className="pn-err" role="alert">No pudimos confirmar el envío. Revisa tu conexión y vuelve a intentarlo.</p>}
-                <button type="button" className="pn-b pn-b1" onClick={enviar} disabled={envio === "enviando"}>{envio === "enviando" ? "Enviando…" : "Enviar para revisión"}</button>
+                <button type="button" className="pn-b pn-b1" onClick={enviar} disabled={envio === "enviando" || envio === "ok"} data-testid="pn-enviar">{envio === "enviando" ? "Enviando…" : envio === "ok" ? "✅ Enviado · en revisión" : "Enviar para revisión"}</button>
               </div>
             )}
             {tab === "pedidos" && (
