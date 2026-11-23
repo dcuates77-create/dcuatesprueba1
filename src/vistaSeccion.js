@@ -75,6 +75,10 @@ export const VISTA = {
     pregunta: "¿Qué ofrecemos?",
     intro: "Apoyamos emprendimientos y negocios locales que comparten nuestros valores y generan un impacto positivo.",
     extras: [
+      { ico: "🗂️", t: "Catálogo CUATES", d: "Todo lo que DCUATES comparte: productos, libros y apoyos.", a: { tabl: "Otros" } },
+      { ico: "🏪", t: "Emprendimientos CUATE", d: "Negocios y proyectos de la comunidad en el Tablón.", a: { tabl: "Emprendimientos" } },
+      { ico: "📇", t: "Directorio de Páginas CUATE", d: "Busca por categoría, colonia o «abierto ahora».", a: { dir: 1 } },
+      { ico: "✨", t: "Arma tu Página CUATE gratis", d: "Paso a paso, con vista previa en vivo.", a: { asist: 1 } },
       { ico: "🗺️", t: "Comercios y mapa de la zona", d: "Fichas, cupones, aliados, agenda y mapa.", anidada: "fichas" },
       { ico: "🛍️", t: "Ventas con causa y publicidad", d: "Compra, vende y registra tu negocio gratis.", anidada: "slot" }
     ],

@@ -20,6 +20,9 @@ export function ejecutar(a, abrirProyecto = () => {}) {
   if (a.p) abrirProyecto(a.p);
   else if (a.z) ev("dcuates:abrir-zona", a.z);
   else if (a.causaVent) ev("dcuates:causa-vent", a.causaVent);
+  else if (a.tabl !== undefined) ev("dcuates:abrir-tablon", a.tabl); // e93: Tablón con filtro («Otros» = Catálogo CUATES, «Emprendimientos»)
+  else if (a.dir) ev("dcuates:directorio");
+  else if (a.asist) ev("dcuates:asistente");
   else if (a.serv) abrirServicios();
   else if (a.logros) abrirLogros();
   else if (a.acc) ev("dcuates:abrir-acceso", a.acc);
