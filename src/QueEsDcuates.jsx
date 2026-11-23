@@ -79,7 +79,15 @@ export default function QueEsDcuates() {
   }, []);
   const cerrar = () => { setAbierto(false); setMas(null); };
   const oculta = useAtras(abierto, cerrar, { hub: true });
+  // e93: dentro de una opción (Quiero buscar, Descubre…) «Atrás» y ✕ regresan al MENÚ de «¿Qué es DCUATES?», no a la página principal.
+  useAtras(abierto && vista !== "menu", () => { setMas(null); setVista("menu"); });
   const ocultaMas = useAtras(!!mas, () => setMas(null));
+  const salirVista = () => {
+    if (vista === "menu") { cerrar(); return; }
+    const v0 = vista;
+    try { history.back(); } catch (x) { setVista("menu"); }
+    setTimeout(() => setVista((v) => (v === v0 ? "menu" : v)), 250); // por si el historial no respondió
+  };
   useEffect(() => { if (abierto) registrar("que_es_abrir"); }, [abierto]);
   useEffect(() => { if (abierto) registrar("que_es_vista", { v: vista }); }, [abierto, vista]);
   useEffect(() => { if (abierto) { const el = document.querySelector(".qe-cuerpo"); if (el) el.scrollTop = 0; } }, [vista, abierto]);
@@ -338,7 +346,7 @@ export default function QueEsDcuates() {
             <LogoDcuates alto={32} />
             <span className="qe-cab-s" />
             <BotonCompartir key={vista} hash={"que-es-" + vista} variante="circulo" titulo={`${A ? A.t : vista === "p1" ? PUERTA1.t : PUERTA2.t} — ¿Qué es DCUATES?`} texto="Conoce DCUATES: una comunidad donde todos tenemos algo que buscar, ofrecer y compartir" />
-            <button type="button" className="qe-x qe-x-l" onClick={cerrar} aria-label="Cerrar" data-testid="qe-cerrar">✕</button>
+            <button type="button" className="qe-x qe-x-l" onClick={salirVista} aria-label="Cerrar y volver al menú" data-testid="qe-cerrar">✕</button>
           </header>
           {nAp > 0 && (
             <nav className="qe-tabs" aria-label="Pasos">

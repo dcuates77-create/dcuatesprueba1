@@ -663,6 +663,9 @@ export default function BloqueCentral({
     else if (a.proy) onAbrirProyecto(a.proy);
     else if (a.zona) ev("dcuates:abrir-zona", a.zona);
     else if (a.causaVent) window.dispatchEvent(new CustomEvent("dcuates:causa-vent", { detail: a.causaVent }));
+    else if (a.tabl !== undefined) ev("dcuates:abrir-tablon", a.tabl);
+    else if (a.dir) ev("dcuates:directorio");
+    else if (a.asist) ev("dcuates:asistente");
     else if (a.ir) irASeccion(a.ir);
     else if (a.wa) window.open(wa(a.wa), "_blank", "noopener");
     else if (a.tab) { const i = TABS_TODAS.findIndex((t) => t.id === a.tab); if (i >= 0) cambiar(i); }
