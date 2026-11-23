@@ -9,6 +9,7 @@ import { abrirRegistroPrevio } from "./RegistroPrevio.jsx";
 import { cargarNegocio, categoriaDe, NIVELES, esOficial, diasHasta, textoCuenta } from "./datos/negocios.js";
 import PaginaCuateCTA from "./PaginaCuateCTA.jsx";
 import ReelNegocio from "./ReelNegocio.jsx";
+import { BloquesPerfil, BloqueFAQ } from "./PerfilCuate.jsx"; // e92: perfil, evento, servicios, modalidades, preguntas
 import { ImagenSegura, useImagenSegura } from "./componentes/MediaInteligente.jsx";
 import { ListaNegocios, PaginaCategoria, esSlugCategoria, categoriaDeSlug } from "./PaginaCategoria.jsx";
 import { abrirPanelNegocio } from "./PanelNegocio.jsx";
@@ -195,6 +196,7 @@ export default function NegocioCuate() {
             {n.of && n.of.length > 0 && (
               <section className="ng-s"><h2>Qué ofrece</h2><ul className="ng-l">{n.of.map((x) => <li key={x}>{x}</li>)}</ul></section>
             )}
+            <BloquesPerfil n={n} clic={clic} abrirOtro={(s) => { registrar("negocio_red", { de: slug, a: s }); abrirNegocio(s); }} />
             {(n.ga || n.gd || n.gp) && (
               <section className="ng-s" data-testid="negocio-guia">
                 <h2>🩺 Guía de atención</h2>
@@ -219,6 +221,7 @@ export default function NegocioCuate() {
                 {n.cc && <a className="ng-cc" href={n.cc} target="_blank" rel="noopener noreferrer" onClick={() => clic("catalogo")} data-testid="negocio-catalogo-completo">📖 Ver catálogo completo</a>}
               </section>
             )}
+            <BloqueFAQ n={n} />
             {(n.h || n.dir) && (
               <section className="ng-s ng-dat">{n.h && <p>🕒 {n.h}</p>}{n.dir && <p>📍 {n.dir}</p>}</section>
             )}
