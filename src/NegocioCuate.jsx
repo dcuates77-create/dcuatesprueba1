@@ -2,6 +2,8 @@
 // Una sola plantilla para todos los negocios; el contenido viene de la hoja «NegociosCUATE» (ver src/datos/negocios.js).
 // Bloques: portada · contacto · qué ofrece · Pase del emprendimiento · (Patrocinador: galería · oferta · Club · Red CUATE).
 import React, { useEffect, useState } from "react";
+import { LogoDcuates } from "./componentes/LogoDcuates.jsx";
+import { abiertoAhora } from "./utilidades/horario.js";
 import { createPortal } from "react-dom";
 import { useAtras } from "./atras.js";
 import { registrar } from "./analitica.js";
@@ -9,7 +11,7 @@ import { abrirRegistroPrevio } from "./RegistroPrevio.jsx";
 import { cargarNegocio, categoriaDe, NIVELES, esOficial, diasHasta, textoCuenta } from "./datos/negocios.js";
 import PaginaCuateCTA from "./PaginaCuateCTA.jsx";
 import ReelNegocio from "./ReelNegocio.jsx";
-import { BloquesPerfil, BloqueFAQ } from "./PerfilCuate.jsx"; // e92: perfil, evento, servicios, modalidades, preguntas
+import { BloquesPerfil, BloqueFAQ, VerMas } from "./PerfilCuate.jsx"; // e92: perfil, evento, servicios, modalidades, preguntas
 import { ImagenSegura, useImagenSegura } from "./componentes/MediaInteligente.jsx";
 import { ListaNegocios, PaginaCategoria, esSlugCategoria, categoriaDeSlug } from "./PaginaCategoria.jsx";
 import { abrirPanelNegocio } from "./PanelNegocio.jsx";
@@ -131,6 +133,19 @@ export default function NegocioCuate() {
     const caja = document.querySelector(".ng-caja"); if (caja) caja.scrollTop = 0;
     return () => { document.title = ant; };
   }, [slug, est]);
+  // e94: la barra inferior (WhatsApp · Llamar · Cómo llegar) aparece cuando los botones de arriba ya no se ven.
+  const [barra, setBarra] = useState(false);
+  useEffect(() => {
+    if (!slug || !est.ok) { setBarra(false); return undefined; }
+    const t = setTimeout(() => {
+      const acc = document.querySelector(".ng-acc"), raiz = document.querySelector(".ng-caja");
+      if (!acc || !raiz || typeof IntersectionObserver === "undefined") { setBarra(true); return; }
+      const io = new IntersectionObserver(([e]) => setBarra(!e.isIntersecting), { root: raiz, threshold: 0 });
+      io.observe(acc);
+      raiz.__ioBarra = io;
+    }, 120);
+    return () => { clearTimeout(t); const raiz = document.querySelector(".ng-caja"); if (raiz && raiz.__ioBarra) { raiz.__ioBarra.disconnect(); raiz.__ioBarra = null; } };
+  }, [slug, est]);
   const portadaOk = useImagenSegura(est.ok && est.negocio ? est.negocio.portada : ""); // e89: sin «imagen rota»
   if (!slug) return null;
   const esCat = esSlugCategoria(slug);
@@ -145,6 +160,11 @@ export default function NegocioCuate() {
     window.open(`https://wa.me/?text=${encodeURIComponent(texto + " " + url)}`, "_blank", "noopener");
   };
   const urlPedido = (c, id) => `https://wa.me/${n.wa}?text=${encodeURIComponent("¡Hola! Vi su página en DCUATES y quiero pedir: " + c.n + (c.p ? " (" + c.p + ")" : "") + "." + (id ? " Pedido " + id : ""))}`;
+  const promos = n ? [...(n.ofT ? [{ t: n.ofT, d: n.ofD, v: n.ofV }] : []), ...(n.pr || [])].slice(0, 5) : [];
+  const atajos = n ? [
+    n.ev && n.ev.t && ["ng-evento", "📅 Evento"], promos.length > 0 && ["ng-promos", "🎟️ Promos"], n.sv && n.sv.length > 0 && ["ng-servicios", "🧰 Servicios"],
+    n.ct && n.ct.length > 0 && ["negocio-catalogo", "🛍️ Catálogo"], (n.pn || (n.pp && n.pp.length)) && ["ng-sobre", "👤 Perfil"], (n.h || n.dir) && ["ng-horario", "🕒 Horario"], ["ng-opiniones", "⭐ Opiniones"],
+  ].filter(Boolean) : [];
   const clic = (que) => { registrar("negocio_clic", { s: slug, q: que }); eventoNegocio(slug, que); };
   return createPortal(
     <div className="ng-fondo" style={oculta ? { display: "none" } : undefined} role="dialog" aria-modal="true" aria-label={n ? n.n : "Emprendimiento CUATE"} data-testid="negocio">
@@ -155,6 +175,9 @@ export default function NegocioCuate() {
           <b>{n ? n.n : esCat ? (catPag ? catPag.nombre : "Emprendimientos CUATE") : "Emprendimiento CUATE"}</b>
           {n && <BotonFavorito slug={slug} nombre={n.n} clase="ng-sh ng-fv" />}
           {n && <button type="button" className="ng-sh" onClick={compartir} aria-label="Compartir">📤</button>}
+          <a className="ng-lat" href="/" aria-label="Ir a la página principal de DCUATES" title="DCUATES · ¡Comparte y gana!" data-testid="negocio-logo-arriba" onClick={(e) => { e.preventDefault(); registrar("negocio_logo", { s: slug, d: "arriba" }); cerrar(); }}>
+            <img src="/images/logo-circular.webp" alt="" width="34" height="34" /><span>¡COMPARTE<br />Y GANA!</span>
+          </a>
         </div>
         {esCat && <PaginaCategoria slug={slug} />}
         {est.cargando && !esCat && <p className="ng-msg" role="status">Cargando…</p>}
@@ -176,6 +199,7 @@ export default function NegocioCuate() {
               <div className="ng-logo">{n.logo ? <ImagenSegura src={n.logo} alt="" icono={cat.e} /> : <span aria-hidden="true">{cat.e}</span>}</div>
               <h1>{n.n}</h1>
               {n.e && <p className="ng-esl">{n.e}</p>}
+              {abiertoAhora(n.h) === true && <p className="ng-abi" data-testid="negocio-abierto">🟢 Abierto ahora</p>}
               {n.v && <p className="ng-ver" data-testid="negocio-verificado">✅ CUATE VERIFICADO <small>Lo revisó DCUATES</small></p>}
             </div>
             <div className="ng-acc">
@@ -191,8 +215,13 @@ export default function NegocioCuate() {
                 {n.ig && <a className="ng-si" href={n.ig} target="_blank" rel="noopener noreferrer" onClick={() => clic("ig")}><span aria-hidden="true">📸</span> Instagram</a>}
               </div>
             )}
+            {atajos.length >= 3 && (
+              <nav className="ng-at" aria-label="Ir a una parte de la página" data-testid="negocio-atajos">
+                {atajos.map(([id, t]) => <button type="button" key={id} onClick={() => { const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: "smooth", block: "start" }); clic("atajo"); }}>{t}</button>)}
+              </nav>
+            )}
             {n.gal && n.gal.length > 0 && <ReelNegocio items={n.gal} nombre={n.n} />}
-            {n.d && <section className="ng-s"><p className="ng-d">{n.d}</p></section>}
+            {n.d && <section className="ng-s"><VerMas className="ng-d" lineas={5} prueba="negocio-desc">{n.d}</VerMas></section>}
             {n.of && n.of.length > 0 && (
               <section className="ng-s"><h2>Qué ofrece</h2><ul className="ng-l">{n.of.map((x) => <li key={x}>{x}</li>)}</ul></section>
             )}
@@ -206,13 +235,13 @@ export default function NegocioCuate() {
               </section>
             )}
             {n.ct && n.ct.length > 0 && (
-              <section className="ng-s" data-testid="negocio-catalogo">
+              <section className="ng-s" id="negocio-catalogo" data-testid="negocio-catalogo">
                 <h2>Catálogo</h2>
                 <AvisoPedido slug={slug} negocio={n.n} refresco={verPed} />
                 <ul className="ng-ct">
                   {n.ct.map((c, i) => (
                     <li key={i}>
-                      <div><b>{c.n}</b>{c.d && <small>{c.d}</small>}</div>
+                      <div><b>{c.n}</b>{c.d && <VerMas className="ng-ctd" lineas={3}>{c.d}</VerMas>}</div>
                       {c.p && <span className="ng-pr">{c.p}</span>}
                       {n.wa && <a className="ng-pd" href={urlPedido(c)} target="_blank" rel="noopener noreferrer" onClick={(e) => { const id = registrarPedido(slug, n.n, c.n, c.p); e.currentTarget.href = urlPedido(c, id); setVerPed((x) => x + 1); clic("pedido"); }} aria-label={`Pedir ${c.n} por WhatsApp`}>Pedir</a>}
                     </li>
@@ -223,12 +252,18 @@ export default function NegocioCuate() {
             )}
             <BloqueFAQ n={n} />
             {(n.h || n.dir) && (
-              <section className="ng-s ng-dat">{n.h && <p>🕒 {n.h}</p>}{n.dir && <p>📍 {n.dir}</p>}</section>
+              <section className="ng-s ng-dat" id="ng-horario">{n.h && <p>🕒 {n.h}</p>}{n.dir && <p>📍 {n.dir}</p>}</section>
             )}
-            {n.ofT && (
-              <section className="ng-oferta" data-testid="negocio-oferta">
-                <span>🎟️ OFERTA PARA CUATES</span><b>{n.ofT}</b>{n.ofD && <p>{n.ofD}</p>}{n.ofV && textoCuenta(diasHasta(n.ofV)) && <p className="ng-cd" data-testid="oferta-cuenta">⏳ {textoCuenta(diasHasta(n.ofV))}</p>}
-              </section>
+            {promos.length > 0 && (
+              <div id="ng-promos" data-testid="negocio-promos">
+                {promos.map((o, k) => (
+                  <section className="ng-oferta" key={o.t + k} data-testid={k === 0 ? "negocio-oferta" : "negocio-oferta-" + (k + 1)}>
+                    <span>🎟️ {promos.length > 1 ? `PROMOCIÓN ${k + 1} DE ${promos.length} PARA CUATES` : "OFERTA PARA CUATES"}</span><b>{o.t}</b>
+                    {o.d && <VerMas className="ng-od" lineas={4}>{o.d}</VerMas>}
+                    {o.v && textoCuenta(diasHasta(o.v)) && <p className="ng-cd" data-testid={k === 0 ? "oferta-cuenta" : undefined}>⏳ {textoCuenta(diasHasta(o.v))}</p>}
+                  </section>
+                ))}
+              </div>
             )}
             {(n.rec || n.nec || n.com) && (
               <section className="ng-pase" data-testid="negocio-pase">
@@ -246,7 +281,7 @@ export default function NegocioCuate() {
                 <button type="button" className="ng-b" onClick={() => { registrar("negocio_pase", { s: slug }); eventoNegocio(slug, "pase"); window.dispatchEvent(new Event("dcuates:tarjeta")); }}>💳 Ya soy Cuate: abrir mi Pase</button>
               </section>
             )}
-            <Resenas slug={slug} nombre={n.n} ejemplo={!!est.ejemplo} />
+            <div id="ng-opiniones"><Resenas slug={slug} nombre={n.n} ejemplo={!!est.ejemplo} /></div>
             {n.red && n.red.length > 0 && (
               <section className="ng-s" data-testid="negocio-red">
                 <h2>Más de la red CUATE</h2>
@@ -272,7 +307,17 @@ export default function NegocioCuate() {
               </div>
               <PaginaCuateCTA compacto />
               <button type="button" className="ng-b ng-dueno" onClick={() => abrirPanelNegocio(slug)}>🔑 Soy el dueño: administrar mi página</button>
+              <a className="ng-fin" href="/" data-testid="negocio-logo-pie" onClick={(e) => { e.preventDefault(); registrar("negocio_logo", { s: slug, d: "pie" }); cerrar(); }}>
+                <LogoDcuates alto={40} /><em>Juntos construimos una mejor comunidad</em>
+              </a>
             </section>
+            {(n.wa || n.tel || n.mapa || n.dir) && barra && (
+              <nav className="ng-bb" aria-label="Contactar" data-testid="negocio-barra">
+                {n.wa && <a className="ng-wa" href={`https://wa.me/${n.wa}?text=${encodeURIComponent("¡Hola! Vi su página en DCUATES.")}`} target="_blank" rel="noopener noreferrer" onClick={() => clic("wa")}>💬 WhatsApp</a>}
+                {n.tel && <a href={telHref(n.tel)} onClick={() => clic("tel")}>📞 Llamar</a>}
+                {(n.mapa || n.dir) && <a href={n.mapa || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(n.dir + " " + n.n)}`} target="_blank" rel="noopener noreferrer" onClick={() => clic("mapa")}>📍 Llegar</a>}
+              </nav>
+            )}
           </>
         )}
       </div>
@@ -285,7 +330,17 @@ const CSS = `
 .ng-fondo{position:fixed;inset:0;z-index:80;background:var(--dc-fondo,#FBF7EC);font-family:Nunito,system-ui,sans-serif;color:#0f2d1e;display:flex;justify-content:center}
 .ng-caja{width:100%;max-width:560px;height:100%;overflow-y:auto;overscroll-behavior:contain;padding-bottom:40px;background:var(--dc-fondo,#FBF7EC)}
 .ng-bar{position:sticky;top:0;z-index:3;display:flex;align-items:center;gap:8px;background:var(--c);color:#fff;padding:8px 10px}
-.ng-bar b{flex:1;font-size:16px;font-weight:900;line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ng-bar b{flex:1;min-width:0;font-size:15px;font-weight:900;line-height:1.15;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.ng-lat{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:1px;width:56px;color:#fff;text-decoration:none}.ng-lat img{width:34px;height:34px;border-radius:50%;background:#fff;object-fit:contain;animation:ng-lat 1.6s ease-in-out infinite}
+.ng-lat span{font-size:8px;line-height:1;font-weight:900;text-align:center;letter-spacing:.02em}
+@keyframes ng-lat{0%,100%{transform:scale(1)}50%{transform:scale(1.14)}}@media (prefers-reduced-motion:reduce){.ng-lat img{animation:none}}
+.ng-at{display:flex;gap:6px;overflow-x:auto;padding:4px 14px 8px;scrollbar-width:none}.ng-at::-webkit-scrollbar{display:none}.ng-at button{flex:0 0 auto;min-height:38px;padding:0 12px;border-radius:999px;border:2px solid var(--c);background:#fff;color:var(--c);font:900 13px Nunito,system-ui,sans-serif;cursor:pointer}
+.ng-abi{margin:4px 0 0;font-size:13px;font-weight:900;color:#1b6b3a}
+.ng-caja [id^="ng-"],.ng-caja #negocio-catalogo{scroll-margin-top:70px}
+.ng-ctd{font-size:12px;font-weight:700;color:#4a5b52}.ng-od{margin:2px 0 0;font-size:14px;font-weight:700}
+.ng-bb{position:sticky;bottom:0;z-index:3;display:flex;gap:6px;padding:8px 10px calc(8px + env(safe-area-inset-bottom));background:#fff;border-top:2px solid #e3dcc6;box-shadow:0 -4px 14px rgba(0,0,0,.08)}
+.ng-bb a{flex:1;display:flex;align-items:center;justify-content:center;min-height:48px;border-radius:14px;border:2px solid var(--c);background:#fff;color:var(--c);font:900 14px Nunito,system-ui,sans-serif;text-decoration:none}.ng-bb a.ng-wa{background:#1fa855;border-color:#1fa855;color:#fff}
+.ng-fin{display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:10px;padding:14px 8px 14px;border-top:2px solid #e3dcc6;text-decoration:none}.ng-fin em{font-size:14px;font-weight:900;font-style:normal;color:#0B6E78;text-align:center}
 .ng-x,.ng-sh{width:44px;height:44px;border-radius:50%;border:0;background:#fff;color:var(--c);font-size:19px;font-weight:900;cursor:pointer}
 .ng-msg{padding:24px 16px;text-align:center;font-size:15px;font-weight:700}
 .ng-ej{margin:0;padding:6px 12px;background:#FFF4D6;color:#8a5a0c;font-size:12.5px;font-weight:900;text-align:center}

@@ -1,6 +1,7 @@
 // DIRECTORIO «NEGOCIOS CUATE» (e80) — lista de todas las Páginas CUATE aprobadas, con buscador y filtros por categoría y colonia.
 // Se abre con abrirDirectorio() (evento dcuates:directorio) o con el enlace #negocios-cuate. Cada tarjeta abre la Página CUATE del negocio.
 import React, { useEffect, useMemo, useState } from "react";
+import { MarcaVentana } from "./componentes/LogoDcuates.jsx";
 import { createPortal } from "react-dom";
 import { useAtras } from "./atras.js";
 import { registrar } from "./analitica.js";
@@ -84,6 +85,7 @@ export default function DirectorioNegocios() {
     <div className="dn-fondo" style={oculta ? { display: "none" } : undefined} role="dialog" aria-modal="true" aria-label="Emprendimientos CUATE" data-testid="directorio">
       <style>{CSS}</style>
       <div className="dn-caja">
+        <div style={{ background: "#fff", padding: "8px 14px 4px" }}><MarcaVentana /></div>
         <div className="dn-bar">
           <button type="button" className="dn-x" onClick={cerrar} aria-label="Cerrar">✕</button>
           <b>🏪 Emprendimientos CUATE</b>

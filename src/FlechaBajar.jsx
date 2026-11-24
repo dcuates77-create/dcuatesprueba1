@@ -1,4 +1,4 @@
-// FLECHA ↓ (e49) — pareja de la flecha ↑ «Subir»: aparece arriba a la derecha, DEBAJO del encabezado
+// FLECHA ↓ (e49, e94) — pareja de la flecha ↑ «Subir»: aparece a la derecha, a la MITAD de la primera pantalla (e94; antes iba pegada al encabezado)
 // (no tapa sus iconos), solo mientras la persona está cerca del inicio de la página. Al tocarla baja una pantalla.
 import React, { useEffect, useState } from "react";
 
@@ -9,8 +9,10 @@ export default function FlechaBajar() {
   useEffect(() => {
     const medir = () => {
       setArriba(window.scrollY < 120 && document.documentElement.scrollHeight > window.innerHeight * 1.5);
+      // e94: a la mitad de la primera pantalla (a la altura del pulgar), nunca encima del encabezado
       const enc = document.getElementById("encabezado-fijo");
-      if (enc) setTop(Math.round(enc.getBoundingClientRect().bottom) + 10);
+      const minimo = enc ? Math.round(enc.getBoundingClientRect().bottom) + 10 : 70;
+      setTop(Math.max(minimo, Math.round(window.innerHeight / 2 - 24)));
     };
     medir();
     window.addEventListener("scroll", medir, { passive: true });

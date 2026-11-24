@@ -2,7 +2,7 @@
 // Todo es OPCIONAL: si la hoja no trae el dato, el bloque no aparece. Los datos llegan desde «NegociosCUATE» (ver script e92).
 //   BloquesPerfil: Próximo evento · Servicios · Qué atiendo · Modalidades · Cómo trabajo · Sobre mí (y centro)
 //   BloqueFAQ:     Preguntas frecuentes
-import React from "react";
+import React, { useLayoutEffect, useRef, useState } from "react";
 import { ImagenSegura } from "./componentes/MediaInteligente.jsx";
 import { diasHasta, textoCuenta } from "./datos/negocios.js";
 
@@ -14,6 +14,29 @@ const fechaLarga = (iso) => {
     return t.charAt(0).toUpperCase() + t.slice(1);
   } catch (e) { return iso; }
 };
+// «Ver más / Ver menos» (e94): recorta el texto a N renglones y muestra el botón SOLO si de verdad se corta.
+export function VerMas({ children, lineas = 4, className = "", prueba = "" }) {
+  const ref = useRef(null);
+  const [abierto, setAbierto] = useState(false);
+  const [larga, setLarga] = useState(false);
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return undefined;
+    const medir = () => { if (!abierto) setLarga(el.scrollHeight > el.clientHeight + 2); };
+    medir();
+    let ro = null;
+    if (typeof ResizeObserver !== "undefined") { ro = new ResizeObserver(medir); ro.observe(el); }
+    return () => { if (ro) ro.disconnect(); };
+  }, [children, abierto]);
+  return (
+    <>
+      <div ref={ref} className={"vm-t " + className + (abierto ? " vm-ab" : "")} style={abierto ? undefined : { WebkitLineClamp: lineas }} data-testid={prueba || undefined}>{children}</div>
+      {(larga || abierto) && (
+        <button type="button" className="vm-b" aria-expanded={abierto} onClick={() => setAbierto((v) => !v)} data-testid={prueba ? prueba + "-btn" : undefined}>{abierto ? "Ver menos ▲" : "Ver más ▼"}</button>
+      )}
+    </>
+  );
+}
 const soloDigitos = (x) => String(x || "").replace(/\D/g, "");
 
 export function BloquesPerfil({ n, clic, abrirOtro }) {
@@ -29,7 +52,7 @@ export function BloquesPerfil({ n, clic, abrirOtro }) {
     <>
       <style>{CSS_PERFIL}</style>
       {ev && (
-        <section className="pf-ev" data-testid="perfil-evento">
+        <section className="pf-ev" id="ng-evento" data-testid="perfil-evento">
           <span className="pf-ev-tag">● PRÓXIMO EVENTO</span>
           <div className="pf-ev-cab">
             {ev.im && <div className="pf-ev-im"><ImagenSegura src={ev.im} alt={ev.t} icono="🎟️" /></div>}
@@ -40,7 +63,7 @@ export function BloquesPerfil({ n, clic, abrirOtro }) {
             </div>
           </div>
           {ev.pq && <p className="pf-ev-pq"><b>Para quién:</b> {ev.pq}</p>}
-          {ev.tx && <p className="pf-ev-tx">{ev.tx}</p>}
+          {ev.tx && <VerMas className="pf-ev-tx" lineas={5}>{ev.tx}</VerMas>}
           {ev.inc && ev.inc.length > 0 && (
             <>
               <h3>¿Qué te vas a llevar?</h3>
@@ -64,14 +87,14 @@ export function BloquesPerfil({ n, clic, abrirOtro }) {
       )}
 
       {sv.length > 0 && (
-        <section className="ng-s" data-testid="perfil-servicios">
+        <section className="ng-s" id="ng-servicios" data-testid="perfil-servicios">
           <h2>Servicios y actividades</h2>
           <div className="pf-g">
             {sv.map((s, i) => (
               <div className="pf-c" key={s.t + i}>
                 <i>{String(i + 1).padStart(2, "0")}</i>
                 <b>{s.t}</b>
-                {s.d && <p>{s.d}</p>}
+                {s.d && <VerMas className="pf-sd" lineas={3}>{s.d}</VerMas>}
               </div>
             ))}
           </div>
@@ -108,14 +131,14 @@ export function BloquesPerfil({ n, clic, abrirOtro }) {
       )}
 
       {tienePerfil && (
-        <section className="ng-s" data-testid="perfil-sobre">
+        <section className="ng-s" id="ng-sobre" data-testid="perfil-sobre">
           <h2>{n.pn ? "Sobre mí" : "Sobre nosotros"}</h2>
           <div className="pf-pf">
             {n.pf && <div className="pf-foto"><ImagenSegura src={n.pf} alt={n.pn || ""} icono="🙂" /></div>}
             <div className="pf-tx">
               {n.pn && <b className="pf-nom">{n.pn}</b>}
               {n.pc && <small className="pf-car">{n.pc}</small>}
-              {(n.pp || []).map((p, i) => <p key={i}>{p}</p>)}
+              {(n.pp || []).map((p, i) => <VerMas key={i} className="pf-pp" lineas={6}>{p}</VerMas>)}
             </div>
           </div>
           {n.pcr && n.pcr.length > 0 && (
@@ -153,6 +176,10 @@ export function BloqueFAQ({ n }) {
 }
 
 const CSS_PERFIL = `
+.vm-t{display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}.vm-t.vm-ab{display:block;-webkit-line-clamp:unset}
+.vm-b{display:inline-flex;align-items:center;min-height:36px;margin:2px 0 4px;padding:0 12px;border:2px solid var(--c);border-radius:999px;background:#fff;color:var(--c);font:900 13px Nunito,system-ui,sans-serif;cursor:pointer}
+.pf-sd,.pf-pp{margin:4px 0 0;font-size:13.5px;font-weight:700;line-height:1.45;color:#33433a}.pf-pp{font-size:14.5px;color:inherit;margin:0 0 6px}
+
 .pf-ev{position:relative;margin:22px 14px 0;padding:18px 14px 14px;border:2px solid var(--c);border-radius:18px;background:#fff;overflow:hidden}
 .pf-ev-tag{position:absolute;top:-1px;left:12px;background:var(--c);color:#fff;font-size:11px;font-weight:900;letter-spacing:.05em;padding:4px 10px;border-radius:0 0 10px 10px}
 .pf-ev-cab{display:flex;gap:12px;align-items:flex-start;margin-top:8px}

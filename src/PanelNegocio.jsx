@@ -6,7 +6,7 @@ import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useAtras } from "./atras.js";
 import { registrar } from "./analitica.js";
-import { GOOGLE_SHEETS_URL } from "./datos/config.js";
+import { GOOGLE_SHEETS_URL, URL_SITIO } from "./datos/config.js";
 
 export const abrirPanelNegocio = (slug) => window.dispatchEvent(new CustomEvent("dcuates:panel-negocio", { detail: slug }));
 
@@ -14,10 +14,12 @@ export const abrirPanelNegocio = (slug) => window.dispatchEvent(new CustomEvent(
 const GRUPOS = [
   ["Tu emprendimiento", [["e", "Eslogan", "t"], ["d", "Descripción", "a"], ["of", "Qué ofreces (un renglón por cada uno)", "l"], ["h", "Horario", "t"], ["dir", "Dirección", "t"], ["col", "Colonia o municipio", "t"]]],
   ["Contacto", [["wa", "WhatsApp (10 dígitos)", "t"], ["tel", "Teléfono", "t"], ["mapa", "Enlace de Google Maps (https://…)", "t"], ["web", "Sitio web (https://…)", "t"], ["fb", "Facebook (https://…)", "t"], ["ig", "Instagram (https://…)", "t"]]],
-  ["Promoción para los Cuates", [["ofT", "Título de la promoción", "t"], ["ofD", "Detalle", "a"], ["ofV", "Vence (dd/mm/aaaa, opcional)", "t"]]],
+  ["Promoción para los Cuates", [["ofT", "Título de la promoción", "t"], ["ofD", "Detalle", "a"], ["ofV", "Vence (dd/mm/aaaa, opcional)", "t"], ["pr", "Más promociones (Impulsor: 2 · Patrocinador: 4). Un renglón por promoción → Título ~ Detalle ~ Vence (dd/mm/aaaa, opcional)", "l", true]]],
   ["Tu Pase del emprendimiento", [["rec", "Ofrezco", "t"], ["nec", "Necesito", "t"], ["com", "Comparto", "t"]]],
   ["Imágenes, videos y catálogo", [["logo", "Enlace del logo (https://…)", "t"], ["portada", "Enlace de la portada (https://…)", "t"], ["gal", "Imágenes y videos: un enlace por renglón (YouTube o imagen)", "l", true], ["ct", "Catálogo: un renglón por producto → Nombre ~ Precio ~ Descripción", "l", true], ["cc", "Enlace de tu catálogo completo (https://…)", "t", true]]]
 ];
+// e94: largo máximo de cada campo (el mismo que acepta la hoja) para mostrar el contador «escritos / permitidos».
+const MAXIMO = { e: 120, d: 1200, of: 600, h: 160, dir: 200, col: 60, ofT: 90, ofD: 600, pr: 2800, rec: 200, nec: 200, com: 200, ct: 4500, gal: 1200 };
 const aTexto = (k, tipo, v) => (tipo === "l" ? String(v || "").split("|").map((x) => x.trim()).filter(Boolean).join("\n") : String(v || ""));
 const deTexto = (tipo, v) => (tipo === "l" ? String(v || "").split("\n").map((x) => x.trim()).filter(Boolean).join(" | ") : String(v || "").trim());
 const pedir = async (qs) => {
@@ -122,6 +124,12 @@ export default function PanelNegocio() {
             {tab === "ficha" && (
               <div className="pn-f">
                 <p>Tus cambios <b>no se publican solos</b>: DCUATES los revisa y, al aprobarlos, aparecen en tu página.</p>
+                <button type="button" className="pn-b pn-comp" data-testid="pn-compartir" onClick={() => {
+                  const url = `${URL_SITIO}/n/${slug}`, txt = `¡Conoce mi página en DCUATES! ${(d && d.negocio && d.negocio.n) || ""}`.trim();
+                  registrar("panel_compartir", { s: slug });
+                  if (navigator.share) { navigator.share({ title: txt, text: txt, url }).catch(() => {}); return; }
+                  window.open(`https://wa.me/?text=${encodeURIComponent(txt + " " + url)}`, "_blank", "noopener");
+                }}>📤 Compartir mi página</button>
                 {d.pendiente && <p className="pn-aviso" data-testid="pn-pendiente">⏳ Ya tienes un cambio en revisión. Si envías otro, lo reemplaza.</p>}
                 {GRUPOS.map(([titulo, cs]) => {
                   const campos = cs.filter(([, , , alto]) => !alto || nivelAlto);
@@ -130,10 +138,11 @@ export default function PanelNegocio() {
                     <fieldset key={titulo}><legend>{titulo}</legend>
                       {campos.map(([c, r, tipo]) => (
                         <div key={c} className="pn-c"><label htmlFor={"pn-" + c}>{r}</label>
-                          {tipo === "t" ? <input id={"pn-" + c} type="text" value={v[c] || ""} onChange={(e) => set(c, e.target.value)} /> : <textarea id={"pn-" + c} rows={tipo === "a" ? 3 : 4} value={v[c] || ""} onChange={(e) => set(c, e.target.value)} />}
+                          {tipo === "t" ? <input id={"pn-" + c} type="text" value={v[c] || ""} maxLength={MAXIMO[c] || undefined} onChange={(e) => set(c, e.target.value)} /> : <textarea id={"pn-" + c} rows={tipo === "a" ? (c === "d" ? 6 : 4) : 5} value={v[c] || ""} maxLength={MAXIMO[c] || undefined} onChange={(e) => set(c, e.target.value)} />}
+                          {MAXIMO[c] && <small className={"pn-cu" + ((v[c] || "").length > MAXIMO[c] * 0.9 ? " pn-cu-ya" : "")} data-testid={"pn-cuenta-" + c}>{(v[c] || "").length} / {MAXIMO[c]} caracteres</small>}
                         </div>
                       ))}
-                      {bloqueados.length > 0 && <p className="pn-nota">🔒 Galería y catálogo son para emprendimientos Impulsor o Patrocinador.</p>}
+                      {bloqueados.length > 0 && <p className="pn-nota">🔒 Galería, catálogo y promociones extra son para emprendimientos Impulsor o Patrocinador.</p>}
                     </fieldset>
                   );
                 })}
@@ -204,6 +213,7 @@ const CSS = `
 .pn-bar{position:sticky;top:0;z-index:3;display:flex;align-items:center;gap:8px;background:#7a4a00;color:#fff;padding:8px 10px}
 .pn-bar b{flex:1;font-size:16px;font-weight:900;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pn-x{width:44px;height:44px;border-radius:50%;border:0;background:#fff;color:#7a4a00;font-size:19px;font-weight:900;cursor:pointer}
+.pn-cu{display:block;margin-top:2px;font-size:12px;font-weight:700;color:#6b6b5a;text-align:right}.pn-cu-ya{color:#8a1c1c;font-weight:900}.pn-comp{margin:2px 0 8px;width:100%}
 .pn-tabs{display:flex;gap:6px;padding:10px 12px 0;overflow-x:auto}
 .pn-tabs button{flex:1 0 auto;min-height:44px;padding:0 12px;border:2px solid #7a4a00;border-radius:12px;background:#fff;color:#7a4a00;font:inherit;font-size:13.5px;font-weight:900;cursor:pointer;white-space:nowrap}
 .pn-tabs button.on{background:#7a4a00;color:#fff}

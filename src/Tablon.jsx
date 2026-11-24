@@ -5,6 +5,7 @@
 //   3) El Apps Script (doGet ?a=publicados) lo entrega SIN nombre ni teléfono y aparece aquí en minutos.
 // Se abre con abrirTablon("Ofrezco") (filtro opcional) o con el evento dcuates:abrir-tablon.
 import React, { useEffect, useState } from "react";
+import { MarcaVentana } from "./componentes/LogoDcuates.jsx";
 import { createPortal } from "react-dom";
 import { useAtras } from "./atras.js";
 import BotonCompartir from "./BotonCompartir.jsx";
@@ -79,6 +80,7 @@ export default function Tablon() {
     <div className="tb-fondo" style={oculta ? { display: "none" } : undefined} role="dialog" aria-modal="true" aria-label="Lo que compartimos" onClick={(e) => { if (e.target === e.currentTarget) cerrar(); }}>
       <style>{CSS}</style>
       <div className="tb-caja">
+        <div style={{ background: "#fff", padding: "8px 14px 4px" }}><MarcaVentana /></div>
         <div className="tb-cab">
           <b>🧺 Lo que compartimos</b>
           <BotonCompartir hash="lo-que-compartimos" titulo="Lo que compartimos — DCUATES" texto="Lo que la comunidad ofrece y necesita" variante="circulo" />

@@ -2,6 +2,7 @@
 // Se monta UNA vez en App. Se abre con abrirRegistroPrevio("ecatepets") o con el evento dcuates:registro-previo
 // (detail: "id" o { id, valores: { campo: "valor" }, perfil: "texto" }). Los registros viven en src/datos/registros.js.
 import React, { useEffect, useState } from "react";
+import { MarcaVentana } from "./componentes/LogoDcuates.jsx";
 import { createPortal } from "react-dom";
 import { useAtras } from "./atras.js";
 import FormMini from "./FormMini.jsx";
@@ -55,6 +56,7 @@ export default function RegistroPrevio() {
     <div className="rp-fondo" style={oculta ? { display: "none" } : undefined} role="dialog" aria-modal="true" aria-label={base.titulo} onClick={(e) => { if (e.target === e.currentTarget) cerrar(); }}>
       <style>{CSS}</style>
       <div className="rp-caja">
+        <div style={{ background: "#fff", padding: "8px 14px 4px" }}><MarcaVentana /></div>
         <div className="rp-cab">
           {pila.length > 0 && <button type="button" className="rp-x rp-v" onClick={cerrar} aria-label="Volver">‹</button>}
           <b>{base.e} {base.titulo}</b>

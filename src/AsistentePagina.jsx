@@ -2,6 +2,7 @@
 // ves una vista previa en vivo y lo envías para revisión. Llega a la hoja «NegociosCUATE» como «En revisión» (NO se publica sola).
 // Logo, portada y fotos se mandan después por WhatsApp con el folio. Se abre con abrirAsistente() (evento dcuates:asistente) o con #arma-tu-pagina.
 import React, { useEffect, useRef, useState } from "react";
+import { MarcaVentana } from "./componentes/LogoDcuates.jsx";
 import { createPortal } from "react-dom";
 import { useAtras } from "./atras.js";
 import { registrar } from "./analitica.js";
@@ -107,6 +108,7 @@ export default function AsistentePagina() {
     <div className="as-fondo" style={oculta ? { display: "none" } : undefined} role="dialog" aria-modal="true" aria-label="Arma tu Página CUATE" data-testid="asistente">
       <style>{CSS}</style>
       <div className="as-caja">
+        <div style={{ background: "#fff", padding: "8px 14px 4px" }}><MarcaVentana /></div>
         <div className="as-bar">
           <button type="button" className="as-x" onClick={cerrar} aria-label="Cerrar">✕</button>
           <b>🧩 Arma tu Página CUATE</b>

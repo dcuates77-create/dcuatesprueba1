@@ -639,8 +639,8 @@ export default function App() {
       />
       <PistaDeslizar vista={vista} />
       <AvisoSinConexion />
-      {/* e93: la flecha flotante queda POR ENCIMA del menú de secciones (antes se escondía detrás) y un poco más abajo, libre del encabezado. */}
-      <div className="fb-env"><style>{".fb-env>*{z-index:36!important;margin-top:56px}"}</style><FlechaBajar /></div>
+      {/* e93: la flecha flotante queda POR ENCIMA del menú de secciones (antes se escondía detrás) (e94: y a media pantalla). */}
+      <div className="fb-env"><style>{".fb-env>*{z-index:36!important}"}</style><FlechaBajar /></div>
       <Reservado />
 
       {/* Flecha "Subir" — abajo a la derecha, arriba de la barra inferior; aparece después de bajar un poco. */}
