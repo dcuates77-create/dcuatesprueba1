@@ -12,6 +12,7 @@ import { cargarNegocio, categoriaDe, NIVELES, esOficial, diasHasta, textoCuenta 
 import PaginaCuateCTA from "./PaginaCuateCTA.jsx";
 import ReelNegocio from "./ReelNegocio.jsx";
 import { Anuncios, ReelsProductos } from "./BloqueAnuncios.jsx"; // e95
+import { AgendaNegocio } from "./AgendaCuate.jsx"; // e96
 import { BloquesPerfil, BloqueFAQ, VerMas } from "./PerfilCuate.jsx"; // e92: perfil, evento, servicios, modalidades, preguntas
 import { ImagenSegura, useImagenSegura } from "./componentes/MediaInteligente.jsx";
 import { ListaNegocios, PaginaCategoria, esSlugCategoria, categoriaDeSlug } from "./PaginaCategoria.jsx";
@@ -163,7 +164,7 @@ export default function NegocioCuate() {
   const urlPedido = (c, id) => `https://wa.me/${n.wa}?text=${encodeURIComponent("¡Hola! Vi su página en DCUATES y quiero pedir: " + c.n + (c.p ? " (" + c.p + ")" : "") + "." + (id ? " Pedido " + id : ""))}`;
   const promos = n ? [...(n.ofT ? [{ t: n.ofT, d: n.ofD, v: n.ofV }] : []), ...(n.pr || [])].slice(0, 5) : [];
   const atajos = n ? [
-    n.ev && n.ev.t && ["ng-evento", "📅 Evento"], promos.length > 0 && ["ng-promos", "🎟️ Promos"], n.an && n.an.length > 0 && ["ng-anuncios", "📢 Anuncios"], n.rl && n.rl.length > 0 && ["ng-reels", "🛍️ Productos"], n.sv && n.sv.length > 0 && ["ng-servicios", "🧰 Servicios"],
+    n.ev && n.ev.t && ["ng-evento", "📅 Evento"], promos.length > 0 && ["ng-promos", "🎟️ Promos"], n.fe && n.fe.length > 0 && ["ng-agenda", "📅 Agenda"], n.an && n.an.length > 0 && ["ng-anuncios", "📢 Anuncios"], n.rl && n.rl.length > 0 && ["ng-reels", "🛍️ Productos"], n.sv && n.sv.length > 0 && ["ng-servicios", "🧰 Servicios"],
     n.ct && n.ct.length > 0 && ["negocio-catalogo", "🛍️ Catálogo"], (n.pn || (n.pp && n.pp.length)) && ["ng-sobre", "👤 Perfil"], (n.h || n.dir) && ["ng-horario", "🕒 Horario"], ["ng-opiniones", "⭐ Opiniones"],
   ].filter(Boolean) : [];
   const clic = (que) => { registrar("negocio_clic", { s: slug, q: que }); eventoNegocio(slug, que); };
@@ -252,6 +253,7 @@ export default function NegocioCuate() {
                 {n.cc && <a className="ng-cc" href={n.cc} target="_blank" rel="noopener noreferrer" onClick={() => clic("catalogo")} data-testid="negocio-catalogo-completo">📖 Ver catálogo completo</a>}
               </section>
             )}
+            <AgendaNegocio items={n.fe} wa={n.wa} nombre={n.n} clic={clic} />
             <Anuncios items={n.an} clic={clic} />
             <BloqueFAQ n={n} />
             {(n.h || n.dir) && (

@@ -9,6 +9,7 @@ import { registrar } from "./analitica.js";
 import { GOOGLE_SHEETS_URL, URL_SITIO } from "./datos/config.js";
 import { Anuncios, leerAnuncios } from "./BloqueAnuncios.jsx"; // e95: anuncios y vista previa
 import { VerMas } from "./PerfilCuate.jsx";
+import { AgendaNegocio, leerAgenda } from "./AgendaCuate.jsx"; // e96
 
 export const abrirPanelNegocio = (slug) => window.dispatchEvent(new CustomEvent("dcuates:panel-negocio", { detail: slug }));
 
@@ -18,11 +19,12 @@ const GRUPOS = [
   ["Contacto", [["wa", "WhatsApp (10 dígitos)", "t"], ["tel", "Teléfono", "t"], ["mapa", "Enlace de Google Maps (https://…)", "t"], ["web", "Sitio web (https://…)", "t"], ["fb", "Facebook (https://…)", "t"], ["ig", "Instagram (https://…)", "t"]]],
   ["Promoción para los Cuates", [["ofT", "Título de la promoción", "t"], ["ofD", "Detalle", "a"], ["ofV", "Vence (dd/mm/aaaa, opcional)", "t"], ["pr", "Más promociones (Impulsor: 2 · Patrocinador: 4). Un renglón por promoción → Título ~ Detalle ~ Vence (dd/mm/aaaa, opcional)", "l", true]]],
   ["Anuncios con botones (Gratuito: 1 · Impulsor: 3 · Patrocinador: 6)", [["an", "Un renglón por anuncio → Título ~ Texto ~ Imagen (https, opcional) ~ Botón 1 ~ Enlace 1 ~ Botón 2 ~ Enlace 2 ~ Vence (dd/mm/aaaa, opcional). El enlace puede ser https://…, un WhatsApp de 10 dígitos, tel:… o mailto:…", "l"]]],
+  ["Agenda: fechas, citas y avisos (Básico: 3 · Impulsor: 8 · Patrocinador: 15)", [["fe", "Un renglón por fecha → Tipo (Evento, Taller, Promoción, Cita, Aviso o Cierre) ~ Fecha (dd/mm/aaaa) ~ Hora (ej. 5:00 pm) ~ Hora fin ~ Título ~ Detalle ~ Lugar o modalidad ~ Costo ~ Botón ~ Enlace (opcional) ~ ¿Visible en DCUATES? (Sí/No). Las citas piden la fecha solo si quieres. Los eventos «Sí» salen en la Agenda general solo si DCUATES los aprueba.", "l"]]],
   ["Tu Pase del emprendimiento", [["rec", "Ofrezco", "t"], ["nec", "Necesito", "t"], ["com", "Comparto", "t"]]],
   ["Imágenes, videos y catálogo", [["logo", "Enlace del logo (https://…)", "t"], ["portada", "Enlace de la portada (https://…)", "t"], ["gal", "Imágenes y videos: un enlace por renglón (YouTube o imagen)", "l", true], ["ct", "Catálogo: un renglón por producto → Nombre ~ Precio ~ Descripción", "l", true], ["cc", "Enlace de tu catálogo completo (https://…)", "t", true]]]
 ];
 // e94: largo máximo de cada campo (el mismo que acepta la hoja) para mostrar el contador «escritos / permitidos».
-const MAXIMO = { e: 120, d: 1200, of: 600, h: 160, dir: 200, col: 60, ofT: 90, ofD: 600, pr: 2800, rec: 200, nec: 200, com: 200, ct: 4500, gal: 1200, an: 3500 };
+const MAXIMO = { e: 120, d: 1200, of: 600, h: 160, dir: 200, col: 60, ofT: 90, ofD: 600, pr: 2800, rec: 200, nec: 200, com: 200, ct: 4500, gal: 1200, an: 3500, fe: 3500 };
 const aTexto = (k, tipo, v) => (tipo === "l" ? String(v || "").split("|").map((x) => x.trim()).filter(Boolean).join("\n") : String(v || ""));
 const deTexto = (tipo, v) => (tipo === "l" ? String(v || "").split("\n").map((x) => x.trim()).filter(Boolean).join(" | ") : String(v || "").trim());
 const pedir = async (qs) => {
@@ -211,6 +213,8 @@ export default function PanelNegocio() {
         const pr = String(v.pr || "").split("\n").map((x) => x.split("~").map((y) => y.trim())).filter((q) => q[0]);
         const of = String(v.of || "").split("\n").map((x) => x.trim()).filter(Boolean);
         const an = leerAnuncios(String(v.an || "").split("\n").map((x) => x.trim()).filter(Boolean).join(" | "), 6);
+        const fe = leerAgenda(String(v.fe || "").split("\n").map((x) => x.trim()).filter(Boolean).join(" | "), 15);
+        const limF = (d.negocio && /^(p|patrocinador)/i.test(String(d.negocio.niv || ""))) ? 15 : nivelAlto ? 8 : 3;
         const lim = (d.negocio && /^(p|patrocinador)/i.test(String(d.negocio.niv || ""))) ? 6 : nivelAlto ? 3 : 1;
         return (
           <div className="pn-vp" role="dialog" aria-modal="true" aria-label="Vista previa de tu página" data-testid="pn-vista">
@@ -226,6 +230,8 @@ export default function PanelNegocio() {
                   {pr.map((q, i) => <div className="pn-vpr" key={i}><b>{q[0]}</b>{q[1] && <p>{q[1]}</p>}{q[2] && <small>Vence: {q[2]}</small>}</div>)}
                 </section>
               )}
+              <AgendaNegocio items={fe.slice(0, limF)} wa={v.wa} nombre={d.negocio.n} />
+              {fe.length > limF && <p className="pn-aviso">Escribiste {fe.length} fechas; tu nivel muestra solo {limF}.</p>}
               <Anuncios items={an.slice(0, lim)} />
               {an.length > lim && <p className="pn-aviso">Escribiste {an.length} anuncios; tu nivel muestra solo {lim}. Los demás no se publicarán.</p>}
               <button type="button" className="pn-b pn-b1" onClick={() => setVista(false)}>← Volver a editar</button>
