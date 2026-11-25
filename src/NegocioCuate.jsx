@@ -13,6 +13,7 @@ import PaginaCuateCTA from "./PaginaCuateCTA.jsx";
 import ReelNegocio from "./ReelNegocio.jsx";
 import { Anuncios, ReelsProductos } from "./BloqueAnuncios.jsx"; // e95
 import { AgendaNegocio } from "./AgendaCuate.jsx"; // e96
+import { abrirLegal } from "./componentes/legal.jsx"; // e97
 import { BloquesPerfil, BloqueFAQ, VerMas } from "./PerfilCuate.jsx"; // e92: perfil, evento, servicios, modalidades, preguntas
 import { ImagenSegura, useImagenSegura } from "./componentes/MediaInteligente.jsx";
 import { ListaNegocios, PaginaCategoria, esSlugCategoria, categoriaDeSlug } from "./PaginaCategoria.jsx";
@@ -315,6 +316,7 @@ export default function NegocioCuate() {
               <a className="ng-fin" href="/" data-testid="negocio-logo-pie" onClick={(e) => { e.preventDefault(); registrar("negocio_logo", { s: slug, d: "pie" }); cerrar(); }}>
                 <LogoDcuates alto={40} /><em>Juntos construimos una mejor comunidad</em>
               </a>
+              <button type="button" className="ng-priv" data-testid="negocio-privacidad" onClick={() => abrirLegal("privacidad")}>Aviso de privacidad</button>
             </section>
             {(n.wa || n.tel || n.mapa || n.dir) && barra && (
               <nav className="ng-bb" aria-label="Contactar" data-testid="negocio-barra">
@@ -345,6 +347,7 @@ const CSS = `
 .ng-ctd{font-size:12px;font-weight:700;color:#4a5b52}.ng-od{margin:2px 0 0;font-size:14px;font-weight:700}
 .ng-bb{position:sticky;bottom:0;z-index:3;display:flex;gap:6px;padding:8px 10px calc(8px + env(safe-area-inset-bottom));background:#fff;border-top:2px solid #e3dcc6;box-shadow:0 -4px 14px rgba(0,0,0,.08)}
 .ng-bb a{flex:1;display:flex;align-items:center;justify-content:center;min-height:48px;border-radius:14px;border:2px solid var(--c);background:#fff;color:var(--c);font:900 14px Nunito,system-ui,sans-serif;text-decoration:none}.ng-bb a.ng-wa{background:#1fa855;border-color:#1fa855;color:#fff}
+.ng-priv{align-self:center;min-height:44px;padding:0 12px;border:0;background:none;color:#5a6b62;font:800 12.5px Nunito,system-ui,sans-serif;text-decoration:underline;cursor:pointer}
 .ng-fin{display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:10px;padding:14px 8px 14px;border-top:2px solid #e3dcc6;text-decoration:none}.ng-fin em{font-size:14px;font-weight:900;font-style:normal;color:#0B6E78;text-align:center}
 .ng-x,.ng-sh{width:44px;height:44px;border-radius:50%;border:0;background:#fff;color:var(--c);font-size:19px;font-weight:900;cursor:pointer}
 .ng-msg{padding:24px 16px;text-align:center;font-size:15px;font-weight:700}

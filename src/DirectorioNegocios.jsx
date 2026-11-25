@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { MarcaVentana } from "./componentes/LogoDcuates.jsx";
 import { createPortal } from "react-dom";
 import { useAtras } from "./atras.js";
+import { ListaVitrinas } from "./Vitrina.jsx"; // e97
 import { registrar } from "./analitica.js";
 import { cargarDirectorio, ordenarDirectorio, ORDENES, categoriaDe, claveCategoria, NIVELES, esOficial } from "./datos/negocios.js";
 import { abrirNegocio } from "./NegocioCuate.jsx";
@@ -92,6 +93,7 @@ export default function DirectorioNegocios() {
           <button type="button" className="dn-x" onClick={compartir} aria-label="Compartir">📤</button>
         </div>
         <p className="dn-p">Emprendimientos de tu comunidad con beneficios para los Cuates. Muestra tu Pase y aprovecha sus promociones. 💛</p>
+        <ListaVitrinas />
         {est.ejemplo && <p className="dn-ej">EJEMPLOS ilustrativos · así se verá el directorio</p>}
         {!est.cargando && <PromoDelMes items={est.items} abrir={(s) => { eventoNegocio(s, "directorio"); abrirNegocio(s); }} />}
         {!est.cargando && <RetoVisitas nombres={nombres} />}

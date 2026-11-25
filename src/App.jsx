@@ -49,6 +49,7 @@ import MicroAcciones from "./MicroAcciones.jsx";
 import RegistroPrevio from "./RegistroPrevio.jsx";
 import NegocioCuate from "./NegocioCuate.jsx";
 import DirectorioNegocios from "./DirectorioNegocios.jsx";
+import Vitrina from "./Vitrina.jsx"; // e97
 import AsistentePagina from "./AsistentePagina.jsx";
 import QueEsDcuates from "./QueEsDcuates.jsx";
 import VentanasCausas from "./VentanasCausas.jsx";
@@ -752,6 +753,7 @@ export default function App() {
       <RegistroPrevio />
       <NegocioCuate />
       <DirectorioNegocios />
+      <Vitrina />
       <AsistentePagina />
       <QueEsDcuates />
       <VentanasCausas reelItems={portadasItems.causas || []} cargando={!baserowListo} animalProps={{ apoyoCausaAnimalLinks, apoyoCosasCasosLinks, apoyoPersonasExtraviadasLinks, extraviadosResumenAbierto, setExtraviadosResumenAbierto }} />
