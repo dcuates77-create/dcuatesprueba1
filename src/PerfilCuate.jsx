@@ -30,6 +30,7 @@ export function VerMas({ children, lineas = 4, className = "", prueba = "" }) {
   }, [children, abierto]);
   return (
     <>
+      <style>{CSS_VM}</style>
       <div ref={ref} className={"vm-t " + className + (abierto ? " vm-ab" : "")} style={abierto ? undefined : { WebkitLineClamp: lineas }} data-testid={prueba || undefined}>{children}</div>
       {(larga || abierto) && (
         <button type="button" className="vm-b" aria-expanded={abierto} onClick={() => setAbierto((v) => !v)} data-testid={prueba ? prueba + "-btn" : undefined}>{abierto ? "Ver menos ▲" : "Ver más ▼"}</button>
@@ -37,6 +38,8 @@ export function VerMas({ children, lineas = 4, className = "", prueba = "" }) {
     </>
   );
 }
+const CSS_VM = `.vm-t{display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}.vm-t.vm-ab{display:block;-webkit-line-clamp:unset}
+.vm-b{display:inline-flex;align-items:center;min-height:36px;margin:2px 0 4px;padding:0 12px;border:2px solid var(--c,#1F7A46);border-radius:999px;background:#fff;color:var(--c,#1F7A46);font:900 13px Nunito,system-ui,sans-serif;cursor:pointer}`;
 const soloDigitos = (x) => String(x || "").replace(/\D/g, "");
 
 export function BloquesPerfil({ n, clic, abrirOtro }) {

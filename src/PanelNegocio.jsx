@@ -7,6 +7,8 @@ import { createPortal } from "react-dom";
 import { useAtras } from "./atras.js";
 import { registrar } from "./analitica.js";
 import { GOOGLE_SHEETS_URL, URL_SITIO } from "./datos/config.js";
+import { Anuncios, leerAnuncios } from "./BloqueAnuncios.jsx"; // e95: anuncios y vista previa
+import { VerMas } from "./PerfilCuate.jsx";
 
 export const abrirPanelNegocio = (slug) => window.dispatchEvent(new CustomEvent("dcuates:panel-negocio", { detail: slug }));
 
@@ -15,11 +17,12 @@ const GRUPOS = [
   ["Tu emprendimiento", [["e", "Eslogan", "t"], ["d", "Descripción", "a"], ["of", "Qué ofreces (un renglón por cada uno)", "l"], ["h", "Horario", "t"], ["dir", "Dirección", "t"], ["col", "Colonia o municipio", "t"]]],
   ["Contacto", [["wa", "WhatsApp (10 dígitos)", "t"], ["tel", "Teléfono", "t"], ["mapa", "Enlace de Google Maps (https://…)", "t"], ["web", "Sitio web (https://…)", "t"], ["fb", "Facebook (https://…)", "t"], ["ig", "Instagram (https://…)", "t"]]],
   ["Promoción para los Cuates", [["ofT", "Título de la promoción", "t"], ["ofD", "Detalle", "a"], ["ofV", "Vence (dd/mm/aaaa, opcional)", "t"], ["pr", "Más promociones (Impulsor: 2 · Patrocinador: 4). Un renglón por promoción → Título ~ Detalle ~ Vence (dd/mm/aaaa, opcional)", "l", true]]],
+  ["Anuncios con botones (Gratuito: 1 · Impulsor: 3 · Patrocinador: 6)", [["an", "Un renglón por anuncio → Título ~ Texto ~ Imagen (https, opcional) ~ Botón 1 ~ Enlace 1 ~ Botón 2 ~ Enlace 2 ~ Vence (dd/mm/aaaa, opcional). El enlace puede ser https://…, un WhatsApp de 10 dígitos, tel:… o mailto:…", "l"]]],
   ["Tu Pase del emprendimiento", [["rec", "Ofrezco", "t"], ["nec", "Necesito", "t"], ["com", "Comparto", "t"]]],
   ["Imágenes, videos y catálogo", [["logo", "Enlace del logo (https://…)", "t"], ["portada", "Enlace de la portada (https://…)", "t"], ["gal", "Imágenes y videos: un enlace por renglón (YouTube o imagen)", "l", true], ["ct", "Catálogo: un renglón por producto → Nombre ~ Precio ~ Descripción", "l", true], ["cc", "Enlace de tu catálogo completo (https://…)", "t", true]]]
 ];
 // e94: largo máximo de cada campo (el mismo que acepta la hoja) para mostrar el contador «escritos / permitidos».
-const MAXIMO = { e: 120, d: 1200, of: 600, h: 160, dir: 200, col: 60, ofT: 90, ofD: 600, pr: 2800, rec: 200, nec: 200, com: 200, ct: 4500, gal: 1200 };
+const MAXIMO = { e: 120, d: 1200, of: 600, h: 160, dir: 200, col: 60, ofT: 90, ofD: 600, pr: 2800, rec: 200, nec: 200, com: 200, ct: 4500, gal: 1200, an: 3500 };
 const aTexto = (k, tipo, v) => (tipo === "l" ? String(v || "").split("|").map((x) => x.trim()).filter(Boolean).join("\n") : String(v || ""));
 const deTexto = (tipo, v) => (tipo === "l" ? String(v || "").split("\n").map((x) => x.trim()).filter(Boolean).join(" | ") : String(v || "").trim());
 const pedir = async (qs) => {
@@ -39,6 +42,7 @@ export default function PanelNegocio() {
   const [v, setV] = useState({});
   const [tab, setTab] = useState("ficha");
   const [envio, setEnvio] = useState("");
+  const [vista, setVista] = useState(false);
   const [num, setNum] = useState("");
   const [cj, setCj] = useState(null);
   const [ped, setPed] = useState(null);
@@ -149,6 +153,7 @@ export default function PanelNegocio() {
                 {envio === "sin" && <p className="pn-aviso">No cambiaste nada todavía.</p>}
                 {envio === "ok" && <p className="pn-ok" role="status" data-testid="pn-enviado">✅ Recibimos tus cambios. Los revisamos y aparecen en tu página en cuanto los aprobemos.</p>}
                 {envio === "falla" && <p className="pn-err" role="alert">No pudimos confirmar el envío. Revisa tu conexión y vuelve a intentarlo.</p>}
+                <button type="button" className="pn-b" onClick={() => { setVista(true); registrar("panel_vista_previa", { s: slug }); }} data-testid="pn-vista-btn">👁️ Ver cómo quedará (vista previa)</button>
                 <button type="button" className="pn-b pn-b1" onClick={enviar} disabled={envio === "enviando" || envio === "ok"} data-testid="pn-enviar">{envio === "enviando" ? "Enviando…" : envio === "ok" ? "✅ Enviado · en revisión" : "Enviar para revisión"}</button>
               </div>
             )}
@@ -202,6 +207,32 @@ export default function PanelNegocio() {
           </>
         )}
       </div>
+      {vista && paso === "panel" && d && (() => {
+        const pr = String(v.pr || "").split("\n").map((x) => x.split("~").map((y) => y.trim())).filter((q) => q[0]);
+        const of = String(v.of || "").split("\n").map((x) => x.trim()).filter(Boolean);
+        const an = leerAnuncios(String(v.an || "").split("\n").map((x) => x.trim()).filter(Boolean).join(" | "), 6);
+        const lim = (d.negocio && /^(p|patrocinador)/i.test(String(d.negocio.niv || ""))) ? 6 : nivelAlto ? 3 : 1;
+        return (
+          <div className="pn-vp" role="dialog" aria-modal="true" aria-label="Vista previa de tu página" data-testid="pn-vista">
+            <div className="pn-bar"><button type="button" className="pn-x" onClick={() => setVista(false)} aria-label="Volver a editar">←</button><b>👁️ Así se verá (vista previa)</b></div>
+            <div className="pn-vc" style={{ "--c": "#1F7A46" }}>
+              <p className="pn-aviso">Es solo una vista previa: todavía no se envió nada. La imagen y el diseño final los acomoda DCUATES.</p>
+              <div className="pn-vt"><h1>{d.negocio.n}</h1>{v.e && <p className="pn-ve">{v.e}</p>}{v.h && <p>🕒 {v.h}</p>}{v.dir && <p>📍 {v.dir}</p>}</div>
+              {v.d && <section className="ng-s"><VerMas className="pn-vd" lineas={5}>{v.d}</VerMas></section>}
+              {of.length > 0 && <section className="ng-s"><h2>Qué ofrece</h2><ul>{of.map((x) => <li key={x}>{x}</li>)}</ul></section>}
+              {(v.ofT || pr.length > 0) && (
+                <section className="ng-s"><h2>🎟️ Promociones para Cuates</h2>
+                  {v.ofT && <div className="pn-vpr"><b>{v.ofT}</b>{v.ofD && <p>{v.ofD}</p>}{v.ofV && <small>Vence: {v.ofV}</small>}</div>}
+                  {pr.map((q, i) => <div className="pn-vpr" key={i}><b>{q[0]}</b>{q[1] && <p>{q[1]}</p>}{q[2] && <small>Vence: {q[2]}</small>}</div>)}
+                </section>
+              )}
+              <Anuncios items={an.slice(0, lim)} />
+              {an.length > lim && <p className="pn-aviso">Escribiste {an.length} anuncios; tu nivel muestra solo {lim}. Los demás no se publicarán.</p>}
+              <button type="button" className="pn-b pn-b1" onClick={() => setVista(false)}>← Volver a editar</button>
+            </div>
+          </div>
+        );
+      })()}
     </div>,
     document.body
   );
@@ -214,6 +245,11 @@ const CSS = `
 .pn-bar b{flex:1;font-size:16px;font-weight:900;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pn-x{width:44px;height:44px;border-radius:50%;border:0;background:#fff;color:#7a4a00;font-size:19px;font-weight:900;cursor:pointer}
 .pn-cu{display:block;margin-top:2px;font-size:12px;font-weight:700;color:#6b6b5a;text-align:right}.pn-cu-ya{color:#8a1c1c;font-weight:900}.pn-comp{margin:2px 0 8px;width:100%}
+.pn-vp{position:absolute;inset:0;z-index:5;background:var(--dc-fondo,#FBF7EC);overflow-y:auto;max-width:560px;margin:0 auto;display:flex;flex-direction:column}
+.pn-vc{display:flex;flex-direction:column;gap:10px;padding:12px 14px 40px}.pn-vc .ng-s{padding:0}.pn-vc h2{margin:0;font-size:18px;font-weight:900}.pn-vc ul{margin:6px 0 0;padding-left:20px;font-weight:700}
+.pn-vt h1{margin:0;font-size:22px;font-weight:900}.pn-vt p{margin:3px 0;font-weight:800;font-size:14px}.pn-vt .pn-ve{color:#1F7A46;font-size:15px}
+.pn-vpr{border:3px dashed #B7791F;border-radius:14px;background:#FFF4D6;padding:10px 12px;margin-top:8px}.pn-vpr p{margin:4px 0}.pn-vpr small{font-weight:800;color:#6b6b5a}
+.pn-vd{font-size:15px;font-weight:700;line-height:1.45}
 .pn-tabs{display:flex;gap:6px;padding:10px 12px 0;overflow-x:auto}
 .pn-tabs button{flex:1 0 auto;min-height:44px;padding:0 12px;border:2px solid #7a4a00;border-radius:12px;background:#fff;color:#7a4a00;font:inherit;font-size:13.5px;font-weight:900;cursor:pointer;white-space:nowrap}
 .pn-tabs button.on{background:#7a4a00;color:#fff}
