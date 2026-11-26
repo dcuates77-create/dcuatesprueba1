@@ -1,10 +1,10 @@
 // DIRECTORIO «NEGOCIOS CUATE» (e80) — lista de todas las Páginas CUATE aprobadas, con buscador y filtros por categoría y colonia.
 // Se abre con abrirDirectorio() (evento dcuates:directorio) o con el enlace #negocios-cuate. Cada tarjeta abre la Página CUATE del negocio.
 import React, { useEffect, useMemo, useState } from "react";
-import { MarcaVentana } from "./componentes/LogoDcuates.jsx";
+import { MarcaVentana, LogoDcuates } from "./componentes/LogoDcuates.jsx";
 import { createPortal } from "react-dom";
 import { useAtras } from "./atras.js";
-import { ListaVitrinas } from "./Vitrina.jsx"; // e97
+import { ListaVitrinas, DesplazaH } from "./Vitrina.jsx"; // e97/e98
 import { registrar } from "./analitica.js";
 import { cargarDirectorio, ordenarDirectorio, ORDENES, categoriaDe, claveCategoria, NIVELES, esOficial } from "./datos/negocios.js";
 import { abrirNegocio } from "./NegocioCuate.jsx";
@@ -29,6 +29,7 @@ export default function DirectorioNegocios() {
   const [soloFav, setSoloFav] = useState(false);
   const [ahora, setAhora] = useState(false);
   const favs = useFavoritos();
+  const [fil, setFil] = useState(false);
   const [orden, setOrden] = useState("destacados");
   useEffect(() => {
     const quitar = () => { try { history.replaceState(history.state, "", window.location.pathname + window.location.search); } catch (x) { /* sin historial */ } };
@@ -76,11 +77,12 @@ export default function DirectorioNegocios() {
   if (!abierto) return null;
   const compartir = () => {
     registrar("directorio_compartir");
-    const url = `${URL_SITIO}/?origen=directorio#negocios-cuate`;
+    const url = `${URL_SITIO}/emprendimientos`; // e98: enlace corto con vista previa propia (api/p.js)
     const texto = "Emprendimientos CUATE: emprendimientos de tu comunidad con beneficios para Cuates.";
     if (navigator.share) { navigator.share({ title: "Emprendimientos CUATE", text: texto, url }).catch(() => {}); return; }
     window.open(`https://wa.me/?text=${encodeURIComponent(texto + " " + url)}`, "_blank", "noopener");
   };
+  const nFiltros = [cat, pais, ent, col, soloV, soloFav, ahora].filter(Boolean).length;
   const limpiar = () => { setQ(""); setCat(""); setCol(""); setPais(""); setEnt(""); setSoloV(false); setSoloFav(false); setAhora(false); };
   return createPortal(
     <div className="dn-fondo" style={oculta ? { display: "none" } : undefined} role="dialog" aria-modal="true" aria-label="Emprendimientos CUATE" data-testid="directorio">
@@ -99,6 +101,13 @@ export default function DirectorioNegocios() {
         {!est.cargando && <RetoVisitas nombres={nombres} />}
         <div className="dn-f">
           <input type="search" className="dn-q" placeholder="🔎 Busca un emprendimiento, giro o colonia" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Buscar" />
+        </div>
+        <button type="button" className={"dn-acc" + (fil ? " on" : "")} aria-expanded={fil} aria-controls="dn-filtros" data-testid="dir-filtros-btn" onClick={() => { setFil(!fil); registrar("directorio_filtros", { abre: !fil }); }}>
+          <span>⚙️ Filtros y orden{nFiltros > 0 && <i className="dn-n">{nFiltros} activo{nFiltros === 1 ? "" : "s"}</i>}</span><span aria-hidden="true">{fil ? "▲" : "▼"}</span>
+        </button>
+        {fil && (
+          <div className="dn-acc-c" id="dn-filtros" data-testid="dir-filtros">
+            <div className="dn-f">
           {paises.length > 1 && (
             <select className="dn-s" value={pais} onChange={(e) => { setPais(e.target.value); setEnt(""); setCol(""); }} aria-label="País" data-testid="dir-pais">
               <option value="">Todos los países</option>
@@ -118,14 +127,17 @@ export default function DirectorioNegocios() {
           <select className="dn-s" value={orden} onChange={(e) => { setOrden(e.target.value); registrar("directorio_orden", { o: e.target.value }); }} aria-label="Ordenar por" data-testid="dir-orden">
             {ORDENES.map(([k, t]) => <option key={k} value={k}>Orden: {t}</option>)}
           </select>
-        </div>
-        <div className="dn-chips" role="group" aria-label="Categorías">
+            </div>
+        <DesplazaH className="dn-chips" etiqueta="Categorías">
           <button type="button" className={"dn-chip" + (cat === "" ? " on" : "")} onClick={() => setCat("")}>Todas ({est.items.length})</button>
           {est.items.some((i) => i.v) && <button type="button" className={"dn-chip" + (soloV ? " on" : "")} aria-pressed={soloV} onClick={() => setSoloV(!soloV)}>✅ Solo verificados</button>}
           {favs.length > 0 && <button type="button" className={"dn-chip" + (soloFav ? " on" : "")} aria-pressed={soloFav} data-testid="chip-fav" onClick={() => setSoloFav(!soloFav)}>♥ Mis favoritos ({favs.length})</button>}
           {nAbiertos > 0 && <button type="button" className={"dn-chip" + (ahora ? " on" : "")} aria-pressed={ahora} data-testid="chip-abierto" onClick={() => setAhora(!ahora)}>🟢 Abierto ahora ({nAbiertos})</button>}
           {cats.map((c) => <button type="button" key={c.k} className={"dn-chip" + (cat === c.k ? " on" : "")} onClick={() => setCat(cat === c.k ? "" : c.k)}>{categoriaDe(c.k).e} {c.k} ({c.n})</button>)}
-        </div>
+        </DesplazaH>
+          </div>
+        )}
+
         {est.cargando && <p className="dn-m" role="status">Cargando…</p>}
         {!est.cargando && <p className="dn-m" role="status" data-testid="dir-cuenta">{lista.length} {lista.length === 1 ? "emprendimiento" : "emprendimientos"}{(q || cat || col || pais || ent || soloV || soloFav || ahora) && <> · <button type="button" className="dn-lk" onClick={limpiar}>Quitar filtros</button></>}</p>}
         <div className="dn-lista">
@@ -147,6 +159,7 @@ export default function DirectorioNegocios() {
         </div>
         {!est.cargando && lista.length === 0 && <p className="dn-m">No encontramos emprendimientos con esos filtros.</p>}
         <PaginaCuateCTA />
+        <a className="dn-fin" href="/" data-testid="directorio-logo-pie" aria-label="DCUATES Comunidad: ir a la página principal"><LogoDcuates alto={64} /><em>Juntos construimos una mejor comunidad</em></a>
       </div>
     </div>,
     document.body
@@ -163,7 +176,11 @@ const CSS = `
 .dn-ej{margin:0 -12px 8px;padding:6px 12px;background:#FFF4D6;color:#8a5a0c;font-size:12.5px;font-weight:900;text-align:center}
 .dn-f{display:flex;flex-direction:column;gap:8px;margin:8px 0}
 .dn-q,.dn-s{min-height:46px;border:2px solid #cfc8b0;border-radius:12px;background:#fff;padding:0 12px;font:inherit;font-size:15px;font-weight:700;color:#0f2d1e;width:100%;box-sizing:border-box}
-.dn-chips{display:flex;gap:6px;overflow-x:auto;padding:2px 0 8px}
+.dn-chips{padding:2px 0 8px;gap:6px}
+.dn-acc{width:100%;min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 14px;margin:2px 0 6px;border:2px solid var(--dc-verde,#1F7A46);border-radius:14px;background:#fff;color:var(--dc-verde,#1F7A46);font:inherit;font-size:15px;font-weight:900;cursor:pointer}.dn-acc.on{background:#eef6f0}
+.dn-n{margin-left:8px;padding:2px 9px;border-radius:999px;background:var(--dc-verde,#1F7A46);color:#fff;font-style:normal;font-size:12px}
+.dn-acc-c{margin:0 0 8px;padding:8px 10px 2px;border:2px solid #e3dcc6;border-radius:14px;background:#fff}
+.dn-fin{display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:16px;padding:14px 8px 8px;text-decoration:none;color:#4a5b52}.dn-fin em{font-style:normal;font-size:13px;font-weight:800;text-align:center}
 .dn-chip{flex:none;min-height:38px;padding:0 12px;border:2px solid var(--dc-verde,#1F7A46);border-radius:999px;background:#fff;color:var(--dc-verde,#1F7A46);font:inherit;font-size:12.5px;font-weight:900;cursor:pointer;white-space:nowrap}
 .dn-chip.on{background:var(--dc-verde,#1F7A46);color:#fff}
 .dn-m{margin:4px 0 8px;font-size:13px;font-weight:800;color:#4a5b52}

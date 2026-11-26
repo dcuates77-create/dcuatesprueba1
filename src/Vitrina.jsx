@@ -1,7 +1,7 @@
 // e97 — VITRINAS: colecciones por tema, proyecto o actividad (talleres, comida, artesanías, temporada…).
 // Reúnen imágenes de la pestaña «Reels» y páginas CUATE con la(s) etiqueta(s) del filtro de la vitrina (pestaña «Vitrinas» de la hoja).
 // Se abre con abrirVitrina("slug"), con el enlace https://dcuates.com/#vitrina-slug o desde la lista del Directorio.
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { MarcaVentana } from "./componentes/LogoDcuates.jsx";
 import { useAtras } from "./atras.js";
@@ -15,16 +15,67 @@ export const abrirVitrina = (slug) => { try { window.dispatchEvent(new CustomEve
 const slugDeHash = () => { const h = decodeURIComponent((typeof window !== "undefined" && window.location.hash) || ""); return /^#vitrina-[a-z0-9-]{1,60}$/.test(h) ? h.slice("#vitrina-".length) : ""; };
 const limpia = (x) => String(x || "").toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 60);
 
-// Chips con las vitrinas activas (para el Directorio). No muestra nada si no hay ninguna.
+// Contenedor que se desplaza a los lados y avisa que hay más: degradado + flecha ›/‹ que aparece solo cuando hay contenido oculto.
+export function DesplazaH({ className = "", children, etiqueta = "Desplazar" }) {
+  const ref = useRef(null);
+  const [lados, setLados] = useState({ izq: false, der: false });
+  const medir = () => { const e = ref.current; if (!e) return; const n = { izq: e.scrollLeft > 6, der: e.scrollLeft + e.clientWidth < e.scrollWidth - 6 }; setLados((v) => (v.izq === n.izq && v.der === n.der ? v : n)); };
+  useLayoutEffect(() => {
+    medir(); const e = ref.current; if (!e) return undefined;
+    let ro = null; try { ro = new ResizeObserver(medir); ro.observe(e); Array.from(e.children).forEach((c) => ro.observe(c)); } catch (x) { /* sin ResizeObserver */ }
+    window.addEventListener("resize", medir);
+    return () => { window.removeEventListener("resize", medir); if (ro) ro.disconnect(); };
+  });
+  const ir = (d) => { const e = ref.current; if (e) e.scrollBy({ left: d * Math.max(120, e.clientWidth * 0.75), behavior: "smooth" }); };
+  return (
+    <div className="dh">
+      <style>{CSS}</style>
+      <div className={"dh-in " + className} ref={ref} onScroll={medir} tabIndex={0} aria-label={etiqueta}>{children}</div>
+      {lados.izq && <button type="button" className="dh-f dh-i" onClick={() => ir(-1)} aria-label="Ver anteriores" data-testid="dh-izq">‹</button>}
+      {lados.der && <button type="button" className="dh-f dh-d" onClick={() => ir(1)} aria-label="Ver más a la derecha" data-testid="dh-der">›</button>}
+    </div>
+  );
+}
+
+// Vitrinas por tema para el Directorio: barra de botones (con indicador de desplazamiento) y, debajo, un reel con las imágenes de la
+// vitrina seleccionada (al inicio, la primera). Al tocar una imagen o «Ver toda la vitrina» se abre la ventana completa.
 export function ListaVitrinas() {
   const [items, setItems] = useState([]);
-  useEffect(() => { let vivo = true; pedir("a=vitrinas").then((j) => { if (vivo && j && j.ok && Array.isArray(j.items)) setItems(j.items); }).catch(() => {}); return () => { vivo = false; }; }, []);
+  const [sel, setSel] = useState("");
+  const [datos, setDatos] = useState({});
+  useEffect(() => { let vivo = true; pedir("a=vitrinas").then((j) => { if (vivo && j && j.ok && Array.isArray(j.items)) { setItems(j.items); if (j.items[0]) setSel(j.items[0].s); } }).catch(() => {}); return () => { vivo = false; }; }, []);
+  useEffect(() => {
+    if (!sel || datos[sel]) return undefined;
+    let vivo = true;
+    pedir("a=vitrina&slug=" + encodeURIComponent(sel)).then((j) => { if (vivo) setDatos((d) => ({ ...d, [sel]: j && j.ok ? { ok: true, it: j.it || [], ng: j.ng || [] } : { ok: false } })); }).catch(() => { if (vivo) setDatos((d) => ({ ...d, [sel]: { ok: false } })); });
+    return () => { vivo = false; };
+  }, [sel, datos]);
   if (!items.length) return null;
+  const actual = items.find((v) => v.s === sel) || items[0];
+  const d = datos[actual.s];
   return (
     <div className="vt-lista" data-testid="vitrinas-lista">
       <style>{CSS}</style>
       <b>🛍️ Vitrinas por tema</b>
-      <div className="vt-chips">{items.map((v) => <button key={v.s} type="button" className="vt-chip" onClick={() => { registrar("vitrina_abrir", { s: v.s }); abrirVitrina(v.s); }}>{v.e ? v.e + " " : ""}{v.t}</button>)}</div>
+      <DesplazaH className="vt-chips" etiqueta="Vitrinas por tema">
+        {items.map((v) => <button key={v.s} type="button" className={"vt-chip" + (v.s === actual.s ? " on" : "")} aria-pressed={v.s === actual.s} data-testid="vitrina-chip" onClick={() => { registrar("vitrina_chip", { s: v.s }); setSel(v.s); }}>{v.e ? v.e + " " : ""}{v.t}</button>)}
+      </DesplazaH>
+      <div className="vt-reel" data-testid="vitrina-reel">
+        {!d && <p className="vt-rm" role="status">Cargando…</p>}
+        {d && d.ok && d.it.length > 0 && (
+          <DesplazaH className="vt-rl" etiqueta={"Imágenes de " + actual.t}>
+            {d.it.map((x, i) => (
+              <button key={i} type="button" className="vt-ri" data-testid="vitrina-reel-item" onClick={() => { registrar("vitrina_abrir", { s: actual.s }); abrirVitrina(actual.s); }} aria-label={(x.t || "Producto") + ". Abrir vitrina " + actual.t}>
+                <img src={x.u} alt="" loading="lazy" decoding="async" />
+                {(x.t || x.p) && <span>{x.t && <b>{x.t}</b>}{x.p && <em>{x.p}</em>}</span>}
+              </button>
+            ))}
+          </DesplazaH>
+        )}
+        {d && d.ok && d.it.length === 0 && <p className="vt-rm">Pronto habrá imágenes en esta vitrina. 💛</p>}
+        {d && !d.ok && <p className="vt-rm">No pudimos cargar esta vitrina.</p>}
+        <button type="button" className="vt-ver" data-testid="vitrina-ver-toda" onClick={() => { registrar("vitrina_abrir", { s: actual.s }); abrirVitrina(actual.s); }}>Ver toda la vitrina «{actual.t}» ›</button>
+      </div>
     </div>
   );
 }
@@ -113,8 +164,19 @@ export default function Vitrina() {
 
 const CSS = `
 .vt-lista{margin:8px 0 10px;display:flex;flex-direction:column;gap:6px}.vt-lista>b{font-size:15px;font-weight:900;color:#0f2d1e}
-.vt-chips{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 6px;scrollbar-width:none}.vt-chips::-webkit-scrollbar{display:none}
-.vt-chip{flex:none;min-height:44px;padding:0 14px;border:2px solid var(--dc-verde,#1F7A46);border-radius:999px;background:#fff;color:var(--dc-verde,#1F7A46);font:900 14.5px Nunito,system-ui,sans-serif;cursor:pointer}
+.dh{position:relative;min-width:0}
+.dh-in{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 8px;scrollbar-width:thin;scrollbar-color:#B7791F #efe9d4;-webkit-overflow-scrolling:touch}
+.dh-in::-webkit-scrollbar{height:6px}.dh-in::-webkit-scrollbar-thumb{background:#B7791F;border-radius:6px}.dh-in::-webkit-scrollbar-track{background:#efe9d4;border-radius:6px}
+.dh-f{position:absolute;top:0;bottom:12px;width:40px;border:0;color:#7a4a00;font-size:30px;font-weight:900;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+.dh-d{right:0;background:linear-gradient(90deg,rgba(251,247,236,0),rgba(251,247,236,.96) 55%)}.dh-i{left:0;background:linear-gradient(270deg,rgba(251,247,236,0),rgba(251,247,236,.96) 55%)}
+.vt-chip{flex:none;min-height:44px;padding:0 14px;border:2px solid var(--dc-verde,#1F7A46);border-radius:999px;background:#fff;color:var(--dc-verde,#1F7A46);font:900 14.5px Nunito,system-ui,sans-serif;cursor:pointer;white-space:nowrap}
+.vt-chip.on{background:var(--dc-verde,#1F7A46);color:#fff}
+.vt-reel{display:flex;flex-direction:column;gap:2px}
+.vt-ri{flex:none;width:132px;display:flex;flex-direction:column;border:2px solid #e3dcc6;border-radius:14px;background:#fff;overflow:hidden;padding:0;font:inherit;color:#0f2d1e;text-align:left;cursor:pointer}
+.vt-ri img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;background:#efe9d4}
+.vt-ri span{display:flex;flex-direction:column;gap:1px;padding:5px 7px 7px}.vt-ri b{font-size:12.5px;font-weight:900;line-height:1.2;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}.vt-ri em{font-style:normal;font-size:13px;font-weight:900;color:var(--dc-verde,#1F7A46)}
+.vt-rm{margin:6px 2px;font-size:13px;font-weight:800;color:#4a5b52}
+.vt-ver{min-height:44px;border:0;background:none;color:var(--dc-verde,#1F7A46);font:900 14px Nunito,system-ui,sans-serif;text-align:left;text-decoration:underline;cursor:pointer;padding:0 2px}
 .vt-fondo{position:fixed;inset:0;z-index:79;background:var(--dc-fondo,#FBF7EC);font-family:Nunito,system-ui,sans-serif;color:#0f2d1e;display:flex;justify-content:center}
 .vt-caja{width:100%;max-width:560px;height:100%;overflow-y:auto;overscroll-behavior:contain;padding:0 12px 40px}
 .vt-bar{position:sticky;top:0;z-index:3;display:flex;align-items:center;gap:8px;margin:0 -12px;background:var(--dc-verde,#1F7A46);color:#fff;padding:8px 10px}.vt-bar b{flex:1;font-size:17px;font-weight:900;line-height:1.2;overflow-wrap:anywhere}

@@ -18,10 +18,6 @@ export default function PaginaCuateCTA({ compacto = false, directorio = false })
       <style>{CSS}</style>
       <h3>{texto("cta_titulo", "🏪 TU PÁGINA CUATE CON BENEFICIOS PARA TI Y TUS CLIENTES")}</h3>
       {!compacto && <p>{texto("cta_intro", "Tu emprendimiento con página propia: tu WhatsApp, tus promociones, tu Pase y el Club DCUATES. Elige cómo quieres empezar:")}</p>}
-      <button type="button" className="pc-b pc-a" data-testid="cta-asistente" onClick={() => { registrar("pagina_asistente"); abrirAsistente(); }}>
-        <b>🧩 ARMA TU PÁGINA PASO A PASO</b>
-        <span>{texto("cta_asist_d", "SI YA TIENES TU FOLIO APROBADO, INGRESA LOS DATOS DE TU PÁGINA: elige tu giro, usa textos de ejemplo, mira cómo se verá y envíala para revisión")}</span>
-      </button>
       <button type="button" className="pc-b pc-g" onClick={() => abrirRegistroPagina("Gratuita")}>
         <b>{texto("cta_gratis_t", "TU PÁGINA GRATUITA")}</b>
         <span>{texto("cta_gratis_d", "Es gratuita si APOYAS o deseas APOYAR CAUSAS con una aportación voluntaria de lo que te podamos AYUDAR A VENDER Y CONECTAR a través de la página y nuestros distintos espacios publicitarios; o si eres ALIADO, PATROCINADOR o un VALIOSO ELEMENTO MULTIPLICADOR PARA NUESTRAS COMUNIDADES. REGÍSTRATE Y CONTÁCTANOS PARA LOGRAR LOS MEJORES ACUERDOS GANAR-GANAR PARA TODOS. ¡¡¡REGÍSTRATE AQUÍ!!!")}</span>
@@ -29,6 +25,10 @@ export default function PaginaCuateCTA({ compacto = false, directorio = false })
       <button type="button" className="pc-b pc-v" onClick={() => abrirRegistroPagina("Aportación voluntaria")}>
         <b>{texto("cta_vol_t", "TU PÁGINA DE APORTACIÓN VOLUNTARIA")}</b>
         <span>{texto("cta_vol_d", "si no tienes promociones o algún beneficio para los CUATES de la comunidad. Tú decides el valor de lo que podría ayudar a CRECER TU EMPRENDIMIENTO. ¡¡¡REGÍSTRATE AQUÍ!!!")}</span>
+      </button>
+      <button type="button" className="pc-b pc-a" data-testid="cta-asistente" onClick={() => { registrar("pagina_asistente"); abrirAsistente(); }}>
+        <b>🧩 ARMA TU PÁGINA PASO A PASO</b>
+        <span>{texto("cta_asist_d", "SI YA TIENES TU FOLIO APROBADO, INGRESA LOS DATOS DE TU PÁGINA: elige tu giro, usa textos de ejemplo, mira cómo se verá y envíala para revisión")}</span>
       </button>
       {directorio && <button type="button" className="pc-d" onClick={() => { registrar("pagina_directorio"); abrirDirectorio(); }}>🔎 Ver emprendimientos CUATE</button>}
     </section>
