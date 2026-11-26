@@ -5,7 +5,7 @@
       "destination": "/api/n?slug=:slug"
     },
     {
-      "source": "/:alias(libros|bienestar|asesorias|ecatepets|mascotas|circulo|publicidad|recomienda|alianzas|bazar|ventas|apoyo|donar|noticias|nosotros|beneficios|causas|negocios|valores|regalos|gratitud|solicitud|mapa|historias)",
+      "source": "/:alias(emprendimientos|libros|bienestar|asesorias|ecatepets|mascotas|circulo|publicidad|recomienda|alianzas|bazar|ventas|apoyo|donar|noticias|nosotros|beneficios|causas|negocios|valores|regalos|gratitud|solicitud|mapa|historias)",
       "destination": "/api/p?id=:alias"
     }
   ],
