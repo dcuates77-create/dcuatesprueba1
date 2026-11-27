@@ -14,7 +14,7 @@ import { NOTICIAS_GALERIA_ITEMS, CUPONES_PROMOS_ITEMS } from "./datos/proyectos.
 import { abrirLegal } from "./componentes/legal.jsx";
 import { WHATSAPP_NUMERO } from "./datos/config.js";
 import { ACTIVIDADES_FIJAS } from "./datos/actividadesFijas.js";
-import { VERSION_BUILD, esAdmin } from "./datos/config.js";
+import { VERSION_BUILD, esAdmin, verSello } from "./datos/config.js";
 import { PUNTOS_EJEMPLOS, PREMIOS_EJEMPLOS, BENEFICIOS_EJEMPLOS } from "./datos/clubEjemplos.js";
 import ClubTarjeta from "./ClubDcuates.jsx";
 import PaginaCuateCTA, { abrirDirectorio } from "./PaginaCuateCTA.jsx";
@@ -172,7 +172,7 @@ function Pie({ onSugerencias }) {
         {L.map(([t, f]) => <button key={t} type="button" onClick={f}>{t}</button>)}
       </nav>
       <p>© {new Date().getFullYear()} DCUATES, un programa de CONEXIONES CON CAUSA ♥</p>
-      {esAdmin() && <p className="v2-sello" data-testid="sello-version">Versión {VERSION_BUILD}</p>}
+      {verSello() && <p className="v2-sello" data-testid="sello-version">Versión {VERSION_BUILD}</p>}
     </footer>
   );
 }

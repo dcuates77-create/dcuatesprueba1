@@ -29,7 +29,7 @@ import Reservado from "./Reservado.jsx";
 import InvitaVecino from "./InvitaVecino.jsx";
 import FlechaBajar from "./FlechaBajar.jsx";
 import AvisoSinConexion from "./AvisoSinConexion.jsx";
-import { PistaDeslizar } from "./AyudaFlotante.jsx";
+import { PistaDeslizar, hayPista } from "./AyudaFlotante.jsx";
 import { enlaceReporteProblema } from "./utilidades/reporte.js";
 import NavInferior from "./NavInferior.jsx";
 import ZonaJuegos from "./ZonaJuegos.jsx";
@@ -652,7 +652,7 @@ export default function App() {
           aria-label="Subir al inicio de la página"
           title="Subir al menú"
           className="fixed right-3 sm:right-6 z-50 h-12 w-12 flex items-center justify-center rounded-full bg-[#0f2d1e] text-white shadow-lg border-2 border-white/40 hover:bg-emerald-800 transition-colors"
-          style={{ bottom: "calc(var(--alto-nav, 0px) + 12px)" }}
+          style={{ bottom: hayPista(vista) ? "calc(var(--alto-ticker, 48px) + var(--alto-nav, 0px) + 70px)" : "calc(var(--alto-nav, 0px) + 12px)" }} data-testid="flecha-subir"
         >
           <span className="text-2xl leading-none font-black" aria-hidden="true">↑</span>
         </button>

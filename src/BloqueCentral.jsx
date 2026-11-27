@@ -758,6 +758,11 @@ export default function BloqueCentral({
           ))}
         </TiraAuto>
       {tab.mapa && <MapaLocal url={mapaUrl} color={tab.color} />}
+      {tab.mapa && (
+        <button type="button" className="bc-pill" data-testid="elegir-mapas" style={{ display: "block", width: "100%", margin: "10px 0 4px", minHeight: 48, background: tab.boton || tab.color, fontSize: 14 }} onClick={() => window.dispatchEvent(new CustomEvent("dcuates:abrir-plus", { detail: "mapas" }))}>
+          🗺️ ELEGIR OTROS MAPAS DE LA ZONA
+        </button>
+      )}
     </>
   ) : null;
   const hayPortada = cargando || (portadasItems[tab.id] || []).length > 0;
