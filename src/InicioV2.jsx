@@ -189,7 +189,7 @@ function MisPuntos({ onPase, onUnirse }) {
   return (
     <button type="button" className="v2-mp" onClick={() => { registrar("v2_mis_puntos", { tiene: m.tiene }); (m.tiene ? onPase : onUnirse)(); }} aria-label={"Mis puntos: " + num + ". " + frase}>
       <span className="v2-mp-e" aria-hidden="true">✦</span>
-      <span className="v2-mp-t"><small>MIS PUNTOS</small><b>{num}</b></span>
+      <span className="v2-mp-t"><small>MIS PUNTOS</small><b className={num.length >= 4 ? "v2-mp-n4" : num.length === 3 ? "v2-mp-n3" : ""}>{num}</b></span>
       <span className="v2-mp-f">{frase}</span>
     </button>
   );
@@ -718,7 +718,7 @@ const CSS = `
 @keyframes v2tw2{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(1.2) rotate(12deg)}}
 .v2-mp-t{grid-area:t;display:flex;align-items:baseline;justify-content:space-between;gap:6px;min-width:0}
 .v2-mp-t small{font-size:11px;font-weight:900;letter-spacing:.3px;color:#12355B;white-space:nowrap}
-.v2-mp-t b{font-size:26px;font-weight:900;line-height:1;color:#0A7A3C}
+.v2-mp-t{flex-wrap:wrap}.v2-mp-n3{font-size:21px!important}.v2-mp-n4{font-size:17px!important}.v2-mp-t b{max-width:100%;font-variant-numeric:tabular-nums;font-size:26px;font-weight:900;line-height:1;color:#0A7A3C}
 .v2-mp-f{grid-area:f;font-size:12.5px;font-weight:800;line-height:1.2;color:#7a3b00}
 .v2-unete{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;gap:12px;width:100%;min-height:62px;margin:12px 0 0;padding:6px 14px;border:2px solid #fff;border-radius:18px;background:linear-gradient(120deg,#0A7A3C,#12A057);color:#fff;font:inherit;cursor:pointer;box-shadow:0 5px 0 #06592B;z-index:1}
 .v2-unete span{font-size:22px;font-weight:900;letter-spacing:.4px;text-shadow:0 2px 2px rgba(0,0,0,.3)}
