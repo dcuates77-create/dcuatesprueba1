@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import { expandirBusqueda } from "../datos/sinonimos.js";
 import { BotonCerrar, CasillaAcepto, ErrorAcepto, abrirLegal, useAceptacion } from "./legal.jsx";
 import { BotonRecibeBeneficios } from "./ventanas.jsx";
-import { NAV_LINKS_MAS, REDES_SOCIALES, SECCIONES_BUSCABLES, VERSION_BUILD, esAdmin } from "../datos/config.js";
+import { NAV_LINKS_MAS, REDES_SOCIALES, SECCIONES_BUSCABLES, VERSION_BUILD, esAdmin, verSello } from "../datos/config.js";
 import { FAQ_ITEMS } from "../datos/legal.js";
 import { NECESIDADES_GRUPOS, TODOS_LOS_PROYECTOS } from "../datos/listas.js";
 import { BOTONES_PORTADA, CATEGORIAS_PROYECTOS, normalizarBusqueda } from "../datos/proyectos.js";
@@ -679,7 +679,7 @@ export function SelloVersion() {
     window.addEventListener("dcuates:baserow-estado", alCambiar);
     return () => window.removeEventListener("dcuates:baserow-estado", alCambiar);
   }, []);
-  const [admin] = useState(() => esAdmin());
+  const [admin] = useState(() => verSello());
   const texto = !estado
     ? "conectando…"
     : estado.ok
