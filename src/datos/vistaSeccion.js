@@ -17,6 +17,7 @@ export const VISTA = {
       { ico: "🎯", t: "Misión y visión", d: "Hacia dónde vamos y por qué.", anidada: "mision" },
       { ico: "🤝", t: "Cómo podemos sumar", d: "Las ventajas de trabajar en comunidad.", anidada: "sumar" },
       { ico: "📜", t: "Manifiesto DCUATES", d: "Lo que nos une y nos da identidad y más valor.", anidada: "manifiesto" },
+      { ico: "💡", t: "¿Qué es DCUATES?", d: "Qué hacemos, para quién y cómo participar.", a: { evento: "dcuates:que-es" } },
       { ico: "🗺️", t: "Mapa del sitio", d: "Todos los proyectos en un vistazo.", a: { acceso: "proyectos" } }
     ],
     cta: { t: "¿Quieres sumarte?", d: "Conoce cómo apoyar como voluntario.", a: { ir: "donaciones" } },
@@ -79,7 +80,7 @@ export const VISTA = {
       { ico: "🏪", t: "Emprendimientos CUATE", d: "Negocios y proyectos de la comunidad en el Tablón.", a: { tabl: "Emprendimientos" } },
       { ico: "📇", t: "Directorio de Páginas CUATE", d: "Busca por categoría, colonia o «abierto ahora».", a: { dir: 1 } },
       { ico: "✨", t: "Arma tu Página CUATE gratis", d: "Paso a paso, con vista previa en vivo.", a: { asist: 1 } },
-      { ico: "🗺️", t: "Comercios y mapa de la zona", d: "Fichas, cupones, aliados, agenda y mapa.", anidada: "fichas" },
+      { ico: "🗺️", t: "Comercios y mapas de la zona", d: "Fichas, cupones, aliados, agenda y mapas.", anidada: "fichas" },
       { ico: "🛍️", t: "Ventas con causa y publicidad", d: "Compra, vende y registra tu negocio gratis.", anidada: "slot" }
     ],
     cta: { t: "¿Tienes un negocio o emprendimiento?", d: "Únete a nuestra red de negocios comunitarios.", a: { zona: "negocio" } },

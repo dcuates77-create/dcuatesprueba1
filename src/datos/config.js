@@ -22,7 +22,7 @@ export const YOUTUBE_VIDEO_ID = "SUnE27QnnyI";
 // iframe); no hace falta tocar nada más en el código.
 // Sello de versión: se ve en pequeño al final de los accesos rápidos y en la
 // consola del navegador. Sirve para comprobar que el celular ya cargó lo último.
-export const VERSION_BUILD = "CLON15 · e99";
+export const VERSION_BUILD = "CLON15 · e100";
 // e59 — versión del Aviso de Privacidad que acepta la persona al registrarse (se anota en la hoja, columna «Aceptó aviso»). Súbela cuando cambies el aviso.
 export const VERSION_AVISO = "oct-2026 (borrador)";
 
@@ -36,6 +36,17 @@ export const MOSTRAR_EJEMPLOS = true;
 // Modo administrador (e48): el sello de versión y el estado de Baserow solo se ven aquí.
 // Para activarlo en un teléfono: abre dcuates.com/?admin=1 (queda guardado en ese teléfono).
 // Para apagarlo: dcuates.com/?admin=0. En tu computadora (localhost) siempre se ve.
+// e100: el sello de versión ya NO se ve por defecto (ni siquiera para la administración). Para verlo: dcuates.com/?version=1 (se apaga con ?version=0).
+export function verSello() {
+  try {
+    const q = new URLSearchParams(window.location.search).get("version");
+    if (q === "1") window.sessionStorage.setItem("dcuates_ver_sello", "1");
+    if (q === "0") window.sessionStorage.removeItem("dcuates_ver_sello");
+    return esAdmin() && window.sessionStorage.getItem("dcuates_ver_sello") === "1";
+  } catch {
+    return false;
+  }
+}
 export function esAdmin() {
   try {
     const q = new URLSearchParams(window.location.search).get("admin");
