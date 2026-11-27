@@ -31,6 +31,9 @@ export default function DirectorioNegocios() {
   const favs = useFavoritos();
   const [fil, setFil] = useState(false);
   const [orden, setOrden] = useState("destacados");
+  const [lim, setLim] = useState(12); // e99: «Ver más»
+  const [miCol, setMiCol] = useState(() => { try { return localStorage.getItem("dc_mi_colonia") || ""; } catch (x) { return ""; } });
+  const [enfoque, setEnfoque] = useState(false);
   useEffect(() => {
     const quitar = () => { try { history.replaceState(history.state, "", window.location.pathname + window.location.search); } catch (x) { /* sin historial */ } };
     if (window.location.hash === "#negocios-cuate") quitar();
@@ -72,6 +75,12 @@ export default function DirectorioNegocios() {
     if (q.trim()) { const t = sinAc([i.n, i.e, i.c, i.col, i.en, i.pa].join(" ")); if (!sinAc(q).split(/\s+/).filter(Boolean).every((w) => t.includes(w))) return false; }
     return true;
   });
+  useEffect(() => { setLim(12); }, [q, cat, col, pais, ent, soloV, soloFav, ahora, orden]);
+  const sugerencias = useMemo(() => {
+    const v = [...new Set([...est.items.map((i) => categoriaDe(i.c).nombre), ...est.items.map((i) => (i.col || "").trim())].filter(Boolean))];
+    return v.slice(0, 6);
+  }, [est.items]);
+  const guardarCol = (c) => { try { if (c) localStorage.setItem("dc_mi_colonia", c); else localStorage.removeItem("dc_mi_colonia"); } catch (x) { /* sin almacenamiento */ } setMiCol(c); };
   const nAbiertos = useMemo(() => est.items.filter((i) => abiertoAhora(i.h) === true).length, [est.items]);
   const nombres = useMemo(() => Object.fromEntries(est.items.map((i) => [i.s, i.n])), [est.items]);
   if (!abierto) return null;
@@ -80,6 +89,13 @@ export default function DirectorioNegocios() {
     const url = `${URL_SITIO}/emprendimientos`; // e98: enlace corto con vista previa propia (api/p.js)
     const texto = "Emprendimientos CUATE: emprendimientos de tu comunidad con beneficios para Cuates.";
     if (navigator.share) { navigator.share({ title: "Emprendimientos CUATE", text: texto, url }).catch(() => {}); return; }
+    window.open(`https://wa.me/?text=${encodeURIComponent(texto + " " + url)}`, "_blank", "noopener");
+  };
+  const compartirUno = (i) => {
+    registrar("directorio_compartir_uno", { s: i.s });
+    const url = `${URL_SITIO}/n/${i.s}`; // enlace corto con vista previa propia (api/n.js)
+    const texto = `${i.n}: emprendimiento CUATE de tu comunidad.`;
+    if (navigator.share) { navigator.share({ title: i.n, text: texto, url }).catch(() => {}); return; }
     window.open(`https://wa.me/?text=${encodeURIComponent(texto + " " + url)}`, "_blank", "noopener");
   };
   const nFiltros = [cat, pais, ent, col, soloV, soloFav, ahora].filter(Boolean).length;
@@ -97,11 +113,19 @@ export default function DirectorioNegocios() {
         <p className="dn-p">Emprendimientos de tu comunidad con beneficios para los Cuates. Muestra tu Pase y aprovecha sus promociones. 💛</p>
         <ListaVitrinas />
         {est.ejemplo && <p className="dn-ej">EJEMPLOS ilustrativos · así se verá el directorio</p>}
-        {!est.cargando && <PromoDelMes items={est.items} abrir={(s) => { eventoNegocio(s, "directorio"); abrirNegocio(s); }} />}
-        {!est.cargando && <RetoVisitas nombres={nombres} />}
+        {!est.cargando && (
+          <details className="dn-tira" data-testid="dir-tira">
+            <summary>🎟️ Promo del mes y 🎯 Reto de visitas</summary>
+            <PromoDelMes items={est.items} abrir={(s) => { eventoNegocio(s, "directorio"); abrirNegocio(s); }} />
+            <RetoVisitas nombres={nombres} />
+          </details>
+        )}
         <div className="dn-f">
-          <input type="search" className="dn-q" placeholder="🔎 Busca un emprendimiento, giro o colonia" value={q} onChange={(e) => setQ(e.target.value)} aria-label="Buscar" />
+          <input type="search" className="dn-q" placeholder="🔎 Busca un emprendimiento, giro o colonia" value={q} onChange={(e) => setQ(e.target.value)} onFocus={() => setEnfoque(true)} onBlur={() => setTimeout(() => setEnfoque(false), 200)} aria-label="Buscar" data-testid="dir-q" />
         </div>
+        {enfoque && !q.trim() && sugerencias.length > 0 && (
+          <div className="dn-sug" data-testid="dir-sugerencias"><small>Prueba buscar:</small>{sugerencias.map((x) => <button type="button" key={x} onMouseDown={(e) => e.preventDefault()} onClick={() => { setQ(x); registrar("directorio_sugerencia", { q: x }); }}>{x}</button>)}</div>
+        )}
         <button type="button" className={"dn-acc" + (fil ? " on" : "")} aria-expanded={fil} aria-controls="dn-filtros" data-testid="dir-filtros-btn" onClick={() => { setFil(!fil); registrar("directorio_filtros", { abre: !fil }); }}>
           <span>⚙️ Filtros y orden{nFiltros > 0 && <i className="dn-n">{nFiltros} activo{nFiltros === 1 ? "" : "s"}</i>}</span><span aria-hidden="true">{fil ? "▲" : "▼"}</span>
         </button>
@@ -124,12 +148,15 @@ export default function DirectorioNegocios() {
             <option value="">Todas las colonias</option>
             {cols.map((c) => <option key={c} value={c}>{c}</option>)}
           </select>
+          {col && col !== miCol && <button type="button" className="dn-lk" data-testid="dir-guardar-col" onClick={() => guardarCol(col)}>📍 Guardar «{col}» como mi colonia</button>}
+          {miCol && <button type="button" className="dn-lk" onClick={() => { guardarCol(""); if (col === miCol) setCol(""); }}>Quitar mi colonia guardada</button>}
           <select className="dn-s" value={orden} onChange={(e) => { setOrden(e.target.value); registrar("directorio_orden", { o: e.target.value }); }} aria-label="Ordenar por" data-testid="dir-orden">
             {ORDENES.map(([k, t]) => <option key={k} value={k}>Orden: {t}</option>)}
           </select>
             </div>
         <DesplazaH className="dn-chips" etiqueta="Categorías">
           <button type="button" className={"dn-chip" + (cat === "" ? " on" : "")} onClick={() => setCat("")}>Todas ({est.items.length})</button>
+          {miCol && <button type="button" className={"dn-chip" + (col === miCol ? " on" : "")} aria-pressed={col === miCol} data-testid="chip-micol" onClick={() => { setCol(col === miCol ? "" : miCol); setPais(""); setEnt(""); registrar("directorio_mi_colonia"); }}>📍 Mi colonia ({miCol})</button>}
           {est.items.some((i) => i.v) && <button type="button" className={"dn-chip" + (soloV ? " on" : "")} aria-pressed={soloV} onClick={() => setSoloV(!soloV)}>✅ Solo verificados</button>}
           {favs.length > 0 && <button type="button" className={"dn-chip" + (soloFav ? " on" : "")} aria-pressed={soloFav} data-testid="chip-fav" onClick={() => setSoloFav(!soloFav)}>♥ Mis favoritos ({favs.length})</button>}
           {nAbiertos > 0 && <button type="button" className={"dn-chip" + (ahora ? " on" : "")} aria-pressed={ahora} data-testid="chip-abierto" onClick={() => setAhora(!ahora)}>🟢 Abierto ahora ({nAbiertos})</button>}
@@ -141,7 +168,7 @@ export default function DirectorioNegocios() {
         {est.cargando && <p className="dn-m" role="status">Cargando…</p>}
         {!est.cargando && <p className="dn-m" role="status" data-testid="dir-cuenta">{lista.length} {lista.length === 1 ? "emprendimiento" : "emprendimientos"}{(q || cat || col || pais || ent || soloV || soloFav || ahora) && <> · <button type="button" className="dn-lk" onClick={limpiar}>Quitar filtros</button></>}</p>}
         <div className="dn-lista">
-          {lista.map((i) => {
+          {lista.slice(0, lim).map((i) => {
             const c = categoriaDe(i.c); const nv = NIVELES[i.niv];
             return (
               <div key={i.s} className="dn-w"><button type="button" className="dn-card" style={{ "--c": c.color }} onClick={() => { registrar("directorio_clic", { s: i.s }); eventoNegocio(i.s, "directorio"); abrirNegocio(i.s); }}>
@@ -153,10 +180,12 @@ export default function DirectorioNegocios() {
                 </span>
               </button>
               <BotonFavorito slug={i.s} nombre={i.n} clase="pe-fav dn-fv" />
+              <button type="button" className="dn-sh" aria-label={"Compartir " + i.n} data-testid="dir-card-compartir" onClick={() => compartirUno(i)}>📤</button>
               </div>
             );
           })}
         </div>
+        {lista.length > lim && <button type="button" className="dn-mas" data-testid="dir-ver-mas" onClick={() => { setLim(lim + 12); registrar("directorio_ver_mas"); }}>Ver más ({lista.length - lim} restantes)</button>}
         {!est.cargando && lista.length === 0 && <p className="dn-m">No encontramos emprendimientos con esos filtros.</p>}
         <PaginaCuateCTA />
         <a className="dn-fin" href="/" data-testid="directorio-logo-pie" aria-label="DCUATES Comunidad: ir a la página principal"><LogoDcuates alto={64} /><em>Juntos construimos una mejor comunidad</em></a>
@@ -189,7 +218,12 @@ const CSS = `
 .dn-card{display:flex;align-items:center;gap:10px;width:100%;padding:10px;border:2px solid var(--c);border-radius:16px;background:#fff;color:inherit;font:inherit;text-align:left;cursor:pointer}
 .dn-lg{flex:none;width:56px;height:56px;border-radius:50%;background:#f1ecdc;display:flex;align-items:center;justify-content:center;font-size:28px;overflow:hidden}
 .dn-lg img{width:100%;height:100%;object-fit:contain;padding:4px;box-sizing:border-box;background:#fff}
-.dn-w{position:relative}.dn-w .dn-card{padding-right:60px}.dn-fv{position:absolute;top:8px;right:8px}
+.dn-sh{position:absolute;bottom:8px;right:8px;width:36px;height:36px;border-radius:50%;border:1.5px solid #cfd8d2;background:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+.dn-sh:focus-visible{outline:3px solid #FFD54F}
+.dn-mas{display:block;width:100%;min-height:48px;margin:10px 0;border:2px solid var(--dc-verde,#1F7A46);border-radius:14px;background:#fff;color:var(--dc-verde,#1F7A46);font:inherit;font-weight:900;font-size:14px;cursor:pointer}
+.dn-tira{margin:6px 0;border:1.5px solid #e0d8c4;border-radius:14px;background:#fffdf5;padding:0 8px}.dn-tira>summary{cursor:pointer;min-height:44px;display:flex;align-items:center;font-weight:900;font-size:13.5px;color:#0B6E78;list-style:none}.dn-tira>summary::-webkit-details-marker{display:none}.dn-tira[open]>summary{border-bottom:1px solid #eee3c8;margin-bottom:6px}
+.dn-sug{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 8px}.dn-sug small{font-weight:800;color:#555}.dn-sug button{border:1.5px solid #cfd8d2;background:#fff;border-radius:999px;min-height:36px;padding:0 12px;font:inherit;font-size:12.5px;font-weight:800;cursor:pointer}
+.dn-w{position:relative}.dn-w .dn-card{padding-right:60px;padding-bottom:42px}.dn-fv{position:absolute;top:8px;right:8px}
 ${CSS_PE}
 .dn-t{display:flex;flex-direction:column;gap:2px;min-width:0}
 .dn-t b{font-size:15.5px;font-weight:900;line-height:1.15}

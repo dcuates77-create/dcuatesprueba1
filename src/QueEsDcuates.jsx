@@ -1,6 +1,7 @@
 // «¿QUÉ ES DCUATES?» (e87) — MAQUETA para revisión. Complemento de «Quiero conocer DCUATES» (que no se toca).
 // Nivel 1: ventana de menú (botones con leyenda, estilo EXPLORA). Nivel 2: pantallas con vista (logo con D naranja, foto, tarjetas).
 // Todo el texto vive en src/datos/queEsDcuates.js. Fotos: public/images/que-es/<clave>.webp (reemplazables).
+import PieSeccion from "./PieSeccion.jsx";
 import React, { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useAtras } from "./atras.js";
@@ -114,6 +115,7 @@ export default function QueEsDcuates() {
     else if (acc === "causa") ejecutarAccion({ z: "causa" });
     else if (acc === "folio") ev("dcuates:consulta-folio");
   };
+  const irInicio = () => { cerrar(); ev("dcuates:inicio-directo"); try { window.scrollTo({ top: 0 }); } catch (x) { /* sin scroll */ } };
   const Lista = ({ items, letra }) => <div className="qe-lista">{items.map((it) => <Tarjeta key={it.k || it.l} it={it} onMas={abrirMas} letra={letra} />)}</div>;
   const Sig = ({ txt }) => (
     <div className="qe-pie">
@@ -337,6 +339,7 @@ export default function QueEsDcuates() {
             ))}
           </div>
           <div className="qe-frase qe-frase-g">{FRASES.cultivamos}<small>{FRASES.desarrollo}</small></div>
+          <PieSeccion desde="menu" onClub={() => ejecutar("club")} onInicio={irInicio} />
         </div>
       ) : (
         <>
@@ -353,7 +356,7 @@ export default function QueEsDcuates() {
               <small>{nAp} de 8 · {A.t}</small>
             </nav>
           )}
-          <main className="qe-cuerpo">{cuerpo}</main>
+          <main className="qe-cuerpo">{cuerpo}<div style={{ padding: "0 14px 18px" }}><PieSeccion desde={vista} onClub={() => ejecutar("club")} onInicio={irInicio} /></div></main>
         </>
       )}
       {mas && !ocultaMas && (

@@ -5,6 +5,7 @@ import { abrirQueEs } from "./QueEsDcuates.jsx";
 import EntradaDcuates, { elegirPuerta, abrirVentanaEntrada, abrirTour } from "./PuertasDcuates.jsx";
 import { BandaImpacto, TABS } from "./BloqueCentral.jsx";
 import { Hoja, Atajos, BloqueLado, CSS as CSS_VI } from "./InicioNuevo.jsx";
+import PieSeccion from "./PieSeccion.jsx";
 import MiniPase, { PaseCompleto, CSS_MINIPASE, CSS_PASEEJ, CSS_PASECOMPLETO } from "./MiniPase.jsx";
 import { proximos, fechaLinda } from "./utilidades/calendario.js";
 import { agendaDesdeZona } from "./datos/zona.js";
@@ -209,6 +210,7 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
   const tabNosotros = TABS[0];
   const ev = (n, d) => window.dispatchEvent(new CustomEvent(n, { detail: d }));
   const cierra = () => setVen(null);
+  const irInicio = () => { setVen(null); try { window.scrollTo({ top: 0 }); } catch (x) { /* sin scroll */ } };
   // La ventana se queda abierta debajo: al abrirse otra cosa encima (o al cambiar de sección) se oculta sola y REAPARECE al dar «Atrás».
   const va = (f, tag) => () => { if (tag) registrar("v2_boton", { b: tag }); f(); };
 
@@ -523,6 +525,7 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
         <Fila pal={PAL} n="video" t="Ejemplo: Chuy" s="Mira una causa que sí se logró" fam="causas" f={va(() => irASeccion("chuy-video"), "chuy")} />
         <Fila pal={PAL} n="dar" t="Cómo apoyar causas" s="Dona o participa" fam="causas" f={va(() => irASeccion("donaciones"), "apoyar")} />
         <PaginaCuateCTA compacto />
+        <PieSeccion desde="causas" onClub={() => setVen("club")} onInicio={irInicio} />
       </Hoja>
 
       <Hoja abierta={ven === "pagina"} onCerrar={cierra} titulo="Tu página gratis" compartir={{ hash: "tu-pagina", texto: "Tu página CUATE para tu emprendimiento" }}>
@@ -550,6 +553,7 @@ export default function InicioV2({ onIr, logros = [], cargando = false, entrada 
         <Fila pal={PAL} n="estrella" t="Gratitud" s="Gracias, reconocimientos y muro" fam="negocios" f={va(() => onIr("gratitud"), "gratitud")} />
         <Fila pal={PAL} n="alianza" t="Alianzas" s="Zona de aliados" fam="negocios" f={va(() => ejecutar({ aliados: 1 }), "alianzas")} />
         <Fila pal={PAL} n="libro" t="Patrocinios" s="Cómo patrocinar" fam="negocios" f={va(() => irASeccion("patrocinadores"), "patrocinios")} />
+        <PieSeccion desde="ganar-ganar" onClub={() => setVen("club")} onInicio={irInicio} />
       </Hoja>
 
       <Hoja abierta={ven === "club-puntos"} onCerrar={cierra} titulo="Puntos DCUATES" compartir={{ hash: "club-puntos", texto: "Suma puntos y cámbialos por premios" }}>
