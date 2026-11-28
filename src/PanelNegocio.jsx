@@ -25,6 +25,8 @@ const GRUPOS = [
 ];
 // e94: largo máximo de cada campo (el mismo que acepta la hoja) para mostrar el contador «escritos / permitidos».
 const MAXIMO = { e: 120, d: 1200, of: 600, h: 160, dir: 200, col: 60, ofT: 90, ofD: 600, pr: 2800, rec: 200, nec: 200, com: 200, ct: 4500, gal: 1200, an: 3500, fe: 3500 };
+const idsOv = (x) => [...new Set(String(x || "").toUpperCase().split(/[,|\s]+/).map((u) => u.replace(/[^A-Z0-9-]/g, "")).filter(Boolean))];
+const ETIQ_E = { d: "Disponible", u: "Últimas piezas", x: "Agotado" };
 const aTexto = (k, tipo, v) => (tipo === "l" ? String(v || "").split("|").map((x) => x.trim()).filter(Boolean).join("\n") : String(v || ""));
 const deTexto = (tipo, v) => (tipo === "l" ? String(v || "").split("\n").map((x) => x.trim()).filter(Boolean).join(" | ") : String(v || "").trim());
 const pedir = async (qs) => {
@@ -49,15 +51,22 @@ export default function PanelNegocio() {
   const [cj, setCj] = useState(null);
   const [ped, setPed] = useState(null);
   const [montos, setMontos] = useState({});
+  const [vp, setVp] = useState(null); // e102: productos de Ventas DCUATES {lista, cupo}
+  const [ov, setOv] = useState([]);   // ids que este vendedor ofrece
   const cargarPedidos = async () => { try { const j = await pedir(`a=negocio_pedidos&slug=${encodeURIComponent(slug)}&k=${encodeURIComponent(pin.trim())}`); setPed(j && j.ok ? j : { pedidos: [], pts: 0, tiene: false, error: true }); } catch (x) { setPed({ pedidos: [], pts: 0, tiene: false, error: true }); } };
   const confirmarVenta = async (id) => {
     try { await fetch(GOOGLE_SHEETS_URL, { method: "POST", mode: "no-cors", body: new URLSearchParams({ Tipo: "NegocioPedidoConfirma", Rol: "V", Id: id, Slug: slug, K: pin.trim(), Monto: (montos[id] || "").trim() }) }); } catch (x) { /* se confirma abajo */ }
     registrar("negocio_venta_confirmada", { s: slug });
     await new Promise((r) => setTimeout(r, 2500)); cargarPedidos();
   };
+  const marcarInv = async (id, estado) => {
+    try { await fetch(GOOGLE_SHEETS_URL, { method: "POST", mode: "no-cors", body: new URLSearchParams({ Tipo: "NegocioInventario", Slug: slug, K: pin.trim(), Id: id, Estado: estado }) }); } catch (x) { /* se confirma abajo */ }
+    registrar("negocio_inventario", { s: slug, e: estado });
+    await new Promise((r) => setTimeout(r, 2500)); cargarPedidos();
+  };
   useEffect(() => { if (paso === "panel" && tab === "pedidos" && !ped) cargarPedidos(); }, [paso, tab]); // eslint-disable-line
   useEffect(() => {
-    const ab = (e) => { const s = String((e && e.detail) || "").toLowerCase().replace(/[^a-z0-9-]/g, ""); if (!s) return; setSlug(s); setPin(""); setPaso("pin"); setError(""); setD(null); setTab("ficha"); setEnvio(""); setNum(""); setCj(null); setPed(null); setMontos({}); };
+    const ab = (e) => { const s = String((e && e.detail) || "").toLowerCase().replace(/[^a-z0-9-]/g, ""); if (!s) return; setSlug(s); setPin(""); setPaso("pin"); setError(""); setD(null); setTab("ficha"); setEnvio(""); setNum(""); setCj(null); setPed(null); setMontos({}); setVp(null); setOv([]); };
     window.addEventListener("dcuates:panel-negocio", ab);
     return () => window.removeEventListener("dcuates:panel-negocio", ab);
   }, []);
@@ -71,7 +80,9 @@ export default function PanelNegocio() {
       if (j && j.ok) {
         registrar("negocio_panel_entrar", { s: slug });
         const f = {}; GRUPOS.forEach(([, cs]) => cs.forEach(([c, , tipo]) => { f[c] = aTexto(c, tipo, (j.campos || {})[c]); }));
-        setD(j); setV(f); setPaso("panel"); return;
+        setD(j); setV(f); setOv(idsOv((j.campos || {}).ov)); setPaso("panel");
+        pedir("a=ventas_productos").then((r) => { if (r && r.ok) setVp({ lista: r.lista || [], cupo: r.cupo || 12 }); }).catch(() => {});
+        return;
       }
       setError(MOTIVOS[j && j.motivo] || "No pudimos entrar. Inténtalo de nuevo."); setPaso("pin");
     } catch (x) { setError("Sin conexión con el servidor. Inténtalo de nuevo en un momento."); setPaso("pin"); }
@@ -83,6 +94,7 @@ export default function PanelNegocio() {
       const nuevo = deTexto(tipo, v[c]), viejo = deTexto(tipo, aTexto(c, tipo, (d.campos || {})[c]));
       if (nuevo !== viejo) cambios[c] = nuevo;
     }));
+    if (vp && vp.lista.length && ov.join(", ") !== idsOv((d.campos || {}).ov).join(", ")) cambios.ov = ov.join(", ");
     if (!Object.keys(cambios).length) { setEnvio("sin"); return; }
     setEnvio("enviando");
     try { await fetch(GOOGLE_SHEETS_URL, { method: "POST", mode: "no-cors", body: new URLSearchParams({ Tipo: "NegocioCambio", Slug: slug, K: pin.trim(), C: JSON.stringify(cambios) }) }); } catch (x) { /* se confirma abajo */ }
@@ -152,6 +164,21 @@ export default function PanelNegocio() {
                     </fieldset>
                   );
                 })}
+                {vp && vp.lista.length > 0 && (
+                  <fieldset data-testid="pn-ventas"><legend>🛒 Productos de Ventas DCUATES que ofrezco</legend>
+                    <p className="pn-nota">Elige los productos que quieres ofrecer en tu página. Cuando alguien los pida, DCUATES lo registra y lo aparta. Puedes elegir hasta <b>{vp.cupo}</b> (el mismo máximo para todos). Se publican cuando DCUATES apruebe tus cambios.</p>
+                    <small className={"pn-cu" + (ov.length >= vp.cupo ? " pn-cu-ya" : "")} data-testid="pn-ventas-cuenta">{ov.length} / {vp.cupo} elegidos</small>
+                    {vp.lista.map((x) => {
+                      const on = ov.includes(x.i), lleno = !on && ov.length >= vp.cupo;
+                      return (
+                        <label key={x.i} className={"pn-vz" + (lleno ? " pn-vz-no" : "")} data-testid={"pn-vp-" + x.i}>
+                          <input type="checkbox" checked={on} disabled={lleno} onChange={() => { setOv((o) => (o.includes(x.i) ? o.filter((y) => y !== x.i) : [...o, x.i])); setEnvio(""); }} />
+                          <span><b>{x.n}</b>{x.p ? <em> · {x.p}</em> : null}<small className={"pn-e pn-e-" + x.e}>{ETIQ_E[x.e] || ""}</small></span>
+                        </label>
+                      );
+                    })}
+                  </fieldset>
+                )}
                 {envio === "sin" && <p className="pn-aviso">No cambiaste nada todavía.</p>}
                 {envio === "ok" && <p className="pn-ok" role="status" data-testid="pn-enviado">✅ Recibimos tus cambios. Los revisamos y aparecen en tu página en cuanto los aprobemos.</p>}
                 {envio === "falla" && <p className="pn-err" role="alert">No pudimos confirmar el envío. Revisa tu conexión y vuelve a intentarlo.</p>}
@@ -169,7 +196,17 @@ export default function PanelNegocio() {
                 {ped && ped.pedidos.map((x) => (
                   <div className="pn-mes" key={x.id} data-testid="pn-pedido">
                     <b>{x.p}{x.pr ? ` · ${x.pr}` : ""}</b>
-                    <p>Pedido {x.id} · {x.f}</p>
+                    <p>Pedido {x.id} · {x.f}{x.cm ? ` · Comprador: ${x.cm}` : ""}</p>
+                    {x.ip && (
+                      <div className="pn-inv" data-testid="pn-inv">
+                        <p><b>Producto de Ventas DCUATES ({x.ip})</b> · Estado: <b data-testid="pn-inv-estado">{x.iv || "Pedido"}</b></p>
+                        {!/cancelado/i.test(x.iv) && (
+                          <div className="pn-inv-b">
+                            {["Apartado", "Vendido", "Entregado", "Cancelado"].filter((e) => e.toLowerCase() !== String(x.iv || "").toLowerCase()).map((e) => <button type="button" key={e} className="pn-b" data-testid={"pn-inv-" + e} onClick={() => marcarInv(x.id, e)}>{e === "Apartado" ? "📌 Apartado" : e === "Vendido" ? "💰 Vendido" : e === "Entregado" ? "📦 Entregado" : "✖ Cancelar"}</button>)}
+                          </div>
+                        )}
+                      </div>
+                    )}
                     {/entregados/i.test(x.e) ? <p className="pn-ok">🎁 Puntos entregados</p> : /rechazado/i.test(x.e) ? <p className="pn-aviso">No validado por DCUATES</p> : x.cv ? <p className="pn-ok">✔ Ya lo confirmaste{x.cc ? " (el comprador también)" : ""}. DCUATES lo está validando.</p> : (
                       <div className="pn-conf">
                         <label htmlFor={"pn-m-" + x.id}>Monto cobrado (opcional)</label>
@@ -245,6 +282,11 @@ export default function PanelNegocio() {
 }
 
 const CSS = `
+.pn-vz{display:flex;gap:10px;align-items:flex-start;padding:8px 6px;border:1.5px solid #d5ddd8;border-radius:12px;margin:6px 0;background:#fff;min-height:48px;cursor:pointer}
+.pn-f .pn-vz input{width:24px;min-height:24px;height:24px;padding:0;flex:0 0 24px;margin-top:2px}.pn-vz-no{opacity:.5}
+.pn-vz b{font-size:14px}.pn-vz em{font-style:normal;color:#0A6A32;font-weight:800;font-size:13px}.pn-e{display:inline-block;margin-left:8px;font-size:11px;font-weight:900;padding:1px 8px;border-radius:999px;background:#E3F4E8;color:#0A6A32}.pn-e-u{background:#FFF1C9;color:#8A5A00}.pn-e-x{background:#F3D9D9;color:#9A1C1C}
+.pn-inv{margin-top:6px;padding:8px;border-radius:10px;background:#F4F8FF;border:1px solid #cfe0f5}.pn-inv p{margin:0 0 6px;font-size:13px}.pn-inv-b{display:flex;flex-wrap:wrap;gap:6px}.pn-inv-b .pn-b{flex:1 1 44%;min-height:44px;font-size:13px;margin:0}
+
 .pn-fondo{position:fixed;inset:0;z-index:85;background:var(--dc-fondo,#FBF7EC);font-family:Nunito,system-ui,sans-serif;color:#0f2d1e;display:flex;justify-content:center}
 .pn-caja{width:100%;max-width:560px;height:100%;overflow-y:auto;overscroll-behavior:contain;padding-bottom:40px}
 .pn-bar{position:sticky;top:0;z-index:3;display:flex;align-items:center;gap:8px;background:#7a4a00;color:#fff;padding:8px 10px}

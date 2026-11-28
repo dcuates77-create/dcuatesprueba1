@@ -162,7 +162,7 @@ export default function NegocioCuate() {
     if (navigator.share) { navigator.share({ title: n ? n.n : "DCUATES", text: texto, url }).catch(() => {}); return; }
     window.open(`https://wa.me/?text=${encodeURIComponent(texto + " " + url)}`, "_blank", "noopener");
   };
-  const urlPedido = (c, id) => `https://wa.me/${n.wa}?text=${encodeURIComponent("¡Hola! Vi su página en DCUATES y quiero pedir: " + c.n + (c.p ? " (" + c.p + ")" : "") + "." + (id ? " Pedido " + id : ""))}`;
+  const urlPedido = (c, id, verbo = "pedir") => `https://wa.me/${n.wa}?text=${encodeURIComponent("¡Hola! Vi su página en DCUATES y quiero " + verbo + ": " + c.n + (c.p ? " (" + c.p + ")" : "") + "." + (id ? " Pedido " + id : ""))}`;
   const promos = n ? [...(n.ofT ? [{ t: n.ofT, d: n.ofD, v: n.ofV }] : []), ...(n.pr || [])].slice(0, 5) : [];
   const atajos = n ? [
     n.ev && n.ev.t && ["ng-evento", "📅 Evento"], promos.length > 0 && ["ng-promos", "🎟️ Promos"], n.fe && n.fe.length > 0 && ["ng-agenda", "📅 Agenda"], n.an && n.an.length > 0 && ["ng-anuncios", "📢 Anuncios"], n.rl && n.rl.length > 0 && ["ng-reels", "🛍️ Productos"], n.sv && n.sv.length > 0 && ["ng-servicios", "🧰 Servicios"],
@@ -252,6 +252,24 @@ export default function NegocioCuate() {
                   ))}
                 </ul>
                 {n.cc && <a className="ng-cc" href={n.cc} target="_blank" rel="noopener noreferrer" onClick={() => clic("catalogo")} data-testid="negocio-catalogo-completo">📖 Ver catálogo completo</a>}
+              </section>
+            )}
+            {n.vv && n.vv.length > 0 && (
+              <section className="ng-s" id="negocio-ventas" data-testid="negocio-ventas">
+                <h2>🛒 Ventas DCUATES</h2>
+                <p className="ng-vvn">Aparta el tuyo por WhatsApp: tu pedido queda registrado y te lo confirmamos.</p>
+                {!(n.ct && n.ct.length > 0) && <AvisoPedido slug={slug} negocio={n.n} refresco={verPed} />}
+                <ul className="ng-vv">
+                  {n.vv.map((c) => (
+                    <li key={c.i} data-testid="ventas-item">
+                      {c.m && <img src={c.m} alt="" loading="lazy" referrerPolicy="no-referrer" />}
+                      <div><b>{c.n}</b>{c.d && <VerMas className="ng-ctd" lineas={3}>{c.d}</VerMas>}
+                        <span className={"ng-ve ng-ve-" + c.e} data-testid="ventas-estado">{c.e === "x" ? "Agotado" : c.e === "u" ? "Últimas piezas" : "Disponible"}</span></div>
+                      {c.p && <span className="ng-pr">{c.p}</span>}
+                      {n.wa && c.e !== "x" && <a className="ng-pd" href={urlPedido({ n: c.n, p: c.p }, "", "apartar")} target="_blank" rel="noopener noreferrer" onClick={(e) => { const id = registrarPedido(slug, n.n, c.n, c.p, c.i); e.currentTarget.href = urlPedido({ n: c.n, p: c.p }, id, "apartar"); setVerPed((x) => x + 1); clic("pedido"); }} aria-label={`Apartar ${c.n} por WhatsApp`} data-testid="ventas-apartar">Apartar</a>}
+                    </li>
+                  ))}
+                </ul>
               </section>
             )}
             <AgendaNegocio items={n.fe} wa={n.wa} nombre={n.n} clic={clic} />
@@ -371,6 +389,12 @@ const CSS = `
 .ng-ct{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
 .ng-ct li{display:flex;align-items:center;gap:8px;padding:8px 10px;background:#fff;border:2px solid #e3dcc6;border-radius:12px}
 .ng-ct li>div{flex:1;min-width:0;display:flex;flex-direction:column}.ng-ct b{font-size:14.5px;font-weight:900}.ng-ct small{font-size:12px;font-weight:700;color:#4a5b52}
+.ng-vvn{margin:0 0 8px;font-size:13px;font-weight:700;color:#4a5b52}
+.ng-vv{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
+.ng-vv li{display:flex;align-items:center;gap:8px;padding:8px 10px;background:#fff;border:2px solid #cfe5d6;border-radius:12px}
+.ng-vv li>div{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.ng-vv b{font-size:14.5px;font-weight:900}
+.ng-vv img{width:56px;height:56px;border-radius:10px;object-fit:cover;flex:0 0 auto;background:#eef3ef}
+.ng-ve{align-self:flex-start;font-size:11px;font-weight:900;padding:1px 8px;border-radius:999px;background:#E3F4E8;color:#0A6A32}.ng-ve-u{background:#FFF1C9;color:#8A5A00}.ng-ve-x{background:#F3D9D9;color:#9A1C1C}
 .ng-pr{font-size:14px;font-weight:900;color:var(--c);white-space:nowrap}
 .ng-pd{min-height:44px;min-width:60px;display:inline-flex;align-items:center;justify-content:center;border-radius:12px;background:#128c4a;color:#fff;font-weight:900;font-size:13.5px;text-decoration:none;padding:0 10px}
 .ng-dueno{border-style:dashed;font-size:13.5px}
