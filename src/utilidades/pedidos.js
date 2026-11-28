@@ -18,10 +18,10 @@ export function nuevoId() {
   try { const b = new Uint8Array(8); crypto.getRandomValues(b); b.forEach((x) => { s += A[x % A.length]; }); } catch (e) { for (let i = 0; i < 8; i++) s += A[Math.floor(Math.random() * A.length)]; }
   return s;
 }
-export function registrarPedido(slug, negocio, producto, precio) {
+export function registrarPedido(slug, negocio, producto, precio, prod) {
   const id = nuevoId();
   guardar([...leerPedidos(), { id, s: slug, n: negocio, p: producto, pr: precio || "", t: Date.now(), c: 0, d: 0 }]);
-  enviar({ Tipo: "NegocioPedido", Slug: slug, Id: id, Producto: producto, Precio: precio || "", Pase: paseGuardado() });
+  enviar({ Tipo: "NegocioPedido", Slug: slug, Id: id, Producto: producto, Precio: precio || "", Pase: paseGuardado(), ...(prod ? { Prod: prod } : {}) });
   return id;
 }
 const marcar = (id, campos) => guardar(leerPedidos().map((x) => (x.id === id ? { ...x, ...campos } : x)));
